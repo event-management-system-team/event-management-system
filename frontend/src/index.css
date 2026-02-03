@@ -1,1 +1,21 @@
 @import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-display: "Plus Jakarta Sans", sans-serif;
+  }
+}
+
+@layer components {
+  .bg-login-gradient {
+    background: linear-gradient(135deg, #89a8b2 0%, #5d727a 100%);
+  }
+
+  .bg-button-gradient {
+    background: linear-gradient(90deg, #89a8b2 0%, #b3c8cf 100%);
+  }
+
+  .glass-effect {
+    @apply bg-white/15 backdrop-blur-md border border-white/20;
+  }
+}
