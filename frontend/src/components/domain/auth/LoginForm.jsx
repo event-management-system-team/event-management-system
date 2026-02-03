@@ -30,11 +30,11 @@ export const LoginForm = () => {
         </div>
 
         <div className="relative flex items-center mb-8">
-          <div className="flex-grow border-t border-gray-300"></div>
-          <span className="flex-shrink mx-4 text-gray-400 text-sm font-medium">
+          <div className="grow border-t border-gray-300"></div>
+          <span className="shrink mx-4 text-gray-400 text-sm font-medium">
             Or continue with
           </span>
-          <div className="flex-grow border-t border-gray-300"></div>
+          <div className="grow border-t border-gray-300"></div>
         </div>
 
         <form className="space-y-6">
