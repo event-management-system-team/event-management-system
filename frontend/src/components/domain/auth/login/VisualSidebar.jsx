@@ -29,7 +29,7 @@ export const VisualSidebar = () => {
           Discover the best moments happening around you.
         </p>
 
-        <div className="grid grid-cols-2 gap-4 w-full">
+        <div className="grid grid-cols-2 gap-6 w-full">
           <StatCard label="Events" value="15,000+" />
           <StatCard label="Members" value="500k+" />
         </div>

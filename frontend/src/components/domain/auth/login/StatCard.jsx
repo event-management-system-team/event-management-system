@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import { animate, useInView } from "motion/react";
+// eslint-disable-next-line no-unused-vars
+import { animate, motion, useInView } from "motion/react";
 
 export const StatCard = ({ label, value }) => {
   const nodeRef = useRef(null);
@@ -24,11 +25,15 @@ export const StatCard = ({ label, value }) => {
   }, [isInView, value]);
 
   return (
-    <div className="rounded-full glass-effect p-6 text-left">
+    <motion.div
+      className="rounded-full glass-effect p-6 text-left"
+      whileHover={{ scale: 1.05, x: 10 }}
+      whileTap={{ scale: 0.98 }}
+    >
       <p className="text-sm opacity-80 mb-1">{label}</p>
       <p ref={nodeRef} className="text-3xl font-bold">
         0+
       </p>
-    </div>
+    </motion.div>
   );
 };
