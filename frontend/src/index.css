@@ -19,3 +19,8 @@
     @apply bg-white/15 backdrop-blur-md border border-white/20;
   }
 }
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
