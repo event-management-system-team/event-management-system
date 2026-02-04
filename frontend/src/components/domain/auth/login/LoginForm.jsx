@@ -1,5 +1,5 @@
-import { InputField } from "../../common/InputField";
-import { Button } from "../../common/Button";
+import { InputField } from "../../../common/InputField";
+import { Button } from "../../../common/Button";
 import { SiEventbrite } from "react-icons/si";
 import { MdArrowForward } from "react-icons/md";
 import { FcGoogle } from "react-icons/fc";
@@ -53,7 +53,7 @@ export const LoginForm = () => {
           <div className="flex items-center justify-between py-2">
             <label className="flex items-center cursor-pointer group">
               <input
-                className="size-5 rounded-md border-gray-300 text-[#8aa8b2] focus:ring-primary checked:bg-[#8aa8b2] hover:cursor-pointer transition-all"
+                className="size-5 rounded-md border-gray-300 text-[#8aa8b2] focus:ring-primary"
                 type="checkbox"
               />
               <span className="ml-2 text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">
