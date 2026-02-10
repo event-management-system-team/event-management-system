@@ -3,7 +3,7 @@ spring:
     name: event-management-backend
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/event_management
+    url: jdbc:postgresql://localhost:5432/event-management-system
     username: postgres
     password:
     driver-class-name: org.postgresql.Driver
@@ -18,7 +18,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
 jwt:
-  secret: your-secret-key-must-be-at-least-256-bits-long-for-hs512
+  secret: ${JWT_SECRET:zBv7X9p2N5m8Q1w4R0t7Y3u6I9o2P5a8S1d4F7g0H3j6K9l2Z5x8C1v4B7n0M3}
   access-token-expiration: 900000 # 15 phút
   refresh-token-expiration: 604800000 # 7 ngày
 
