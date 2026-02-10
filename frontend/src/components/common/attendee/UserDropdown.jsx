@@ -56,7 +56,7 @@ const UserDropdown = () => {
                 />
 
                 <div className="hidden lg:flex flex-col items-start leading-none">
-                    <span className="text-sm font-bold text-gray-700">Tuan Anh</span>
+                    <span className="text-sm font-bold">Tuan Anh</span>
                     <span className="text-[10px] text-gray-500">Attendee</span>
                 </div>
 

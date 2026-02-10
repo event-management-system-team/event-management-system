@@ -6,10 +6,10 @@ import UserDropdown from './UserDropdown';
 
 const HeaderApp = () => {
 
-    const isLoggedIn = true;
+    const isLoggedIn = false;
     return (
         <>
-            <header className="sticky top-0 z-50 border-b border-[#d8ddde]">
+            <header className="sticky top-0 z-50 border-b border-[#d8ddde] bg-[#F1F0E8]">
                 <div className="w-full mx-auto px-6 h-20 flex items-center justify-between">
                     <Logo />
                     <NavMenu />

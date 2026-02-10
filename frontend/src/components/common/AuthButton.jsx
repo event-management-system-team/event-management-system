@@ -8,7 +8,7 @@ const AuthButtons = () => {
 
             {/* Login */}
             <button
-                className="text-sm font-bold text-gray-600 px-4 py-2 hover:text-primary transition-colors cursor-pointer"
+                className="text-sm font-bold px-4 py-2 hover:text-primary transition-colors cursor-pointer"
             // onClick={() => navigate("/login")}
             >
                 Login

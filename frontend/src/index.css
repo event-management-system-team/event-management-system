@@ -9,11 +9,12 @@
   --color-cream: #f1f0e8;
   --color-background-light: #f7f7f7;
   --color-background-dark: #171a1b;
+  --color-text-body: #374151;
   --font-display: "Plus Jakarta Sans", sans-serif;
 }
 
 body {
   font-family: var(--font-display);
   background-color: var(--color-cream);
-  color: #131516;
+  color: var(--color-text-body);
 }
