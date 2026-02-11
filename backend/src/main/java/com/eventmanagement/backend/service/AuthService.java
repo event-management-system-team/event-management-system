@@ -1,12 +1,17 @@
 package com.eventmanagement.backend.service;
 
+import com.eventmanagement.backend.constants.Status;
 import com.eventmanagement.backend.dto.request.LoginRequest;
+import com.eventmanagement.backend.dto.request.RegisterRequest;
 import com.eventmanagement.backend.dto.response.LoginResponse;
+import com.eventmanagement.backend.dto.response.RegisterResponse;
 import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.exception.BadRequestException;
 import com.eventmanagement.backend.exception.UnauthorizedException;
 import com.eventmanagement.backend.repository.UserRepository;
 import com.eventmanagement.backend.security.JwtTokenProvider;
+import com.eventmanagement.backend.constants.Role;
+import com.eventmanagement.backend.util.GenerateAvatarUrl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,6 +26,43 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final GenerateAvatarUrl generateAvatarUrl;
+
+    public RegisterResponse register(RegisterRequest request) {
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            throw new BadRequestException("Passwords do not match");
+        }
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new BadRequestException("Email already exists");
+        }
+
+        User user = User.builder()
+                .email(request.getEmail())
+                .passwordHash(passwordEncoder.encode(request.getPassword()))
+                .fullName(request.getFullName())
+                .phone(request.getPhone())
+                .avatarUrl(generateAvatarUrl.generateAvatarUrl(request.getFullName()))
+                .role(Role.ATTENDEE)
+                .status(Status.ACTIVE)
+                .emailVerified(false)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        User savedUser = userRepository.save(user);
+
+        return RegisterResponse.builder()
+                .userId(savedUser.getUserId())
+                .email(savedUser.getEmail())
+                .fullName(savedUser.getFullName())
+                .phone(savedUser.getPhone())
+                .avatarUrl(savedUser.getAvatarUrl())
+                .role(savedUser.getRole())
+                .createdAt(savedUser.getCreatedAt())
+                .message("Registration successful! Please log in to continue.")
+                .build();
+    }
 
     @Transactional
     public LoginResponse login(LoginRequest request) {
