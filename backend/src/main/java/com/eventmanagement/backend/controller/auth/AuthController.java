@@ -3,8 +3,13 @@ package com.eventmanagement.backend.controller.auth;
 import com.eventmanagement.backend.dto.request.LoginRequest;
 import com.eventmanagement.backend.dto.request.RegisterRequest;
 import com.eventmanagement.backend.dto.response.LoginResponse;
+import com.eventmanagement.backend.dto.response.RefreshTokenResponse;
 import com.eventmanagement.backend.dto.response.RegisterResponse;
 import com.eventmanagement.backend.service.AuthService;
+import com.eventmanagement.backend.util.CookieUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final CookieUtil cookieUtil;
 
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(
@@ -27,8 +33,19 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        LoginResponse response = authService.login(request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
+        LoginResponse loginResponse = authService.login(request, response);
+        return ResponseEntity.ok(loginResponse);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<RefreshTokenResponse> refreshToken(
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        String refreshToken = cookieUtil.getRefreshTokenFromCookie(request)
+                .orElseThrow(() -> new RuntimeException("Refresh token not found"));
+
+        RefreshTokenResponse tokenResponse = authService.refreshToken(refreshToken, response);
+        return ResponseEntity.ok(tokenResponse);
     }
 }

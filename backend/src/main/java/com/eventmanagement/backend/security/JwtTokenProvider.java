@@ -16,10 +16,10 @@ public class JwtTokenProvider {
     private String jwtSecret;
 
     @Value("${jwt.access-token-expiration}")
-    private long accessTokenExpiration; // 15 phút
+    private long accessTokenExpiration;
 
     @Value("${jwt.refresh-token-expiration}")
-    private long refreshTokenExpiration; // 7 ngày
+    private long refreshTokenExpiration;
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());

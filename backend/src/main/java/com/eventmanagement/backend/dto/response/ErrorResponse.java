@@ -9,7 +9,7 @@ import java.util.Map;
 
 @Data
 @Builder
-@JsonInclude(JsonInclude.Include.NON_NULL) // Chỉ trả về field có giá trị
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorResponse {
 
     private LocalDateTime timestamp;
@@ -22,5 +22,5 @@ public class ErrorResponse {
 
     private String path;
 
-    private Map<String, String> errors; // Dùng cho validation errors
+    private Map<String, String> errors;
 }
