@@ -1,32 +1,20 @@
 import {
     Calendar,
-    Users,
-    TrendingUp,
     CheckCircle,
-    Plus,
-    Settings,
-    BarChart3,
-    UserPlus,
     Bell,
     Zap,
     CalendarCheck,
-    Home,
     ChevronRight,
     Filter,
     Search,
-    HelpCircle,
     ArrowUpDown,
-    LogOut,
-    LayoutDashboard,
-    UserCircle,
-    CalendarCog, Text
 } from 'lucide-react';
-import {Link} from 'react-router';
 import {Button} from "../../components/Button.jsx";
 import {Input} from "../../components/Input.jsx";
 import {Avatar, AvatarFallback} from "../../components/Avatar.jsx";
 import {Card, CardContent, CardHeader, CardTitle} from "../../components/Card.jsx";
 import {Badge} from "../../components/Badge.jsx";
+import {AdminSidebar} from "../../components/AdminSidebar.jsx";
 
 // Mock data for admin-level system-wide metrics
 const summaryMetrics = [
@@ -138,76 +126,7 @@ export function AdminDashboard() {
         <>
             <div className="flex h-screen bg-[#F5F5F7]">
                 {/* Sidebar */}
-                <aside className="w-50 bg-[#3C4F5F] text-white flex flex-col ">
-                    {/* Logo */}
-                    <div className="p-6 pb-8 border-b border-[#4A5F71]">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-[#5A738A] rounded-lg flex items-center justify-center">
-                                <Calendar className="w-5 h-5 text-white"/>
-                            </div>
-                            <div>
-                                <div className="font-semibold text-white">EventHub</div>
-                                <div className="text-sm text-gray-300">Admin</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Navigation */}
-                    <nav className="flex-1 px-3 pt-6">
-                        <Link to="/">
-                            <Button
-                                variant="secondary"
-                                className="w-full justify-start bg-[#5A738A] hover:bg-[#657F97] text-white mb-1"
-                            >
-                                <LayoutDashboard className="mr-3 h-4 w-4"/>
-                                Dashboard
-                            </Button>
-                        </Link>
-                        <Link to="/account-list">
-                            <Button
-                                variant="ghost"
-                                className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#4A5F71] mb-1"
-                            >
-                                <UserCircle className="mr-3 h-4 w-4"/>
-                                Account List
-                            </Button>
-                        </Link>
-                        <Link to="/event-management">
-                            <Button
-                                variant="ghost"
-                                className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#4A5F71] mb-1"
-                            >
-                                <CalendarCog className="mr-3 h-4 w-4"/>
-                                Event Management
-                            </Button>
-                        </Link>
-                        <Link to="/event-analytics">
-                            <Button
-                                variant="ghost"
-                                className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#4A5F71] mb-1"
-                            >
-                                <BarChart3 className="mr-3 h-4 w-4"/>
-                                Event Analytics
-                            </Button>
-                        </Link>
-                        <Button
-                            variant="ghost"
-                            className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#4A5F71] mb-1"
-                        >
-                            <Settings className="mr-3 h-4 w-4"/>
-                            Settings
-                        </Button>
-                    </nav>
-
-                    {/* Sign Out */}
-                    <div className="p-6 border-t border-[#4A5F71]">
-                        <Button variant="ghost"
-                                className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#4A5F71] p-2">
-                            <LogOut className="mr-2 h-4 w-4"/>
-                            Sign Out
-                        </Button>
-                    </div>
-                </aside>
+                <AdminSidebar />
 
                 {/* Main Content */}
                 <main className="flex-1 overflow-auto">
@@ -242,7 +161,7 @@ export function AdminDashboard() {
                             </div>
                         </div>
                         <div>
-                            <h1 className="text-foreground text-2xl mb-1">Admin Dashboard Overview</h1>
+                            <h1 className="text-foreground text-2xl mb-1 font-semibold">Admin Dashboard Overview</h1>
                             <p className="text-gray-500 text-sm">
                                 System-wide event management and platform insights
                             </p>
