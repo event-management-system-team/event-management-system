@@ -21,10 +21,4 @@ dist-ssr
 *.ntvs*
 *.njsproj
 *.sln
-*.swig
-*.code-workspace
-
-.env
-.env.*.local
-.env.local
-
+*.sw?
