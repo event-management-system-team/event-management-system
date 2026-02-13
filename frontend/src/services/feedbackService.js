@@ -1,13 +1,12 @@
-import axiosClient from '@/config/axios';
+import axiosClient from '../config/axios';
 
-// Lấy danh sách phản hồi theo ID
-export const getEventFeedbacks = async (eventId) => {
-    const response = await axiosClient.get(`/event/${eventId}/feedbacks`);
-    return response.data;
-}
+const feedbackService = {
+  // Lấy danh sách feedback theo Event ID
+  getFeedbacksByEvent: (eventId) => {
+    return axiosClient.get(`/events/${eventId}/feedbacks`);
+  },
+  
+  // Các hàm khác nếu cần (Xóa, chi tiết...)
+};
 
-// hàm ẩn, hiện phản hồi
-export const toggleFeedbackVisibility = async (feedbackId) => {
-    const response = await axiosClient.patch(`/feedback/${feedbackId}/toggle-visibility`);
-    return response.data;
-}
+export default feedbackService;
