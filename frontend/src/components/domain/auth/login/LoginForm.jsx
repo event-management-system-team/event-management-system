@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
+import { GoogleLogin } from "@react-oauth/google";
 import { InputField } from "../../../common/InputField";
 import { Button } from "../../../common/Button";
 import { SiEventbrite } from "react-icons/si";
@@ -10,7 +10,11 @@ import { MdArrowForward } from "react-icons/md";
 import { FcGoogle } from "react-icons/fc";
 import { loginSchema } from "../../../../schemas/login.schema";
 import { useEffect } from "react";
-import { loginUser, clearError } from "../../../../store/slices/auth.slice";
+import {
+  loginUser,
+  loginWithGoogle,
+  clearError,
+} from "../../../../store/slices/auth.slice";
 
 export const LoginForm = () => {
   const dispatch = useDispatch();
@@ -30,8 +34,7 @@ export const LoginForm = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      //navigate("/");
-      console.log("isAuthenticated");
+      navigate("/");
     }
   }, [isAuthenticated, navigate]);
 
@@ -41,6 +44,19 @@ export const LoginForm = () => {
 
   const onSubmit = async (data) => {
     await dispatch(loginUser(data));
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    console.log("Google credential:", credentialResponse);
+    try {
+      await dispatch(loginWithGoogle(credentialResponse.credential)).unwrap();
+    } catch (err) {
+      console.error("Google login failed:", err);
+    }
+  };
+
+  const handleGoogleError = () => {
+    console.error("Google login failed");
   };
 
   return (
@@ -67,11 +83,25 @@ export const LoginForm = () => {
           </div>
         )}
 
-        <div className="flex justify-center mb-8">
+        {/*<div className="flex justify-center mb-8">
           <button className="w-full flex items-center justify-center gap-2 h-12 px-6 rounded-full border border-gray-300 bg-white text-gray-700 font-semibold hover:bg-gray-50 transition-colors">
             <FcGoogle className="size-5" />
             <span>Continue with Google</span>
           </button>
+        </div>*/}
+        <div className="flex justify-center mb-8">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleError}
+            useOneTap={false}
+            type="standard"
+            theme="outline"
+            size="large"
+            text="continue_with"
+            shape="pill"
+            width="384"
+            locale="en"
+          />
         </div>
 
         <div className="relative flex items-center mb-8">
@@ -112,8 +142,9 @@ export const LoginForm = () => {
             <div className="text-sm font-bold text-[#FF6B35] hover:opacity-80 transition-opacity">
               <Link
               //to="/forgot-password"
-              />
-              Forgot password?
+              >
+                Forgot password?
+              </Link>
             </div>
           </div>
 
@@ -128,8 +159,7 @@ export const LoginForm = () => {
         <p className="mt-10 text-center text-gray-600 dark:text-gray-400 text-sm font-medium">
           Don't have an account?
           <span className="text-[#8aa8b2] font-bold hover:underline ml-1">
-            <Link to="/register" />
-            Sign up now
+            <Link to="/register">Sign up now</Link>
           </span>
         </p>
       </div>

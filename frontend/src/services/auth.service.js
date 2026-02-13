@@ -11,6 +11,13 @@ const authService = {
     return response.data;
   },
 
+  loginWithGoogle: async (googleToken) => {
+    const response = await axiosInstance.post("/auth/google", {
+      googleToken: googleToken,
+    });
+    return response.data;
+  },
+
   refreshToken: async () => {
     const response = await axiosInstance.post("/auth/refresh");
     return response.data;
