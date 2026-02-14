@@ -13,22 +13,19 @@ export const ScheduleSection = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Input
                     label="Start Date"
-                    type="text"
-                    placeholder="mm/dd/yyyy"
+                    type="date"
                     icon={Calendar}
                 />
                 <Input
                     label="End Date"
-                    type="text"
-                    placeholder="mm/dd/yyyy"
+                    type="date"
                     icon={Calendar}
                 />
             </div>
             <div className="mt-6">
                 <Input
                     label="Start Time"
-                    type="text"
-                    placeholder="-- : --"
+                    type="time"
                     icon={Clock}
                 />
             </div>
