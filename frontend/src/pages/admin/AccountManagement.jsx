@@ -18,22 +18,22 @@ import {
     Eye
 } from 'lucide-react';
 import {Link} from 'react-router';
-import {AdminSidebar} from "../../components/AdminSidebar.jsx";
-import {CreateOrganizerModal} from "../../components/CreateOrganizerModal.jsx";
+import {AdminSidebar} from "../../components/domain/admin/AdminSidebar.jsx";
+import {CreateOrganizerModal} from "../../components/domain/admin/CreateOrganizerModal.jsx";
 import {useState} from "react";
-import {Button} from "../../components/Button.jsx";
-import {Avatar, AvatarFallback} from "../../components/Avatar.jsx";
-import {Card, CardContent} from "../../components/Card.jsx";
-import {Checkbox} from "../../components/Checkbox.jsx";
-import {Input} from "../../components/Input.jsx";
-import {Badge} from "../../components/Badge.jsx";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "../../components/Select.jsx";
+import {Button} from "../../components/domain/admin/Button.jsx";
+import {Avatar, AvatarFallback} from "../../components/domain/admin/Avatar.jsx";
+import {Card, CardContent} from "../../components/domain/admin/Card.jsx";
+import {Checkbox} from "../../components/domain/admin/Checkbox.jsx";
+import {Input} from "../../components/domain/admin/Input.jsx";
+import {Badge} from "../../components/domain/admin/Badge.jsx";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "../../components/domain/admin/Select.jsx";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger
-} from "../../components/Dropdown-Menu.jsx";
+} from "../../components/domain/admin/Dropdown-Menu.jsx";
 
 // Mock data for admin-level system-wide metrics
 const summaryMetrics = [

@@ -9,12 +9,12 @@ import {
     Search,
     ArrowUpDown,
 } from 'lucide-react';
-import {Button} from "../../components/Button.jsx";
-import {Input} from "../../components/Input.jsx";
-import {Avatar, AvatarFallback} from "../../components/Avatar.jsx";
-import {Card, CardContent, CardHeader, CardTitle} from "../../components/Card.jsx";
-import {Badge} from "../../components/Badge.jsx";
-import {AdminSidebar} from "../../components/AdminSidebar.jsx";
+import {Button} from "../../components/domain/admin/Button.jsx";
+import {Input} from "../../components/domain/admin/Input.jsx";
+import {Avatar, AvatarFallback} from "../../components/domain/admin/Avatar.jsx";
+import {Card, CardContent, CardHeader, CardTitle} from "../../components/domain/admin/Card.jsx";
+import {Badge} from "../../components/domain/admin/Badge.jsx";
+import {AdminSidebar} from "../../components/domain/admin/AdminSidebar.jsx";
 
 // Mock data for admin-level system-wide metrics
 const summaryMetrics = [
