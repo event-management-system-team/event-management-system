@@ -89,7 +89,7 @@ export const LoginForm = () => {
             <span>Continue with Google</span>
           </button>
         </div>*/}
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-8 text-center text-gray-700">
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={handleGoogleError}
