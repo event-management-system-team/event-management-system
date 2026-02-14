@@ -1,6 +1,5 @@
-@import "tailwindcss";
-
 @theme  {
+  /* Biến màu sắc */
   --color-primary: #8aa8b2;
   --color-secondary: #b3c8cf;
   --color-accent: #ff6b35;
@@ -10,11 +9,35 @@
   --color-background-light: #f7f7f7;
   --color-background-dark: #171a1b;
   --color-text-body: #374151;
+
+  /* Khai báo Font chung vào theme luôn, bỏ :root đi cho gọn */
   --font-display: "Plus Jakarta Sans", sans-serif;
 }
 
-body {
-  font-family: var(--font-display);
-  background-color: var(--color-cream);
-  color: var(--color-text-body);
+@layer base {
+  body {
+    font-family: var(--font-display);
+    background-color: var(--color-cream);
+    color: var(--color-text-body);
+  }
+}
+
+@layer components {
+  .bg-login-gradient {
+    background: linear-gradient(135deg, #89a8b2 0%, #5d727a 100%);
+  }
+
+  .bg-button-gradient {
+    background: linear-gradient(90deg, #89a8b2 0%, #b3c8cf 100%);
+  }
+
+  .glass-effect {
+    @apply bg-white/15 backdrop-blur-md border border-white/20;
+  }
+}
+
+/* Ẩn icon con mắt mặc định của input password trên trình duyệt Edge/IE */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
 }
