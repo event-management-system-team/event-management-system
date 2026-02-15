@@ -93,7 +93,7 @@ export function AdminSidebar() {
                             }`}
                         >
                             <CalendarCog className="mr-3 h-4 w-4"/>
-                            Event Management
+                            Events
                         </Button>
                     )}
                 </NavLink>
