@@ -9,6 +9,7 @@ import {useDispatch} from "react-redux";
 import {AdminDashboard} from "./pages/admin/AdminDashboard.jsx";
 import {AccountManagement} from "./pages/admin/AccountManagement.jsx";
 import {EventManagement} from "./pages/admin/EventManagement.jsx";
+import {EventAnalytics} from "./pages/admin/EventAnalytics.jsx";
 
 function App() {
     const dispatch = useDispatch();
@@ -36,6 +37,7 @@ function App() {
             <Route path="/admin" element={<AdminDashboard/>}/>
             <Route path="/admin/accounts" element={<AccountManagement/>}/>
             <Route path="/admin/events" element={<EventManagement/>}/>
+            <Route path="/admin/analytics" element={<EventAnalytics/>}/>
         </Routes>
     );
 }
