@@ -357,7 +357,7 @@ export function EventAnalytics() {
         <>
             <div className="flex h-screen bg-[#F5F5F7]">
                 {/* Sidebar */}
-                <AdminSidebar />
+                <AdminSidebar/>
 
                 {/* Main Content */}
                 <main className="flex-1 overflow-auto">
@@ -365,7 +365,7 @@ export function EventAnalytics() {
                     <header className="bg-white border-b border-gray-200 px-8 py-5">
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2 text-sm text-gray-600">
-                                <span>Home</span>
+                                <span>Dashboard</span>
                                 <ChevronRight className="h-4 w-4"/>
                                 <span>Event Analytics</span>
                             </div>
@@ -398,7 +398,7 @@ export function EventAnalytics() {
                         </div>
                         <div className="flex items-start justify-between">
                             <div>
-                                <h1 className="text-foreground text-2xl mb-1">Event Analytics</h1>
+                                <h1 className="text-foreground text-2xl mb-1 font-semibold">Event Analytics</h1>
                                 <p className="text-gray-500 text-sm">
                                     Comprehensive performance metrics and insights across all events
                                 </p>
@@ -423,7 +423,7 @@ export function EventAnalytics() {
                             const TrendIcon =
                                 metric.trending === "up" ? TrendingUp : TrendingDown
                             return (
-                                <Card key={index} className="bg-white shadow-sm">
+                                <Card key={index} className="bg-white shadow-sm border border-gray-200">
                                     <CardContent className="p-5">
                                         <div className="flex items-start justify-between mb-2">
                                             <div
@@ -456,7 +456,7 @@ export function EventAnalytics() {
 
                     {/* Filters & Search */}
                     <div className="px-8 pb-6">
-                        <Card className="bg-white shadow-sm">
+                        <Card className="bg-white shadow-sm border border-gray-200">
                             <CardContent className="p-5">
                                 <div className="flex items-center gap-3">
                                     {/* Search Input */}
@@ -472,10 +472,10 @@ export function EventAnalytics() {
 
                                     {/* Date Range */}
                                     <Select defaultValue="30days">
-                                        <SelectTrigger className="w-[160px]">
+                                        <SelectTrigger className="w-[160px] border border-gray-200">
                                             <SelectValue/>
                                         </SelectTrigger>
-                                        <SelectContent>
+                                        <SelectContent className='border border-gray-200'>
                                             <SelectItem value="7days">Last 7 days</SelectItem>
                                             <SelectItem value="30days">Last 30 days</SelectItem>
                                             <SelectItem value="90days">Last 90 days</SelectItem>
@@ -485,10 +485,10 @@ export function EventAnalytics() {
 
                                     {/* Category Filter */}
                                     <Select defaultValue="all">
-                                        <SelectTrigger className="w-[150px]">
+                                        <SelectTrigger className="w-[150px] border border-gray-200">
                                             <SelectValue/>
                                         </SelectTrigger>
-                                        <SelectContent>
+                                        <SelectContent className='border border-gray-200'>
                                             <SelectItem value="all">All Categories</SelectItem>
                                             <SelectItem value="technology">Technology</SelectItem>
                                             <SelectItem value="music">Music</SelectItem>
@@ -499,10 +499,10 @@ export function EventAnalytics() {
 
                                     {/* Status Filter */}
                                     <Select defaultValue="all">
-                                        <SelectTrigger className="w-[140px]">
+                                        <SelectTrigger className="w-[140px] border border-gray-200">
                                             <SelectValue/>
                                         </SelectTrigger>
-                                        <SelectContent>
+                                        <SelectContent className='border border-gray-200'>
                                             <SelectItem value="all">All Status</SelectItem>
                                             <SelectItem value="upcoming">Upcoming</SelectItem>
                                             <SelectItem value="ongoing">Ongoing</SelectItem>
@@ -525,7 +525,7 @@ export function EventAnalytics() {
                     {/* Data Visualization Section */}
                     <div className="grid grid-cols-2 gap-5 px-8 pb-6">
                         {/* Ticket Sales Over Time */}
-                        <Card className="bg-white shadow-sm">
+                        <Card className="bg-white shadow-sm border border-gray-200">
                             <CardHeader className="border-b border-gray-100">
                                 <CardTitle className="text-lg">Ticket Sales Trend</CardTitle>
                                 <CardDescription>
@@ -563,7 +563,7 @@ export function EventAnalytics() {
                         </Card>
 
                         {/* Revenue by Event */}
-                        <Card className="bg-white shadow-sm">
+                        <Card className="bg-white shadow-sm  border border-gray-200">
                             <CardHeader className="border-b border-gray-100">
                                 <CardTitle className="text-lg">Revenue by Event</CardTitle>
                                 <CardDescription>
@@ -596,7 +596,7 @@ export function EventAnalytics() {
                         </Card>
 
                         {/* Event Category Distribution */}
-                        <Card className="bg-white shadow-sm">
+                        <Card className="bg-white shadow-sm border border-gray-200">
                             <CardHeader className="border-b border-gray-100">
                                 <CardTitle className="text-lg">Event Distribution</CardTitle>
                                 <CardDescription>Events by category breakdown</CardDescription>
@@ -639,7 +639,7 @@ export function EventAnalytics() {
                         </Card>
 
                         {/* Conversion Funnel */}
-                        <Card className="bg-white shadow-sm">
+                        <Card className="bg-white shadow-sm  border border-gray-200">
                             <CardHeader className="border-b border-gray-100">
                                 <CardTitle className="text-lg">Conversion Funnel</CardTitle>
                                 <CardDescription>
@@ -656,12 +656,9 @@ export function EventAnalytics() {
                                         return (
                                             <div key={stage.stage}>
                                                 <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-700">
-                          {stage.stage}
-                        </span>
-                                                    <span className="text-sm font-semibold text-gray-900">
-                          {stage.value.toLocaleString()} ({percentage}%)
-                        </span>
+                                                    <span
+                                                        className="text-sm font-medium text-gray-700">{stage.stage}</span>
+                                                    <span className="text-sm font-semibold text-gray-900">{stage.value.toLocaleString()} ({percentage}%)</span>
                                                 </div>
                                                 <div
                                                     className="h-10 rounded-lg overflow-hidden"
@@ -689,7 +686,7 @@ export function EventAnalytics() {
                     {/* Performance Highlights */}
                     <div className="grid grid-cols-2 gap-5 px-8 pb-6">
                         {/* Top Performing Events */}
-                        <Card className="bg-white shadow-sm">
+                        <Card className="bg-white shadow-sm border border-gray-200">
                             <CardHeader className="border-b border-gray-100">
                                 <div className="flex items-center gap-2">
                                     <Award className="h-5 w-5 text-green-600"/>
@@ -737,7 +734,7 @@ export function EventAnalytics() {
                         </Card>
 
                         {/* Underperforming Events */}
-                        <Card className="bg-white shadow-sm">
+                        <Card className="bg-white shadow-sm border border-gray-200">
                             <CardHeader className="border-b border-gray-100">
                                 <div className="flex items-center gap-2">
                                     <AlertTriangle className="h-5 w-5 text-orange-600"/>
@@ -796,7 +793,7 @@ export function EventAnalytics() {
 
                     {/* Event Performance Table */}
                     <div className="px-8 pb-8">
-                        <Card className="bg-white shadow-sm">
+                        <Card className="bg-white shadow-sm border border-gray-200">
                             <CardHeader className="border-b border-gray-100">
                                 <div className="flex items-center justify-between">
                                     <CardTitle className="text-lg">
@@ -804,10 +801,10 @@ export function EventAnalytics() {
                                     </CardTitle>
                                     <div className="flex gap-2">
                                         <Select defaultValue="10">
-                                            <SelectTrigger className="w-[120px]">
+                                            <SelectTrigger className="w-[120px] border border-gray-200">
                                                 <SelectValue/>
                                             </SelectTrigger>
-                                            <SelectContent>
+                                            <SelectContent className='border border-gray-200'>
                                                 <SelectItem value="10">Show 10</SelectItem>
                                                 <SelectItem value="25">Show 25</SelectItem>
                                                 <SelectItem value="50">Show 50</SelectItem>

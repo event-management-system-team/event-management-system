@@ -222,7 +222,7 @@ export function AccountManagement() {
                     <header className="bg-white border-b border-gray-200 px-8 py-5">
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2 text-sm text-gray-600">
-                                <span>Home</span>
+                                <span>Dashboard</span>
                                 <ChevronRight className="h-4 w-4"/>
                                 <span>Account Management</span>
                             </div>
