@@ -10,6 +10,7 @@ import {AdminDashboard} from "./pages/admin/AdminDashboard.jsx";
 import {AccountManagement} from "./pages/admin/AccountManagement.jsx";
 import {AccountDetail} from "./pages/admin/AccountDetail.jsx";
 import {EventManagement} from "./pages/admin/EventManagement.jsx";
+import {EventDetail} from "./pages/admin/EventDetail.jsx";
 import {EventAnalytics} from "./pages/admin/EventAnalytics.jsx";
 
 function App() {
@@ -37,8 +38,9 @@ function App() {
             {/* Admin Pages */}
             <Route path="/admin" element={<AdminDashboard/>}/>
             <Route path="/admin/accounts" element={<AccountManagement/>}/>
-            <Route path="/admin/account-detail/:id" element={<AccountDetail/>}/>
+            <Route path="/admin/accounts/account-detail/:id" element={<AccountDetail/>}/>
             <Route path="/admin/events" element={<EventManagement/>}/>
+            <Route path="/admin/events/event-detail/:id" element={<EventDetail/>}/>
             <Route path="/admin/analytics" element={<EventAnalytics/>}/>
         </Routes>
     );

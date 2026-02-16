@@ -210,13 +210,13 @@ export function AccountDetail() {
                         <TabsList className="h-12 bg-transparent border-0 p-0 space-x-6">
                             <TabsTrigger
                                 value="basic"
-                                className="h-12 bg-transparent border-b-2 border-transparent data-[state=active]:border-[#7FA5A5] data-[state=active]:text-[#7FA5A5] rounded-none px-0 data-[state=active]:shadow-none"
+                                className="h-12 bg-transparent border-b-2 border-transparent data-[state=active]:border-[#7FA5A5] data-[state=active]:text-[#7FA5A5] rounded-none px-5 data-[state=active]:shadow-none"
                             >
                                 Basic Info
                             </TabsTrigger>
                             <TabsTrigger
                                 value="events"
-                                className="h-12 bg-transparent border-b-2 border-transparent data-[state=active]:border-[#7FA5A5] data-[state=active]:text-[#7FA5A5] rounded-none px-0 data-[state=active]:shadow-none"
+                                className="h-12 bg-transparent border-b-2 border-transparent data-[state=active]:border-[#7FA5A5] data-[state=active]:text-[#7FA5A5] rounded-none px-5 data-[state=active]:shadow-none"
                             >
                                 Events
                             </TabsTrigger>
