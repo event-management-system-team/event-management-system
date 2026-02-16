@@ -8,6 +8,7 @@ import {logoutUser} from "./store/slices/auth.slice";
 import {useDispatch} from "react-redux";
 import {AdminDashboard} from "./pages/admin/AdminDashboard.jsx";
 import {AccountManagement} from "./pages/admin/AccountManagement.jsx";
+import {AccountDetail} from "./pages/admin/AccountDetail.jsx";
 import {EventManagement} from "./pages/admin/EventManagement.jsx";
 import {EventAnalytics} from "./pages/admin/EventAnalytics.jsx";
 
@@ -36,6 +37,7 @@ function App() {
             {/* Admin Pages */}
             <Route path="/admin" element={<AdminDashboard/>}/>
             <Route path="/admin/accounts" element={<AccountManagement/>}/>
+            <Route path="/admin/account-detail/:id" element={<AccountDetail/>}/>
             <Route path="/admin/events" element={<EventManagement/>}/>
             <Route path="/admin/analytics" element={<EventAnalytics/>}/>
         </Routes>

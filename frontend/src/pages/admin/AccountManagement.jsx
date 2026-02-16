@@ -366,7 +366,7 @@ export function AccountManagement() {
                                             </Badge>
                                         </div>
                                         <div className="col-span-1 flex justify-end gap-1">
-                                            <Link to={`/account-detail/${account.id}`}>
+                                            <Link to={`/admin/account-detail/${account.id}`}>
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
