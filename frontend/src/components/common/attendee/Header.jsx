@@ -6,7 +6,7 @@ import UserDropdown from './UserDropdown';
 
 const HeaderApp = () => {
 
-    const isLoggedIn = false;
+    const isLoggedIn = true;
     return (
         <>
             <header className="sticky top-0 z-50 border-b border-[#d8ddde] bg-[#F1F0E8]">
