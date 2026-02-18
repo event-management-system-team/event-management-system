@@ -1,8 +1,11 @@
 package com.eventmanagement.backend.repository;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.eventmanagement.backend.model.User;
+import org.springframework.data.jpa.repository.Query;
 
+import java.awt.print.Pageable;
 import java.util.Optional;
 import java.util.UUID;
 

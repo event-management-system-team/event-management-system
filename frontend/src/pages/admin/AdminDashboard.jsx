@@ -41,7 +41,7 @@ const summaryMetrics = [
         icon: Calendar,
         iconBg: "bg-blue-100",
         iconColor: "text-blue-600",
-        link: "/event-management"
+        link: "/admin/events"
     },
     {
         title: "ACTIVE EVENTS",
@@ -51,7 +51,7 @@ const summaryMetrics = [
         icon: Zap,
         iconBg: "bg-green-100",
         iconColor: "text-green-600",
-        link: "/event-management?status=active"
+        link: "/admin/events?status=active"
     },
     {
         title: "PENDING REVIEWS",
@@ -61,7 +61,7 @@ const summaryMetrics = [
         icon: AlertCircle,
         iconBg: "bg-orange-100",
         iconColor: "text-orange-600",
-        link: "/event-management?status=pending",
+        link: "/admin/events?status=pending",
         highlight: true
     },
     {
@@ -72,7 +72,7 @@ const summaryMetrics = [
         icon: Users,
         iconBg: "bg-purple-100",
         iconColor: "text-purple-600",
-        link: "/account-list"
+        link: "/admin/accounts"
     },
     {
         title: "SUSPENDED ACCOUNTS",
@@ -82,7 +82,7 @@ const summaryMetrics = [
         icon: UserX,
         iconBg: "bg-red-100",
         iconColor: "text-red-600",
-        link: "/account-list?status=suspended"
+        link: "/admin/accounts?status=suspended"
     }
 ]
 
@@ -336,7 +336,7 @@ export function AdminDashboard() {
                                 <CardHeader className="border-b border-gray-100">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <CardTitle className="text-lg">Pending Events</CardTitle>
+                                            <CardTitle className="text-lg font-semibold">Pending Events</CardTitle>
                                             <CardDescription>Events awaiting review and approval</CardDescription>
                                         </div>
                                         <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100">
@@ -349,7 +349,7 @@ export function AdminDashboard() {
                                         {pendingEvents.map((event) => (
                                             <Link
                                                 key={event.id}
-                                                to={`/event-detail/${event.id}`}
+                                                to={`events/event-detail/${event.id}`}
                                                 className="block hover:bg-gray-50 transition-colors"
                                             >
                                                 <div className="p-4 flex items-center justify-between">
@@ -459,19 +459,19 @@ export function AdminDashboard() {
                                     </CardHeader>
                                     <CardContent className="p-4">
                                         <div className="space-y-2">
-                                            <Link to="/event-management?status=pending">
+                                            <Link to="events?status=pending">
                                                 <Button variant="ghost" className="w-full justify-start text-gray-700 hover:bg-gray-100">
                                                     <AlertCircle className="mr-3 h-4 w-4 text-orange-600" />
                                                     View All Pending Events
                                                 </Button>
                                             </Link>
-                                            <Link to="/account-list">
+                                            <Link to="accounts">
                                                 <Button variant="ghost" className="w-full justify-start text-gray-700 hover:bg-gray-100">
                                                     <Users className="mr-3 h-4 w-4 text-purple-600" />
                                                     Manage Organizer Accounts
                                                 </Button>
                                             </Link>
-                                            <Link to="/event-analytics">
+                                            <Link to="analytics">
                                                 <Button variant="ghost" className="w-full justify-start text-gray-700 hover:bg-gray-100">
                                                     <BarChart3 className="mr-3 h-4 w-4 text-blue-600" />
                                                     View Event Analytics
@@ -494,12 +494,12 @@ export function AdminDashboard() {
                                     <CardContent className="p-4">
                                         <div className="space-y-4">
                                             {systemInsights.map((insight, index) => (
-                                                <div key={index} className="flex items-center gap-3">
+                                                <div key={index} className="flex items-center gap-5">
                                                     <div className={`p-2 rounded-lg ${insight.iconBg}`}>
                                                         <insight.icon className={`h-4 w-4 ${insight.iconColor}`} />
                                                     </div>
                                                     <div className="flex-1">
-                                                        <div className="text-2xl font-bold text-gray-900">
+                                                        <div className="text-2xl font-semibold text-gray-900">
                                                             {insight.value}
                                                         </div>
                                                         <div className="text-xs font-medium text-gray-900">
