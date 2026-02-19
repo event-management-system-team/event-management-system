@@ -6,6 +6,8 @@ import ProtectedRoute from "./components/common/ProtectedRoute";
 
 import { logoutUser } from "./store/slices/auth.slice";
 import { useDispatch } from "react-redux";
+import PublicRoutes from "./routes/PublicRoutes";
+import AppRoutes from "./routes";
 function App() {
   const dispatch = useDispatch();
 
@@ -18,7 +20,7 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route
-        path="/"
+        path="/logout"
         element={
           <ProtectedRoute>
             <div>
@@ -27,6 +29,8 @@ function App() {
           </ProtectedRoute>
         }
       />
+
+      <Route path="/*" element={<AppRoutes />} />
     </Routes>
   );
 }
