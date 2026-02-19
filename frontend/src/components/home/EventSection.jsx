@@ -1,37 +1,30 @@
 import EventCard from "../common/EventCard";
 import { Compass } from "lucide-react";
-
-const EVENTS = [
-    {
-        image: "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?q=80&w=1000",
-        month: "AUG", date: "12", title: "Summer Music Fest 2026", location: "Grand Arena Stadium", price: "45.00", isLowStock: true
-    },
-    {
-        image: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?q=80&w=1000",
-        month: "SEP", date: "05", title: "AI & Tech Expo Global", location: "Convention Center", price: "120.00", isLowStock: false
-    },
-    {
-        image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1000",
-        month: "OCT", date: "18", title: "Gourmet Food Trail", location: "Riverside Walk", price: "25.00", isLowStock: false
-    },
-    {
-        image: "https://images.unsplash.com/photo-1560439514-4e9645039924?q=80&w=1000",
-        month: "NOV", date: "02", title: "International Art Week", location: "Modern Art Gallery", price: "0.00", isLowStock: false
-    },
-];
+import { useFeaturedEvents } from '../../hooks/useFeaturedEvents'
 
 const EventSection = () => {
+
+    const { events, isLoading, error } = useFeaturedEvents();
+
+    if (isLoading) return <div>Loading hot event ...</div>;
+    if (error) return <div>Error: {error}</div>;
+
     return (
-        <section className="py-16 px-6 bg-[#F1F0E8]/30">
+        <section className="py-16 px-6 bg-[#F1F0E8]/30 overflow-hidden">
             <div className="max-w-7xl mx-auto">
                 <div className="mb-10">
                     <h2 className="text-3xl font-extrabold ">Featured Events</h2>
                     <p className="text-gray-500 mt-2">The most popular experiences picked just for you</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {EVENTS.map((evt, idx) => (
-                        <EventCard key={idx} {...evt} />
+                <div className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-8 pt-4 -mx-6 px-6 md:mx-0 md:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                    {events.map((event) => (
+                        <div
+                            key={event.eventId}
+                            className="w-[85vw] sm:w-[320px] shrink-0 snap-start"
+                        >
+                            <EventCard key={event.eventId} {...event} />
+                        </div>
                     ))}
                 </div>
 
