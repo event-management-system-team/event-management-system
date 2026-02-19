@@ -51,12 +51,15 @@ import {adminService} from "../../services/admin.service.js";
 export function AccountManagement() {
 
     const [accounts, setAccounts] = useState([]);
+    const [originalAccounts, setOriginalAccounts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [status, setStatus] = useState("all");
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [sortOption, setSortOption] = useState("newest");
+    const [searchTerm, setSearchTerm] = useState("");
+
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const openModal = () => {
@@ -84,22 +87,43 @@ export function AccountManagement() {
     //     fetchAccounts();
     // }, [])
 
-    useEffect(() => {
-        const fetchAccounts = async () => {
-            try {
-                setLoading(true);
-                const response = await adminService.getAllAccounts();
-                setAccounts(response.data);
-            } catch (error) {
-                setError("Cannot load account list");
-                console.error(error)
-            } finally {
-                setLoading(false);
-            }
+    const fetchAccounts = async () => {
+        try {
+            setLoading(true);
+            const response = await adminService.getAllAccounts();
+            setAccounts(response.data);
+            setOriginalAccounts(response.data);
+        } catch (error) {
+            setError("Cannot load account list");
+            console.error(error)
+        } finally {
+            setLoading(false);
         }
+    }
 
+    useEffect(() => {
         fetchAccounts();
     }, [])
+
+    const handleSearch = async (e) => {
+        const value = e.target.value;
+        setSearchTerm(value);
+
+        if (value.trim() === "") {
+            setAccounts(originalAccounts)
+            return;
+        }
+
+        try {
+            const response = await adminService.searchAccounts(value);
+            setAccounts(response.data);
+        }  catch (error) {
+            setError("Cannot load account list");
+            console.error(error)
+        } finally {
+            setLoading(false);
+        }
+    }
 
     const processedAccounts = useMemo(() => {
         return [...accounts]
@@ -227,16 +251,6 @@ export function AccountManagement() {
                                 <span>Account Management</span>
                             </div>
                             <div className="flex items-center gap-3">
-                                {/* Search Bar */}
-                                <div className="relative">
-                                    <Search
-                                        className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"/>
-                                    <Input
-                                        type="text"
-                                        placeholder="Search events..."
-                                        className="pl-9 pr-4 py-2 w-[280px] rounded-full border-gray-300 focus:ring-[#7FA5A5] focus:border-[#7FA5A5]"
-                                    />
-                                </div>
                                 {/* Notification Icon */}
                                 <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
                                     <Bell className="h-5 w-5 text-gray-600"/>
@@ -304,13 +318,16 @@ export function AccountManagement() {
                     {/* Search, Filter & Sort Controls */}
                     <div className="px-8 pb-4">
                         <div className="flex items-center gap-3">
+
                             {/* Search Input */}
                             <div className="relative flex-1">
                                 <Search
                                     className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"/>
                                 <Input
                                     type="text"
-                                    placeholder="Search organizer, company or email..."
+                                    placeholder="Search organizer, full name, email or phone number..."
+                                    value={searchTerm}
+                                    onChange={handleSearch}
                                     className="pl-9 pr-4 py-2 w-full border-gray-300 focus:ring-[#7FA5A5] focus:border-[#7FA5A5]"
                                 />
                             </div>

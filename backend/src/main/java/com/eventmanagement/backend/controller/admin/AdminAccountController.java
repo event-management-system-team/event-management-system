@@ -1,6 +1,7 @@
 package com.eventmanagement.backend.controller.admin;
 
 import com.eventmanagement.backend.dto.response.UserResponse;
+import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/admin/accounts")
+@RequestMapping("/api/admin/accounts")
 @RequiredArgsConstructor
 public class AdminAccountController {
     private final AdminService adminService;
@@ -28,5 +29,11 @@ public class AdminAccountController {
     public ResponseEntity<List<UserResponse>> getAll() {
         List<UserResponse> users = adminService.getAllAccountsPlain();
         return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<UserResponse>> search(@RequestParam("q") String q) {
+        List<UserResponse> results = adminService.searchAccounts(q);
+        return ResponseEntity.ok(results);
     }
 }

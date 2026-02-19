@@ -11,4 +11,10 @@ export const adminService = {
     getAllAccounts: () => {
         return axiosInstance.get(`/admin/accounts`);
     },
+
+    searchAccounts: (keyword) => {
+        return axiosInstance.get(`/admin/accounts/search`, {
+            params: {q: keyword}
+        })
+    },
 };

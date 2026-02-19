@@ -21,12 +21,17 @@ public class AdminService {
 //        return userRepository.findAll(pageable).map(this::mapToResponse);
 //    }
 
-    // Lấy tất cả account không phân trang
     public List<UserResponse> getAllAccountsPlain() {
         return userRepository.findAll()
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
+    }
+
+    public List<UserResponse> searchAccounts(String keyword) {
+        List<User> users = userRepository.searchUsers(keyword);
+
+        return users.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
     private UserResponse mapToResponse(User user) {
