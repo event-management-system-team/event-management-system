@@ -194,9 +194,9 @@ export function AccountManagement() {
     };
 
     const summaryMetrics = (accounts) => {
-        const total = accounts.length;
-        const active = accounts.filter(acc => acc.status === "ACTIVE").length;
-        const banned = accounts.filter(acc => acc.status === "BANNED").length;
+        const total = originalAccounts.length;
+        const active = originalAccounts.filter(acc => acc.status === "ACTIVE").length;
+        const banned = originalAccounts.filter(acc => acc.status === "BANNED").length;
 
         return [
             {
