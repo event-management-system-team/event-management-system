@@ -6,12 +6,10 @@ import com.eventmanagement.backend.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/accounts")
@@ -35,5 +33,10 @@ public class AdminAccountController {
     public ResponseEntity<List<UserResponse>> search(@RequestParam("q") String q) {
         List<UserResponse> results = adminService.searchAccounts(q);
         return ResponseEntity.ok(results);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse> getDetail(@PathVariable UUID id) {
+        return ResponseEntity.ok(adminService.getAccountById(id));
     }
 }

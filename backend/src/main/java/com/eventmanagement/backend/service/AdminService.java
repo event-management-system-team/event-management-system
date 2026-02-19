@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +33,12 @@ public class AdminService {
         List<User> users = userRepository.searchUsers(keyword);
 
         return users.stream().map(this::mapToResponse).collect(Collectors.toList());
+    }
+
+    public UserResponse getAccountById(UUID id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User does not exist"));
+        return mapToResponse(user);
     }
 
     private UserResponse mapToResponse(User user) {

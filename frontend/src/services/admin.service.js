@@ -17,4 +17,8 @@ export const adminService = {
             params: {q: keyword}
         })
     },
+
+    getAccountDetail: (id) => {
+        return axiosInstance.get(`/admin/accounts/${id}`);
+    },
 };
