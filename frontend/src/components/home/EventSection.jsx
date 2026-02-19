@@ -25,7 +25,7 @@ const EventSection = () => {
         <section className="py-16 px-6 bg-[#F1F0E8]/30">
             <div className="max-w-7xl mx-auto">
                 <div className="mb-10">
-                    <h2 className="text-3xl font-extrabold text-gray-900">Featured Events</h2>
+                    <h2 className="text-3xl font-extrabold ">Featured Events</h2>
                     <p className="text-gray-500 mt-2">The most popular experiences picked just for you</p>
                 </div>
 
