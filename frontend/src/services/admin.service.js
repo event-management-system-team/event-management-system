@@ -21,4 +21,8 @@ export const adminService = {
     getAccountDetail: (id) => {
         return axiosInstance.get(`/admin/accounts/${id}`);
     },
+
+    updateProfile: (id, data) => {
+        return axiosInstance.put(`/admin/accounts/${id}/profile`, data);
+    },
 };

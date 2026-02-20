@@ -1,5 +1,6 @@
 package com.eventmanagement.backend.controller.admin;
 
+import com.eventmanagement.backend.dto.request.UserUpdateRequest;
 import com.eventmanagement.backend.dto.response.UserResponse;
 import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.service.AdminService;
@@ -38,5 +39,10 @@ public class AdminAccountController {
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getDetail(@PathVariable UUID id) {
         return ResponseEntity.ok(adminService.getAccountById(id));
+    }
+
+    @PutMapping("/{id}/profile")
+    public ResponseEntity<UserResponse> updateProfile(@PathVariable UUID id, @RequestBody UserUpdateRequest request) {
+        return ResponseEntity.ok(adminService.updateProfile(id, request));
     }
 }

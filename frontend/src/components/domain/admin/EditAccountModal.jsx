@@ -1,4 +1,4 @@
-import {X, AlertCircle, Ban, CheckCircle} from "lucide-react"
+import {X, AlertCircle} from "lucide-react"
 import {Button} from "./Button.jsx"
 import {Input} from "./Input.jsx"
 import {Label} from "./Label.jsx"
@@ -12,8 +12,9 @@ import {
 import {Badge} from "./Badge.jsx"
 import {useState} from "react"
 import {cn} from "./utils.js"
+import {adminService} from "../../../services/admin.service.js";
 
-export function EditAccountModal({isOpen, onClose, accountData}) {
+export function EditAccountModal({isOpen, onClose, accountData, onSuccess}) {
     const [formData, setFormData] = useState({
         fullName: accountData.fullName || "",
         email: accountData.email || "",
@@ -21,11 +22,30 @@ export function EditAccountModal({isOpen, onClose, accountData}) {
     })
 
     const [errors, setErrors] = useState({})
-    const [isSuspended, setIsSuspended] = useState(
-        accountData.status === "Suspended"
-    )
-
     const isOrganizer = accountData.role === "ORGANIZER"
+
+    const handleUpdateProfile = async () => {
+        try {
+            const res = await adminService.updateProfile(accountData.id, formData);
+            alert("Profile updated successfully");
+
+            if (onSuccess) {
+                onSuccess(res.data);
+            }
+
+            onClose();
+        } catch (error) {
+            console.error(error)
+
+            const message = error?.response?.data?.message || "Update profile failed"
+
+            if (message.toLowerCase().includes("email")) {
+                setErrors(prev => ({...prev, email: message}))
+            } else {
+                alert(message)
+            }
+        }
+    }
 
     const handleInputChange = (field, value) => {
         setFormData({...formData, [field]: value})
@@ -38,13 +58,34 @@ export function EditAccountModal({isOpen, onClose, accountData}) {
     const validateForm = () => {
         const newErrors = {}
 
-        if (!formData.fullName.trim()) {
+        // Full name
+        const fullName = formData.fullName.trim()
+        if (!fullName) {
             newErrors.fullName = "Full name is required"
+        } else if (fullName.length < 3) {
+            newErrors.fullName = "Full name must be at least 3 characters"
+        } else if (fullName.length > 50) {
+            newErrors.fullName = "Full name must be less than 50 characters"
+        } else if (!/^[a-zA-ZÀ-ỹ\s]+$/.test(fullName)) {
+            newErrors.fullName = "Full name cannot contain numbers or special characters"
         }
-        if (!formData.email.trim()) {
+
+        // Email
+        const email = formData.email.trim()
+        if (!email) {
             newErrors.email = "Email is required"
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        } else if (email.length > 100) {
+            newErrors.email = "Email is too long"
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
             newErrors.email = "Please enter a valid email address"
+        }
+
+        // Phone (VN)
+        const phone = formData.phone.trim()
+        if (!phone) {
+            newErrors.phone = "Phone number is required"
+        } else if (!/^(?!00)\d{10}$/.test(phone)) {
+            newErrors.phone = "Phone number must be 10 digits and not start with 00"
         }
 
         setErrors(newErrors)
@@ -52,33 +93,23 @@ export function EditAccountModal({isOpen, onClose, accountData}) {
     }
 
     const handleSave = () => {
-        if (validateForm()) {
-            // In a real app, this would make an API call
-            console.log("Saving account data:", {
-                ...formData,
-                status: isSuspended ? "Suspended" : "Active"
-            })
-
-            // Show success toast (in a real app, you'd use a toast library)
-            alert("Profile updated successfully")
-
-            onClose()
-        }
-    }
-
-    const handleToggleStatus = () => {
-        setIsSuspended(!isSuspended)
+        if (!validateForm()) return;
+         if (!hasChanges()) {
+             alert("No changes detected");
+             return;
+         }
+         handleUpdateProfile();
     }
 
     const hasChanges = () => {
         return (
-            formData.fullName !== accountData.name ||
+            formData.fullName !== accountData.fullName ||
             formData.email !== accountData.email ||
             formData.phone !== (accountData.phone || "")
         )
     }
 
-    if (!isOpen) return null
+    if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -175,7 +206,7 @@ export function EditAccountModal({isOpen, onClose, accountData}) {
                                 <Input
                                     id="phone"
                                     type="tel"
-                                    placeholder="+1 (555) 000-0000"
+                                    placeholder="0912345678"
                                     value={formData.phone}
                                     onChange={e => handleInputChange("phone", e.target.value)}
                                     className="h-10"
@@ -192,7 +223,7 @@ export function EditAccountModal({isOpen, onClose, accountData}) {
                         </Button>
                         <Button
                             onClick={handleSave}
-                            disabled={Object.keys(errors).length > 0}
+                            disabled={Object.keys(errors).length > 0 || !hasChanges()}
                             className="px-6 bg-[#7FA5A5] hover:bg-[#6D9393] text-white disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             Save Changes

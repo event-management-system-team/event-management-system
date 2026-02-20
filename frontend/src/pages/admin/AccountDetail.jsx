@@ -389,6 +389,9 @@ export function AccountDetail() {
                     phone: account.phone,
                     role: account.role
                 }}
+                onSuccess={(updatedAccount) => {
+                    setAccount(updatedAccount)
+                }}
             />
         </div>
     )
