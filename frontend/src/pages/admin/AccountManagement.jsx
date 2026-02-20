@@ -340,7 +340,7 @@ export function AccountManagement() {
                                 value={status}
                                 onValueChange={(value) => setStatus(value)}
                             >
-                                <SelectTrigger className="w-[160px] border border-gray-200">
+                                <SelectTrigger className="w-[160px] border border-gray-200 cursor-pointer">
                                     <SelectValue placeholder="Status"/>
                                 </SelectTrigger>
                                 <SelectContent className='border border-gray-200'>
@@ -364,7 +364,7 @@ export function AccountManagement() {
                                 customInput={
                                     <Button
                                         variant="outline"
-                                        className="gap-2 min-w-[210px] justify-start"
+                                        className="gap-2 min-w-[210px] justify-start cursor-pointer"
                                     >
                                         <Calendar className="h-4 w-4 text-gray-500"/>
                                         <span>
@@ -381,7 +381,7 @@ export function AccountManagement() {
                                 value={sortOption}
                                 onValueChange={(value) => setSortOption(value)}
                             >
-                                <SelectTrigger className="w-[140px] border border-gray-200">
+                                <SelectTrigger className="w-[140px] border border-gray-200 cursor-pointer">
                                     <SelectValue placeholder="Sort by"/>
                                 </SelectTrigger>
                                 <SelectContent className='border border-gray-200'>
@@ -458,23 +458,26 @@ export function AccountManagement() {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="h-8 w-8"
+                                                    className="h-8 w-8 hover:bg-gray-100 cursor-pointer"
                                                     title="View account details"
                                                 >
                                                     <Eye className="h-4 w-4 text-gray-500"/>
                                                 </Button>
                                             </Link>
-                                            <DropdownMenu>
+                                            <DropdownMenu modal={false}>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                    <Button variant="ghost" size="icon"
+                                                            className="h-8 w-8 hover:bg-gray-100 cursor-pointer">
                                                         <MoreVertical className="h-4 w-4 text-gray-500"/>
                                                     </Button>
                                                 </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem>
-                                                        <UserCircle className="mr-2 h-4 w-4"/>
-                                                        View account details
-                                                    </DropdownMenuItem>
+                                                <DropdownMenuContent align="end" className="bg-white border-2 border-gray-200">
+                                                    <Link to={`/admin/accounts/account-detail/${account.userId}`}>
+                                                        <DropdownMenuItem>
+                                                            <UserCircle className="mr-2 h-4 w-4"/>
+                                                            View account details
+                                                        </DropdownMenuItem>
+                                                    </Link>
                                                     <DropdownMenuItem>
                                                         {account.status === "BANNED" ? (
                                                             <>
@@ -488,10 +491,10 @@ export function AccountManagement() {
                                                             </>
                                                         )}
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem>
-                                                        <Settings className="mr-2 h-4 w-4"/>
-                                                        Reset password
-                                                    </DropdownMenuItem>
+                                                    {/*<DropdownMenuItem>*/}
+                                                    {/*    <Settings className="mr-2 h-4 w-4"/>*/}
+                                                    {/*    Reset password*/}
+                                                    {/*</DropdownMenuItem>*/}
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </div>

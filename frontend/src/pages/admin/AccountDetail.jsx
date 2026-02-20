@@ -195,16 +195,29 @@ export function AccountDetail() {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex gap-2">
-                            <Button className="gap-2 bg-[#7FA5A5] hover:bg-[#6D9393] text-white">
-                                <Edit className="h-4 w-4"/>
-                                Edit Profile
-                            </Button>
-                            <Button variant="destructive" className="gap-2">
-                                <Ban className="h-4 w-4"/>
-                                Suspend Account
-                            </Button>
-                        </div>
+                        {account.role !== "ADMIN" && (
+                            <>
+                                {account.status === "ACTIVE" ? (
+                                    <div className="flex gap-2">
+                                        <Button className="gap-2 bg-[#7FA5A5] hover:bg-[#6D9393] text-white">
+                                            <Edit className="h-4 w-4"/>
+                                            Edit Profile
+                                        </Button>
+                                        <Button variant="destructive" className="gap-2">
+                                            <Ban className="h-4 w-4"/>
+                                            Ban Account
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    <div className="flex gap-2">
+                                        <Button className="gap-2 bg-green-600 hover:bg-green-700 text-white">
+                                            <CheckCircle className="h-4 w-4" />
+                                            Activate Account
+                                        </Button>
+                                    </div>
+                                )}
+                            </>
+                        )}
                     </div>
                 </div>
 
