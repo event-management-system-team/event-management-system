@@ -10,7 +10,7 @@ export const useFeaturedEvents = () => {
         const fetchEvents = async () => {
             try {
                 setIsLoading(true);
-                const data = await eventService.getTopEventsHot();
+                const data = await eventService.getTopFeaturedEvents();
                 setEvents(data);
             } catch (err) {
                 setError(err.response?.data?.message || 'Failed to load event list');

@@ -5,6 +5,8 @@ import com.eventmanagement.backend.dto.response.attendee.EventResponse;
 import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,6 +22,13 @@ public class EventService {
     public List<EventResponse> getTopNewEvents() {
         List<Event> events = eventRepository.findTop6ByStatusOrderByRegisteredCountDesc(EventStatus.APPROVED);
 
+        return events.stream().map((event) -> mapToResponse(event)).collect(Collectors.toList());
+    }
+
+    public List<EventResponse> getHotEvents() {
+
+        Pageable topSix = PageRequest.of(0, 6);
+        List<Event> events = eventRepository.findHotEventsSellingFast(EventStatus.APPROVED, topSix);
         return events.stream().map((event) -> mapToResponse(event)).collect(Collectors.toList());
     }
 

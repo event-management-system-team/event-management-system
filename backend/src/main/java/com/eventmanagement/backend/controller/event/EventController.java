@@ -24,5 +24,11 @@ public class EventController {
         List<EventResponse> eventResponses = eventService.getTopNewEvents();
         return ResponseEntity.ok(eventResponses);
     }
+
+    @GetMapping("/hot")
+    public ResponseEntity<List<EventResponse>> getTopHotEvents() {
+        List<EventResponse> eventResponses = eventService.getHotEvents();
+        return ResponseEntity.ok(eventResponses);
+    }
 }
 
