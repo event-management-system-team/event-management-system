@@ -1,4 +1,4 @@
-package com.eventmanagement.backend.dto.response;
+package com.eventmanagement.backend.dto.response.attendee;
 
 import lombok.*;
 

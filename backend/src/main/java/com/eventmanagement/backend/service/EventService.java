@@ -1,12 +1,14 @@
 package com.eventmanagement.backend.service;
 
 import com.eventmanagement.backend.constants.EventStatus;
-import com.eventmanagement.backend.dto.response.EventResponse;
+import com.eventmanagement.backend.dto.response.attendee.EventResponse;
 import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,7 +18,7 @@ public class EventService {
     private final EventRepository eventRepository;
 
     public List<EventResponse> getTopNewEvents() {
-        List<Event> events = eventRepository.findTop6ByStatusOrderByStartDateAsc(EventStatus.APPROVED);
+        List<Event> events = eventRepository.findTop6ByStatusOrderByRegisteredCountDesc(EventStatus.APPROVED);
 
         return events.stream().map((event) -> mapToResponse(event)).collect(Collectors.toList());
     }
@@ -43,6 +45,15 @@ public class EventService {
                     .build();
         }
 
+        BigDecimal minPrice = null;
+        if (event.getTicketTypes() != null) {
+            minPrice = event.getTicketTypes().stream()
+                    .filter((ticket) -> ticket.getIsActive())
+                    .map((ticket) -> ticket.getPrice())
+                    .min((price1, price2) -> price1.compareTo(price2))
+                    .orElse(null);
+        }
+
         return EventResponse.builder()
                 .eventId(event.getEventId())
                 .eventName(event.getEventName())
@@ -64,6 +75,7 @@ public class EventService {
                 .updatedAt(event.getUpdatedAt())
                 .category(categoryDto)
                 .organizer(organizerDto)
+                .minPrice(minPrice)
                 .build();
     }
 }

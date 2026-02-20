@@ -1,6 +1,6 @@
 package com.eventmanagement.backend.controller.event;
 
-import com.eventmanagement.backend.dto.response.EventResponse;
+import com.eventmanagement.backend.dto.response.attendee.EventResponse;
 import com.eventmanagement.backend.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,6 +1,6 @@
 import { MapPin, ShoppingCart, Users } from "lucide-react";
 
-const EventCard = ({ startDate, totalCapacity, registeredCount, bannerUrl, eventName, category, location, isFree }) => {
+const EventCard = ({ startDate, totalCapacity, registeredCount, bannerUrl, eventName, category, location, isFree, minPrice }) => {
 
 
 
@@ -59,10 +59,21 @@ const EventCard = ({ startDate, totalCapacity, registeredCount, bannerUrl, event
 
                 <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-2">
                     <div className="flex flex-col">
-                        <span className="text-[10px] font-bold text-gray-400 uppercase">From</span>
-                        <span className="text-lg font-extrabold text-primary">
-                            {isFree ? 'FREE' : 'HAVE FEE'}
-                        </span>
+
+                        {isFree ? (
+                            <span className="px-3 py-1 bg-green-50 border border-green-200 text-green-600 rounded-lg text-sm font-extrabold uppercase tracking-wider inline-block">FREE</span>
+                        )
+                            :
+                            minPrice > 0 ? (
+                                <span className="text-sm font-extrabold text-primary uppercase tracking-wider">
+                                    From {minPrice.toLocaleString('vi-VN')}đ
+                                </span>
+                            )
+                                : (
+                                    <span className=" text-gray-500 text-sm font-extrabold uppercase italic">updating</span>
+                                )
+
+                        }
                     </div>
                     <button className="size-10 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all shadow-sm">
                         <ShoppingCart size={18} />

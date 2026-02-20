@@ -1,7 +1,7 @@
 import axiosInstance from '../config/axios'
 
 const eventService = {
-    getTopNewEvents: async () => {
+    getTopEventsHot: async () => {
         const response = await axiosInstance.get('/events/featured')
         return response.data
     },

@@ -1,10 +1,11 @@
-package com.eventmanagement.backend.dto.response;
+package com.eventmanagement.backend.dto.response.attendee;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,8 @@ public class EventResponse {
 
     private CategoryDto category;
     private OrganizerDto organizer;
-    
+    private BigDecimal minPrice;
+
 
     @Data
     @Builder

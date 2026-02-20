@@ -1,6 +1,6 @@
 package com.eventmanagement.backend.service;
 
-import com.eventmanagement.backend.dto.response.EventCategoryResponse;
+import com.eventmanagement.backend.dto.response.attendee.EventCategoryResponse;
 import com.eventmanagement.backend.model.EventCategory;
 import com.eventmanagement.backend.repository.EventCategoryRepository;
 import lombok.RequiredArgsConstructor;

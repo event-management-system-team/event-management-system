@@ -1,7 +1,7 @@
 package com.eventmanagement.backend.controller.event_category;
 
 
-import com.eventmanagement.backend.dto.response.EventCategoryResponse;
+import com.eventmanagement.backend.dto.response.attendee.EventCategoryResponse;
 import com.eventmanagement.backend.service.EventCategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
