@@ -38,12 +38,14 @@ import {Input} from "../../components/domain/admin/Input.jsx";
 import {Badge} from "../../components/domain/admin/Badge.jsx";
 import {useEffect, useState} from "react";
 import {adminService} from "../../services/admin.service.js";
+import {EditAccountModal} from "../../components/domain/admin/EditAccountModal.jsx";
 
 export function AccountDetail() {
     const {id} = useParams();
     const [loading, setLoading] = useState(true);
     const [account, setAccount] = useState(null);
     const [error, setError] = useState(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     const fetchAccount = async () => {
         if (!id) return;
@@ -199,7 +201,10 @@ export function AccountDetail() {
                             <>
                                 {account.status === "ACTIVE" ? (
                                     <div className="flex gap-2">
-                                        <Button className="gap-2 bg-[#7FA5A5] hover:bg-[#6D9393] text-white">
+                                        <Button
+                                            className="gap-2 bg-[#7FA5A5] hover:bg-[#6D9393] text-white"
+                                            onClick={() => setIsEditModalOpen(true)}
+                                        >
                                             <Edit className="h-4 w-4"/>
                                             Edit Profile
                                         </Button>
@@ -211,7 +216,7 @@ export function AccountDetail() {
                                 ) : (
                                     <div className="flex gap-2">
                                         <Button className="gap-2 bg-green-600 hover:bg-green-700 text-white">
-                                            <CheckCircle className="h-4 w-4" />
+                                            <CheckCircle className="h-4 w-4"/>
                                             Activate Account
                                         </Button>
                                     </div>
@@ -373,6 +378,18 @@ export function AccountDetail() {
                     </Tabs>
                 </div>
             </main>
+
+            <EditAccountModal
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                accountData={{
+                    id: account.userId,
+                    fullName: account.fullName,
+                    email: account.email,
+                    phone: account.phone,
+                    role: account.role
+                }}
+            />
         </div>
     )
 }
