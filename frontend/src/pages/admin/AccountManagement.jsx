@@ -117,7 +117,7 @@ export function AccountManagement() {
         try {
             const response = await adminService.searchAccounts(value);
             setAccounts(response.data);
-        }  catch (error) {
+        } catch (error) {
             setError("Cannot load account list");
             console.error(error)
         } finally {
@@ -144,16 +144,19 @@ export function AccountManagement() {
 
             // sort by option
             .sort((a, b) => {
-                if (sortOption === "newest") {
-                    return new Date(b.createdAt) - new Date(a.createdAt);
+                switch (sortOption) {
+                    case "newest":
+                        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+
+                    case "oldest":
+                        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+
+                    case "name":
+                        return (a.fullName ?? "").localeCompare(b.fullName ?? "");
+
+                    default:
+                        return 0;
                 }
-                if (sortOption === "oldest") {
-                    return new Date(a.createdAt) - new Date(b.createdAt)
-                }
-                if (sortOption === "name") {
-                    return a.fullName.localeCompare(b.fullName)
-                }
-                return 0;
             });
     }, [accounts, status, startDate, endDate, sortOption]);
 
@@ -419,12 +422,10 @@ export function AccountManagement() {
                                         </div>
                                         <div className="col-span-3 flex items-center gap-3">
                                             <Avatar className="w-10 h-10">
-                                                {account.avatar ? (
-                                                    <AvatarImage src={account.avatar} alt={account.username}/>
+                                                {account.avatarUrl ? (
+                                                    <AvatarImage src={account.avatarUrl} alt={account.fullName}/>
                                                 ) : (
-                                                    <AvatarFallback className="bg-gray-300 text-gray-600 text-xs">
-                                                        {account.username}
-                                                    </AvatarFallback>
+                                                    <AvatarFallback className="bg-gray-300"/>
                                                 )}
                                             </Avatar>
 
@@ -453,7 +454,7 @@ export function AccountManagement() {
                                             </Badge>
                                         </div>
                                         <div className="col-span-1 flex justify-end gap-1">
-                                            <Link to={`account-detail/${account.id}`}>
+                                            <Link to={`/admin/accounts/account-detail/${account.userId}`}>
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"

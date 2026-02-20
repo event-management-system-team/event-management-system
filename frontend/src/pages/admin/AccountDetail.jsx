@@ -32,76 +32,92 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from '../../components/domain/
 import {Link, useParams} from 'react-router';
 import {AdminSidebar} from "../../components/domain/admin/AdminSidebar.jsx";
 import {Button} from "../../components/domain/admin/Button.jsx";
-import {Avatar, AvatarFallback} from "../../components/domain/admin/Avatar.jsx";
+import {Avatar, AvatarFallback, AvatarImage} from "../../components/domain/admin/Avatar.jsx";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "../../components/domain/admin/Card.jsx";
 import {Input} from "../../components/domain/admin/Input.jsx";
 import {Badge} from "../../components/domain/admin/Badge.jsx";
-
-// Mock account data - in a real app, this would be fetched based on the ID
-const accountData = {
-    "1": {
-        id: 1,
-        name: "Sarah Johnson",
-        email: "sarah.johnson@techevents.com",
-        phone: "+1 (555) 123-4567",
-        dateOfBirth: "March 15, 1988",
-        address: "123 Tech Street, San Francisco, CA 94105",
-        company: "TechEvents Inc.",
-        avatar: "SJ",
-        avatarBg: "bg-purple-600",
-        eventsCreated: 24,
-        joinedDate: "Jan 15, 2025",
-        status: "Active",
-        statusVariant: "default",
-        verified: true,
-        location: "San Francisco, CA",
-        lastActive: "2 hours ago",
-        systemId: "TE-2025-001",
-        registrationDate: "January 15, 2025",
-        lastLogin: "Feb 12, 2026 at 10:45 AM",
-        lastLoginDevice: "Chrome on MacOS",
-        accountTier: "Enterprise Plus",
-        twoFactorEnabled: true,
-        lastSecurityReview: "Feb 1, 2026",
-        storageUsed: 85,
-        storageTotal: 100,
-        role: "Owner",
-        roleDescription: "Full access to all features and settings"
-    },
-    "2": {
-        id: 2,
-        name: "Michael Chen",
-        email: "michael.chen@musicfest.com",
-        phone: "+1 (555) 234-5678",
-        dateOfBirth: "July 22, 1985",
-        address: "456 Music Avenue, Los Angeles, CA 90028",
-        company: "MusicFest Productions",
-        avatar: "MC",
-        avatarBg: "bg-blue-600",
-        eventsCreated: 18,
-        joinedDate: "Dec 8, 2024",
-        status: "Active",
-        statusVariant: "default",
-        verified: true,
-        location: "Los Angeles, CA",
-        lastActive: "1 day ago",
-        systemId: "MF-2024-045",
-        registrationDate: "December 8, 2024",
-        lastLogin: "Feb 11, 2026 at 3:22 PM",
-        lastLoginDevice: "Firefox on Windows",
-        accountTier: "Professional",
-        twoFactorEnabled: false,
-        lastSecurityReview: "Jan 15, 2026",
-        storageUsed: 62,
-        storageTotal: 50,
-        role: "Admin",
-        roleDescription: "Can manage events and team members"
-    }
-}
+import {useEffect, useState} from "react";
+import {adminService} from "../../services/admin.service.js";
 
 export function AccountDetail() {
-    const {id} = useParams()
-    const account = accountData[id || "1"] || accountData["1"]
+    const {id} = useParams();
+    const [loading, setLoading] = useState(true);
+    const [account, setAccount] = useState(null);
+    const [error, setError] = useState(null);
+
+    const fetchAccount = async () => {
+        if (!id) return;
+
+        try {
+            setLoading(true);
+            const response = await adminService.getAccountDetail(id);
+            setAccount(response.data);
+        } catch (error) {
+            setError("Cannot load account detail");
+            console.error(error)
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        if (id) {
+            fetchAccount();
+        }
+    }, [id]);
+
+    const getStatusVariant = (status) => {
+        switch (status) {
+            case "ACTIVE":
+                return "default";
+            case "BANNED":
+                return "destructive";
+            default:
+                return "secondary";
+        }
+    }
+
+    const getStatusClasses = (status) => {
+        switch (status) {
+            case "ACTIVE":
+                return "bg-green-100 text-green-700 hover:bg-green-100";
+            case "BANNED":
+                return "bg-red-100 text-red-700 hover:bg-red-100";
+            default:
+                return "bg-gray-100 text-gray-700";
+        }
+    };
+
+    function formatDateTime(isoString) {
+        if (!isoString) return "—";
+
+        const sanitized = isoString.replace(
+            /\.(\d{3})\d+/,
+            ".$1"
+        );
+
+        const date = new Date(sanitized);
+
+        if (isNaN(date.getTime())) return "Invalid date";
+
+        const datePart = new Intl.DateTimeFormat("en-US", {
+            month: "short",
+            day: "2-digit",
+            year: "numeric",
+        }).format(date);
+
+        const timePart = new Intl.DateTimeFormat("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+        }).format(date);
+
+        return `${datePart} at ${timePart}`;
+    }
+
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>{error}</div>;
+    if (!account) return <div>Cannot find account detail.</div>;
 
     return (
         <div className="flex h-screen bg-[#F5F5F7]">
@@ -125,16 +141,6 @@ export function AccountDetail() {
                             <span>Account Detail</span>
                         </div>
                         <div className="flex items-center gap-3">
-                            {/*/!* Search Bar *!/*/}
-                            {/*<div className="relative">*/}
-                            {/*    <Search*/}
-                            {/*        className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"/>*/}
-                            {/*    <Input*/}
-                            {/*        type="text"*/}
-                            {/*        placeholder="Search events..."*/}
-                            {/*        className="pl-9 pr-4 py-2 w-[280px] rounded-full border-gray-300 focus:ring-[#7FA5A5] focus:border-[#7FA5A5]"*/}
-                            {/*    />*/}
-                            {/*</div>*/}
                             {/* Notification Icon */}
                             <Button
                                 variant="ghost"
@@ -158,25 +164,23 @@ export function AccountDetail() {
                     <div className="flex items-start justify-between">
                         <div className="flex items-center gap-6">
                             {/* Large Avatar */}
-                            <Avatar className={`w-20 h-20 ${account.avatarBg}`}>
-                                <AvatarFallback className="text-white text-2xl">
-                                    {account.avatar}
-                                </AvatarFallback>
+                            <Avatar className="w-20 h-20">
+                                {account.avatarUrl ? (
+                                    <AvatarImage src={account.avatarUrl} alt={account.fullName}/>
+                                ) : (
+                                    <AvatarFallback className="bg-gray-300"/>
+                                )}
                             </Avatar>
 
                             {/* Account Info */}
                             <div>
                                 <div className="flex items-center gap-3 mb-2">
                                     <h1 className="text-2xl font-semibold text-gray-900">
-                                        {account.name}
+                                        {account.fullName}
                                     </h1>
                                     <Badge
-                                        variant={account.statusVariant}
-                                        className={
-                                            account.statusVariant === "default"
-                                                ? "bg-green-100 text-green-700 hover:bg-green-100"
-                                                : "bg-red-100 text-red-700 hover:bg-red-100"
-                                        }
+                                        variant={getStatusVariant(account.status)}
+                                        className={getStatusClasses(account.status)}
                                     >
                                         ● {account.status}
                                     </Badge>
@@ -214,12 +218,14 @@ export function AccountDetail() {
                             >
                                 Basic Info
                             </TabsTrigger>
-                            <TabsTrigger
-                                value="events"
-                                className="h-12 bg-transparent border-b-2 border-transparent data-[state=active]:border-[#7FA5A5] data-[state=active]:text-[#7FA5A5] rounded-none px-5 data-[state=active]:shadow-none"
-                            >
-                                Events
-                            </TabsTrigger>
+                            {account.role === "ORGANIZER" && (
+                                <TabsTrigger
+                                    value="events"
+                                    className="h-12 bg-transparent border-b-2 border-transparent data-[state=active]:border-[#7FA5A5] data-[state=active]:text-[#7FA5A5] rounded-none px-5 data-[state=active]:shadow-none"
+                                >
+                                    Events
+                                </TabsTrigger>
+                            )}
                         </TabsList>
 
                         <TabsContent value="basic" className="mt-0">
@@ -242,7 +248,7 @@ export function AccountDetail() {
                                                     Full Name
                                                 </label>
                                                 <div className="text-sm text-gray-900 font-medium">
-                                                    {account.name}
+                                                    {account.fullName}
                                                 </div>
                                             </div>
                                             <div>
@@ -267,24 +273,6 @@ export function AccountDetail() {
                                                     {account.phone}
                                                 </div>
                                             </div>
-                                            <div>
-                                                <label
-                                                    className="text-xs text-gray-500 uppercase tracking-wide mb-1 block">
-                                                    Date of Birth
-                                                </label>
-                                                <div className="text-sm text-gray-900">
-                                                    {account.dateOfBirth}
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <label
-                                                    className="text-xs text-gray-500 uppercase tracking-wide mb-1 block">
-                                                    Address
-                                                </label>
-                                                <div className="text-sm text-gray-900">
-                                                    {account.address}
-                                                </div>
-                                            </div>
                                         </CardContent>
                                     </Card>
 
@@ -297,22 +285,22 @@ export function AccountDetail() {
                                             </CardDescription>
                                         </CardHeader>
                                         <CardContent className="pt-6 space-y-4">
-                                            <div>
-                                                <label
-                                                    className="text-xs text-gray-500 uppercase tracking-wide mb-1 block">
-                                                    System ID
-                                                </label>
-                                                <div className="text-sm text-gray-900 font-mono">
-                                                    {account.systemId}
-                                                </div>
-                                            </div>
+                                            {/*<div>*/}
+                                            {/*    <label*/}
+                                            {/*        className="text-xs text-gray-500 uppercase tracking-wide mb-1 block">*/}
+                                            {/*        System ID*/}
+                                            {/*    </label>*/}
+                                            {/*    <div className="text-sm text-gray-900 font-mono">*/}
+                                            {/*        {account.systemId}*/}
+                                            {/*    </div>*/}
+                                            {/*</div>*/}
                                             <div>
                                                 <label
                                                     className="text-xs text-gray-500 uppercase tracking-wide mb-1 block">
                                                     Registration Date
                                                 </label>
                                                 <div className="text-sm text-gray-900">
-                                                    {account.registrationDate}
+                                                    {formatDateTime(account.createdAt)}
                                                 </div>
                                             </div>
                                             <div>
@@ -321,53 +309,54 @@ export function AccountDetail() {
                                                     Last Login
                                                 </label>
                                                 <div className="text-sm text-gray-900">
-                                                    {account.lastLogin}
-                                                </div>
-                                                <div className="text-xs text-gray-500 mt-0.5">
-                                                    {account.lastLoginDevice}
+                                                    {formatDateTime(account.lastLoginAt)}
                                                 </div>
                                             </div>
-                                            <div>
-                                                <label
-                                                    className="text-xs text-gray-500 uppercase tracking-wide mb-1 block">
-                                                    Events Created
-                                                </label>
-                                                <div className="flex items-center gap-2">
-                          <span className="text-sm text-gray-900 font-semibold">
-                            {account.eventsCreated}
-                          </span>
-                                                    <Badge
-                                                        variant="outline"
-                                                        className="text-xs bg-green-50 text-green-700 border-green-200"
-                                                    >
-                                                        <TrendingUp className="h-3 w-3 mr-1"/>
-                                                        +12%
-                                                    </Badge>
+                                            {(account.role === "ORGANIZER" && (
+                                                <div>
+                                                    <label
+                                                        className="text-xs text-gray-500 uppercase tracking-wide mb-1 block">
+                                                        Events Created
+                                                    </label>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-sm text-gray-900 font-semibold">
+                                                            10 - test
+                                                        </span>
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="text-xs bg-green-50 text-green-700 border-green-200"
+                                                        >
+                                                            <TrendingUp className="h-3 w-3 mr-1"/>
+                                                            +12%
+                                                        </Badge>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            ))}
                                         </CardContent>
                                     </Card>
                                 </div>
                             </div>
                         </TabsContent>
 
-                        <TabsContent value="events" className="mt-0">
-                            <div className="p-8">
-                                <Card className="bg-white shadow-sm border border-gray-200">
-                                    <CardHeader className="border-b border-gray-100">
-                                        <CardTitle className="text-lg">Events Overview</CardTitle>
-                                        <CardDescription>
-                                            List of events created by this account
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent className="pt-6">
-                                        <p className="text-sm text-gray-600">
-                                            Events list would be displayed here...
-                                        </p>
-                                    </CardContent>
-                                </Card>
-                            </div>
-                        </TabsContent>
+                        {account.role === "ORGANIZER" && (
+                            <TabsContent value="events" className="mt-0">
+                                <div className="p-8">
+                                    <Card className="bg-white shadow-sm border border-gray-200">
+                                        <CardHeader className="border-b border-gray-100">
+                                            <CardTitle className="text-lg">Events Overview</CardTitle>
+                                            <CardDescription>
+                                                List of events created by this account
+                                            </CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="pt-6">
+                                            <p className="text-sm text-gray-600">
+                                                Events list would be displayed here...
+                                            </p>
+                                        </CardContent>
+                                    </Card>
+                                </div>
+                            </TabsContent>
+                        )}
                     </Tabs>
                 </div>
             </main>
