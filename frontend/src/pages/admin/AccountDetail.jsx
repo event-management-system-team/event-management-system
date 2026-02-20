@@ -68,6 +68,19 @@ export function AccountDetail() {
         }
     }, [id]);
 
+    const handleToggleBan = async () => {
+        const action = account.status === "ACTIVE" ? 'BAN' : 'ACTIVATE';
+        if (window.confirm(`Are you sure you want to ${action} this account?`)) {
+            try {
+                const res = await adminService.toggleBan(id);
+                alert(`${action} successfully!`);
+                await fetchAccount();
+            } catch (error) {
+                alert('Operation failed');
+            }
+        }
+    }
+
     const getStatusVariant = (status) => {
         switch (status) {
             case "ACTIVE":
@@ -208,14 +221,14 @@ export function AccountDetail() {
                                             <Edit className="h-4 w-4"/>
                                             Edit Profile
                                         </Button>
-                                        <Button variant="destructive" className="gap-2">
+                                        <Button variant="destructive" className="gap-2" onClick={handleToggleBan}>
                                             <Ban className="h-4 w-4"/>
                                             Ban Account
                                         </Button>
                                     </div>
                                 ) : (
                                     <div className="flex gap-2">
-                                        <Button className="gap-2 bg-green-600 hover:bg-green-700 text-white">
+                                        <Button className="gap-2 bg-green-600 hover:bg-green-700 text-white" onClick={handleToggleBan}>
                                             <CheckCircle className="h-4 w-4"/>
                                             Activate Account
                                         </Button>

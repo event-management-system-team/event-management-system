@@ -1,5 +1,6 @@
 package com.eventmanagement.backend.service;
 
+import com.eventmanagement.backend.constants.Status;
 import com.eventmanagement.backend.dto.request.UserUpdateRequest;
 import com.eventmanagement.backend.dto.response.UserResponse;
 import com.eventmanagement.backend.model.User;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -42,6 +44,7 @@ public class AdminService {
         return mapToResponse(user);
     }
 
+    @Transactional
     public UserResponse updateProfile(UUID id, UserUpdateRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User does not exist"));
@@ -49,6 +52,20 @@ public class AdminService {
         if (request.getFullName() != null) user.setFullName(request.getFullName());
         if (request.getEmail() != null) user.setEmail(request.getEmail());
         if (request.getPhone() != null) user.setPhone(request.getPhone());
+
+        return mapToResponse(userRepository.save(user));
+    }
+
+    @Transactional
+    public UserResponse toggleBanAccount(UUID id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User does not exist"));
+
+        if (user.getStatus() == Status.ACTIVE) {
+            user.setStatus(Status.BANNED);
+        } else {
+            user.setStatus(Status.ACTIVE);
+        }
 
         return mapToResponse(userRepository.save(user));
     }

@@ -45,4 +45,9 @@ public class AdminAccountController {
     public ResponseEntity<UserResponse> updateProfile(@PathVariable UUID id, @RequestBody UserUpdateRequest request) {
         return ResponseEntity.ok(adminService.updateProfile(id, request));
     }
+
+    @PatchMapping("/{id}/toggle-ban")
+    public ResponseEntity<UserResponse> toggleBan(@PathVariable UUID id) {
+        return ResponseEntity.ok(adminService.toggleBanAccount(id));
+    }
 }

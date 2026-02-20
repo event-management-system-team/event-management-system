@@ -25,4 +25,8 @@ export const adminService = {
     updateProfile: (id, data) => {
         return axiosInstance.put(`/admin/accounts/${id}/profile`, data);
     },
+
+    toggleBan: (id) => {
+        return axiosInstance.patch(`/admin/accounts/${id}/toggle-ban`);
+    }
 };
