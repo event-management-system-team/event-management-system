@@ -8,7 +8,7 @@ export const fetchCategories = createAsyncThunk(
             const data = await categoryService.getAllCategories();
             return data;
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response?.data || 'Failed to load category list');
+            return thunkAPI.rejectWithValue(error.response?.data);
         }
     }
 );
@@ -20,7 +20,6 @@ const categorySlice = createSlice({
         categories: [],
         isLoading: false,
         isError: false,
-        errorMessage: '',
     },
     reducers: {},
     extraReducers: (builder) => {
@@ -39,7 +38,6 @@ const categorySlice = createSlice({
             .addCase(fetchCategories.rejected, (state, action) => {
                 state.isLoading = false;
                 state.isError = true;
-                state.errorMessage = action.payload;
             });
     }
 });
