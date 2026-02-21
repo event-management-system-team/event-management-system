@@ -30,23 +30,16 @@ export function CreateOrganizerModal({isOpen, onClose}) {
         fullName: "",
         email: "",
         phone: "",
-        password: "",
-        companyName: "",
-        industry: "",
-        companySize: "",
-        website: "",
-        address: "",
-        country: ""
+        password: ""
     })
 
     const steps = [
-        {number: 1, label: "Personal", id: "personal"},
-        {number: 2, label: "Company", id: "company"},
-        {number: 3, label: "Verification", id: "verification"}
+        {number: 1, label: "General", id: "general"},
+        {number: 2, label: "Verification", id: "verification"}
     ]
 
     const handleNext = () => {
-        if (currentStep < 3) {
+        if (currentStep < 2) {
             setCurrentStep(currentStep + 1)
         }
     }
@@ -85,20 +78,13 @@ export function CreateOrganizerModal({isOpen, onClose}) {
             fullName: "",
             email: "",
             phone: "",
-            password: "",
-            companyName: "",
-            industry: "",
-            companySize: "",
-            website: "",
-            address: "",
-            country: ""
+            password: ""
         })
         setUploadedFiles([])
     }
 
     const isStep1Valid =
         formData.fullName && formData.email && formData.password.length >= 8
-    const isStep2Valid = formData.companyName && formData.industry
 
     if (!isOpen) return null
 
@@ -163,15 +149,15 @@ export function CreateOrganizerModal({isOpen, onClose}) {
                         </div>
                     </div>
 
-                    {/* Step 1 - Personal Information */}
+                    {/* Step 1 - General Information */}
                     {currentStep === 1 && (
                         <div>
                             <div className="mb-6">
                                 <h2 className="text-xl font-semibold text-gray-900 mb-1">
-                                    Step 1: Personal Information
+                                    Step 1: General Information
                                 </h2>
                                 <p className="text-sm text-gray-500">
-                                    Please provide the primary contact details for this account.
+                                    Please provide the primary contact details for this organizer account.
                                 </p>
                             </div>
 
@@ -179,12 +165,12 @@ export function CreateOrganizerModal({isOpen, onClose}) {
                                 <div>
                                     <Label htmlFor="fullName"
                                            className="text-sm font-medium text-gray-700 mb-1.5 block">
-                                        Full Name <span className="text-red-500">*</span>
+                                        Organization Name <span className="text-red-500">*</span>
                                     </Label>
                                     <Input
                                         id="fullName"
                                         type="text"
-                                        placeholder="e.g. John Doe"
+                                        placeholder="e.g. Vie Channel Ent."
                                         value={formData.fullName}
                                         onChange={(e) => setFormData({...formData, fullName: e.target.value})}
                                         className="h-10"
@@ -193,7 +179,7 @@ export function CreateOrganizerModal({isOpen, onClose}) {
 
                                 <div>
                                     <Label htmlFor="email" className="text-sm font-medium text-gray-700 mb-1.5 block">
-                                        Corporate Email <span className="text-red-500">*</span>
+                                        Email Address <span className="text-red-500">*</span>
                                     </Label>
                                     <Input
                                         id="email"
@@ -217,7 +203,6 @@ export function CreateOrganizerModal({isOpen, onClose}) {
                                         onChange={(e) => setFormData({...formData, phone: e.target.value})}
                                         className="h-10"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">Include country code</p>
                                 </div>
 
                                 <div>
@@ -258,141 +243,12 @@ export function CreateOrganizerModal({isOpen, onClose}) {
                         </div>
                     )}
 
-                    {/* Step 2 - Company Details */}
+                    {/* Step 2 - Verification Documents */}
                     {currentStep === 2 && (
                         <div>
                             <div className="mb-6">
                                 <h2 className="text-xl font-semibold text-gray-900 mb-1">
-                                    Step 2: Company Details
-                                </h2>
-                                <p className="text-sm text-gray-500">
-                                    Provide information about the organization or business.
-                                </p>
-                            </div>
-
-                            <div className="space-y-5">
-                                <div>
-                                    <Label htmlFor="companyName"
-                                           className="text-sm font-medium text-gray-700 mb-1.5 block">
-                                        Company Name <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Input
-                                        id="companyName"
-                                        type="text"
-                                        placeholder="e.g. TechEvents Inc."
-                                        value={formData.companyName}
-                                        onChange={(e) => setFormData({...formData, companyName: e.target.value})}
-                                        className="h-10"
-                                    />
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <Label htmlFor="industry"
-                                               className="text-sm font-medium text-gray-700 mb-1.5 block">
-                                            Industry <span className="text-red-500">*</span>
-                                        </Label>
-                                        <Select
-                                            value={formData.industry}
-                                            onValueChange={(value) => setFormData({...formData, industry: value})}
-                                        >
-                                            <SelectTrigger className="h-10">
-                                                <SelectValue placeholder="Select industry"/>
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="technology">Technology</SelectItem>
-                                                <SelectItem value="music">Music & Entertainment</SelectItem>
-                                                <SelectItem value="education">Education</SelectItem>
-                                                <SelectItem value="business">Business & Corporate</SelectItem>
-                                                <SelectItem value="food">Food & Beverage</SelectItem>
-                                                <SelectItem value="sports">Sports & Recreation</SelectItem>
-                                                <SelectItem value="other">Other</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    <div>
-                                        <Label htmlFor="companySize"
-                                               className="text-sm font-medium text-gray-700 mb-1.5 block">
-                                            Company Size
-                                        </Label>
-                                        <Select
-                                            value={formData.companySize}
-                                            onValueChange={(value) => setFormData({...formData, companySize: value})}
-                                        >
-                                            <SelectTrigger className="h-10">
-                                                <SelectValue placeholder="Select size"/>
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="1-10">1-10 employees</SelectItem>
-                                                <SelectItem value="11-50">11-50 employees</SelectItem>
-                                                <SelectItem value="51-200">51-200 employees</SelectItem>
-                                                <SelectItem value="201-500">201-500 employees</SelectItem>
-                                                <SelectItem value="500+">500+ employees</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <Label htmlFor="website" className="text-sm font-medium text-gray-700 mb-1.5 block">
-                                        Website
-                                    </Label>
-                                    <Input
-                                        id="website"
-                                        type="url"
-                                        placeholder="https://www.company.com"
-                                        value={formData.website}
-                                        onChange={(e) => setFormData({...formData, website: e.target.value})}
-                                        className="h-10"
-                                    />
-                                </div>
-
-                                <div>
-                                    <Label htmlFor="country" className="text-sm font-medium text-gray-700 mb-1.5 block">
-                                        Country
-                                    </Label>
-                                    <Select
-                                        value={formData.country}
-                                        onValueChange={(value) => setFormData({...formData, country: value})}
-                                    >
-                                        <SelectTrigger className="h-10">
-                                            <SelectValue placeholder="Select country"/>
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="us">United States</SelectItem>
-                                            <SelectItem value="ca">Canada</SelectItem>
-                                            <SelectItem value="uk">United Kingdom</SelectItem>
-                                            <SelectItem value="au">Australia</SelectItem>
-                                            <SelectItem value="de">Germany</SelectItem>
-                                            <SelectItem value="fr">France</SelectItem>
-                                            <SelectItem value="other">Other</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-
-                                <div>
-                                    <Label htmlFor="address" className="text-sm font-medium text-gray-700 mb-1.5 block">
-                                        Business Address
-                                    </Label>
-                                    <Textarea
-                                        id="address"
-                                        placeholder="Street address, city, state/province, postal code"
-                                        value={formData.address}
-                                        onChange={(e) => setFormData({...formData, address: e.target.value})}
-                                        className="min-h-20 resize-none"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Step 3 - Verification Documents */}
-                    {currentStep === 3 && (
-                        <div>
-                            <div className="mb-6">
-                                <h2 className="text-xl font-semibold text-gray-900 mb-1">
-                                    Step 3: Verification Documents
+                                    Step 2: Verification Documents
                                 </h2>
                                 <p className="text-sm text-gray-500">
                                     Upload business licenses or identity proof for verification.
@@ -466,12 +322,12 @@ export function CreateOrganizerModal({isOpen, onClose}) {
                                     </div>
                                 )}
 
-                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                    <p className="text-sm text-blue-800">
-                                        <strong>Note:</strong> Documents will be reviewed within 24-48 hours. You'll
-                                        receive an email notification once the account is approved.
-                                    </p>
-                                </div>
+                                {/*<div className="bg-blue-50 border border-blue-200 rounded-lg p-4">*/}
+                                {/*    <p className="text-sm text-blue-800">*/}
+                                {/*        <strong>Note:</strong> Documents will be reviewed within 24-48 hours. You'll*/}
+                                {/*        receive an email notification once the account is approved.*/}
+                                {/*    </p>*/}
+                                {/*</div>*/}
                             </div>
                         </div>
                     )}
@@ -495,16 +351,15 @@ export function CreateOrganizerModal({isOpen, onClose}) {
                             >
                                 Back
                             </Button>
-                            {currentStep < 3 ? (
+                            {currentStep < 2 ? (
                                 <Button
                                     onClick={handleNext}
                                     disabled={
-                                        (currentStep === 1 && !isStep1Valid) ||
-                                        (currentStep === 2 && !isStep2Valid)
+                                        (currentStep === 1 && !isStep1Valid)
                                     }
                                     className="px-6 bg-[#7FA5A5] hover:bg-[#6D9393] text-white"
                                 >
-                                    {currentStep === 1 ? 'Next: Company Details' : 'Next: Verification'}
+                                    Next: Verification
                                 </Button>
                             ) : (
                                 <Button

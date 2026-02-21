@@ -1,5 +1,6 @@
 package com.eventmanagement.backend.controller.admin;
 
+import com.eventmanagement.backend.dto.request.CreateOrganizerRequest;
 import com.eventmanagement.backend.dto.request.UserUpdateRequest;
 import com.eventmanagement.backend.dto.response.UserResponse;
 import com.eventmanagement.backend.model.User;
@@ -49,5 +50,10 @@ public class AdminAccountController {
     @PatchMapping("/{id}/toggle-ban")
     public ResponseEntity<UserResponse> toggleBan(@PathVariable UUID id) {
         return ResponseEntity.ok(adminService.toggleBanAccount(id));
+    }
+
+    @PostMapping("/organizer")
+    public ResponseEntity<UserResponse> createOrganizer(@RequestBody CreateOrganizerRequest request) {
+        return ResponseEntity.ok(adminService.createOrganizer(request));
     }
 }
