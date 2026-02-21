@@ -28,11 +28,7 @@ const FeedbackList = () => {
             <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-2">Attendee Feedback</h1>
             <p className="text-gray-500 font-medium italic">Showing all responses for <span className="text-gray-800 not-italic font-bold">BridgeFest 2025</span></p>
           </div>
-<<<<<<< Updated upstream:frontend/src/pages/FeedbackList.jsx
-          <button className="bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-5 py-2.5 rounded-lg flex items-center gap-2 text-sm font-bold shadow-md transition-all">
-             <Download size={18} strokeWidth={2.5} /> Feedback Form
-          </button>
-=======
+
 {/* Bọc 2 nút vào một div có flex và gap */}
 <div className="flex items-center gap-3 justify-end">
   <Link 
@@ -50,7 +46,6 @@ const FeedbackList = () => {
     <Plus size={18} strokeWidth={2.5} /> Update Feedback Form
   </Link>
 </div>
->>>>>>> Stashed changes:frontend/src/pages/organizer/FeedbackList.jsx
         </div>
 
         {/* Filter Bar (Thanh tìm kiếm) */}
