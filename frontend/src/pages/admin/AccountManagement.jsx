@@ -125,6 +125,23 @@ export function AccountManagement() {
         }
     }
 
+    const handleToggleBan = async (account) => {
+        if (!account) return;
+
+        const isBanned = account.status === "BANNED";
+        const action = isBanned ? "ACTIVATE" : "BAN";
+
+        if (window.confirm(`Are you sure you want to ${action} this account?`)) {
+            try {
+                const res = await adminService.toggleBan(account.userId);
+                alert(`${action} successfully!`);
+                await fetchAccounts();
+            } catch (error) {
+                alert('Operation failed');
+            }
+        }
+    }
+
     const processedAccounts = useMemo(() => {
         return [...accounts]
             // filter by status
@@ -414,7 +431,7 @@ export function AccountManagement() {
                                 {/* Account Rows */}
                                 {processedAccounts.map(account => (
                                     <div
-                                        key={account.id}
+                                        key={account.userId}
                                         className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-gray-50"
                                     >
                                         <div className="col-span-1 flex items-center">
@@ -478,18 +495,21 @@ export function AccountManagement() {
                                                             View account details
                                                         </DropdownMenuItem>
                                                     </Link>
-                                                    <DropdownMenuItem>
-                                                        {account.status === "BANNED" ? (
-                                                            <>
-                                                                <CheckCircle className="mr-2 h-4 w-4"/>
-                                                                Activate account
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <UserX className="mr-2 h-4 w-4"/>
-                                                                Ban account
-                                                            </>
-                                                        )}
+                                                    <DropdownMenuItem
+                                                        className="flex items-center gap-2 cursor-pointer"
+                                                        onClick={() => handleToggleBan(account)}
+                                                    >
+                                                            {account.status === "BANNED" ? (
+                                                                <>
+                                                                    <CheckCircle className="mr-2 h-4 w-4"/>
+                                                                    Activate account
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <UserX className="mr-2 h-4 w-4"/>
+                                                                    Ban account
+                                                                </>
+                                                            )}
                                                     </DropdownMenuItem>
                                                     {/*<DropdownMenuItem>*/}
                                                     {/*    <Settings className="mr-2 h-4 w-4"/>*/}
