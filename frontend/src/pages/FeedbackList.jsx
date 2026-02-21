@@ -28,9 +28,29 @@ const FeedbackList = () => {
             <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-2">Attendee Feedback</h1>
             <p className="text-gray-500 font-medium italic">Showing all responses for <span className="text-gray-800 not-italic font-bold">BridgeFest 2025</span></p>
           </div>
+<<<<<<< Updated upstream:frontend/src/pages/FeedbackList.jsx
           <button className="bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-5 py-2.5 rounded-lg flex items-center gap-2 text-sm font-bold shadow-md transition-all">
              <Download size={18} strokeWidth={2.5} /> Feedback Form
           </button>
+=======
+{/* Bọc 2 nút vào một div có flex và gap */}
+<div className="flex items-center gap-3 justify-end">
+  <Link 
+    to="/organizer/feedback/createform" 
+    className="bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-5 py-2.5 rounded-lg flex items-center gap-2 text-sm font-bold shadow-md transition-all"
+  >
+    <Plus size={18} strokeWidth={2.5} /> Create Feedback Form
+  </Link>
+  
+  <Link 
+    to="/organizer/feedback/createform" 
+    className="bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-5 py-2.5 rounded-lg flex items-center gap-2 text-sm font-bold shadow-md transition-all"
+  >
+    {/* Gợi ý: Nếu là nút Update, bạn có thể đổi icon <Plus> thành <Edit> hoặc <Pen> cho hợp lý nhé */}
+    <Plus size={18} strokeWidth={2.5} /> Update Feedback Form
+  </Link>
+</div>
+>>>>>>> Stashed changes:frontend/src/pages/organizer/FeedbackList.jsx
         </div>
 
         {/* Filter Bar (Thanh tìm kiếm) */}
@@ -111,9 +131,9 @@ const FeedbackList = () => {
 
                   {/* Cột 5: Hành động */}
                   <td className="px-6 py-5 text-center">
-                    <button className="text-gray-300 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-all">
+                  <Link to={`/organizer/feedback/${item.id}`} className="inline-block text-gray-300 hover:text-[#8c9db3] hover:bg-[#8c9db3]/10 p-2 rounded-full transition-all">
                       <Eye size={20} />
-                    </button>
+                    </Link>
                   </td>
                 </tr>
               ))}
