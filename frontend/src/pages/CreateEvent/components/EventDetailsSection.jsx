@@ -1,6 +1,6 @@
 import React from 'react';
 import { Upload } from 'lucide-react';
-import { Input, TextArea, Select } from '../../../components/ui/Input';
+import { Input, TextArea, Select } from '../../../components/common/Input';
 
 export const EventDetailsSection = () => {
     return (

@@ -1,6 +1,6 @@
 import React from 'react';
 import { MapPin, Search } from 'lucide-react';
-import { Input } from '../../../components/ui/Input';
+import { Input } from '../../../components/common/Input';
 
 export const LocationSection = () => {
     return (
