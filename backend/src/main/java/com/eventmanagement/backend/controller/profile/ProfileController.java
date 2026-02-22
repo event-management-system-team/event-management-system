@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -62,16 +63,31 @@ public class ProfileController {
 
     @PostMapping("/upload-avatar")
     public ResponseEntity<Map<String, String>> uploadAvatar(
-            @RequestParam String avatarUrl,
+            @RequestParam("file") MultipartFile file,
             HttpServletRequest httpRequest) {
-        UUID userId = getUserIdFromRequest(httpRequest);
-        String url = profileService.uploadAvatar(userId, avatarUrl);
+        try {
+            log.info("Received avatar upload request");
+            log.info("File name: {}", file.getOriginalFilename());
+            log.info("File size: {} bytes", file.getSize());
+            log.info("Content type: {}", file.getContentType());
 
-        Map<String, String> response = new HashMap<>();
-        response.put("avatarUrl", url);
-        response.put("message", "Avatar uploaded successfully");
+            UUID userId = getUserIdFromRequest(httpRequest);
+            String avatarUrl = profileService.uploadAvatar(userId, file);
 
-        return ResponseEntity.ok(response);
+            Map<String, String> response = new HashMap<>();
+            response.put("avatarUrl", avatarUrl);
+            response.put("message", "Avatar uploaded successfully");
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("Avatar upload failed: {}", e.getMessage(), e);
+
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+
+            return ResponseEntity.badRequest().body(error);
+        }
     }
 
     private UUID getUserIdFromRequest(HttpServletRequest request) {

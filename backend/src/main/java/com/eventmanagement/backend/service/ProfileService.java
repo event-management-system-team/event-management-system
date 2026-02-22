@@ -2,8 +2,8 @@ package com.eventmanagement.backend.service;
 
 import java.util.UUID;
 
-import org.checkerframework.checker.units.qual.s;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.eventmanagement.backend.dto.request.ChangePasswordRequest;
 import com.eventmanagement.backend.dto.request.UpdateProfileRequest;
@@ -19,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.io.IOException;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -26,6 +28,7 @@ public class ProfileService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CloudinaryService cloudinaryService;
 
     public ProfileResponse getProfile(UUID userId) {
 
@@ -108,11 +111,21 @@ public class ProfileService {
     }
 
     @Transactional
-    public String uploadAvatar(UUID userId, String avatarUrl) {
+    public String uploadAvatar(UUID userId, MultipartFile file) throws IOException {
         log.info("Uploading avatar for user: {}", userId);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
+
+        if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
+            try {
+                cloudinaryService.deleteImage(user.getAvatarUrl());
+            } catch (Exception e) {
+                log.warn("Failed to delete old avatar: {}", e.getMessage());
+            }
+        }
+
+        String avatarUrl = cloudinaryService.uploadImage(file);
 
         user.setAvatarUrl(avatarUrl);
         userRepository.save(user);
