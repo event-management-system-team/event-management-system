@@ -70,6 +70,11 @@ export function AccountManagement() {
         setIsModalOpen(false);
     };
 
+    const handleOrganizerCreated = (newAccount) => {
+        setAccounts(prevAccounts => [newAccount, ...prevAccounts]);
+        setOriginalAccounts(prevOriginal => [newAccount, ...prevOriginal]);
+    }
+
     // useEffect(() => {
     //     const fetchAccounts = async () => {
     //         try {
@@ -488,7 +493,8 @@ export function AccountManagement() {
                                                         <MoreVertical className="h-4 w-4 text-gray-500"/>
                                                     </Button>
                                                 </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="bg-white border-2 border-gray-200">
+                                                <DropdownMenuContent align="end"
+                                                                     className="bg-white border-2 border-gray-200">
                                                     <Link to={`/admin/accounts/account-detail/${account.userId}`}>
                                                         <DropdownMenuItem>
                                                             <UserCircle className="mr-2 h-4 w-4"/>
@@ -499,17 +505,17 @@ export function AccountManagement() {
                                                         className="flex items-center gap-2 cursor-pointer"
                                                         onClick={() => handleToggleBan(account)}
                                                     >
-                                                            {account.status === "BANNED" ? (
-                                                                <>
-                                                                    <CheckCircle className="mr-2 h-4 w-4"/>
-                                                                    Activate account
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    <UserX className="mr-2 h-4 w-4"/>
-                                                                    Ban account
-                                                                </>
-                                                            )}
+                                                        {account.status === "BANNED" ? (
+                                                            <>
+                                                                <CheckCircle className="mr-2 h-4 w-4"/>
+                                                                Activate account
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <UserX className="mr-2 h-4 w-4"/>
+                                                                Ban account
+                                                            </>
+                                                        )}
                                                     </DropdownMenuItem>
                                                     {/*<DropdownMenuItem>*/}
                                                     {/*    <Settings className="mr-2 h-4 w-4"/>*/}
@@ -558,7 +564,7 @@ export function AccountManagement() {
                 </main>
 
                 {/* Create Organizer Modal */}
-                <CreateOrganizerModal isOpen={isModalOpen} onClose={closeModal}/>
+                <CreateOrganizerModal isOpen={isModalOpen} onClose={closeModal} onCreated={handleOrganizerCreated}/>
             </div>
         </>
     );

@@ -28,5 +28,9 @@ export const adminService = {
 
     toggleBan: (id) => {
         return axiosInstance.patch(`/admin/accounts/${id}/toggle-ban`);
+    },
+
+    createOrganizer: (data) => {
+        return axiosInstance.post(`/admin/accounts/organizer`, data);
     }
 };

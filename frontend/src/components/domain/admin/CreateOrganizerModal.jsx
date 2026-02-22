@@ -19,8 +19,9 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from './S
 import {Textarea} from './Textarea.jsx';
 import {useState} from 'react';
 import {cn} from './utils.js';
+import {adminService} from "../../../services/admin.service.js";
 
-export function CreateOrganizerModal({isOpen, onClose}) {
+export function CreateOrganizerModal({isOpen, onClose, onCreated}) {
     const [currentStep, setCurrentStep] = useState(1);
     const [showPassword, setShowPassword] = useState(false);
     const [uploadedFiles, setUploadedFiles] = useState([])
@@ -68,19 +69,18 @@ export function CreateOrganizerModal({isOpen, onClose}) {
         setUploadedFiles(uploadedFiles.filter(file => file.id !== id))
     }
 
-    const handleSubmit = () => {
-        // Handle form submission
-        console.log("Form submitted:", formData)
-        onClose()
-        // Reset form
-        setCurrentStep(1)
-        setFormData({
-            fullName: "",
-            email: "",
-            phone: "",
-            password: ""
-        })
-        setUploadedFiles([])
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await adminService.createOrganizer(formData);
+            alert("Created successfully");
+            onCreated(response.data);
+            onClose();
+        } catch (error) {
+            console.error(error);
+            alert(error.message);
+        }
     }
 
     const isStep1Valid =
@@ -198,7 +198,7 @@ export function CreateOrganizerModal({isOpen, onClose}) {
                                     <Input
                                         id="phone"
                                         type="tel"
-                                        placeholder="+1 (555) 000-0000"
+                                        placeholder="0123456789"
                                         value={formData.phone}
                                         onChange={(e) => setFormData({...formData, phone: e.target.value})}
                                         className="h-10"
