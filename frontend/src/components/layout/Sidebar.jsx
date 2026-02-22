@@ -6,7 +6,7 @@ const Sidebar = () => {
     const location = useLocation();
 
     const navItems = [
-        { icon: Calendar, label: 'My Events', path: '/create-event' }, // Assuming this is the active one in screenshot
+        { icon: Calendar, label: 'Create New Event', path: '/create-event' },
     ];
 
     return (
@@ -41,8 +41,8 @@ const Sidebar = () => {
                             key={index}
                             to={item.path}
                             className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${isActive
-                                    ? 'bg-gradient-to-r from-teal-500/20 to-teal-500/10 text-teal-400 border border-teal-500/20'
-                                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                                ? 'bg-gradient-to-r from-teal-500/20 to-teal-500/10 text-teal-400 border border-teal-500/20'
+                                : 'text-gray-400 hover:bg-gray-800 hover:text-white'
                                 }`}
                         >
                             <item.icon className="w-5 h-5" />
