@@ -1,34 +1,33 @@
 package com.eventmanagement.backend.service;
 
-import com.eventmanagement.backend.constants.Status;
-import com.eventmanagement.backend.dto.request.GoogleLoginRequest;
-import com.eventmanagement.backend.dto.request.LoginRequest;
-import com.eventmanagement.backend.dto.request.RegisterRequest;
-import com.eventmanagement.backend.dto.response.LoginResponse;
-import com.eventmanagement.backend.dto.response.RefreshTokenResponse;
-import com.eventmanagement.backend.dto.response.RegisterResponse;
-import com.eventmanagement.backend.dto.response.GoogleLoginResponse;
-import com.eventmanagement.backend.model.User;
-import com.eventmanagement.backend.exception.BadRequestException;
-import com.eventmanagement.backend.exception.UnauthorizedException;
-import com.eventmanagement.backend.repository.UserRepository;
-import com.eventmanagement.backend.security.JwtTokenProvider;
-import com.eventmanagement.backend.constants.Role;
-import com.eventmanagement.backend.util.GenerateAvatarUrl;
-
-import jakarta.servlet.http.HttpServletResponse;
-
-import com.eventmanagement.backend.util.CookieUtil;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
+import com.eventmanagement.backend.constants.Role;
+import com.eventmanagement.backend.constants.Status;
+import com.eventmanagement.backend.dto.request.GoogleLoginRequest;
+import com.eventmanagement.backend.dto.request.LoginRequest;
+import com.eventmanagement.backend.dto.request.RegisterRequest;
+import com.eventmanagement.backend.dto.response.GoogleLoginResponse;
+import com.eventmanagement.backend.dto.response.LoginResponse;
+import com.eventmanagement.backend.dto.response.RefreshTokenResponse;
+import com.eventmanagement.backend.dto.response.RegisterResponse;
+import com.eventmanagement.backend.exception.BadRequestException;
+import com.eventmanagement.backend.exception.UnauthorizedException;
+import com.eventmanagement.backend.model.User;
+import com.eventmanagement.backend.repository.UserRepository;
+import com.eventmanagement.backend.security.JwtTokenProvider;
+import com.eventmanagement.backend.util.CookieUtil;
+import com.eventmanagement.backend.util.GenerateAvatarUrl;
+
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
@@ -75,7 +74,7 @@ public class AuthService {
                 .fullName(savedUser.getFullName())
                 .phone(savedUser.getPhone())
                 .avatarUrl(savedUser.getAvatarUrl())
-                .role((Role) savedUser.getRole())
+                .role(savedUser.getRole())
                 .createdAt(savedUser.getCreatedAt())
                 .message("Registration successful! Please log in to continue.")
                 .build();
@@ -87,7 +86,8 @@ public class AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UnauthorizedException("Incorrect email or password"));
 
-        if (((Role) user.getRole()).name().equals("BANNED")) {
+
+        if (user.getStatus().name().equals("BANNED")) {
             throw new BadRequestException("Your account has been locked.");
         }
 
@@ -101,8 +101,8 @@ public class AuthService {
         String accessToken = jwtTokenProvider.generateAccessToken(
                 user.getUserId(),
                 user.getEmail(),
-                ((Role) user.getRole()).name());
 
+                user.getRole().name());
         String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUserId());
 
         int maxAge = (int) refreshTokenExpiration / 60;
@@ -116,7 +116,7 @@ public class AuthService {
                         .email(user.getEmail())
                         .full_name(user.getFullName())
                         .avatar_url(user.getAvatarUrl())
-                        .role((Role) user.getRole())
+                        .role(user.getRole())
                         .build())
                 .build();
     }
@@ -166,7 +166,8 @@ public class AuthService {
         String accessToken = jwtTokenProvider.generateAccessToken(
                 user.getUserId(),
                 user.getEmail(),
-                ((Role) user.getRole()).name());
+
+                user.getRole().name());
 
         String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUserId());
 
@@ -181,7 +182,7 @@ public class AuthService {
                         .email(user.getEmail())
                         .full_name(user.getFullName())
                         .avatar_url(user.getAvatarUrl())
-                        .role((Role) user.getRole())
+                        .role(user.getRole())
                         .build())
                 .build();
     }
@@ -204,7 +205,8 @@ public class AuthService {
         String newAccessToken = jwtTokenProvider.generateAccessToken(
                 user.getUserId(),
                 user.getEmail(),
-                ((Role) user.getRole()).name());
+
+                user.getRole().name());
 
         String newRefreshToken = jwtTokenProvider.generateRefreshToken(user.getUserId());
         int maxAge = (int) (refreshTokenExpiration / 1000);

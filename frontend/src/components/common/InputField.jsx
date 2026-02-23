@@ -18,14 +18,16 @@ export const InputField = forwardRef(
         </label>
         <div className="relative">
           <input
-            ref={ref} // ✅ Quan trọng: Forward ref cho React Hook Form
+            ref={ref}
+
             className={`w-full h-12 px-6 rounded-full border ${
               error ? "border-red-500" : "border-gray-300"
             } bg-white text-gray-900 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-gray-400`}
             id={id}
             placeholder={placeholder}
             type={inputType}
-            {...rest} // ✅ Spread các props từ register()
+
+            {...rest}
           />
           {isPassword && (
             <button

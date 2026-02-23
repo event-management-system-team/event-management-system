@@ -1,6 +1,6 @@
 import React from 'react';
 import { Eye, Search, Download, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
-import Sidebar from '../components/layout/Sidebar'; // Đảm bảo import đúng Sidebar vừa tạo
+import Sidebar from '../../components/layout/Sidebar'; // Đảm bảo import đúng Sidebar vừa tạo
 
 const FeedbackList = () => {
   // DỮ LIỆU GIẢ (Mock Data) - Giống hệt trong ảnh bạn gửi
