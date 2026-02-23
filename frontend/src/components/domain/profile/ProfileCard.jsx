@@ -160,7 +160,7 @@ export const ProfileCard = () => {
   // Logout
   const handleLogout = async () => {
     await dispatch(logoutUser());
-    navigate("/login");
+    navigate("/");
   };
 
   if (!profileData) {
