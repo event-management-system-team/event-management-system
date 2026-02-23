@@ -83,12 +83,6 @@ export const LoginForm = () => {
           </div>
         )}
 
-        {/*<div className="flex justify-center mb-8">
-          <button className="w-full flex items-center justify-center gap-2 h-12 px-6 rounded-full border border-gray-300 bg-white text-gray-700 font-semibold hover:bg-gray-50 transition-colors">
-            <FcGoogle className="size-5" />
-            <span>Continue with Google</span>
-          </button>
-        </div>*/}
         <div className="flex justify-center mb-8 text-center text-gray-700">
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
