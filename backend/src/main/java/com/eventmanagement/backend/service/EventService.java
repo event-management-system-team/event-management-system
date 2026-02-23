@@ -32,6 +32,16 @@ public class EventService {
         return events.stream().map((event) -> mapToResponse(event)).collect(Collectors.toList());
     }
 
+    public Page<EventResponse> searchEventsByLocation(String keyword, String location, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        String kw = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : "";
+        String loc = (location != null && !location.trim().isEmpty()) ? location.trim() : "";
+
+        Page<Event> events = eventRepository.findEventsByLocation(EventStatus.APPROVED, kw, loc, pageable);
+        return events.map(event -> mapToResponse(event));
+    }
+
 
     private EventResponse mapToResponse(Event event) {
 

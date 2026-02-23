@@ -29,6 +29,17 @@ public class EventController {
         return ResponseEntity.ok(eventResponses);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<Page<EventResponse>> searchEventsByLocation(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String location,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<EventResponse> events = eventService.searchEventsByLocation(keyword, location, page, size);
+        return ResponseEntity.ok(events);
+    }
+
 
 }
 

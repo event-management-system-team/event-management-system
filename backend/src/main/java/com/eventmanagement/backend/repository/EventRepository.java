@@ -23,5 +23,14 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
             "ORDER BY (e.totalCapacity - e.registeredCount) ASC")
     List<Event> findHotEventsSellingFast(@Param("status") EventStatus status, Pageable pageable);
 
+    @Query("SELECT e FROM Event e " +
+            "WHERE e.status = :status " +
+            "AND (:keyword IS NULL OR LOWER(e.eventName) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+            "AND (:location IS NULL OR LOWER(e.location) LIKE LOWER(CONCAT('%', :location, '%')))")
+    Page<Event> findEventsByLocation(@Param("status") EventStatus status,
+                                     @Param("keyword") String keyword,
+                                     @Param("location") String location,
+                                     Pageable pageable);
+
 
 }

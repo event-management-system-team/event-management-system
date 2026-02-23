@@ -1,12 +1,14 @@
 import { Search, MapPin } from "lucide-react";
-import useEventSearch, { LOCATIONS } from '../../hooks/useEventSearch'
+import useEventSearch from '../../hooks/useEventSearch'
 import { Select } from 'antd'
 import { useLocation } from "../../hooks/useLocation";
+import useFetchEventSearch from "../../hooks/useFetchEventSearch";
+import { useSearchParams } from "react-router-dom";
 
 const HeroSearchBar = () => {
 
-    const { keyword, setKeyword, location, setLocation, handleSearch, handleKeyDown } = useEventSearch()
     const { data: locations, isLoading, isError } = useLocation();
+    const { keyword, setKeyword, location, setLocation, handleSearch, handleKeyDown } = useEventSearch()
 
     return (
         <div className="bg-white rounded-full shadow-2xl p-2 flex flex-col md:flex-row items-center gap-2 border border-gray-100">
@@ -36,7 +38,7 @@ const HeroSearchBar = () => {
                         showSearch
                         value={location}
                         onChange={(value) => setLocation(value)}
-                        options={LOCATIONS}
+                        options={locations}
                         filterOption={(input, option) =>
                             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                         }
