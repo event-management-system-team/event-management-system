@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: event-management-backend
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/event-management-databse
+    username: postgres
+    password:
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+jwt:
+  secret: zB4fG7jK9mN2pQ5rT8uV1xY3zA6dG9iJ2lM5oP8sU1vX4yZ7qW0eR3tY6uI9oP2s
+  access-token-expiration: 900000 # 15 phút
+  refresh-token-expiration: 604800000 # 7 ngày
+
+security:
+  oauth2:
+    client:
+      registration:
+        google:
+          client-id: 548399591626-3fsht9dcvthv0nn5sg879j1p1hv4oicc.apps.googleusercontent.com
+          client-secret: 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
+          scope:
+            - email
+            - profile
+          redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+      provider:
+        google:
+          authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+          token-uri: https://oauth2.googleapis.com/token
+          user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+          user-name-attribute: sub
+
+app:
+  frontend-url: http://localhost:5173
+  cookie:
+    domain: localhost
+    secure: false
+
+server:
+  port: 8080
