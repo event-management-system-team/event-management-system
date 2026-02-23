@@ -26,20 +26,29 @@ function App() {
 
   return (
     <Routes>
+      {/* CÁC ROUTE PUBLIC (Ai cũng vào được) */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      
-      <Route path="/organizer/feedbacklist/:eventId" element={<FeedbackList />} />
-      <Route path="/organizer/feedback/createform" element={<FeedbackForm />} />
-      <Route path="/organizer/feedback/:id" element={<FeedbackDetail />} />
-      
       <Route path="/user/submit-feedback" element={<SubmitFeedback />} />
 
-      <Route path="/profile" element={<ProfileCard />} />
+      {/* CÁC ROUTE PRIVATE (Phải đăng nhập mới được vào) */}
+      <Route 
+        path="/profile" 
+        element={
+          <ProtectedRoute>
+            <ProfileCard />
+          </ProtectedRoute>
+        } 
+      />
       
-      <Route path="/organizer/recruitmentlist" element={<RecruitmentList />} />
-      <Route path="/organizer/recruitmentcreate" element={<RecruitmentBuilder />} />
-      <Route path="/organizer/applications" element={<ApplicationList />} />
+      {/* Vì đây là các chức năng của Organizer trong hệ thống, bạn cũng nên bọc ProtectedRoute lại */}
+      <Route path="/organizer/feedbacklist/:eventId" element={<ProtectedRoute><FeedbackList /></ProtectedRoute>} />
+      <Route path="/organizer/feedback/createform" element={<ProtectedRoute><FeedbackForm /></ProtectedRoute>} />
+      <Route path="/organizer/feedback/:id" element={<ProtectedRoute><FeedbackDetail /></ProtectedRoute>} />
+      <Route path="/organizer/recruitmentlist" element={<ProtectedRoute><RecruitmentList /></ProtectedRoute>} />
+      <Route path="/organizer/recruitmentcreate" element={<ProtectedRoute><RecruitmentBuilder /></ProtectedRoute>} />
+      <Route path="/organizer/applications" element={<ProtectedRoute><ApplicationList /></ProtectedRoute>} />
+
       <Route
         path="/"
         element={
@@ -50,9 +59,7 @@ function App() {
           </ProtectedRoute>
         }
       />
-
     </Routes> 
-
   );
 }
 
