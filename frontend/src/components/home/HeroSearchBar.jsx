@@ -1,6 +1,13 @@
 import { Search, MapPin } from "lucide-react";
+import useEventSearch, { LOCATIONS } from '../../hooks/useEventSearch'
+import { Select } from 'antd'
+import { useLocation } from "../../hooks/useLocation";
 
 const HeroSearchBar = () => {
+
+    const { keyword, setKeyword, location, setLocation, handleSearch, handleKeyDown } = useEventSearch()
+    const { data: locations, isLoading, isError } = useLocation();
+
     return (
         <div className="bg-white rounded-full shadow-2xl p-2 flex flex-col md:flex-row items-center gap-2 border border-gray-100">
 
@@ -9,7 +16,12 @@ const HeroSearchBar = () => {
                 <Search className="text-primary" size={20} />
                 <div className="flex flex-col w-full">
                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Keyword</span>
-                    <input className="bg-transparent border-none p-0 focus:ring-0 text-sm font-bold text-gray-700 w-full placeholder:text-gray-400 outline-none" placeholder="Concerts, Workshops..." type="text" />
+                    <input className="bg-transparent border-none p-0 focus:ring-0 text-sm font-bold text-gray-700 w-full placeholder:text-gray-400 outline-none"
+                        placeholder="Concerts, Workshops..."
+                        type="text"
+                        value={keyword}
+                        onChange={(e) => setKeyword(e.target.value)}
+                        onKeyDown={handleKeyDown} />
                 </div>
             </div>
 
@@ -18,16 +30,24 @@ const HeroSearchBar = () => {
                 <MapPin className="text-primary" size={20} />
                 <div className="flex flex-col w-full">
                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Location</span>
-                    <select className="bg-transparent border-none p-0 focus:ring-0 text-sm font-bold text-gray-700 w-full cursor-pointer outline-none">
-                        <option>Ho Chi Minh City</option>
-                        <option>Ha Noi</option>
-                        <option>Da Nang</option>
-                    </select>
+                    <Select className="w-full -ml-3"
+                        defaultValue=""
+                        bordered={false}
+                        showSearch
+                        value={location}
+                        onChange={(value) => setLocation(value)}
+                        options={LOCATIONS}
+                        filterOption={(input, option) =>
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                        }
+                    />
+
                 </div>
             </div>
 
             {/* Button */}
-            <button className="w-full md:w-auto bg-primary hover:bg-primary/90 text-white px-8 h-12 rounded-full font-bold flex items-center justify-center gap-2 transition-all shadow-md">
+            <button className="w-full md:w-auto bg-primary hover:bg-primary/90 text-white px-8 h-12 rounded-full font-bold flex items-center justify-center gap-2 transition-all shadow-md"
+                onClick={handleSearch}>
                 <Search size={18} />
                 Find Events
             </button>

@@ -3,11 +3,9 @@ package com.eventmanagement.backend.controller.event;
 import com.eventmanagement.backend.dto.response.attendee.EventResponse;
 import com.eventmanagement.backend.service.EventService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,5 +28,7 @@ public class EventController {
         List<EventResponse> eventResponses = eventService.getHotEvents();
         return ResponseEntity.ok(eventResponses);
     }
+
+
 }
 

@@ -3,6 +3,7 @@ import { Compass } from "lucide-react";
 import { useFeaturedEvents } from '../../hooks/useFeaturedEvents'
 import LoadingState from '../common/LoadingState'
 import EmptyState from "../common/EmptyState";
+import { Link } from "react-router-dom"
 
 const EventSection = () => {
 
@@ -11,7 +12,7 @@ const EventSection = () => {
     const isEmpty = isError || !featuredEvents || featuredEvents.length === 0;
 
     return (
-        <section className="py-16 px-6 bg-[#F1F0E8]/30 overflow-hidden">
+        <section className="py-16 px-6 bg-[#F1F0E8]/30 overflow-hidden pb-0">
             <div className="max-w-7xl mx-auto">
                 <div className="mb-10">
                     <h2 className="text-3xl font-extrabold ">Featured Events</h2>
@@ -39,10 +40,14 @@ const EventSection = () => {
                 }
 
                 <div className="mt-12 flex justify-center">
-                    <button className="group flex items-center gap-2 bg-white border-2 border-primary text-primary px-8 py-3 rounded-full font-bold hover:bg-primary hover:text-white transition-all shadow-sm">
-                        View More Events
-                        <Compass size={18} className="group-hover:rotate-90 transition-transform" />
-                    </button>
+                    <Link to={'/events'}>
+                        <button className="group flex items-center gap-2 bg-white border-2 border-primary text-primary px-8 py-3 rounded-full font-bold hover:bg-primary hover:text-white transition-all shadow-sm"
+                        >
+                            View More Events
+                            <Compass size={18} className="group-hover:rotate-90 transition-transform" />
+                        </button>
+                    </Link>
+
                 </div>
             </div>
         </section >

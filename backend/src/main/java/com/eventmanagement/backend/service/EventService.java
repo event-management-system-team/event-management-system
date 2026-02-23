@@ -5,12 +5,12 @@ import com.eventmanagement.backend.dto.response.attendee.EventResponse;
 import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +31,7 @@ public class EventService {
         List<Event> events = eventRepository.findHotEventsSellingFast(EventStatus.APPROVED, topSix);
         return events.stream().map((event) -> mapToResponse(event)).collect(Collectors.toList());
     }
+
 
     private EventResponse mapToResponse(Event event) {
 

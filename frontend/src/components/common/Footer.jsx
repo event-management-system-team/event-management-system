@@ -9,7 +9,7 @@ import {
 
 const DISCOVER_LINKS = [
     { label: "Find Events", href: "/events" },
-    { label: "Find Jobs", href: "/recruitment" },
+    { label: "Find Jobs", href: "/recruitments" },
     { label: "My Tickets", href: "/attendee/my-tickets" },
     { label: "My Applications", href: "/attendee/my-applications" },
 ];

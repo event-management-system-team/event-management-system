@@ -17,7 +17,7 @@ const HeroSlider = ({ events }) => {
 
             <Carousel
                 autoplay
-                autoplaySpeed={4000}
+                autoplaySpeed={3000}
                 effect="fade">
                 {events.map((event) => (
                     <div key={event.eventId} className="outline-none">
@@ -35,7 +35,7 @@ const HeroSlider = ({ events }) => {
 
                             {/* Content */}
                             <div className="relative z-10 max-w-2xl space-y-6">
-                                <div className="inline-flex items-center gap-2 bg-orange-500/90 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
+                                <div className="inline-flex items-center gap-2 bg-red-500/90 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
                                     <Flame size={14} fill="currentColor" />
                                     Hot Event
                                 </div>
@@ -46,17 +46,17 @@ const HeroSlider = ({ events }) => {
 
                                 <div className="text-white/90 text-lg font-medium flex items-center gap-4">
                                     <span className="flex items-center gap-2">
-                                        <Calendar className="text-orange-400" size={20} />
+                                        <Calendar className="text-red-400" size={20} />
                                         {formatDate(event.startDate)}
                                     </span>
                                     <span className="w-1.5 h-1.5 bg-white/50 rounded-full"></span>
                                     <span className="flex items-center gap-2">
-                                        <MapPin className="text-orange-400" size={20} />
+                                        <MapPin className="text-red-400" size={20} />
                                         {event.location || "Updating"}
                                     </span>
                                 </div>
 
-                                <button className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg shadow-orange-500/30 transition-all flex items-center gap-2 transform hover:-translate-y-1">
+                                <button className="bg-red-500 hover:bg-red-600 text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg shadow-red-500/30 transition-all flex items-center gap-2 transform hover:-translate-y-1">
                                     Book Tickets Now
                                     <ArrowRight size={20} />
                                 </button>
