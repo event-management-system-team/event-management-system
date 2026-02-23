@@ -2,8 +2,6 @@ import { Search, MapPin } from "lucide-react";
 import useEventSearch from '../../hooks/useEventSearch'
 import { Select } from 'antd'
 import { useLocation } from "../../hooks/useLocation";
-import useFetchEventSearch from "../../hooks/useFetchEventSearch";
-import { useSearchParams } from "react-router-dom";
 
 const HeroSearchBar = () => {
 
