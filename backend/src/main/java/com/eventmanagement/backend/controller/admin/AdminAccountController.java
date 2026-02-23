@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.UUID;
@@ -53,7 +54,7 @@ public class AdminAccountController {
     }
 
     @PostMapping("/organizer")
-    public ResponseEntity<UserResponse> createOrganizer(@RequestBody CreateOrganizerRequest request) {
+    public ResponseEntity<UserResponse> createOrganizer(@Valid @RequestBody CreateOrganizerRequest request) {
         return ResponseEntity.ok(adminService.createOrganizer(request));
     }
 }

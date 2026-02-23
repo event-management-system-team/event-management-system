@@ -35,11 +35,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/profile/{userId}").permitAll()
                         .anyRequest().authenticated());
-                        // Cho phép tất cả các request bắt đầu bằng /api/ mà không cần kiểm tra gì cả
-                        .requestMatchers("/api/**").permitAll()
-                        // Các request còn lại (như /error) cũng cho phép luôn để tránh log lỗi vòng lặp
-                        .anyRequest().permitAll()
-                );
 
         return http.build();
     }
