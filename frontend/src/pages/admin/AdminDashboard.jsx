@@ -245,14 +245,14 @@ const systemInsights = [
 export function AdminDashboard() {
     return (
         <>
-            <div className="flex h-screen bg-[#F5F5F7]">
+            <div className="flex h-screen bg-[#F1F0E8]">
                 {/* Sidebar */}
                 <AdminSidebar/>
 
                 {/* Main Content */}
                 <main className="flex-1 overflow-auto">
                     {/* Header */}
-                    <header className="bg-white border-b border-gray-200 px-8 py-5">
+                    <header className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-5">
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2 text-sm text-gray-600">
                                 <span>Dashboard</span>
@@ -297,7 +297,7 @@ export function AdminDashboard() {
                             {summaryMetrics.map((metric, index) => (
                                 <Link key={index} to={metric.link}>
                                     <Card
-                                        className={`bg-white shadow-sm hover:shadow-md transition-all cursor-pointer border border-gray-200 ${
+                                        className={`bg-[#f7f7f7] shadow-sm hover:shadow-md transition-all cursor-pointer border border-gray-200 ${
                                             metric.highlight ? 'ring-2 ring-orange-400  border border-gray-200' : ''
                                         }`}
                                     >
@@ -332,7 +332,7 @@ export function AdminDashboard() {
                         {/* 2. Pending Actions - Requires Attention */}
                         <div className="mb-8">
                             {/* Pending Events */}
-                            <Card className="bg-white shadow-sm border border-gray-200">
+                            <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                                 <CardHeader className="border-b border-gray-100">
                                     <div className="flex items-center justify-between">
                                         <div>
@@ -396,7 +396,7 @@ export function AdminDashboard() {
                         <div className="grid grid-cols-3 gap-6">
                             {/* 3. Recent System Activity */}
                             <div className="col-span-2">
-                                <Card className="bg-white shadow-sm border border-gray-200">
+                                <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                                     <CardHeader className="border-b border-gray-100">
                                         <CardTitle className="text-lg">Recent System Activity</CardTitle>
                                         <CardDescription>Administrative actions and audit log</CardDescription>
@@ -452,7 +452,7 @@ export function AdminDashboard() {
                             {/* 4. Quick Actions + 5. System Insights */}
                             <div className="space-y-6">
                                 {/* Quick Actions */}
-                                <Card className="bg-white shadow-sm border border-gray-200">
+                                <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                                     <CardHeader className="border-b border-gray-100">
                                         <CardTitle className="text-lg">Quick Actions</CardTitle>
                                         <CardDescription>Common admin shortcuts</CardDescription>
@@ -486,7 +486,7 @@ export function AdminDashboard() {
                                 </Card>
 
                                 {/* System Insights */}
-                                <Card className="bg-white shadow-sm border border-gray-200">
+                                <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                                     <CardHeader className="border-b border-gray-100">
                                         <CardTitle className="text-lg">System Insights</CardTitle>
                                         <CardDescription>Platform-wide metrics</CardDescription>

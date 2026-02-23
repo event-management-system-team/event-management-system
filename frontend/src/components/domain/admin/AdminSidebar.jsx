@@ -13,9 +13,9 @@ import {NavLink} from "react-router-dom";
 
 export function AdminSidebar() {
     return (
-        <aside className="w-50 bg-[#3C4F5F] text-white flex flex-col ">
+        <aside className="w-50 bg-[#8aa8b2] text-white flex flex-col ">
             {/* Logo */}
-            <div className="p-6 pb-8 border-b border-[#4A5F71]">
+            <div className="p-6 pb-8 border-b border-[#6f8f99]">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-[#5A738A] rounded-lg flex items-center justify-center">
                         <Calendar className="w-5 h-5 text-white"/>
@@ -40,10 +40,10 @@ export function AdminSidebar() {
                     {({ isActive }) => (
                         <Button
                             variant="ghost"
-                            className={`w-full justify-start mb-1 ${
+                            className={`w-full justify-start mb-1 py-5 rounded-3xl  ${
                                 isActive
-                                    ? 'bg-[#5A738A] hover:bg-[#657F97] text-white'
-                                    : 'text-gray-300 hover:text-white hover:bg-[#4A5F71]'
+                                    ? 'bg-[#6f8f99] hover:bg-[#728f9a] text-white'
+                                    : 'text-gray-100 hover:text-white hover:bg-[#6f8f99]'
                             }`}
                         >
                             <LayoutDashboard className="mr-3 h-4 w-4" />
@@ -63,10 +63,10 @@ export function AdminSidebar() {
                     {({ isActive }) => (
                         <Button
                             variant="ghost"
-                            className={`w-full justify-start mb-1 ${
+                            className={`w-full justify-start mb-1 py-5 rounded-3xl  ${
                                 isActive
-                                    ? 'bg-[#5A738A] hover:bg-[#657F97] text-white'
-                                    : 'text-gray-300 hover:text-white hover:bg-[#4A5F71]'
+                                    ? 'bg-[#6f8f99] hover:bg-[#728f9a] text-white'
+                                    : 'text-gray-100 hover:text-white hover:bg-[#6f8f99]'
                             }`}
                         >
                             <UserCircle className="mr-3 h-4 w-4"/>
@@ -86,10 +86,10 @@ export function AdminSidebar() {
                     {({ isActive }) => (
                         <Button
                             variant="ghost"
-                            className={`w-full justify-start mb-1 ${
+                            className={`w-full justify-start mb-1 py-5 rounded-3xl  ${
                                 isActive
-                                    ? 'bg-[#5A738A] hover:bg-[#657F97] text-white'
-                                    : 'text-gray-300 hover:text-white hover:bg-[#4A5F71]'
+                                    ? 'bg-[#6f8f99] hover:bg-[#728f9a] text-white'
+                                    : 'text-gray-100 hover:text-white hover:bg-[#6f8f99]'
                             }`}
                         >
                             <CalendarCog className="mr-3 h-4 w-4"/>
@@ -109,10 +109,10 @@ export function AdminSidebar() {
                     {({ isActive }) => (
                         <Button
                             variant="ghost"
-                            className={`w-full justify-start mb-1 ${
+                            className={`w-full justify-start mb-1 py-5 rounded-3xl  ${
                                 isActive
-                                    ? 'bg-[#5A738A] hover:bg-[#657F97] text-white'
-                                    : 'text-gray-300 hover:text-white hover:bg-[#4A5F71]'
+                                    ? 'bg-[#6f8f99] hover:bg-[#728f9a] text-white'
+                                    : 'text-gray-100 hover:text-white hover:bg-[#6f8f99]'
                             }`}
                         >
                             <BarChart3 className="mr-3 h-4 w-4"/>
@@ -132,10 +132,10 @@ export function AdminSidebar() {
                     {({ isActive }) => (
                         <Button
                             variant="ghost"
-                            className={`w-full justify-start mb-1 ${
+                            className={`w-full justify-start mb-1 py-5 rounded-3xl  ${
                                 isActive
-                                    ? 'bg-[#5A738A] hover:bg-[#657F97] text-white'
-                                    : 'text-gray-300 hover:text-white hover:bg-[#4A5F71]'
+                                    ? 'bg-[#6f8f99] hover:bg-[#728f9a] text-white'
+                                    : 'text-gray-100 hover:text-white hover:bg-[#6f8f99]'
                             }`}
                         >
                             <Settings className="mr-3 h-4 w-4"/>
@@ -146,9 +146,9 @@ export function AdminSidebar() {
             </nav>
 
             {/* Sign Out */}
-            <div className="p-6 border-t border-[#4A5F71]">
+            <div className="p-6 border-t border-[#6f8f99]">
                 <Button variant="ghost"
-                        className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#4A5F71] p-2">
+                        className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#6f8f99] p-2">
                     <LogOut className="mr-2 h-4 w-4"/>
                     Sign Out
                 </Button>

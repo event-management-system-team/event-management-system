@@ -261,14 +261,14 @@ export function AccountManagement() {
 
     return (
         <>
-            <div className="flex h-screen bg-[#F5F5F7]">
+            <div className="flex h-screen bg-[#F1F0E8]">
                 {/* Sidebar */}
                 <AdminSidebar/>
 
                 {/* Main Content */}
                 <main className="flex-1 overflow-auto">
                     {/* Header */}
-                    <header className="bg-white border-b border-gray-200 px-8 py-5">
+                    <header className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-5">
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2 text-sm text-gray-600">
                                 <span>Dashboard</span>
@@ -296,7 +296,7 @@ export function AccountManagement() {
                                 </p>
                             </div>
                             <Button
-                                className="gap-2 bg-[#7FA5A5] hover:bg-[#6D9393] text-white rounded-full px-5"
+                                className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5"
                                 onClick={openModal}
                             >
                                 <Plus className="h-4 w-4"/>
@@ -311,7 +311,7 @@ export function AccountManagement() {
                             const Icon = metric.icon
                             const TrendIcon = metric.trending === "up" ? TrendingUp : TrendingDown
                             return (
-                                <Card key={index} className="bg-white shadow-sm border border-gray-200">
+                                <Card key={index} className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                                     <CardContent className="p-6">
                                         <div className="flex items-start justify-between mb-3">
                                             <div
@@ -353,7 +353,7 @@ export function AccountManagement() {
                                     placeholder="Search organizer, full name, email or phone number..."
                                     value={searchTerm}
                                     onChange={handleSearch}
-                                    className="pl-9 pr-4 py-2 w-full border-gray-300 focus:ring-[#7FA5A5] focus:border-[#7FA5A5]"
+                                    className="pl-9 pr-4 py-2 w-full border-gray-300 focus:ring-[#7FA5A5] focus:border-[#7FA5A5] bg-[#f7f7f7]"
                                 />
                             </div>
 
@@ -362,7 +362,7 @@ export function AccountManagement() {
                                 value={status}
                                 onValueChange={(value) => setStatus(value)}
                             >
-                                <SelectTrigger className="w-[160px] border border-gray-200 cursor-pointer">
+                                <SelectTrigger className="w-[160px] border border-gray-200 cursor-pointer bg-[#f7f7f7] hover:bg-[#B3C8CF]">
                                     <SelectValue placeholder="Status"/>
                                 </SelectTrigger>
                                 <SelectContent className='border border-gray-200'>
@@ -386,7 +386,7 @@ export function AccountManagement() {
                                 customInput={
                                     <Button
                                         variant="outline"
-                                        className="gap-2 min-w-[210px] justify-start cursor-pointer"
+                                        className="gap-2 min-w-[210px] justify-start cursor-pointer bg-[#f7f7f7] hover:bg-[#B3C8CF]"
                                     >
                                         <Calendar className="h-4 w-4 text-gray-500"/>
                                         <span>
@@ -403,7 +403,7 @@ export function AccountManagement() {
                                 value={sortOption}
                                 onValueChange={(value) => setSortOption(value)}
                             >
-                                <SelectTrigger className="w-[140px] border border-gray-200 cursor-pointer">
+                                <SelectTrigger className="w-[140px] border border-gray-200 cursor-pointer bg-[#f7f7f7] hover:bg-[#B3C8CF]">
                                     <SelectValue placeholder="Sort by"/>
                                 </SelectTrigger>
                                 <SelectContent className='border border-gray-200'>
@@ -417,7 +417,7 @@ export function AccountManagement() {
 
                     {/* Account List Table */}
                     <div className="px-8 pb-8">
-                        <Card className="bg-white shadow-sm border border-gray-200">
+                        <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                             <CardContent className="p-0">
                                 {/* Table Header */}
                                 <div
@@ -437,7 +437,7 @@ export function AccountManagement() {
                                 {processedAccounts.map(account => (
                                     <div
                                         key={account.userId}
-                                        className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-gray-50"
+                                        className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-[#eef3f5]"
                                     >
                                         <div className="col-span-1 flex items-center">
                                             <Checkbox/>
@@ -494,7 +494,7 @@ export function AccountManagement() {
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end"
-                                                                     className="bg-white border-2 border-gray-200">
+                                                                     className="bg-[#f7f7f7] border-2 border-gray-200">
                                                     <Link to={`/admin/accounts/account-detail/${account.userId}`}>
                                                         <DropdownMenuItem>
                                                             <UserCircle className="mr-2 h-4 w-4"/>

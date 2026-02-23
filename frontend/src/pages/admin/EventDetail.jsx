@@ -271,14 +271,14 @@ export function EventDetail() {
     }
 
     return (
-        <div className="flex h-screen bg-[#F5F5F7]">
+        <div className="flex h-screen bg-[#F1F0E8]">
             {/* Sidebar */}
             <AdminSidebar/>
 
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
                 {/* Header */}
-                <header className="bg-white border-b border-gray-200 px-8 py-5">
+                <header className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-5">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                             <Link to="/admin" className="hover:text-gray-900">
@@ -328,7 +328,7 @@ export function EventDetail() {
                     </div>
 
                     {/* Event Title & Metadata */}
-                    <div className="bg-white border-b border-gray-200 px-8 py-6">
+                    <div className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-6">
                         <div className="flex items-start justify-between mb-4">
                             <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-3">
@@ -390,7 +390,7 @@ export function EventDetail() {
                 <div className={`p-8 ${isPending ? "grid grid-cols-12 gap-6" : ""}`}>
                     <div className={isPending ? "col-span-8" : "col-span-12"}>
                         <Tabs defaultValue="general" className="w-full">
-                            <TabsList className="h-12 bg-white border-b border-gray-200 w-full justify-start rounded-none p-0">
+                            <TabsList className="h-12 bg-[#f7f7f7] border-b border-gray-200 w-full justify-start rounded-none p-0">
                                 <TabsTrigger
                                     value="general"
                                     className="h-12 bg-transparent border-b-2 border-transparent data-[state=active]:border-[#7FA5A5] data-[state=active]:text-[#7FA5A5] rounded-none px-6 data-[state=active]:shadow-none"
@@ -407,7 +407,7 @@ export function EventDetail() {
 
                             <TabsContent value="general" className="mt-6 space-y-6">
                                 {/* Event Overview */}
-                                <Card className="bg-white shadow-sm border border-gray-200">
+                                <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                                     <CardHeader className="border-b border-gray-100">
                                         <CardTitle className="text-lg">Event Overview</CardTitle>
                                         <CardDescription>
@@ -422,7 +422,7 @@ export function EventDetail() {
                                 </Card>
 
                                 {/* Inventory & Pricing */}
-                                <Card className="bg-white shadow-sm border border-gray-200">
+                                <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                                     <CardHeader className="border-b border-gray-100">
                                         <CardTitle className="text-lg">
                                             Inventory & Pricing
@@ -504,7 +504,7 @@ export function EventDetail() {
                                 </Card>
 
                                 {/* Event Timeline */}
-                                <Card className="bg-white shadow-sm border border-gray-200">
+                                <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                                     <CardHeader className="border-b border-gray-100">
                                         <CardTitle className="text-lg">Event Timeline</CardTitle>
                                         <CardDescription>
@@ -559,7 +559,7 @@ export function EventDetail() {
                             </TabsContent>
 
                             <TabsContent value="analytics" className="mt-6">
-                                <Card className="bg-white shadow-sm border border-gray-200">
+                                <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                                     <CardHeader className="border-b border-gray-100">
                                         <CardTitle className="text-lg">Analytics Preview</CardTitle>
                                         <CardDescription>
@@ -579,7 +579,7 @@ export function EventDetail() {
                     {/* Review & Approve Panel - Only show if status is Pending */}
                     {isPending && (
                         <div className="col-span-4">
-                            <Card className="bg-white shadow-sm sticky top-8 border border-gray-200">
+                            <Card className="bg-[#f7f7f7] shadow-sm sticky top-8 border border-gray-200">
                                 <CardHeader className="border-b border-gray-100">
                                     <CardTitle className="text-lg">Review & Approve</CardTitle>
                                     <CardDescription>

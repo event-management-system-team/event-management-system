@@ -355,14 +355,14 @@ export function EventAnalytics() {
 
     return (
         <>
-            <div className="flex h-screen bg-[#F5F5F7]">
+            <div className="flex h-screen bg-[#F1F0E8]">
                 {/* Sidebar */}
                 <AdminSidebar/>
 
                 {/* Main Content */}
                 <main className="flex-1 overflow-auto">
                     {/* Header */}
-                    <header className="bg-white border-b border-gray-200 px-8 py-5">
+                    <header className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-5">
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2 text-sm text-gray-600">
                                 <span>Dashboard</span>
@@ -423,7 +423,7 @@ export function EventAnalytics() {
                             const TrendIcon =
                                 metric.trending === "up" ? TrendingUp : TrendingDown
                             return (
-                                <Card key={index} className="bg-white shadow-sm border border-gray-200">
+                                <Card key={index} className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                                     <CardContent className="p-5">
                                         <div className="flex items-start justify-between mb-2">
                                             <div
@@ -456,7 +456,7 @@ export function EventAnalytics() {
 
                     {/* Filters & Search */}
                     <div className="px-8 pb-6">
-                        <Card className="bg-white shadow-sm border border-gray-200">
+                        <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                             <CardContent className="p-5">
                                 <div className="flex items-center gap-3">
                                     {/* Search Input */}
@@ -525,7 +525,7 @@ export function EventAnalytics() {
                     {/* Data Visualization Section */}
                     <div className="grid grid-cols-2 gap-5 px-8 pb-6">
                         {/* Ticket Sales Over Time */}
-                        <Card className="bg-white shadow-sm border border-gray-200">
+                        <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                             <CardHeader className="border-b border-gray-100">
                                 <CardTitle className="text-lg">Ticket Sales Trend</CardTitle>
                                 <CardDescription>
@@ -563,7 +563,7 @@ export function EventAnalytics() {
                         </Card>
 
                         {/* Revenue by Event */}
-                        <Card className="bg-white shadow-sm  border border-gray-200">
+                        <Card className="bg-[#f7f7f7] shadow-sm  border border-gray-200">
                             <CardHeader className="border-b border-gray-100">
                                 <CardTitle className="text-lg">Revenue by Event</CardTitle>
                                 <CardDescription>
@@ -596,7 +596,7 @@ export function EventAnalytics() {
                         </Card>
 
                         {/* Event Category Distribution */}
-                        <Card className="bg-white shadow-sm border border-gray-200">
+                        <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                             <CardHeader className="border-b border-gray-100">
                                 <CardTitle className="text-lg">Event Distribution</CardTitle>
                                 <CardDescription>Events by category breakdown</CardDescription>
@@ -639,7 +639,7 @@ export function EventAnalytics() {
                         </Card>
 
                         {/* Conversion Funnel */}
-                        <Card className="bg-white shadow-sm  border border-gray-200">
+                        <Card className="bg-[#f7f7f7] shadow-sm  border border-gray-200">
                             <CardHeader className="border-b border-gray-100">
                                 <CardTitle className="text-lg">Conversion Funnel</CardTitle>
                                 <CardDescription>
@@ -686,7 +686,7 @@ export function EventAnalytics() {
                     {/* Performance Highlights */}
                     <div className="grid grid-cols-2 gap-5 px-8 pb-6">
                         {/* Top Performing Events */}
-                        <Card className="bg-white shadow-sm border border-gray-200">
+                        <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                             <CardHeader className="border-b border-gray-100">
                                 <div className="flex items-center gap-2">
                                     <Award className="h-5 w-5 text-green-600"/>
@@ -734,7 +734,7 @@ export function EventAnalytics() {
                         </Card>
 
                         {/* Underperforming Events */}
-                        <Card className="bg-white shadow-sm border border-gray-200">
+                        <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                             <CardHeader className="border-b border-gray-100">
                                 <div className="flex items-center gap-2">
                                     <AlertTriangle className="h-5 w-5 text-orange-600"/>
@@ -793,7 +793,7 @@ export function EventAnalytics() {
 
                     {/* Event Performance Table */}
                     <div className="px-8 pb-8">
-                        <Card className="bg-white shadow-sm border border-gray-200">
+                        <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                             <CardHeader className="border-b border-gray-100">
                                 <div className="flex items-center justify-between">
                                     <CardTitle className="text-lg">

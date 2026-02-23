@@ -240,14 +240,14 @@ const events = [{
 export function EventManagement() {
     return (
         <>
-            <div className="flex h-screen bg-[#F5F5F7]">
+            <div className="flex h-screen bg-[#F1F0E8]">
                 {/* Sidebar */}
                 <AdminSidebar/>
 
                 {/* Main Content */}
                 <main className="flex-1 overflow-auto">
                     {/* Header */}
-                    <header className="bg-white border-b border-gray-200 px-8 py-5">
+                    <header className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-5">
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2 text-sm text-gray-600">
                                 <span>Dashboard</span>
@@ -298,7 +298,7 @@ export function EventManagement() {
                         {summaryMetrics.map((metric, index) => {
                             const Icon = metric.icon
                             const TrendIcon = metric.trending === "up" ? TrendingUp : TrendingDown
-                            return (<Card key={index} className="bg-white shadow-sm border border-gray-200">
+                            return (<Card key={index} className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                                 <CardContent className="p-6">
                                     <div className="flex items-start justify-between mb-3">
                                         <div
@@ -326,7 +326,7 @@ export function EventManagement() {
 
                     {/* Filter Events Section */}
                     <div className="px-8 pb-6">
-                        <Card className="bg-white shadow-sm border border-gray-200">
+                        <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                             <CardHeader className="border-b border-gray-100">
                                 <CardTitle className="text-lg">Filter Events</CardTitle>
                             </CardHeader>
@@ -412,7 +412,7 @@ export function EventManagement() {
 
                     {/* Event List Table */}
                     <div className="px-8 pb-8">
-                        <Card className="bg-white shadow-sm border border-gray-200">
+                        <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                             <CardContent className="p-0">
                                 {/* Table Header */}
                                 <div
@@ -430,7 +430,7 @@ export function EventManagement() {
                                     const CategoryIcon = event.categoryIcon
                                     return (<div
                                         key={event.id}
-                                        className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-gray-50"
+                                        className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-[#eef3f5]"
                                     >
                                         <div className="col-span-3 flex items-center gap-3">
                                             <Avatar className={`w-10 h-10 ${event.thumbnailBg}`}>

@@ -12,9 +12,11 @@ import {EventManagement} from "./pages/admin/EventManagement.jsx";
 import {EventDetail} from "./pages/admin/EventDetail.jsx";
 import {EventAnalytics} from "./pages/admin/EventAnalytics.jsx";
 
+import AppRoutes from "./routes";
 function App() {
     return (
         <Routes>
+            <Route path="/*" element={<AppRoutes />} />
             <Route path="/login" element={<LoginPage/>}/>
             <Route path="/register" element={<RegisterPage/>}/>
             <Route

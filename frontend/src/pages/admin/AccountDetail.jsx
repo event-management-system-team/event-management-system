@@ -135,14 +135,14 @@ export function AccountDetail() {
     if (!account) return <div>Cannot find account detail.</div>;
 
     return (
-        <div className="flex h-screen bg-[#F5F5F7]">
+        <div className="flex h-screen bg-[#F1F0E8]">
             {/* Sidebar */}
             <AdminSidebar/>
 
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
                 {/* Header */}
-                <header className="bg-white border-b border-gray-200 px-8 py-5">
+                <header className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-5">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                             <Link to="/admin" className="hover:text-gray-900">
@@ -175,7 +175,7 @@ export function AccountDetail() {
                 </header>
 
                 {/* Profile Summary Header */}
-                <div className="bg-white border-b border-gray-200 px-8 py-6">
+                <div className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-6">
                     <div className="flex items-start justify-between">
                         <div className="flex items-center gap-6">
                             {/* Large Avatar */}
@@ -240,7 +240,7 @@ export function AccountDetail() {
                 </div>
 
                 {/* Tabs Navigation */}
-                <div className="bg-white border-b border-gray-200 px-8">
+                <div className="bg-[#f7f7f7] border-b border-gray-200 px-8">
                     <Tabs defaultValue="basic" className="w-full">
                         <TabsList className="h-12 bg-transparent border-0 p-0 space-x-6">
                             <TabsTrigger
@@ -263,7 +263,7 @@ export function AccountDetail() {
                             <div className="p-8">
                                 <div className="grid grid-cols-2 gap-6 mb-6">
                                     {/* Personal Information Card */}
-                                    <Card className="bg-white shadow-sm border border-gray-200">
+                                    <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                                         <CardHeader className="border-b border-gray-100">
                                             <CardTitle className="text-lg">
                                                 Personal Information
@@ -308,7 +308,7 @@ export function AccountDetail() {
                                     </Card>
 
                                     {/* Account Details Card */}
-                                    <Card className="bg-white shadow-sm border border-gray-200">
+                                    <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                                         <CardHeader className="border-b border-gray-100">
                                             <CardTitle className="text-lg">Account Details</CardTitle>
                                             <CardDescription>
@@ -372,7 +372,7 @@ export function AccountDetail() {
                         {account.role === "ORGANIZER" && (
                             <TabsContent value="events" className="mt-0">
                                 <div className="p-8">
-                                    <Card className="bg-white shadow-sm border border-gray-200">
+                                    <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                                         <CardHeader className="border-b border-gray-100">
                                             <CardTitle className="text-lg">Events Overview</CardTitle>
                                             <CardDescription>
