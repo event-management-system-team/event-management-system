@@ -46,7 +46,7 @@ const HeroSearchBar = () => {
             </div>
 
             {/* Button */}
-            <button className="w-full md:w-auto bg-primary hover:bg-primary/90 text-white px-8 h-12 rounded-full font-bold flex items-center justify-center gap-2 transition-all shadow-md"
+            <button className="w-full md:w-auto bg-primary hover:bg-primary/90 text-white px-8 h-12 rounded-full font-bold flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
                 onClick={handleSearch}>
                 <Search size={18} />
                 Find Events
