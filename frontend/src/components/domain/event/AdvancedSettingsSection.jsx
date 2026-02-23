@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, EyeOff } from 'lucide-react';
+import { LuShield, LuEyeOff } from 'react-icons/lu';
 
 const Toggle = ({ enabled, onToggle }) => {
     return (
@@ -26,7 +26,7 @@ export const AdvancedSettingsSection = ({ settings, onToggle }) => {
                 <div className="flex items-center justify-between bg-gray-50/50 border border-gray-200 rounded-xl px-5 py-4">
                     <div className="flex items-center space-x-3">
                         <div className="w-9 h-9 rounded-lg bg-[#8da6ae]/10 flex items-center justify-center">
-                            <Shield className="w-4 h-4 text-[#8da6ae]" />
+                            <LuShield className="w-4 h-4 text-[#8da6ae]" />
                         </div>
                         <div>
                             <p className="font-semibold text-gray-900 text-sm">Limit tickets per person</p>
@@ -40,7 +40,7 @@ export const AdvancedSettingsSection = ({ settings, onToggle }) => {
                 <div className="flex items-center justify-between bg-gray-50/50 border border-gray-200 rounded-xl px-5 py-4">
                     <div className="flex items-center space-x-3">
                         <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                            <EyeOff className="w-4 h-4 text-gray-400" />
+                            <LuEyeOff className="w-4 h-4 text-gray-400" />
                         </div>
                         <div>
                             <p className="font-semibold text-gray-900 text-sm">Private event (invite only)</p>

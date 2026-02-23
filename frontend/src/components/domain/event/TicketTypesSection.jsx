@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trash2, PlusCircle } from 'lucide-react';
+import { LuTrash2, LuCirclePlus } from 'react-icons/lu';
 
 export const TicketTypesSection = ({ tickets, onTicketChange, onRemoveTicket, onAddTicket }) => {
     return (
@@ -46,7 +46,7 @@ export const TicketTypesSection = ({ tickets, onTicketChange, onRemoveTicket, on
                             onClick={() => onRemoveTicket(ticket.id)}
                             className="flex items-center justify-center text-gray-300 hover:text-red-400 transition-colors"
                         >
-                            <Trash2 className="w-4 h-4" />
+                            <LuTrash2 className="w-4 h-4" />
                         </button>
                     </div>
                 ))}
@@ -57,7 +57,7 @@ export const TicketTypesSection = ({ tickets, onTicketChange, onRemoveTicket, on
                 onClick={onAddTicket}
                 className="w-full mt-4 py-4 border-2 border-dashed border-[#8da6ae]/30 rounded-xl flex items-center justify-center space-x-2 text-[#8da6ae] hover:bg-[#8da6ae]/5 hover:border-[#8da6ae]/50 transition-colors"
             >
-                <PlusCircle className="w-5 h-5" />
+                <LuCirclePlus className="w-5 h-5" />
                 <span className="font-medium">Add Another Ticket Type</span>
             </button>
         </div>

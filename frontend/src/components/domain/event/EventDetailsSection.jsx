@@ -1,6 +1,6 @@
 import React from 'react';
-import { Upload } from 'lucide-react';
-import { Input, TextArea, Select } from '../../../components/common/Input';
+import { LuUpload } from 'react-icons/lu';
+import { Input, TextArea, Select } from '../../common/Input';
 
 export const EventDetailsSection = () => {
     return (
@@ -37,7 +37,7 @@ export const EventDetailsSection = () => {
                     <label className="block text-sm font-semibold text-gray-700">Event Cover Image</label>
                     <div className="border-2 border-dashed border-teal-200 rounded-xl bg-teal-50/30 p-12 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-teal-50/50 transition-colors">
                         <div className="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center mb-4 text-teal-600">
-                            <Upload className="w-6 h-6" />
+                            <LuUpload className="w-6 h-6" />
                         </div>
                         <h3 className="font-semibold text-gray-900">Click to upload or drag and drop</h3>
                         <p className="text-sm text-gray-500 mt-1">SVG, PNG, JPG or GIF (max. 800x400px)</p>

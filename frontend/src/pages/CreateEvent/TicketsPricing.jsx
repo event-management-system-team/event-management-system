@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import Layout from '../../components/layout/Layout';
 import { Button } from '../../components/common/Button';
-import { TicketTypesSection } from './components/TicketTypesSection';
-import { AdvancedSettingsSection } from './components/AdvancedSettingsSection';
-import { ArrowLeft, PartyPopper, Check } from 'lucide-react';
+import { TicketTypesSection } from '../../components/domain/event/TicketTypesSection';
+import { AdvancedSettingsSection } from '../../components/domain/event/AdvancedSettingsSection';
+import { LuArrowLeft, LuPartyPopper, LuCheck } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
 
 const TicketsPricing = () => {
@@ -70,7 +70,7 @@ const TicketsPricing = () => {
                 <div className="flex justify-between items-center mb-10 px-8">
                     <div className="flex flex-col items-center">
                         <div className="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center mb-2">
-                            <Check className="w-5 h-5" />
+                            <LuCheck className="w-5 h-5" />
                         </div>
                         <span className="text-sm font-medium text-gray-600">Step 1: Details</span>
                     </div>
@@ -107,12 +107,12 @@ const TicketsPricing = () => {
                         onClick={() => navigate('/create-event')}
                         className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 font-medium px-6 py-3 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
                     >
-                        <ArrowLeft className="w-4 h-4" />
+                        <LuArrowLeft className="w-4 h-4" />
                         <span>Back</span>
                     </button>
                     <Button className="bg-[#1A202C] hover:bg-[#2D3748] text-white px-8 py-3 rounded-xl flex items-center space-x-2">
                         <span>Submit Event</span>
-                        <PartyPopper className="w-4 h-4 ml-1" />
+                        <LuPartyPopper className="w-4 h-4 ml-1" />
                     </Button>
                 </div>
 

@@ -1,12 +1,12 @@
 import React from 'react';
-import { Calendar, Clock } from 'lucide-react';
-import { Input } from '../../../components/common/Input';
+import { LuCalendar, LuClock } from 'react-icons/lu';
+import { Input } from '../../common/Input';
 
 export const ScheduleSection = () => {
     return (
         <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 mb-8">
             <div className="flex items-center space-x-2 mb-6">
-                <Clock className="w-6 h-6 text-gray-400" />
+                <LuClock className="w-6 h-6 text-gray-400" />
                 <h2 className="text-xl font-bold text-gray-900">Schedule Details</h2>
             </div>
 

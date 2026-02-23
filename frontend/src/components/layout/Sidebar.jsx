@@ -1,12 +1,12 @@
 import React from 'react';
-import { LayoutDashboard, LogOut, Calendar } from 'lucide-react';
+import { LuLayoutDashboard, LuLogOut, LuCalendar } from 'react-icons/lu';
 import { Link, useLocation } from 'react-router-dom';
 
 const Sidebar = () => {
     const location = useLocation();
 
     const navItems = [
-        { icon: Calendar, label: 'Create New Event', path: '/create-event' },
+        { icon: LuCalendar, label: 'Create New Event', path: '/create-event' },
     ];
 
     return (
@@ -14,7 +14,7 @@ const Sidebar = () => {
             {/* Logo */}
             <div className="p-6 flex items-center space-x-2">
                 <div className="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
-                    <Calendar className="w-5 h-5 text-white" />
+                    <LuCalendar className="w-5 h-5 text-white" />
                 </div>
                 <div>
                     <h1 className="text-xl font-bold tracking-tight">EventHub <span className="text-xs font-normal text-gray-400 italic">Organizer</span></h1>
@@ -55,7 +55,7 @@ const Sidebar = () => {
             {/* Logout */}
             <div className="p-4 border-t border-gray-800">
                 <button className="flex items-center space-x-3 px-4 py-2 text-gray-400 hover:text-white transition-colors w-full">
-                    <LogOut className="w-5 h-5" />
+                    <LuLogOut className="w-5 h-5" />
                     <span>Logout</span>
                 </button>
             </div>

@@ -1,10 +1,10 @@
 import React from 'react';
 import Layout from '../../components/layout/Layout';
 import { Button } from '../../components/common/Button';
-import { EventDetailsSection } from './components/EventDetailsSection';
-import { ScheduleSection } from './components/ScheduleSection';
-import { LocationSection } from './components/LocationSection';
-import { ArrowRight, Check } from 'lucide-react';
+import { EventDetailsSection } from '../../components/domain/event/EventDetailsSection';
+import { ScheduleSection } from '../../components/domain/event/ScheduleSection';
+import { LocationSection } from '../../components/domain/event/LocationSection';
+import { LuArrowRight, LuCheck } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
 
 const CreateEvent = () => {
@@ -63,7 +63,7 @@ const CreateEvent = () => {
                         className="bg-[#9ba9b4] hover:bg-[#8a9aa5] text-white px-8 py-3 rounded-xl flex items-center space-x-2"
                     >
                         <span>Continue to Tickets</span>
-                        <ArrowRight className="w-4 h-4 ml-1" />
+                        <LuArrowRight className="w-4 h-4 ml-1" />
                     </Button>
                 </div>
 
