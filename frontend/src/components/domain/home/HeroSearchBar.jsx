@@ -1,8 +1,8 @@
 import { Search, MapPin, Calendar } from "lucide-react";
-import useEventSearch from '../../hooks/useEventSearch'
+import useEventSearch from '../../../hooks/useEventSearch'
 import { DatePicker, Select } from 'antd';
 import dayjs from 'dayjs';
-import { useLocation } from "../../hooks/useLocation";
+import { useLocation } from "../../../hooks/useLocation";
 
 const HeroSearchBar = () => {
 

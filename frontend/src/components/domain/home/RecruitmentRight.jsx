@@ -1,7 +1,7 @@
-import recruitmentService from '../../services/recruitment.service'
-import EmptyState from '../common/EmptyState';
-import LoadingState from '../common/LoadingState';
-import RecruitmentCard from "../common/RecruitmentCard";
+import recruitmentService from '../../../services/recruitment.service'
+import EmptyState from '../../common/EmptyState';
+import LoadingState from '../../common/LoadingState';
+import RecruitmentCard from "../../common/RecruitmentCard";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 const RecruitmentRight = () => {

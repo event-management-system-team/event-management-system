@@ -1,8 +1,8 @@
-import EventCard from "../common/EventCard";
+import EventCard from "../../common/EventCard";
 import { Compass } from "lucide-react";
-import { useFeaturedEvents } from '../../hooks/useFeaturedEvents'
-import LoadingState from '../common/LoadingState'
-import EmptyState from "../common/EmptyState";
+import { useFeaturedEvents } from '../../../hooks/useFeaturedEvents'
+import LoadingState from '../../common/LoadingState'
+import EmptyState from "../../common/EmptyState";
 import { Link } from "react-router-dom"
 
 const EventSection = () => {

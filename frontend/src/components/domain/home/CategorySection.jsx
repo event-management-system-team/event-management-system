@@ -3,11 +3,11 @@ import {
     Briefcase, Utensils, Plane, HeartPulse, Users, LayoutGrid
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchCategories } from "../../store/slices/category.slice";
+import { fetchCategories } from "../../../store/slices/category.slice";
 import { useEffect } from "react";
-import EmptyState from '../common/EmptyState'
-import LoadingState from '../common/LoadingState'
-import useEventSearch from '../../hooks/useEventSearch';
+import EmptyState from '../../common/EmptyState'
+import LoadingState from '../../common/LoadingState'
+import useEventSearch from '../../../hooks/useEventSearch';
 
 
 const IconMap = {
@@ -73,8 +73,6 @@ const CategorySection = () => {
                                 </button>
                             ))}
                         </div>}
-
-
             </div>
         </section >
     );

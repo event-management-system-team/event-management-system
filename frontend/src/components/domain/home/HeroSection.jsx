@@ -1,8 +1,8 @@
 import HeroSlider from "./HeroSlider";
 import HeroSearchBar from "./HeroSearchBar";
-import { useHotEvents } from '../../hooks/useHotEvents'
-import LoadingState from '../common/LoadingState'
-import EmptyState from "../common/EmptyState";
+import { useHotEvents } from '../../../hooks/useHotEvents'
+import LoadingState from '../../common/LoadingState'
+import EmptyState from "../../common/EmptyState";
 
 const HeroSection = () => {
 

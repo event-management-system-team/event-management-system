@@ -1,12 +1,3 @@
-import {
-    CheckCircle2,
-    ArrowRight,
-    Users,
-    ShieldCheck,
-    Utensils
-} from "lucide-react";
-import RecruitmentCard from "../common/RecruitmentCard";
-import { Link } from "react-router-dom";
 import RecruitmentLeft from "./RecruitmentLeft";
 import RecruitmentRight from "./RecruitmentRight";
 
