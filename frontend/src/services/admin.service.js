@@ -32,5 +32,11 @@ export const adminService = {
 
     createOrganizer: (data) => {
         return axiosInstance.post(`/admin/accounts/organizer`, data);
+    },
+
+    checkEmailAvailability: (email) => {
+        return axiosInstance.get(`/admin/accounts/check-email`, {
+            params: { email }
+        });
     }
 };

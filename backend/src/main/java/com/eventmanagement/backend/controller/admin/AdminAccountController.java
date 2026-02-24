@@ -4,6 +4,7 @@ import com.eventmanagement.backend.dto.request.CreateOrganizerRequest;
 import com.eventmanagement.backend.dto.request.UserUpdateRequest;
 import com.eventmanagement.backend.dto.response.UserResponse;
 import com.eventmanagement.backend.model.User;
+import com.eventmanagement.backend.repository.UserRepository;
 import com.eventmanagement.backend.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AdminAccountController {
     private final AdminService adminService;
+    private final UserRepository userRepository;
 
 //    @GetMapping
 //    public ResponseEntity<?> getAll(@RequestParam(defaultValue = "0") int page,
@@ -56,5 +58,10 @@ public class AdminAccountController {
     @PostMapping("/organizer")
     public ResponseEntity<UserResponse> createOrganizer(@Valid @RequestBody CreateOrganizerRequest request) {
         return ResponseEntity.ok(adminService.createOrganizer(request));
+    }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
+        return ResponseEntity.ok(userRepository.existsByEmail(email));
     }
 }

@@ -34,16 +34,26 @@ export function CreateOrganizerModal({isOpen, onClose, onCreated}) {
         password: ""
     })
 
+    const [errors, setErrors] = useState({
+        fullName: "",
+        email: "",
+        phone: "",
+        password: "",
+    });
+
     const steps = [
         {number: 1, label: "General", id: "general"},
         {number: 2, label: "Verification", id: "verification"}
     ]
 
-    const handleNext = () => {
-        if (currentStep < 2) {
-            setCurrentStep(currentStep + 1)
+    const handleNext = async () => {
+        if (currentStep === 1) {
+            const isValid = await validateStep1();
+            if (!isValid) return;
         }
-    }
+
+        setCurrentStep((prev) => prev + 1);
+    };
 
     const handleBack = () => {
         if (currentStep > 1) {
@@ -72,6 +82,9 @@ export function CreateOrganizerModal({isOpen, onClose, onCreated}) {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const isValid = await validateStep1();
+        if (!isValid) return;
+
         try {
             const response = await adminService.createOrganizer(formData);
             alert("Created successfully");
@@ -83,8 +96,120 @@ export function CreateOrganizerModal({isOpen, onClose, onCreated}) {
         }
     }
 
+    const validateFullName = (fullName = "") => {
+        const value = fullName.trim();
+        if (!value) {
+            return "Organization name is required";
+        } else if (value.length > 50) {
+            return "Organization name must be no more than 50 characters";
+        } else if (!/^[A-Za-z\s]+$/.test(value)) {
+           return "Organization name can only contain letters";
+        }
+        return null;
+    }
+
+    const validateEmail = async (email = "") => {
+        if (!email) {
+            return "Email is required";
+        } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+            return "Invalid email format";
+        }
+
+            try {
+                const response = await adminService.checkEmailAvailability(email);
+                if (response.data === true) {
+                    return "Email already exists";
+                }
+            } catch (error) {
+                console.error("Error checking email:", error);
+            }
+
+        return null;
+    }
+
+    const validatePhone = (phoneNumber ="") => {
+        const phone = phoneNumber.trim();
+
+        if (!phone) {
+            return "Phone number is required";
+        } else if (/\D/.test(phone) && phone.charAt(0) !== "+") {
+            return "Phone number must contain only digits";
+        } else if (phone.charAt(0) !== "+" && phone.charAt(0) !== "0") {
+            return "Phone number must start with 0 or a country code";
+        } else if (phone.length < 9 || phone.length > 11) {
+            return "Phone number must be 10 digits long"
+        } else if (phone.charAt(0) === "0" && phone.charAt(1) === "0") {
+            return "Phone number cannot start with 00";
+        }
+        return null;
+    }
+
+    const validatePassword = (password = "") => {
+        const pw = password.trim();
+        if (!pw) {
+            return "Password is required";
+        } else if (pw.length < 8) {
+            return "Password must be at least 8 characters long";
+        } else if ( !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(pw)) {
+           return "Password must include at least one uppercase letter, one lowercase letter and one number";
+        }
+        return null;
+    }
+
+    const validateStep1 = async () => {
+        const newErrors = {};
+
+        const fullNameError = validateFullName(formData.fullName);
+        if (fullNameError) newErrors.fullName = fullNameError;
+
+        const emailError = await validateEmail(formData.email);
+        if (emailError) newErrors.email = emailError;
+
+        const phoneError = validatePhone(formData.phone);
+        if (phoneError) newErrors.phone = phoneError;
+
+        const passwordError = validatePassword(formData.password);
+        if (passwordError) newErrors.password = passwordError;
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const validateField = async (fieldName) => {
+        let error = null;
+
+        switch (fieldName) {
+            case "email":
+                error = await validateEmail(formData.email);
+                break;
+
+            case "password":
+                error = validatePassword(formData.password);
+                break;
+
+            case "phone":
+                error = validatePhone(formData.phone);
+                break;
+
+            case "fullName":
+                error = validateFullName(formData.fullName);
+                break;
+
+            default:
+                break;
+        }
+
+        setErrors((prev) => ({
+            ...prev,
+            [fieldName]: error,
+        }));
+    };
+
     const isStep1Valid =
-        formData.fullName && formData.email && formData.password.length >= 8
+        !!formData.fullName &&
+        !!formData.email &&
+        !!formData.phone &&
+        !!formData.password;
 
     if (!isOpen) return null
 
@@ -173,8 +298,12 @@ export function CreateOrganizerModal({isOpen, onClose, onCreated}) {
                                         placeholder="e.g. Vie Channel Ent."
                                         value={formData.fullName}
                                         onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                                        onBlur={() => validateField("fullName")}
                                         className="h-10"
                                     />
+                                    {errors.fullName && (
+                                        <p className="text-xs text-red-500 mt-1">{errors.fullName}</p>
+                                    )}
                                 </div>
 
                                 <div>
@@ -187,8 +316,12 @@ export function CreateOrganizerModal({isOpen, onClose, onCreated}) {
                                         placeholder="name@company.com"
                                         value={formData.email}
                                         onChange={(e) => setFormData({...formData, email: e.target.value})}
+                                        onBlur={() => validateField("email")}
                                         className="h-10"
                                     />
+                                    {errors.email && (
+                                        <p className="text-xs text-red-500 mt-1">{errors.email}</p>
+                                    )}
                                 </div>
 
                                 <div>
@@ -201,8 +334,12 @@ export function CreateOrganizerModal({isOpen, onClose, onCreated}) {
                                         placeholder="0123456789"
                                         value={formData.phone}
                                         onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                                        onBlur={() => validateField("phone")}
                                         className="h-10"
                                     />
+                                    {errors.phone && (
+                                        <p className="text-xs text-red-500 mt-1">{errors.phone}</p>
+                                    )}
                                 </div>
 
                                 <div>
@@ -217,6 +354,7 @@ export function CreateOrganizerModal({isOpen, onClose, onCreated}) {
                                             placeholder="Min. 8 characters"
                                             value={formData.password}
                                             onChange={(e) => setFormData({...formData, password: e.target.value})}
+                                            onBlur={() => validateField("password")}
                                             className="h-10 pr-10"
                                         />
                                         <button
@@ -231,12 +369,8 @@ export function CreateOrganizerModal({isOpen, onClose, onCreated}) {
                                             )}
                                         </button>
                                     </div>
-                                    {formData.password && formData.password.length < 8 && (
-                                        <p className="text-xs text-red-500 mt-1">Password must be at least 8
-                                            characters</p>
-                                    )}
-                                    {formData.password && formData.password.length >= 8 && (
-                                        <p className="text-xs text-green-600 mt-1">Password strength: Good</p>
+                                    {errors.password && (
+                                        <p className="text-xs text-red-500 mt-1">{errors.password}</p>
                                     )}
                                 </div>
                             </div>

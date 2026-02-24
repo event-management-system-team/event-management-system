@@ -5,6 +5,7 @@ import com.eventmanagement.backend.constants.Status;
 import com.eventmanagement.backend.dto.request.CreateOrganizerRequest;
 import com.eventmanagement.backend.dto.request.UserUpdateRequest;
 import com.eventmanagement.backend.dto.response.UserResponse;
+import com.eventmanagement.backend.exception.BadRequestException;
 import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.repository.UserRepository;
 import com.eventmanagement.backend.util.GenerateAvatarUrl;
@@ -80,7 +81,7 @@ public class AdminService {
     @Transactional
     public UserResponse createOrganizer(CreateOrganizerRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new BadRequestException("Email already exists");
         }
 
         User user = User.builder()
