@@ -105,7 +105,7 @@ public class AuthService {
 
         String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUserId());
 
-        int maxAge = (int) refreshTokenExpiration / 60;
+        int maxAge = request.isRememberMe() ? (int) (refreshTokenExpiration / 60) : -1;
         cookieUtil.addRefreshTokenCookie(response, refreshToken, maxAge);
 
         return LoginResponse.builder()

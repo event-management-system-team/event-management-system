@@ -7,9 +7,8 @@ import { InputField } from "../../../common/InputField";
 import { Button } from "../../../common/Button";
 import { SiEventbrite } from "react-icons/si";
 import { MdArrowForward } from "react-icons/md";
-import { FcGoogle } from "react-icons/fc";
 import { loginSchema } from "../../../../schemas/login.schema";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   loginUser,
   loginWithGoogle,
@@ -22,6 +21,8 @@ export const LoginForm = () => {
   const { loading, error, isAuthenticated } = useSelector(
     (state) => state.auth,
   );
+
+  const [rememberMe, setRememberMe] = useState(false);
 
   const {
     register,
@@ -43,7 +44,7 @@ export const LoginForm = () => {
   }, [dispatch]);
 
   const onSubmit = async (data) => {
-    await dispatch(loginUser(data));
+    await dispatch(loginUser({ ...data, rememberMe }));
   };
 
   const handleGoogleSuccess = async (credentialResponse) => {
@@ -128,6 +129,8 @@ export const LoginForm = () => {
               <input
                 className="size-5 rounded-md border-gray-300 text-[#8aa8b2] focus:ring-primary"
                 type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
               />
               <span className="ml-2 text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">
                 Remember me
