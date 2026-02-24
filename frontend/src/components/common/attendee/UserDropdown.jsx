@@ -49,7 +49,7 @@ const UserDropdown = ({ user }) => {
       <div className="cursor-pointer flex items-center gap-2 hover:bg-gray-100 py-1 px-2 rounded-full transition-all">
         <Avatar
           size="large"
-          src={user?.avatar_url || user?.avatar}
+          src={user?.avatarUrl || user?.avatar_url || user?.avatar}
           className="border border-primary/20 bg-white"
           icon={<User size={20} className="text-gray-600" />}
         />

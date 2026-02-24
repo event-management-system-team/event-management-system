@@ -1,14 +1,17 @@
 import { Route, Routes } from "react-router-dom";
 import PublicRoutes from "./PublicRoutes";
-import AuthRoutes from "./AuthRoutes";
+import LoginPage from "../pages/auth/LoginPage";
+import RegisterPage from "../pages/auth/RegisterPage";
 
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/login/*" element={<AuthRoutes />} />
-      <Route path="/register/*" element={<AuthRoutes />} />
+      {/* Auth Routes */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+
+      {/* Public/Protected Routes */}
       <Route path="/*" element={<PublicRoutes />} />
-      <Route path="*" element={<div>404-Page Not Found</div>} />
     </Routes>
   );
 };
