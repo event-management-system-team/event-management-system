@@ -9,7 +9,7 @@ const HeroSearchBar = () => {
     const { data: locations, isLoading } = useLocation();
     const { keyword, setKeyword, location, setLocation, date, setDate, handleSearch, handleKeyDown } = useEventSearch()
 
-    const onChange = (dateString) => {
+    const onChange = (dateObj, dateString) => {
         setDate(dateString);
     };
 

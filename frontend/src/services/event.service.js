@@ -20,10 +20,9 @@ const eventService = {
         if (filters.location) params.append('location', filters.location);
         if (filters.date) params.append('date', filters.date);
         if (filters.category) params.append('category', filters.category);
-        if (filters.price) params.append('price', filters.price);
-        if (filters.price) params.append('price', filters.price);
-        if (filters.page) params.append('page', filters.page);
-        if (filters.size) params.append('size', filters.size);
+        if (filters.price !== undefined && filters.price !== '') params.append('price', filters.price);
+        if (filters.page !== undefined && filters.page !== null) params.append('page', filters.page);
+        if (filters.size !== undefined && filters.size !== null) params.append('size', filters.size);
 
         const response = await axiosInstance.get(`events/search?${params.toString()}`)
         return response.data
