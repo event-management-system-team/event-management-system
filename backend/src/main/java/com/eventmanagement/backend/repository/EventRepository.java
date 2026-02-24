@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,12 +27,18 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
 
     @Query("SELECT e FROM Event e " +
             "WHERE e.status = :status " +
-            "AND (:keyword IS NULL OR LOWER(e.eventName) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
-            "AND (:location IS NULL OR LOWER(e.location) LIKE LOWER(CONCAT('%', :location, '%')))")
-    Page<Event> findEventsByLocation(@Param("status") EventStatus status,
-                                     @Param("keyword") String keyword,
-                                     @Param("location") String location,
-                                     Pageable pageable);
+            "AND (:keyword IS NULL OR LOWER(e.eventName) LIKE LOWER(CONCAT('%', cast(:keyword as string), '%'))) " +
+            "AND (:location IS NULL OR LOWER(e.location) LIKE LOWER(CONCAT('%', cast(:location as string), '%'))) " +
+            "AND (:categorySlug IS NULL OR e.category.categorySlug = cast(:categorySlug as string)) " +
+            "AND (cast(:date as timestamp) IS NULL OR (e.startDate <= :date AND e.endDate >= :date)) " +
+            "AND (:price IS NULL OR EXISTS (SELECT t FROM e.ticketTypes t WHERE t.price <= :price))")
+    Page<Event> searchEvents(@Param("status") EventStatus status,
+                             @Param("keyword") String keyword,
+                             @Param("location") String location,
+                             @Param("categorySlug") String categorySlug,
+                             @Param("date") LocalDateTime date,
+                             @Param("price") BigDecimal price,
+                             Pageable pageable);
 
 
 }

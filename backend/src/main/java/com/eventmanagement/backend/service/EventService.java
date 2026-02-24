@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,13 +34,22 @@ public class EventService {
         return events.stream().map((event) -> mapToResponse(event)).collect(Collectors.toList());
     }
 
-    public Page<EventResponse> searchEventsByLocation(String keyword, String location, int page, int size) {
+    public Page<EventResponse> searchEvents(String keyword, String location,
+                                            String category, LocalDate date,
+                                            BigDecimal price, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        String kw = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : "";
-        String loc = (location != null && !location.trim().isEmpty()) ? location.trim() : "";
+        String kw = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
+        String loc = (location != null && !location.trim().isEmpty()) ? location.trim() : null;
+        String cat = (category != null && !category.trim().isEmpty()) ? category.trim() : null;
 
-        Page<Event> events = eventRepository.findEventsByLocation(EventStatus.APPROVED, kw, loc, pageable);
+        LocalDateTime dateTime = null;
+        if (date != null) {
+            // Biến ngày "25/04/2026" thành "25/04/2026 23:59:59" để tìm các sự kiện đang diễn ra trong ngày đó
+            dateTime = date.atTime(23, 59, 59);
+        }
+
+        Page<Event> events = eventRepository.searchEvents(EventStatus.APPROVED, kw, loc, cat, dateTime, price, pageable);
         return events.map(event -> mapToResponse(event));
     }
 

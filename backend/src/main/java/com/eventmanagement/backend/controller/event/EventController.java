@@ -4,9 +4,13 @@ import com.eventmanagement.backend.dto.response.attendee.EventResponse;
 import com.eventmanagement.backend.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -30,13 +34,17 @@ public class EventController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<EventResponse>> searchEventsByLocation(
+    public ResponseEntity<Page<EventResponse>> searchEvents(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String location,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false)
+            @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate date,
+            @RequestParam(required = false) BigDecimal price,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        Page<EventResponse> events = eventService.searchEventsByLocation(keyword, location, page, size);
+        Page<EventResponse> events = eventService.searchEvents(keyword, location, category, date, price, page, size);
         return ResponseEntity.ok(events);
     }
 

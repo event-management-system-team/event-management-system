@@ -10,7 +10,7 @@ export const useLocation = () => {
         select: (rawData) => {
 
             if (!rawData || !Array.isArray(rawData)) {
-                return [{ value: '', label: 'Tất cả địa điểm' }];
+                return [{ value: '', label: 'Everywhere' }];
             }
 
             const formattedData = rawData.map(province => {
@@ -27,7 +27,7 @@ export const useLocation = () => {
             });
 
             return [
-                { value: '', label: 'Tất cả địa điểm' },
+                { value: '', label: 'Everywhere' },
                 ...formattedData
             ]
         }

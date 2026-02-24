@@ -7,6 +7,7 @@ import { fetchCategories } from "../../store/slices/category.slice";
 import { useEffect } from "react";
 import EmptyState from '../common/EmptyState'
 import LoadingState from '../common/LoadingState'
+import useEventSearch from '../../hooks/useEventSearch';
 
 
 const IconMap = {
@@ -27,6 +28,7 @@ const CategorySection = () => {
 
     const dispatch = useDispatch();
     const { categories, isLoading, isError } = useSelector((state) => state.category);
+    const { searchByCategory } = useEventSearch();
 
     useEffect(() => {
 
@@ -56,14 +58,19 @@ const CategorySection = () => {
 
                         <div className="flex overflow-x-auto gap-6 pb-6 snap-x snap-mandatory scrollbar-hide pt-5">
                             {categories.map((cat) => (
-                                <div key={cat.categoryId} className="flex-shrink-0 w-32 snap-start group flex flex-col items-center gap-4 cursor-pointer">
-                                    <div className="size-20 bg-[#F1F0E8] rounded-full flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white group-hover:-translate-y-2 transition-all duration-300 shadow-sm">
-                                        {IconMap[cat.iconUrl] || <LayoutGrid size={32} />}
+                                <button key={cat.categoryId}
+                                    onClick={() => searchByCategory(cat.categorySlug)}>
+                                    <div className="flex-shrink-0 w-32 snap-start group flex flex-col items-center gap-4 cursor-pointer">
+                                        <div className="size-20 bg-[#F1F0E8] rounded-full flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white group-hover:-translate-y-2 transition-all duration-300 shadow-sm">
+
+                                            {IconMap[cat.iconUrl] || <LayoutGrid size={32} />}
+
+                                        </div>
+                                        <span className="font-bold text-gray-700 group-hover:text-primary transition-colors text-center">
+                                            {cat.categoryName}
+                                        </span>
                                     </div>
-                                    <span className="font-bold text-gray-700 group-hover:text-primary transition-colors text-center">
-                                        {cat.categoryName}
-                                    </span>
-                                </div>
+                                </button>
                             ))}
                         </div>}
 

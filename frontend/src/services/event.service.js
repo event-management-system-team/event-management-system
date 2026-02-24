@@ -14,10 +14,13 @@ const eventService = {
         const response = await axios.get('https://provinces.open-api.vn/api/v2/')
         return response.data
     },
-    searchEvents: async (keyword, location) => {
+    searchEvents: async (filters) => {
         const params = new URLSearchParams();
-        if (keyword) params.append('keyword', keyword);
-        if (location) params.append('location', location);
+        if (filters.keyword) params.append('keyword', filters.keyword);
+        if (filters.location) params.append('location', filters.location);
+        if (filters.date) params.append('date', filters.date);
+        if (filters.category) params.append('category', filters.category);
+        if (filters.price) params.append('price', filters.price);
 
         const response = await axiosInstance.get(`events/search?${params.toString()}`)
         return response.data

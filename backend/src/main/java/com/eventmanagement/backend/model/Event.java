@@ -48,8 +48,7 @@ public class Event {
 
     @Column(name = "location", columnDefinition = "TEXT")
     private String location;
-
-    // Map dữ liệu JSONB của PostgreSQL sang Map của Java
+    
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "location_coordinates", columnDefinition = "jsonb")
     private Map<String, Object> locationCoordinates;
