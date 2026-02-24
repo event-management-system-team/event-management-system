@@ -7,6 +7,7 @@ import LoginPage from "./pages/auth/LoginPage";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import { ProfileCard } from "./components/domain/profile/ProfileCard";
 
+import AppRoutes from "./routes";
 function App() {
   return (
     <Routes>
@@ -23,6 +24,7 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route path="/*" element={<AppRoutes />} />
     </Routes>
   );
 }
