@@ -52,16 +52,19 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
+    @Builder.Default
     private Role role = Role.ATTENDEE;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
+    @Builder.Default
     private Status status = Status.ACTIVE;
 
     @Column(name = "google_id", unique = true)
     private String googleId;
 
     @Column(name = "email_verified")
+    @Builder.Default
     private Boolean emailVerified = false;
 
     @Column(name = "last_login_at")
