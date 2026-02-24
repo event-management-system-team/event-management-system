@@ -8,4 +8,5 @@ import lombok.Data;
 public class RefreshTokenResponse {
     private String accessToken;
     private String tokenType = "Bearer";
+    private LoginResponse.UserInfor user;
 }

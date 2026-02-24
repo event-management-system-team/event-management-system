@@ -66,14 +66,17 @@ const authService = {
   clearSession: () => {
     sessionStorage.clear();
     localStorage.removeItem("user");
+    localStorage.removeItem("accessToken");
     localStorage.removeItem("rememberMe");
   },
 
   isAuthenticated: () => {
-    return (
+    const hasToken =
       !!localStorage.getItem("accessToken") ||
-      !!sessionStorage.getItem("accessToken")
-    );
+      !!sessionStorage.getItem("accessToken");
+    const hasUser =
+      !!localStorage.getItem("user") || !!sessionStorage.getItem("user");
+    return hasToken && hasUser;
   },
 
   isRememberMe: () => {

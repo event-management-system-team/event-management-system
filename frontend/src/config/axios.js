@@ -1,6 +1,6 @@
 import axios from "axios";
 import { store } from "../store/index";
-import { setAccessToken, logoutUser } from "../store/slices/auth.slice";
+import { setAccessToken, setUser, logoutUser } from "../store/slices/auth.slice";
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -70,6 +70,9 @@ axiosInstance.interceptors.response.use(
         const newAccessToken = response.data.accessToken;
 
         store.dispatch(setAccessToken(newAccessToken));
+        if (response.data.user) {
+          store.dispatch(setUser(response.data.user));
+        }
 
         processQueue(null, newAccessToken);
 

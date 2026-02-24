@@ -213,6 +213,13 @@ public class AuthService {
         return RefreshTokenResponse.builder()
                 .accessToken(newAccessToken)
                 .tokenType("Bearer")
+                .user(LoginResponse.UserInfor.builder()
+                        .user_id(user.getUserId())
+                        .email(user.getEmail())
+                        .full_name(user.getFullName())
+                        .avatar_url(user.getAvatarUrl())
+                        .role(user.getRole())
+                        .build())
                 .build();
     }
 

@@ -44,7 +44,7 @@ const HeroSearchBar = () => {
           <Select
             className="w-full -ml-3"
             defaultValue=""
-            bordered={false}
+            variant="borderless"
             showSearch
             value={location}
             onChange={(value) => setLocation(value)}
