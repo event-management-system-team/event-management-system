@@ -4,14 +4,14 @@ import EventSection from '../../components/domain/home/EventSection'
 import RecruitmentSection from '../../components/domain/home/RecruitmentSection'
 
 const HomePage = () => {
-    return (
-        <>
-            <HeroSection />
-            <CategorySection />
-            <EventSection />
-            <RecruitmentSection />
-        </>
-    )
-}
+  return (
+    <>
+      <HeroSection />
+      <CategorySection />
+      <EventSection />
+      <RecruitmentSection />
+    </>
+  );
+};
 
-export default HomePage
+export default HomePage;

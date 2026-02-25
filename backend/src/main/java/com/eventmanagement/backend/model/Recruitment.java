@@ -49,7 +49,6 @@ public class Recruitment {
     @Builder.Default
     private RecruitmentStatus status = RecruitmentStatus.OPEN;
 
-
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 

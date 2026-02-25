@@ -37,17 +37,14 @@ public class EventController {
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String location,
             @RequestParam(required = false) List<String> categories,
-            @RequestParam(required = false)
-            @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate date,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate date,
             @RequestParam(required = false) BigDecimal price,
             @RequestParam(required = false) Boolean isFree,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        Page<EventResponse> events = eventService.searchEvents(keyword, location, categories, date, price, isFree, page, size);
+            @RequestParam(defaultValue = "10") int size) {
+        Page<EventResponse> events = eventService.searchEvents(keyword, location, categories, date, price, isFree, page,
+                size);
         return ResponseEntity.ok(events);
     }
 
-
 }
-

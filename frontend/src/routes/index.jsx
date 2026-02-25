@@ -1,16 +1,19 @@
-import { Route, Routes } from "react-router-dom"
-import PublicRoutes from "./PublicRoutes"
-
+import { Route, Routes } from "react-router-dom";
+import PublicRoutes from "./PublicRoutes";
+import LoginPage from "../pages/auth/LoginPage";
+import RegisterPage from "../pages/auth/RegisterPage";
 
 const AppRoutes = () => {
-    return (
-        <Routes>
-            <Route path="/*" element={<PublicRoutes />} />
+  return (
+    <Routes>
+      {/* Auth Routes */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
 
+      {/* Public/Protected Routes */}
+      <Route path="/*" element={<PublicRoutes />} />
+    </Routes>
+  );
+};
 
-            <Route path="*" element={<div>404-Page Not Found</div>} />
-        </Routes>
-    )
-}
-
-export default AppRoutes
+export default AppRoutes;

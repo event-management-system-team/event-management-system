@@ -5,11 +5,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { GoogleLogin } from "@react-oauth/google";
 import { InputField } from "../../../common/InputField";
 import { Button } from "../../../common/Button";
-import { SiEventbrite } from "react-icons/si";
 import { MdArrowForward } from "react-icons/md";
-import { FcGoogle } from "react-icons/fc";
+import LogoImg from "../../../../assets/logo.png";
 import { loginSchema } from "../../../../schemas/login.schema";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   loginUser,
   loginWithGoogle,
@@ -22,6 +21,8 @@ export const LoginForm = () => {
   const { loading, error, isAuthenticated } = useSelector(
     (state) => state.auth,
   );
+
+  const [rememberMe, setRememberMe] = useState(false);
 
   const {
     register,
@@ -43,7 +44,7 @@ export const LoginForm = () => {
   }, [dispatch]);
 
   const onSubmit = async (data) => {
-    await dispatch(loginUser(data));
+    await dispatch(loginUser({ ...data, rememberMe }));
   };
 
   const handleGoogleSuccess = async (credentialResponse) => {
@@ -63,7 +64,7 @@ export const LoginForm = () => {
     <div className="w-full md:w-1/2 bg-[#F1F0E8] flex flex-col items-center justify-center px-6 py-12 md:px-20 lg:px-32">
       <div className="w-full max-w-md">
         <div className="md:hidden flex items-center gap-2 mb-8 justify-center">
-          <SiEventbrite className="size-12 text-primary" />
+          <img src={LogoImg} alt="EventHub Logo" className="w-12 h-12 object-contain" />
           <span className="text-xl font-bold text-gray-900 ">EventHub</span>
         </div>
 
@@ -128,6 +129,8 @@ export const LoginForm = () => {
               <input
                 className="size-5 rounded-md border-gray-300 text-[#8aa8b2] focus:ring-primary"
                 type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
               />
               <span className="ml-2 text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">
                 Remember me

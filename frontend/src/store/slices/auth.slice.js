@@ -20,8 +20,9 @@ export const loginUser = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const data = await authService.login(credentials);
-      authService.saveAccessToken(data.accessToken);
-      authService.saveUser(data.user);
+      const rememberMe = credentials.rememberMe || false;
+      authService.saveAccessToken(data.accessToken, rememberMe);
+      authService.saveUser(data.user, rememberMe);
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Login failed");
@@ -41,6 +42,25 @@ export const loginWithGoogle = createAsyncThunk(
       return rejectWithValue(
         error.response?.data?.message || "Login with Google failed",
       );
+    }
+  },
+);
+
+export const autoRefreshToken = createAsyncThunk(
+  "auth/autoRefresh",
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await authService.refreshToken();
+      const rememberMe = authService.isRememberMe();
+      authService.saveAccessToken(data.accessToken, rememberMe);
+      if (data.user) {
+        authService.saveUser(data.user, rememberMe);
+      }
+
+      return data;
+    } catch {
+      authService.clearSession();
+      return rejectWithValue("Session expired");
     }
   },
 );
@@ -80,11 +100,11 @@ const authSlice = createSlice({
     setAccessToken: (state, action) => {
       state.accessToken = action.payload;
       state.isAuthenticated = true;
-      authService.saveAccessToken(action.payload);
+      authService.saveAccessToken(action.payload, authService.isRememberMe());
     },
     setUser: (state, action) => {
       state.user = action.payload;
-      authService.saveUser(action.payload);
+      authService.saveUser(action.payload, authService.isRememberMe());
     },
   },
   extraReducers: (builder) => {
@@ -133,6 +153,22 @@ const authSlice = createSlice({
       .addCase(loginWithGoogle.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      .addCase(autoRefreshToken.fulfilled, (state, action) => {
+        state.isAuthenticated = true;
+        state.accessToken = action.payload.accessToken;
+        // Restore user from payload if available, else fallback to localStorage
+        if (action.payload.user) {
+          state.user = action.payload.user;
+        } else {
+          state.user = authService.getUser();
+        }
+      })
+      .addCase(autoRefreshToken.rejected, (state) => {
+        state.isAuthenticated = false;
+        state.user = null;
+        state.accessToken = null;
       })
 
       // Logout

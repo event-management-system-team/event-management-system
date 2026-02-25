@@ -5,7 +5,6 @@ import com.eventmanagement.backend.dto.response.attendee.EventResponse;
 import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -35,9 +34,9 @@ public class EventService {
     }
 
     public Page<EventResponse> searchEvents(String keyword, String location,
-                                            List<String> categories, LocalDate date,
-                                            BigDecimal price, Boolean isFree,
-                                            int page, int size) {
+            List<String> categories, LocalDate date,
+            BigDecimal price, Boolean isFree,
+            int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         String kw = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
@@ -46,14 +45,15 @@ public class EventService {
 
         LocalDateTime dateTime = null;
         if (date != null) {
-            // Biến ngày "25/04/2026" thành "25/04/2026 23:59:59" để tìm các sự kiện đang diễn ra trong ngày đó
+            // Biến ngày "25/04/2026" thành "25/04/2026 23:59:59" để tìm các sự kiện đang
+            // diễn ra trong ngày đó
             dateTime = date.atTime(23, 59, 59);
         }
 
-        Page<Event> events = eventRepository.searchEvents(EventStatus.APPROVED, kw, loc, cat, dateTime, price, isFree, pageable);
+        Page<Event> events = eventRepository.searchEvents(EventStatus.APPROVED, kw, loc, cat, dateTime, price, isFree,
+                pageable);
         return events.map(event -> mapToResponse(event));
     }
-
 
     private EventResponse mapToResponse(Event event) {
 
