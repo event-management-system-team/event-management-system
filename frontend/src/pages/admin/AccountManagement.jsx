@@ -47,10 +47,13 @@ import {
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {adminService} from "../../services/admin.service.js";
+import {AccountsPagination} from "../../components/domain/admin/AccountsPagination.jsx";
 
 export function AccountManagement() {
 
     const [accounts, setAccounts] = useState([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
     const [originalAccounts, setOriginalAccounts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -59,6 +62,7 @@ export function AccountManagement() {
     const [endDate, setEndDate] = useState(null);
     const [sortOption, setSortOption] = useState("newest");
     const [searchTerm, setSearchTerm] = useState("");
+    const [page, setPage] = useState(1);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -75,29 +79,19 @@ export function AccountManagement() {
         setOriginalAccounts(prevOriginal => [newAccount, ...prevOriginal]);
     }
 
-    // useEffect(() => {
-    //     const fetchAccounts = async () => {
-    //         try {
-    //             setLoading(true);
-    //             const response = await adminService.getAllAccounts(0, 10);
-    //             setAccounts(response.data.content);
-    //         } catch (error) {
-    //             setError("Cannot load account list");
-    //             console.error(error)
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     }
-    //
-    //     fetchAccounts();
-    // }, [])
+    const loadAllAccounts = async () => {
+        const res = await adminService.getAllAccountsPlain();
+        setOriginalAccounts(res.data); // full list
+    };
 
-    const fetchAccounts = async () => {
+    const loadData = async () => {
         try {
             setLoading(true);
-            const response = await adminService.getAllAccounts();
-            setAccounts(response.data);
-            setOriginalAccounts(response.data);
+            const response = await adminService.getAllAccounts(currentPage, 10);
+
+            setAccounts(response.data.content);
+            setTotalPages(response.data.totalPages);
+            setCurrentPage(response.data.number)
         } catch (error) {
             setError("Cannot load account list");
             console.error(error)
@@ -107,28 +101,77 @@ export function AccountManagement() {
     }
 
     useEffect(() => {
-        fetchAccounts();
-    }, [])
+        loadData();
+        loadAllAccounts();
+    }, [currentPage]);
 
-    const handleSearch = async (e) => {
+    // api search
+    // const handleSearchChange = async (e) => {
+    //     const value = e.target.value;
+    //     setSearchTerm(value);
+    //
+    //     if (value.trim() === "") {
+    //         setAccounts(originalAccounts)
+    //         return;
+    //     }
+    //
+    //     try {
+    //         const response = await adminService.searchAccounts(value);
+    //         setAccounts(response.data);
+    //     } catch (error) {
+    //         setError("Cannot load account list");
+    //         console.error(error)
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // }
+
+    // local search
+    const handleSearchChange = (e) => {
         const value = e.target.value;
         setSearchTerm(value);
 
-        if (value.trim() === "") {
-            setAccounts(originalAccounts)
+        if (!value.trim()) {
+            setAccounts(originalAccounts);
             return;
         }
 
-        try {
-            const response = await adminService.searchAccounts(value);
-            setAccounts(response.data);
-        } catch (error) {
-            setError("Cannot load account list");
-            console.error(error)
-        } finally {
-            setLoading(false);
-        }
-    }
+        const lower = value.toLowerCase();
+
+        const filtered = originalAccounts.filter(acc =>
+            acc.fullName?.toLowerCase().includes(lower) ||
+            acc.email?.toLowerCase().includes(lower) ||
+            acc.phone?.includes(value)
+        );
+
+        setAccounts(filtered);
+    };
+
+    const pageSize = 10;
+    const isSearching = searchTerm.trim().length > 0;
+
+    const startItem = currentPage * pageSize + 1;
+    const endItem = Math.min(
+        (currentPage + 1) * pageSize,
+        isSearching ? accounts.length : totalPages
+    )
+
+    const handlePrev = () => {
+        if (isSearching || currentPage === 0) return;
+        setCurrentPage(prev => prev - 1);
+    };
+
+    const handleNext = () => {
+        if (isSearching || currentPage >= totalPages - 1) return;
+        setCurrentPage(prev => prev + 1);
+    };
+
+    const handlePageChange = (p) => {
+        if (isSearching) return;
+        setCurrentPage(p - 1); // 🔥 convert 1-based → 0-based
+    };
+
+    // const totalPages = Math.ceil(paginatedAccounts.length / pageSize);
 
     const handleToggleBan = async (account) => {
         if (!account) return;
@@ -140,47 +183,98 @@ export function AccountManagement() {
             try {
                 const res = await adminService.toggleBan(account.userId);
                 alert(`${action} successfully!`);
-                await fetchAccounts();
+                // await fetchAccounts();
+                await loadData();
             } catch (error) {
                 alert('Operation failed');
             }
         }
     }
 
+    // const processedAccounts = useMemo(() => {
+    //     return [...accounts]
+    //         // filter by status
+    //         .filter(account => status === "all" || account.status === status)
+    //
+    //         // filter by date range
+    //         .filter(account => {
+    //             if (!startDate || !endDate) return true;
+    //
+    //             const createdDate = new Date(account.createdAt)
+    //
+    //             const endOfDay = new Date(endDate);
+    //             endOfDay.setHours(23, 59, 59, 999);
+    //
+    //             return (createdDate >= startDate && createdDate <= endOfDay);
+    //         })
+    //
+    //         // sort by option
+    //         .sort((a, b) => {
+    //             switch (sortOption) {
+    //                 case "newest":
+    //                     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    //
+    //                 case "oldest":
+    //                     return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    //
+    //                 case "name":
+    //                     return (a.fullName ?? "").localeCompare(b.fullName ?? "");
+    //
+    //                 default:
+    //                     return 0;
+    //             }
+    //         });
+    // }, [accounts, status, startDate, endDate, sortOption]);
+
     const processedAccounts = useMemo(() => {
-        return [...accounts]
-            // filter by status
-            .filter(account => status === "all" || account.status === status)
+        let list = [...originalAccounts];
 
-            // filter by date range
-            .filter(account => {
-                if (!startDate || !endDate) return true;
+        if (searchTerm.trim()) {
+            const lower = searchTerm.toLowerCase();
+            list = list.filter(acc =>
+                acc.fullName?.toLowerCase().includes(lower) ||
+                acc.email?.toLowerCase().includes(lower) ||
+                acc.phone?.includes(searchTerm)
+            );
+        }
 
-                const createdDate = new Date(account.createdAt)
+        // filter by status
+        if (!status) return originalAccounts;
+        list = list.filter(account => status === "all" || account.status === status);
 
-                const endOfDay = new Date(endDate);
-                endOfDay.setHours(23, 59, 59, 999);
+        // 4. Filter theo Date range
+        list = list.filter(account => {
+            if (!startDate || !endDate) return true;
+            const createdDate = new Date(account.createdAt);
+            const endOfDay = new Date(endDate);
+            endOfDay.setHours(23, 59, 59, 999);
+            return (createdDate >= startDate && createdDate <= endOfDay);
+        });
 
-                return (createdDate >= startDate && createdDate <= endOfDay);
-            })
+        // 5. Sort
+        list.sort((a, b) => {
+            switch (sortOption) {
+                case "newest":
+                    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+                case "oldest":
+                    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+                case "name":
+                    return (a.fullName ?? "").localeCompare(b.fullName ?? "");
+                default:
+                    return 0;
+            }
+        });
 
-            // sort by option
-            .sort((a, b) => {
-                switch (sortOption) {
-                    case "newest":
-                        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        return list;
+    }, [originalAccounts, searchTerm, status, startDate, endDate, sortOption]);
 
-                    case "oldest":
-                        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    const totalItems = processedAccounts.length;
+    // const totalPages = Math.ceil(totalItems / pageSize);
 
-                    case "name":
-                        return (a.fullName ?? "").localeCompare(b.fullName ?? "");
-
-                    default:
-                        return 0;
-                }
-            });
-    }, [accounts, status, startDate, endDate, sortOption]);
+    const paginatedAccounts = processedAccounts.slice(
+        currentPage * pageSize,
+        (currentPage + 1) * pageSize
+    );
 
     const formatDate = (isoString) => {
         const date = new Date(isoString);
@@ -227,8 +321,6 @@ export function AccountManagement() {
             {
                 title: "TOTAL ACCOUNTS",
                 value: total,
-                change: "+12.5%",
-                trending: "up",
                 icon: Users,
                 iconBg: "bg-blue-100",
                 iconColor: "text-blue-600"
@@ -236,8 +328,6 @@ export function AccountManagement() {
             {
                 title: "ACTIVE",
                 value: active,
-                change: "+10.8%",
-                trending: "up",
                 icon: CheckCircle,
                 iconBg: "bg-green-100",
                 iconColor: "text-green-600"
@@ -245,8 +335,6 @@ export function AccountManagement() {
             {
                 title: "BANNED",
                 value: banned,
-                change: "+5.4%",
-                trending: "up",
                 icon: UserX,
                 iconBg: "bg-red-100",
                 iconColor: "text-red-600"
@@ -256,7 +344,7 @@ export function AccountManagement() {
 
     const metrics = summaryMetrics(accounts);
 
-    if (loading) return <div>Loading...</div>
+    if (loading) return <div className="absolute top-0 left-0 w-full h-1 bg-blue-500 animate-pulse z-10"/>
     if (error) return <div>Something went wrong: {error}</div>;
 
     return (
@@ -309,7 +397,6 @@ export function AccountManagement() {
                     <div className="grid grid-cols-3 gap-5 p-8">
                         {metrics.map((metric, index) => {
                             const Icon = metric.icon
-                            const TrendIcon = metric.trending === "up" ? TrendingUp : TrendingDown
                             return (
                                 <Card key={index} className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                                     <CardContent className="p-6">
@@ -324,8 +411,6 @@ export function AccountManagement() {
                                                     metric.trending === "up" ? "text-green-600" : "text-red-600"
                                                 }`}
                                             >
-                                                <TrendIcon className="h-3 w-3"/>
-                                                <span>{metric.change}</span>
                                             </div>
                                         </div>
                                         <div className="text-xs text-gray-500 mb-1 tracking-wide">
@@ -352,7 +437,7 @@ export function AccountManagement() {
                                     type="text"
                                     placeholder="Search organizer, full name, email or phone number..."
                                     value={searchTerm}
-                                    onChange={handleSearch}
+                                    onChange={handleSearchChange}
                                     className="pl-9 pr-4 py-2 w-full border-gray-300 focus:ring-[#7FA5A5] focus:border-[#7FA5A5] bg-[#f7f7f7]"
                                 />
                             </div>
@@ -362,7 +447,8 @@ export function AccountManagement() {
                                 value={status}
                                 onValueChange={(value) => setStatus(value)}
                             >
-                                <SelectTrigger className="w-[160px] border border-gray-200 cursor-pointer bg-[#f7f7f7] hover:bg-[#B3C8CF]">
+                                <SelectTrigger
+                                    className="w-[160px] border border-gray-200 cursor-pointer bg-[#f7f7f7] hover:bg-[#B3C8CF]">
                                     <SelectValue placeholder="Status"/>
                                 </SelectTrigger>
                                 <SelectContent className='border border-gray-200'>
@@ -403,7 +489,8 @@ export function AccountManagement() {
                                 value={sortOption}
                                 onValueChange={(value) => setSortOption(value)}
                             >
-                                <SelectTrigger className="w-[140px] border border-gray-200 cursor-pointer bg-[#f7f7f7] hover:bg-[#B3C8CF]">
+                                <SelectTrigger
+                                    className="w-[140px] border border-gray-200 cursor-pointer bg-[#f7f7f7] hover:bg-[#B3C8CF]">
                                     <SelectValue placeholder="Sort by"/>
                                 </SelectTrigger>
                                 <SelectContent className='border border-gray-200'>
@@ -421,29 +508,29 @@ export function AccountManagement() {
                             <CardContent className="p-0">
                                 {/* Table Header */}
                                 <div
-                                    className="grid grid-cols-12 gap-4 px-6 py-3 border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wide items-center">
-                                    <div className="col-span-1 flex items-center">
-                                        <Checkbox/>
-                                    </div>
-                                    <div className="col-span-3">Account</div>
+                                    className="grid grid-cols-11 gap-4 px-6 py-3 border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wide items-center">
+                                    {/*<div className="col-span-1 flex items-center">*/}
+                                    {/*    <Checkbox/>*/}
+                                    {/*</div>*/}
+                                    <div className="col-span-4 ml-5">Account</div>
                                     <div className="col-span-2">Phone Number</div>
                                     <div className="col-span-1">Role</div>
                                     <div className="col-span-2">Joined Date</div>
-                                    <div className="col-span-2">Status</div>
+                                    <div className="col-span-1">Status</div>
                                     <div className="col-span-1 text-right">Actions</div>
                                 </div>
 
                                 {/* Account Rows */}
-                                {processedAccounts.map(account => (
+                                {paginatedAccounts.map(account => (
                                     <div
                                         key={account.userId}
-                                        className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-[#eef3f5]"
+                                        className="grid grid-cols-11 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-[#eef3f5]"
                                     >
-                                        <div className="col-span-1 flex items-center">
-                                            <Checkbox/>
-                                        </div>
-                                        <div className="col-span-3 flex items-center gap-3">
-                                            <Avatar className="w-10 h-10">
+                                        {/*<div className="col-span-1 flex items-center">*/}
+                                        {/*    <Checkbox/>*/}
+                                        {/*</div>*/}
+                                        <div className="col-span-4 flex items-center gap-3 ml-5">
+                                            <Avatar className="w-10 h-10 mr-4">
                                                 {account.avatarUrl ? (
                                                     <AvatarImage src={account.avatarUrl} alt={account.fullName}/>
                                                 ) : (
@@ -467,7 +554,7 @@ export function AccountManagement() {
                                         <div className="col-span-2 text-sm text-gray-600">
                                             {formatDate(account.createdAt)}
                                         </div>
-                                        <div className="col-span-2">
+                                        <div className="col-span-1">
                                             <Badge
                                                 variant={getStatusVariant(account.status)}
                                                 className={getStatusClasses(account.status)}
@@ -529,35 +616,24 @@ export function AccountManagement() {
 
                                 {/* Footer with Pagination */}
                                 <div className="px-6 py-4 flex items-center justify-between text-sm text-gray-600">
-                                    <div>Showing 1–10 of {accounts.length} results</div>
-                                    <div className="flex gap-2">
-                                        <Button variant="outline" size="sm">
-                                            Previous
-                                        </Button>
-                                        <Button variant="outline" size="sm">
-                                            1
-                                        </Button>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            className="bg-[#7FA5A5] text-white border-[#7FA5A5] hover:bg-[#6D9393]"
-                                        >
-                                            2
-                                        </Button>
-                                        <Button variant="outline" size="sm">
-                                            3
-                                        </Button>
-                                        <Button variant="outline" size="sm">
-                                            ...
-                                        </Button>
-                                        <Button variant="outline" size="sm">
-                                            125
-                                        </Button>
-                                        <Button variant="outline" size="sm">
-                                            Next
-                                        </Button>
+                                    <div>
+                                        {isSearching ? (
+                                            <>Showing {accounts.length} search results</>
+                                        ) : (
+                                            <>Showing {totalItems === 0 ? 0 : startItem}–{Math.min((currentPage + 1) * pageSize, totalItems)} of {totalItems} results</>
+                                        )}
                                     </div>
+
+                                    <AccountsPagination
+                                        handleNext={handleNext}
+                                        handlePrev={handlePrev}
+                                        handlePageChange={handlePageChange}
+                                        page={currentPage + 1}
+                                        totalPages={totalPages}
+                                        isSearching={isSearching}
+                                    />
                                 </div>
+
                             </CardContent>
                         </Card>
                     </div>

@@ -7,6 +7,7 @@ import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.repository.UserRepository;
 import com.eventmanagement.backend.service.AdminService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,22 +23,31 @@ public class AdminAccountController {
     private final AdminService adminService;
     private final UserRepository userRepository;
 
-//    @GetMapping
-//    public ResponseEntity<?> getAll(@RequestParam(defaultValue = "0") int page,
-//                                    @RequestParam(defaultValue = "10") int size) {
-//        return ResponseEntity.ok(adminService.getAllAccounts(PageRequest.of(page, size)));
-//    }
-
     @GetMapping
+    public ResponseEntity<Page<UserResponse>> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(adminService.getAllAccounts(page, size));
+    }
+
+    @GetMapping("/all")
     public ResponseEntity<List<UserResponse>> getAll() {
         List<UserResponse> users = adminService.getAllAccountsPlain();
         return ResponseEntity.ok(users);
     }
 
+//    @GetMapping("/search")
+//    public ResponseEntity<List<UserResponse>> search(@RequestParam("q") String q) {
+//        List<UserResponse> results = adminService.searchAccounts(q);
+//        return ResponseEntity.ok(results);
+//    }
+
     @GetMapping("/search")
-    public ResponseEntity<List<UserResponse>> search(@RequestParam("q") String q) {
-        List<UserResponse> results = adminService.searchAccounts(q);
-        return ResponseEntity.ok(results);
+    public ResponseEntity<Page<UserResponse>> search(
+            @RequestParam("q") String q,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size)    {
+        return ResponseEntity.ok(adminService.searchAccounts(q, page, size));
     }
 
     @GetMapping("/{id}")

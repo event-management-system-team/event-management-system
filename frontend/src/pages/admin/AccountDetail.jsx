@@ -180,8 +180,8 @@ export function AccountDetail() {
                         <div className="flex items-center gap-6">
                             {/* Large Avatar */}
                             <Avatar className="w-20 h-20">
-                                {account.avatarUrl ? (
-                                    <AvatarImage src={account.avatarUrl} alt={account.fullName}/>
+                                {account?.avatarUrl ? (
+                                    <AvatarImage src={account?.avatarUrl} alt={account?.fullName}/>
                                 ) : (
                                     <AvatarFallback className="bg-gray-300"/>
                                 )}
@@ -191,28 +191,28 @@ export function AccountDetail() {
                             <div>
                                 <div className="flex items-center gap-3 mb-2">
                                     <h1 className="text-2xl font-semibold text-gray-900">
-                                        {account.fullName}
+                                        {account?.fullName}
                                     </h1>
                                     <Badge
-                                        variant={getStatusVariant(account.status)}
-                                        className={getStatusClasses(account.status)}
+                                        variant={getStatusVariant(account?.status)}
+                                        className={getStatusClasses(account?.status)}
                                     >
-                                        ● {account.status}
+                                        ● {account?.status}
                                     </Badge>
                                 </div>
                                 <div className="flex items-center gap-4 text-sm text-gray-600">
                                     <div className="flex items-center gap-1.5">
                                         <Mail className="h-4 w-4"/>
-                                        <span>{account.email}</span>
+                                        <span>{account?.email}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         {/* Action Buttons */}
-                        {account.role !== "ADMIN" && (
+                        {account?.role !== "ADMIN" && (
                             <>
-                                {account.status === "ACTIVE" ? (
+                                {account?.status === "ACTIVE" ? (
                                     <div className="flex gap-2">
                                         <Button
                                             className="gap-2 bg-[#7FA5A5] hover:bg-[#6D9393] text-white"
@@ -249,7 +249,7 @@ export function AccountDetail() {
                             >
                                 Basic Info
                             </TabsTrigger>
-                            {account.role === "ORGANIZER" && (
+                            {account?.role === "ORGANIZER" && (
                                 <TabsTrigger
                                     value="events"
                                     className="h-12 bg-transparent border-b-2 border-transparent data-[state=active]:border-[#7FA5A5] data-[state=active]:text-[#7FA5A5] rounded-none px-5 data-[state=active]:shadow-none"
@@ -279,7 +279,7 @@ export function AccountDetail() {
                                                     Full Name
                                                 </label>
                                                 <div className="text-sm text-gray-900 font-medium">
-                                                    {account.fullName}
+                                                    {account?.fullName}
                                                 </div>
                                             </div>
                                             <div>
@@ -288,10 +288,10 @@ export function AccountDetail() {
                                                     Email Address
                                                 </label>
                                                 <a
-                                                    href={`mailto:${account.email}`}
+                                                    href={`mailto:${account?.email}`}
                                                     className="text-sm text-[#7FA5A5] hover:underline flex items-center gap-1"
                                                 >
-                                                    {account.email}
+                                                    {account?.email}
                                                     <ExternalLink className="h-3 w-3"/>
                                                 </a>
                                             </div>
@@ -301,7 +301,7 @@ export function AccountDetail() {
                                                     Phone Number
                                                 </label>
                                                 <div className="text-sm text-gray-900">
-                                                    {account.phone}
+                                                    {account?.phone}
                                                 </div>
                                             </div>
                                         </CardContent>
@@ -331,7 +331,7 @@ export function AccountDetail() {
                                                     Registration Date
                                                 </label>
                                                 <div className="text-sm text-gray-900">
-                                                    {formatDateTime(account.createdAt)}
+                                                    {formatDateTime(account?.createdAt)}
                                                 </div>
                                             </div>
                                             <div>
@@ -340,10 +340,10 @@ export function AccountDetail() {
                                                     Last Login
                                                 </label>
                                                 <div className="text-sm text-gray-900">
-                                                    {formatDateTime(account.lastLoginAt)}
+                                                    {formatDateTime(account?.lastLoginAt)}
                                                 </div>
                                             </div>
-                                            {(account.role === "ORGANIZER" && (
+                                            {(account?.role === "ORGANIZER" && (
                                                 <div>
                                                     <label
                                                         className="text-xs text-gray-500 uppercase tracking-wide mb-1 block">
@@ -369,7 +369,7 @@ export function AccountDetail() {
                             </div>
                         </TabsContent>
 
-                        {account.role === "ORGANIZER" && (
+                        {account?.role === "ORGANIZER" && (
                             <TabsContent value="events" className="mt-0">
                                 <div className="p-8">
                                     <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
@@ -396,11 +396,11 @@ export function AccountDetail() {
                 isOpen={isEditModalOpen}
                 onClose={() => setIsEditModalOpen(false)}
                 accountData={{
-                    id: account.userId,
-                    fullName: account.fullName,
-                    email: account.email,
-                    phone: account.phone,
-                    role: account.role
+                    id: account?.userId,
+                    fullName: account?.fullName,
+                    email: account?.email,
+                    phone: account?.phone,
+                    role: account?.role
                 }}
                 onSuccess={(updatedAccount) => {
                     setAccount(updatedAccount)

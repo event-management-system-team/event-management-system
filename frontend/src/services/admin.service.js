@@ -1,15 +1,14 @@
 import axiosInstance from "../config/axios";
 
 export const adminService = {
-    // get account list with pagination
-//  getAllAccounts: (page = 0, size = 10) => {
-//    return axiosInstance.get(`/admin/accounts`, {
-//      params: { page, size }
-//    });
-//  },
+    getAllAccountsPlain: () => {
+        return axiosInstance.get(`/admin/accounts/all`);
+    },
 
-    getAllAccounts: () => {
-        return axiosInstance.get(`/admin/accounts`);
+    getAllAccounts: (page = 0, size= 10) => {
+        return axiosInstance.get(`/admin/accounts`, {
+            params: {page, size}
+        });
     },
 
     searchAccounts: (keyword) => {

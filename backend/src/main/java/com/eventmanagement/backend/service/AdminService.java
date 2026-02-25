@@ -11,7 +11,9 @@ import com.eventmanagement.backend.repository.UserRepository;
 import com.eventmanagement.backend.util.GenerateAvatarUrl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,9 +31,12 @@ public class AdminService {
     private final GenerateAvatarUrl generateAvatarUrl;
 
     // get account list (+pagination)
-//    public Page<UserResponse> getAllAccounts(Pageable pageable) {
-//        return userRepository.findAll(pageable).map(this::mapToResponse);
-//    }
+    public Page<UserResponse> getAllAccounts(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<User> userPage = userRepository.findAll(pageable);
+
+        return userPage.map(this::mapToResponse);
+    }
 
     public List<UserResponse> getAllAccountsPlain() {
         return userRepository.findAll()
@@ -40,10 +45,18 @@ public class AdminService {
                 .collect(Collectors.toList());
     }
 
-    public List<UserResponse> searchAccounts(String keyword) {
-        List<User> users = userRepository.searchUsers(keyword);
+//    public List<UserResponse> searchAccounts(String keyword) {
+//        List<User> users = userRepository.searchUsers(keyword);
+//
+//        return users.stream().map(this::mapToResponse).collect(Collectors.toList());
+//    }
 
-        return users.stream().map(this::mapToResponse).collect(Collectors.toList());
+    public Page<UserResponse> searchAccounts(String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+        Page<User> userPage = userRepository.searchUsers(keyword, pageable);
+
+        return userPage.map(this::mapToResponse);
     }
 
     public UserResponse getAccountById(UUID id) {

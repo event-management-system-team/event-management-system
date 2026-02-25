@@ -59,8 +59,8 @@ function DropdownMenuItem({className, inset, variant = "default", ...props}) {
 
         transition-colors duration-150
 
-        hover:bg-accent hover:text-accent-foreground
-        focus:bg-accent focus:text-accent-foreground
+        hover:bg-[#B3C8CF] hover:text-accent-foreground
+        focus:bg-[#B3C8CF] focus:text-accent-foreground
 
         data-[variant=destructive]:text-destructive
         data-[variant=destructive]:hover:bg-destructive/10
