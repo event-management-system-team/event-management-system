@@ -2,7 +2,6 @@ package com.eventmanagement.backend.repository;
 
 import com.eventmanagement.backend.constants.EventStatus;
 import com.eventmanagement.backend.model.Event;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,6 +21,5 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
             "AND (e.registeredCount * 1.0 / e.totalCapacity) >= 0.8 " +
             "ORDER BY (e.totalCapacity - e.registeredCount) ASC")
     List<Event> findHotEventsSellingFast(@Param("status") EventStatus status, Pageable pageable);
-
 
 }

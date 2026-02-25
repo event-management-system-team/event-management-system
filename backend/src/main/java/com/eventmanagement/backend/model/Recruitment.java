@@ -3,8 +3,6 @@ package com.eventmanagement.backend.model;
 import com.eventmanagement.backend.constants.RecruitmentStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -49,7 +47,6 @@ public class Recruitment {
     @Column(columnDefinition = "varchar(50) default 'OPEN'")
     @Builder.Default
     private RecruitmentStatus status = RecruitmentStatus.OPEN;
-
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
