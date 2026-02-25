@@ -4,6 +4,7 @@ import EventList from "../../components/domain/events/EventList";
 import { useSearchParams } from "react-router-dom";
 import useFetchEventSearch from "../../hooks/useFetchEventSearch";
 import useFilterEvents from '../../hooks/useFilterEvents'
+import { Filter } from "lucide-react";
 
 const EventsPage = () => {
 
@@ -47,7 +48,19 @@ const EventsPage = () => {
                         <span className="text-gray-900 font-bold">Events</span>
                     </div>
 
+
+                    <div className="flex justify-between items-center mb-2 px-2">
+
+                        <div className="flex items-center gap-1.5 text-gray-400">
+                            <Filter className="w-3.5 h-3.5" strokeWidth={3} />
+                            <h3 className="text-[13px] font-bold uppercase tracking-widest">
+                                Filters
+                            </h3>
+                        </div>
+                    </div>
+
                     <div className="flex flex-col lg:flex-row gap-8">
+
                         <SidebarFilter
                             date={filterControls.date}
                             setDate={filterControls.setDate}

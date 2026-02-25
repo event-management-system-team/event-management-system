@@ -1,17 +1,16 @@
 import { Search, MapPin, Calendar } from "lucide-react";
-import useEventSearch from '../../../hooks/useEventSearch'
 import { DatePicker, Select } from 'antd';
-import dayjs from 'dayjs';
 import { useLocation } from "../../../hooks/useLocation";
+import useDateFilter from "../../../hooks/useDateFilter";
+import useSearchEvents from "../../../hooks/useSearchEvents";
 
 const HeroSearchBar = () => {
 
     const { data: locations, isLoading } = useLocation();
-    const { keyword, setKeyword, location, setLocation, date, setDate, handleSearch, handleKeyDown } = useEventSearch()
 
-    const onChange = (dateObj, dateString) => {
-        setDate(dateString);
-    };
+    const { keyword, setKeyword, location, setLocation, date, setDate, handleSearch, handleKeyDown } = useSearchEvents()
+
+    const { DATE_FORMAT, dateValue, handleDateChange } = useDateFilter(date, setDate)
 
     return (
         <div className="bg-white rounded-full shadow-2xl p-2 flex flex-col md:flex-row items-center gap-2 border border-gray-100">
@@ -61,10 +60,10 @@ const HeroSearchBar = () => {
 
                     <DatePicker className="w-full px-0! bg-transparent shadow-none [&_input]:text-gray-700! [&_input::placeholder]:text-gray-400!"
                         bordered={false}
-                        value={date ? dayjs(date, 'DD/MM/YYYY') : null}
-                        onChange={onChange}
+                        value={dateValue}
+                        onChange={handleDateChange}
                         placeholder="Any date"
-                        format="DD/MM/YYYY" />
+                        format={DATE_FORMAT} />
 
                 </div>
 

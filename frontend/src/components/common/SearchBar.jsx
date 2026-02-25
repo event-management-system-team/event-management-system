@@ -1,9 +1,9 @@
 import { Search } from "lucide-react";
-import useEventSearch from '../../hooks/useEventSearch'
+import useSearchEvents from '../../hooks/useSearchEvents'
 
 const SearchBar = () => {
 
-    const { keyword, setKeyword, handleSearch, handleKeyDown } = useEventSearch()
+    const { keyword, setKeyword, handleSearch, handleKeyDown } = useSearchEvents()
     return (
         <>
             <div className="hidden lg:flex items-center bg-white/50  px-3 py-2 rounded-full border border-[#d8ddde] focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all cursor-text">

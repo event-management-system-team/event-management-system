@@ -6,10 +6,8 @@ const SidebarFilter = ({ date, setDate, categories, setCategories, price, setPri
 
     return (
         <aside className="w-full lg:w-[320px] shrink-0">
-            <div className="sticky top-20 bg-cream rounded-xl p-6 border-2 border-primary/20 shadow-sm max-h-[calc(100vh-6rem)] overflow-y-auto">
-                <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-lg font-bold">Filters</h3>
-                </div>
+            <div className="sticky top-20 bg-cream rounded-xl p-6 border-2 border-primary/20 shadow-sm [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+
                 <FilterCategory
                     categories={categories}
                     setCategories={setCategories} />

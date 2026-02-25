@@ -2,12 +2,10 @@ import {
     Monitor, Music, GraduationCap, Trophy, Palette,
     Briefcase, Utensils, Plane, HeartPulse, Users, LayoutGrid
 } from 'lucide-react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchCategories } from "../../../store/slices/category.slice";
-import { useEffect } from "react";
 import EmptyState from '../../common/EmptyState'
 import LoadingState from '../../common/LoadingState'
-import useEventSearch from '../../../hooks/useEventSearch';
+import useCategories from '../../../hooks/useCategories';
+import { createSearchParams, useNavigate } from 'react-router-dom';
 
 
 const IconMap = {
@@ -26,20 +24,14 @@ const IconMap = {
 
 const CategorySection = () => {
 
-    const dispatch = useDispatch();
-    const { categories, isLoading, isError } = useSelector((state) => state.category);
-    const { searchByCategory } = useEventSearch();
+    const { categories, isLoading, isEmpty } = useCategories();
 
-    useEffect(() => {
+    const navigate = useNavigate();
 
-        if (categories.length === 0) {
-            dispatch(fetchCategories());
-        }
-    }, [dispatch, categories.length]);
-
-    const isEmpty = isError || !categories || categories.length === 0
-
-
+    const searchByCategory = (category) => {
+        const queryString = createSearchParams({ categories: category }).toString()
+        navigate(`/events?${queryString}`)
+    }
 
     return (
         <section className="py-12 px-6 overflow-hidden">

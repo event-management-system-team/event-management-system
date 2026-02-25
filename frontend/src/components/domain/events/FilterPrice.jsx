@@ -1,5 +1,4 @@
 import { Wallet } from 'lucide-react'
-import React from 'react'
 import { Slider, Switch } from 'antd';
 
 
