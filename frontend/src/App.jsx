@@ -4,15 +4,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { autoRefreshToken } from "./store/slices/auth.slice";
 
 import AppRoutes from "./routes";
+import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 
 function App() {
-  const dispatch = useDispatch();
+  /*const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((state) => state.auth);
 
-  // ✅ Auto refresh token khi app load
   useEffect(() => {
     const initAuth = async () => {
-      // Nếu chưa có access token nhưng có refresh token (cookie)
       if (!isAuthenticated) {
         try {
           await dispatch(autoRefreshToken()).unwrap();
@@ -24,12 +23,14 @@ function App() {
     };
 
     initAuth();
-  }, [dispatch, isAuthenticated]);
+  }, [dispatch, isAuthenticated]);*/
 
   return (
-    <Routes>
+    /*<Routes>
       <Route path="/*" element={<AppRoutes />} />
-    </Routes>
+    </Routes>*/
+
+    <ForgotPasswordPage />
   );
 }
 
