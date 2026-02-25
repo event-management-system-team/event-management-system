@@ -9,7 +9,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "recruitments")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,11 +31,11 @@ public class Recruitment {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(columnDefinition = "INT DEFAULT 1")
+    @Column()
     @Builder.Default
     private Integer vacancy = 1;
 
-    @Column(name = "approved_count", columnDefinition = "INT DEFAULT 0")
+    @Column(name = "approved_count")
     @Builder.Default
     private Integer approvedCount = 0;
 
@@ -44,7 +45,7 @@ public class Recruitment {
     private LocalDateTime deadline;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "varchar(50) default 'OPEN'")
+    @Column(columnDefinition = "varchar(50)")
     @Builder.Default
     private RecruitmentStatus status = RecruitmentStatus.OPEN;
 
