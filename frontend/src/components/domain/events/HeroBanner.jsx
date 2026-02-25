@@ -1,6 +1,6 @@
 import HeroSearchBar from './HeroSearchBar'
 
-const HeroBanner = () => {
+const HeroBanner = ({ keyword, setKeyword, location, setLocation, handleSearch, handleKeyDown }) => {
     return (
         <section className="relative pt-12 pb-24 px-6 bg-gradient-to-b from-cream to-beige">
             <div className="max-w-[960px] mx-auto text-center">
@@ -9,7 +9,13 @@ const HeroBanner = () => {
             </div>
 
             <div className="z-20 mx-auto max-w-5xl px-4">
-                <HeroSearchBar />
+                <HeroSearchBar
+                    keyword={keyword}
+                    setKeyword={setKeyword}
+                    location={location}
+                    setLocation={setLocation}
+                    handleSearch={handleSearch}
+                    handleKeyDown={handleKeyDown} />
             </div>
         </section>
     )

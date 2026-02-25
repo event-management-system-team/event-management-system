@@ -35,13 +35,14 @@ public class EventService {
     }
 
     public Page<EventResponse> searchEvents(String keyword, String location,
-                                            String category, LocalDate date,
-                                            BigDecimal price, int page, int size) {
+                                            List<String> categories, LocalDate date,
+                                            BigDecimal price, Boolean isFree,
+                                            int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         String kw = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
         String loc = (location != null && !location.trim().isEmpty()) ? location.trim() : null;
-        String cat = (category != null && !category.trim().isEmpty()) ? category.trim() : null;
+        List<String> cat = (categories != null && !categories.isEmpty()) ? categories : null;
 
         LocalDateTime dateTime = null;
         if (date != null) {
@@ -49,7 +50,7 @@ public class EventService {
             dateTime = date.atTime(23, 59, 59);
         }
 
-        Page<Event> events = eventRepository.searchEvents(EventStatus.APPROVED, kw, loc, cat, dateTime, price, pageable);
+        Page<Event> events = eventRepository.searchEvents(EventStatus.APPROVED, kw, loc, cat, dateTime, price, isFree, pageable);
         return events.map(event -> mapToResponse(event));
     }
 

@@ -29,15 +29,17 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
             "WHERE e.status = :status " +
             "AND (:keyword IS NULL OR LOWER(e.eventName) LIKE LOWER(CONCAT('%', cast(:keyword as string), '%'))) " +
             "AND (:location IS NULL OR LOWER(e.location) LIKE LOWER(CONCAT('%', cast(:location as string), '%'))) " +
-            "AND (:categorySlug IS NULL OR e.category.categorySlug = cast(:categorySlug as string)) " +
+            "AND (:categorySlug IS NULL OR e.category.categorySlug IN :categorySlug ) " +
             "AND (cast(:date as timestamp) IS NULL OR (e.startDate <= :date AND e.endDate >= :date)) " +
-            "AND (:price IS NULL OR EXISTS (SELECT t FROM e.ticketTypes t WHERE t.price <= :price))")
+            "AND (:price IS NULL OR EXISTS (SELECT t FROM e.ticketTypes t WHERE t.price <= :price))" +
+            "AND (:isFree IS NULL OR e.isFree = :isFree) ")
     Page<Event> searchEvents(@Param("status") EventStatus status,
                              @Param("keyword") String keyword,
                              @Param("location") String location,
-                             @Param("categorySlug") String categorySlug,
+                             @Param("categorySlug") List<String> categorySlug,
                              @Param("date") LocalDateTime date,
                              @Param("price") BigDecimal price,
+                             @Param("isFree") Boolean isFree,
                              Pageable pageable);
 
 

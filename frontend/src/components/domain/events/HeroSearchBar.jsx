@@ -1,13 +1,10 @@
-import { Search, MapPin, Calendar } from "lucide-react";
-import useEventSearch from '../../../hooks/useEventSearch'
-import { DatePicker, Select } from 'antd';
-import dayjs from 'dayjs';
+import { Search, MapPin } from "lucide-react";
+import { Select } from 'antd';
 import { useLocation } from "../../../hooks/useLocation";
 
-const HeroSearchBar = () => {
+const HeroSearchBar = ({ keyword, setKeyword, location, setLocation, handleSearch, handleKeyDown }) => {
 
     const { data: locations, isLoading } = useLocation();
-    const { keyword, setKeyword, location, setLocation, handleSearch, handleKeyDown } = useEventSearch()
 
     return (
         <div className="bg-white rounded-full shadow-2xl p-2 flex flex-col md:flex-row items-center gap-2 border border-gray-100">

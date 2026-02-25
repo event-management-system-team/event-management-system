@@ -1,20 +1,24 @@
-import { useSearchParams } from "react-router-dom"
-import LoadingState from '../../components/common/LoadingState'
-import EmptyState from '../../components/common/EmptyState'
-import useFetchEventSearch from "../../hooks/useFetchEventSearch";
 import SidebarFilter from "../../components/domain/events/SidebarFilter";
 import HeroBanner from "../../components/domain/events/HeroBanner";
 import EventList from "../../components/domain/events/EventList";
+import { useSearchParams } from "react-router-dom";
+import useFetchEventSearch from "../../hooks/useFetchEventSearch";
+import useFilterEvents from '../../hooks/useFilterEvents'
 
 const EventsPage = () => {
 
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
+
     const filters = {
         keyword: searchParams.get('keyword') || '',
         location: searchParams.get('location') || '',
         date: searchParams.get('date') || '',
-        category: searchParams.get('category') || '',
+        categories: searchParams.get('categories') || '',
         price: searchParams.get('price') || '',
+        isFree: searchParams.get('isFree') === 'true',
+
+        page: parseInt(searchParams.get('page')) || 0,
+        size: 6,
     }
 
     const { data, isLoading, isError } = useFetchEventSearch(filters);
@@ -22,10 +26,18 @@ const EventsPage = () => {
     const events = data?.content || []
     const isEmpty = isError || events.length === 0
 
+    const filterControls = useFilterEvents({ initialValues: filters, searchParams, setSearchParams });
+
     return (
         <>
             <div className="bg-background-light min-h-screen font-display">
-                <HeroBanner />
+                <HeroBanner
+                    keyword={filterControls.keyword}
+                    setKeyword={filterControls.setKeyword}
+                    location={filterControls.location}
+                    setLocation={filterControls.setLocation}
+                    handleSearch={filterControls.handleSearch}
+                    handleKeyDown={filterControls.handleKeyDown} />
 
                 <main className="max-w-[1400px] mx-auto px-6 py-12">
 
@@ -36,8 +48,24 @@ const EventsPage = () => {
                     </div>
 
                     <div className="flex flex-col lg:flex-row gap-8">
-                        <SidebarFilter />
-                        <EventList />
+                        <SidebarFilter
+                            date={filterControls.date}
+                            setDate={filterControls.setDate}
+                            categories={filterControls.categories}
+                            setCategories={filterControls.setCategories}
+                            price={filterControls.price}
+                            setPrice={filterControls.setPrice}
+                            isFree={filterControls.isFree}
+                            setIsFree={filterControls.setIsFree}
+                            handleApply={filterControls.handleApply}
+                            handleReset={filterControls.handleReset} />
+                        <EventList
+                            events={events}
+                            data={data}
+                            isLoading={isLoading}
+                            isEmpty={isEmpty}
+                            searchParams={searchParams}
+                            setSearchParams={setSearchParams} />
                     </div>
 
                 </main>

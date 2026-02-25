@@ -1,30 +1,13 @@
-import { useSearchParams } from "react-router-dom"
 import { useRef } from 'react';
 import LoadingState from '../../common/LoadingState'
 import EmptyState from '../../common/EmptyState'
-import useFetchEventSearch from "../../../hooks/useFetchEventSearch";
 import EventCard from '../../common/EventCard'
 import { Pagination } from "antd";
 
 
-const EventList = () => {
+const EventList = ({ events, data, isLoading, isEmpty, searchParams, setSearchParams }) => {
 
-    const [searchParams, setSearchParams] = useSearchParams();
-    const filters = {
-        keyword: searchParams.get('keyword') || '',
-        location: searchParams.get('location') || '',
-        date: searchParams.get('date') || '',
-        category: searchParams.get('category') || '',
-        price: searchParams.get('price') || '',
-
-        page: parseInt(searchParams.get('page')) || 0,
-        size: 6,
-    }
-
-    const { data, isLoading, isError } = useFetchEventSearch(filters);
-
-    const events = data?.content || []
-    const isEmpty = isError || events.length === 0
+    const listTopRef = useRef(null);
 
     const pageNumber = (data?.number || 0) + 1
     const pageSize = data?.size || 6
@@ -36,12 +19,18 @@ const EventList = () => {
         searchParams.set('page', springBootPage);
         setSearchParams(searchParams);
 
-        if (listTopRef.current) {
-            listTopRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Xóa focus hiện tại khỏi nút vừa bấm
+        if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
         }
-    }
 
-    const listTopRef = useRef(null);
+        // Delay 100ms chờ giao diện Loading hiện ra ổn định rồi mới cuộn mượt lên cọc
+        setTimeout(() => {
+            if (listTopRef.current) {
+                listTopRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 100);
+    }
 
     return (
         <div className="flex-1 scroll-mt-24" ref={listTopRef}>

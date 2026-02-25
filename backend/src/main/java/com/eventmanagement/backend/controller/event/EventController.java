@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -37,14 +36,15 @@ public class EventController {
     public ResponseEntity<Page<EventResponse>> searchEvents(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String location,
-            @RequestParam(required = false) String category,
+            @RequestParam(required = false) List<String> categories,
             @RequestParam(required = false)
             @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate date,
             @RequestParam(required = false) BigDecimal price,
+            @RequestParam(required = false) Boolean isFree,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        Page<EventResponse> events = eventService.searchEvents(keyword, location, category, date, price, page, size);
+        Page<EventResponse> events = eventService.searchEvents(keyword, location, categories, date, price, isFree, page, size);
         return ResponseEntity.ok(events);
     }
 
