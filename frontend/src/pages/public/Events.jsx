@@ -5,6 +5,7 @@ import { useSearchParams } from "react-router-dom";
 import useFetchEventSearch from "../../hooks/useFetchEventSearch";
 import useFilterEvents from '../../hooks/useFilterEvents'
 import { Filter } from "lucide-react";
+import DynamicBreadcrumb from "../../components/common/DynamicBreadcrumb";
 
 const EventsPage = () => {
 
@@ -42,11 +43,7 @@ const EventsPage = () => {
 
                 <main className="max-w-[1400px] mx-auto px-6 py-12">
 
-                    <div className="flex items-center gap-2 mb-8 text-sm text-gray-500 font-medium">
-                        <a href="/" className="hover:text-primary">Home</a>
-                        {/* <span className="material-symbols-outlined text-xs">chevron_right</span> */}
-                        <span className="text-gray-900 font-bold">Events</span>
-                    </div>
+                    <DynamicBreadcrumb />
 
 
                     <div className="flex justify-between items-center mb-2 px-2">
