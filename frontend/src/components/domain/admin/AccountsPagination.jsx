@@ -42,9 +42,7 @@ export const AccountsPagination = ({handleNext, handlePrev, handlePageChange, pa
             {pagesToShow.map((p, index) => {
                 if (p === "...") {
                     return (
-                        <span key={index} className="px-2 text-muted-foreground">
-            ...
-          </span>
+                        <span key={index} className="px-2 text-muted-foreground">...</span>
                     )
                 }
 

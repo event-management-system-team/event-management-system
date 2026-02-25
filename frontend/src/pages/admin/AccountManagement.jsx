@@ -1,40 +1,23 @@
 import {
     Calendar,
     Users,
-    TrendingUp,
     CheckCircle,
     Plus,
-    Settings,
-    BarChart3,
-    UserPlus,
     Bell,
-    Zap,
-    CalendarCheck,
-    Home,
     ChevronRight,
-    Filter,
     Search,
-    HelpCircle,
-    ArrowUpDown,
-    LogOut,
-    LayoutDashboard,
     UserCircle,
-    CalendarCog,
     MoreVertical,
-    TrendingDown,
     UserX,
-    Clock,
-    ChevronDown,
     Eye
 } from 'lucide-react';
-import {Link, useNavigate} from 'react-router';
+import {Link} from 'react-router';
 import {AdminSidebar} from "../../components/domain/admin/AdminSidebar.jsx";
 import {CreateOrganizerModal} from "../../components/domain/admin/CreateOrganizerModal.jsx";
 import {useEffect, useMemo, useState} from "react";
 import {Button} from "../../components/domain/admin/Button.jsx";
 import {Avatar, AvatarFallback, AvatarImage} from "../../components/domain/admin/Avatar.jsx";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "../../components/domain/admin/Card.jsx";
-import {Checkbox} from "../../components/domain/admin/Checkbox.jsx";
+import {Card, CardContent} from "../../components/domain/admin/Card.jsx";
 import {Input} from "../../components/domain/admin/Input.jsx";
 import {Badge} from "../../components/domain/admin/Badge.jsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "../../components/domain/admin/Select.jsx";
@@ -53,7 +36,6 @@ export function AccountManagement() {
 
     const [accounts, setAccounts] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
-    const [totalPages, setTotalPages] = useState(0);
     const [originalAccounts, setOriginalAccounts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -62,26 +44,19 @@ export function AccountManagement() {
     const [endDate, setEndDate] = useState(null);
     const [sortOption, setSortOption] = useState("newest");
     const [searchTerm, setSearchTerm] = useState("");
-    const [page, setPage] = useState(1);
-
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const openModal = () => {
-        setIsModalOpen(true);
-    };
-
-    const closeModal = () => {
-        setIsModalOpen(false);
-    };
-
-    const handleOrganizerCreated = (newAccount) => {
-        setAccounts(prevAccounts => [newAccount, ...prevAccounts]);
-        setOriginalAccounts(prevOriginal => [newAccount, ...prevOriginal]);
-    }
-
     const loadAllAccounts = async () => {
-        const res = await adminService.getAllAccountsPlain();
-        setOriginalAccounts(res.data); // full list
+        try {
+            setLoading(true)
+            const response = await adminService.getAllAccountsPlain();
+            setOriginalAccounts(response.data);
+        } catch (error) {
+            setError("Cannot load account list");
+            console.error(error)
+        } finally {
+            setLoading(false);
+        }
     };
 
     const loadData = async () => {
@@ -90,7 +65,7 @@ export function AccountManagement() {
             const response = await adminService.getAllAccounts(currentPage, 10);
 
             setAccounts(response.data.content);
-            setTotalPages(response.data.totalPages);
+            // setTotalPages(response.data.totalPages);
             setCurrentPage(response.data.number)
         } catch (error) {
             setError("Cannot load account list");
@@ -105,28 +80,6 @@ export function AccountManagement() {
         loadAllAccounts();
     }, [currentPage]);
 
-    // api search
-    // const handleSearchChange = async (e) => {
-    //     const value = e.target.value;
-    //     setSearchTerm(value);
-    //
-    //     if (value.trim() === "") {
-    //         setAccounts(originalAccounts)
-    //         return;
-    //     }
-    //
-    //     try {
-    //         const response = await adminService.searchAccounts(value);
-    //         setAccounts(response.data);
-    //     } catch (error) {
-    //         setError("Cannot load account list");
-    //         console.error(error)
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // }
-
-    // local search
     const handleSearchChange = (e) => {
         const value = e.target.value;
         setSearchTerm(value);
@@ -147,32 +100,6 @@ export function AccountManagement() {
         setAccounts(filtered);
     };
 
-    const pageSize = 10;
-    const isSearching = searchTerm.trim().length > 0;
-
-    const startItem = currentPage * pageSize + 1;
-    const endItem = Math.min(
-        (currentPage + 1) * pageSize,
-        isSearching ? accounts.length : totalPages
-    )
-
-    const handlePrev = () => {
-        if (isSearching || currentPage === 0) return;
-        setCurrentPage(prev => prev - 1);
-    };
-
-    const handleNext = () => {
-        if (isSearching || currentPage >= totalPages - 1) return;
-        setCurrentPage(prev => prev + 1);
-    };
-
-    const handlePageChange = (p) => {
-        if (isSearching) return;
-        setCurrentPage(p - 1); // 🔥 convert 1-based → 0-based
-    };
-
-    // const totalPages = Math.ceil(paginatedAccounts.length / pageSize);
-
     const handleToggleBan = async (account) => {
         if (!account) return;
 
@@ -191,41 +118,6 @@ export function AccountManagement() {
         }
     }
 
-    // const processedAccounts = useMemo(() => {
-    //     return [...accounts]
-    //         // filter by status
-    //         .filter(account => status === "all" || account.status === status)
-    //
-    //         // filter by date range
-    //         .filter(account => {
-    //             if (!startDate || !endDate) return true;
-    //
-    //             const createdDate = new Date(account.createdAt)
-    //
-    //             const endOfDay = new Date(endDate);
-    //             endOfDay.setHours(23, 59, 59, 999);
-    //
-    //             return (createdDate >= startDate && createdDate <= endOfDay);
-    //         })
-    //
-    //         // sort by option
-    //         .sort((a, b) => {
-    //             switch (sortOption) {
-    //                 case "newest":
-    //                     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    //
-    //                 case "oldest":
-    //                     return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-    //
-    //                 case "name":
-    //                     return (a.fullName ?? "").localeCompare(b.fullName ?? "");
-    //
-    //                 default:
-    //                     return 0;
-    //             }
-    //         });
-    // }, [accounts, status, startDate, endDate, sortOption]);
-
     const processedAccounts = useMemo(() => {
         let list = [...originalAccounts];
 
@@ -242,7 +134,7 @@ export function AccountManagement() {
         if (!status) return originalAccounts;
         list = list.filter(account => status === "all" || account.status === status);
 
-        // 4. Filter theo Date range
+        // filter by date range
         list = list.filter(account => {
             if (!startDate || !endDate) return true;
             const createdDate = new Date(account.createdAt);
@@ -251,7 +143,7 @@ export function AccountManagement() {
             return (createdDate >= startDate && createdDate <= endOfDay);
         });
 
-        // 5. Sort
+        // sort by option
         list.sort((a, b) => {
             switch (sortOption) {
                 case "newest":
@@ -268,13 +160,54 @@ export function AccountManagement() {
         return list;
     }, [originalAccounts, searchTerm, status, startDate, endDate, sortOption]);
 
+    const pageSize = 10;
+    const startItem = currentPage * pageSize + 1;
+    const isSearching = searchTerm.trim().length > 0;
+
     const totalItems = processedAccounts.length;
-    // const totalPages = Math.ceil(totalItems / pageSize);
+    const totalPages = Math.max(
+        1,
+        Math.ceil(totalItems / pageSize)
+    );
+
+    useEffect(() => {
+        if (currentPage > totalPages - 1) {
+            setCurrentPage(0);
+        }
+    }, [totalPages]);
 
     const paginatedAccounts = processedAccounts.slice(
         currentPage * pageSize,
         (currentPage + 1) * pageSize
     );
+
+    const handlePrev = () => {
+        if (isSearching || currentPage === 0) return;
+        setCurrentPage(prev => prev - 1);
+    };
+
+    const handleNext = () => {
+        if (isSearching || currentPage >= totalPages - 1) return;
+        setCurrentPage(prev => prev + 1);
+    };
+
+    const handlePageChange = (p) => {
+        if (isSearching) return;
+        setCurrentPage(p - 1);
+    };
+
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
+    const handleOrganizerCreated = (newAccount) => {
+        setAccounts(prevAccounts => [newAccount, ...prevAccounts]);
+        setOriginalAccounts(prevOriginal => [newAccount, ...prevOriginal]);
+    }
 
     const formatDate = (isoString) => {
         const date = new Date(isoString);
@@ -509,9 +442,6 @@ export function AccountManagement() {
                                 {/* Table Header */}
                                 <div
                                     className="grid grid-cols-11 gap-4 px-6 py-3 border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wide items-center">
-                                    {/*<div className="col-span-1 flex items-center">*/}
-                                    {/*    <Checkbox/>*/}
-                                    {/*</div>*/}
                                     <div className="col-span-4 ml-5">Account</div>
                                     <div className="col-span-2">Phone Number</div>
                                     <div className="col-span-1">Role</div>
@@ -526,9 +456,6 @@ export function AccountManagement() {
                                         key={account.userId}
                                         className="grid grid-cols-11 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-[#eef3f5]"
                                     >
-                                        {/*<div className="col-span-1 flex items-center">*/}
-                                        {/*    <Checkbox/>*/}
-                                        {/*</div>*/}
                                         <div className="col-span-4 flex items-center gap-3 ml-5">
                                             <Avatar className="w-10 h-10 mr-4">
                                                 {account.avatarUrl ? (
@@ -618,7 +545,7 @@ export function AccountManagement() {
                                 <div className="px-6 py-4 flex items-center justify-between text-sm text-gray-600">
                                     <div>
                                         {isSearching ? (
-                                            <>Showing {accounts.length} search results</>
+                                            <>Showing {processedAccounts.length} search results</>
                                         ) : (
                                             <>Showing {totalItems === 0 ? 0 : startItem}–{Math.min((currentPage + 1) * pageSize, totalItems)} of {totalItems} results</>
                                         )}
