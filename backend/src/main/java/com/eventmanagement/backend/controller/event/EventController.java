@@ -3,7 +3,6 @@ package com.eventmanagement.backend.controller.event;
 import com.eventmanagement.backend.dto.response.attendee.EventResponse;
 import com.eventmanagement.backend.service.EventService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +28,4 @@ public class EventController {
         return ResponseEntity.ok(eventResponses);
     }
 
-
 }
-
