@@ -45,6 +45,7 @@ export function AccountDetail() {
     const [loading, setLoading] = useState(true);
     const [account, setAccount] = useState(null);
     const [error, setError] = useState(null);
+    const [eventCount, setEventCount] = useState(0);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     const fetchAccount = async () => {
@@ -62,11 +63,30 @@ export function AccountDetail() {
         }
     }
 
+    const fetchEventCount = async () => {
+        if (!id) return;
+
+        try {
+            setLoading(true);
+            const response = await adminService.getEventCount(id);
+            setEventCount(response.data);
+        } catch (error) {
+            setError("Cannot fetching event count");
+            console.error(error)
+        } finally {
+            setLoading(false);
+        }
+    }
+
     useEffect(() => {
         if (id) {
             fetchAccount();
         }
-    }, [id]);
+
+        if (account?.role === 'ORGANIZER') {
+            fetchEventCount();
+        }
+    }, [id, account?.role]);
 
     const handleToggleBan = async () => {
         const action = account.status === "ACTIVE" ? 'BAN' : 'ACTIVATE';
@@ -130,8 +150,8 @@ export function AccountDetail() {
         return `${datePart} at ${timePart}`;
     }
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>{error}</div>;
+    if (loading) return <div className="absolute top-0 left-0 w-full h-1 bg-blue-500 animate-pulse z-10"/>
+    if (error) return <div>Something went wrong: {error}</div>;
     if (!account) return <div>Cannot find account detail.</div>;
 
     return (
@@ -350,16 +370,9 @@ export function AccountDetail() {
                                                         Events Created
                                                     </label>
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-sm text-gray-900 font-semibold">
-                                                            10 - test
+                                                        <span className="text-sm text-green-600 font-semibold">
+                                                            {eventCount}
                                                         </span>
-                                                        <Badge
-                                                            variant="outline"
-                                                            className="text-xs bg-green-50 text-green-700 border-green-200"
-                                                        >
-                                                            <TrendingUp className="h-3 w-3 mr-1"/>
-                                                            +12%
-                                                        </Badge>
                                                     </div>
                                                 </div>
                                             ))}

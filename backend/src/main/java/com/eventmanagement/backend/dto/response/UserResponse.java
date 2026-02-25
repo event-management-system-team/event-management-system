@@ -18,4 +18,5 @@ public class UserResponse {
     private String status;
     private LocalDateTime lastLoginAt;
     private LocalDateTime createdAt;
+    private long eventCount;
 }

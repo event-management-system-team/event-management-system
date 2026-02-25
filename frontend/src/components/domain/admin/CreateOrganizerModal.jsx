@@ -6,17 +6,10 @@ import {
     Trash2,
     Eye,
     EyeOff,
-    Building,
-    Globe,
-    Users,
-    MapPin,
-    Phone as PhoneIcon
 } from 'lucide-react';
 import {Button} from './Button.jsx';
 import {Input} from './Input.jsx';
 import {Label} from './Label.jsx';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from './Select.jsx';
-import {Textarea} from './Textarea.jsx';
 import {useState} from 'react';
 import {cn} from './utils.js';
 import {adminService} from "../../../services/admin.service.js";
@@ -26,7 +19,6 @@ export function CreateOrganizerModal({isOpen, onClose, onCreated}) {
     const [showPassword, setShowPassword] = useState(false);
     const [uploadedFiles, setUploadedFiles] = useState([])
 
-    // Form state
     const [formData, setFormData] = useState({
         fullName: "",
         email: "",
@@ -136,7 +128,7 @@ export function CreateOrganizerModal({isOpen, onClose, onCreated}) {
             return "Phone number must contain only digits";
         } else if (phone.charAt(0) !== "+" && phone.charAt(0) !== "0") {
             return "Phone number must start with 0 or a country code";
-        } else if (phone.length < 9 || phone.length > 11) {
+        } else if (phone.length !== 10) {
             return "Phone number must be 10 digits long"
         } else if (phone.charAt(0) === "0" && phone.charAt(1) === "0") {
             return "Phone number cannot start with 00";

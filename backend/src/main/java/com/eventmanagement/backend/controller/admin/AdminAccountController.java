@@ -4,6 +4,7 @@ import com.eventmanagement.backend.dto.request.CreateOrganizerRequest;
 import com.eventmanagement.backend.dto.request.UserUpdateRequest;
 import com.eventmanagement.backend.dto.response.UserResponse;
 import com.eventmanagement.backend.model.User;
+import com.eventmanagement.backend.repository.EventRepository;
 import com.eventmanagement.backend.repository.UserRepository;
 import com.eventmanagement.backend.service.AdminService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import java.util.UUID;
 public class AdminAccountController {
     private final AdminService adminService;
     private final UserRepository userRepository;
+    private final EventRepository eventRepository;
 
     @GetMapping
     public ResponseEntity<Page<UserResponse>> getAll(
@@ -53,6 +55,11 @@ public class AdminAccountController {
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getDetail(@PathVariable UUID id) {
         return ResponseEntity.ok(adminService.getAccountById(id));
+    }
+
+    @GetMapping("/{id}/event-count")
+    public ResponseEntity<Long> getEventCount(@PathVariable UUID id) {
+        return ResponseEntity.ok(eventRepository.countByOrganizer_UserId(id));
     }
 
     @PutMapping("/{id}/profile")

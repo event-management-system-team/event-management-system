@@ -21,6 +21,10 @@ export const adminService = {
         return axiosInstance.get(`/admin/accounts/${id}`);
     },
 
+    getEventCount: (id) => {
+        return axiosInstance.get(`/admin/accounts/${id}/event-count`);
+    },
+
     updateProfile: (id, data) => {
         return axiosInstance.put(`/admin/accounts/${id}/profile`, data);
     },

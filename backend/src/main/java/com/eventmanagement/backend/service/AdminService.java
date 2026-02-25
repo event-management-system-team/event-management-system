@@ -7,6 +7,7 @@ import com.eventmanagement.backend.dto.request.UserUpdateRequest;
 import com.eventmanagement.backend.dto.response.UserResponse;
 import com.eventmanagement.backend.exception.BadRequestException;
 import com.eventmanagement.backend.model.User;
+import com.eventmanagement.backend.repository.EventRepository;
 import com.eventmanagement.backend.repository.UserRepository;
 import com.eventmanagement.backend.util.GenerateAvatarUrl;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class AdminService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final GenerateAvatarUrl generateAvatarUrl;
+    private final EventRepository eventRepository;
 
     // get account list (+pagination)
     public Page<UserResponse> getAllAccounts(int page, int size) {
@@ -62,7 +64,14 @@ public class AdminService {
     public UserResponse getAccountById(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User does not exist"));
-        return mapToResponse(user);
+        UserResponse response = mapToResponse(user);
+
+        if (user.getRole() == Role.ORGANIZER) {
+            long count = eventRepository.countByOrganizer_UserId(id);
+            response.setEventCount(count);
+        }
+
+        return response;
     }
 
     @Transactional

@@ -110,7 +110,7 @@ export function AccountManagement() {
             try {
                 const res = await adminService.toggleBan(account.userId);
                 alert(`${action} successfully!`);
-                // await fetchAccounts();
+                await loadAllAccounts();
                 await loadData();
             } catch (error) {
                 alert('Operation failed');

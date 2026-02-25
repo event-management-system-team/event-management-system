@@ -23,5 +23,5 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
             "ORDER BY (e.totalCapacity - e.registeredCount) ASC")
     List<Event> findHotEventsSellingFast(@Param("status") EventStatus status, Pageable pageable);
 
-
+    long countByOrganizer_UserId(UUID organizerId);
 }
