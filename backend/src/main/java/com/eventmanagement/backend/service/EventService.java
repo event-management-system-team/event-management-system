@@ -10,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +31,28 @@ public class EventService {
         Pageable topSix = PageRequest.of(0, 6);
         List<Event> events = eventRepository.findHotEventsSellingFast(EventStatus.APPROVED, topSix);
         return events.stream().map((event) -> mapToResponse(event)).collect(Collectors.toList());
+    }
+
+    public Page<EventResponse> searchEvents(String keyword, String location,
+            List<String> categories, LocalDate date,
+            BigDecimal price, Boolean isFree,
+            int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        String kw = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
+        String loc = (location != null && !location.trim().isEmpty()) ? location.trim() : null;
+        List<String> cat = (categories != null && !categories.isEmpty()) ? categories : null;
+
+        LocalDateTime dateTime = null;
+        if (date != null) {
+            // Biến ngày "25/04/2026" thành "25/04/2026 23:59:59" để tìm các sự kiện đang
+            // diễn ra trong ngày đó
+            dateTime = date.atTime(23, 59, 59);
+        }
+
+        Page<Event> events = eventRepository.searchEvents(EventStatus.APPROVED, kw, loc, cat, dateTime, price, isFree,
+                pageable);
+        return events.map(event -> mapToResponse(event));
     }
 
     private EventResponse mapToResponse(Event event) {

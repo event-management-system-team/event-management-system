@@ -2,7 +2,7 @@ import { Empty } from 'antd';
 
 const EmptyState = ({ className = "", message = "No data" }) => {
     return (
-        <div className={`flex flex-col items-center justify-center bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 ${className}`}>
+        <div className={`flex flex-col items-center justify-center border-none rounded-3xl border-2 ${className}`}>
             <Empty
                 description={
                     <span className="text-gray-500 font-medium text-lg">
