@@ -38,6 +38,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "../../components/domain/
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "../../components/domain/admin/Select.jsx";
 import {AdminSidebar} from "../../components/domain/admin/AdminSidebar.jsx";
 import {Badge} from "../../components/domain/admin/Badge.jsx";
+import {useState} from "react";
 
 // Mock data for event statistics
 const summaryMetrics = [{
@@ -238,6 +239,13 @@ const events = [{
 }]
 
 export function EventManagement() {
+
+    // const [loading, setLoading] = useState(true);
+    // const [error, setError] = useState(null);
+
+    // if (loading) return <div className="absolute top-0 left-0 w-full h-1 bg-blue-500 animate-pulse z-10"/>
+    // if (error) return <div>Something went wrong: {error}</div>;
+
     return (
         <>
             <div className="flex h-screen bg-[#F1F0E8]">
@@ -255,16 +263,6 @@ export function EventManagement() {
                                 <span>Event Management</span>
                             </div>
                             <div className="flex items-center gap-3">
-                                {/* Search Bar */}
-                                <div className="relative">
-                                    <Search
-                                        className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"/>
-                                    <Input
-                                        type="text"
-                                        placeholder="Search events..."
-                                        className="pl-9 pr-4 py-2 w-[280px] rounded-full border-gray-300 focus:ring-[#7FA5A5] focus:border-[#7FA5A5]"
-                                    />
-                                </div>
                                 {/* Notification Icon */}
                                 <Button
                                     variant="ghost"
@@ -328,9 +326,9 @@ export function EventManagement() {
                     <div className="px-8 pb-6">
                         <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                             <CardHeader className="border-b border-gray-100">
-                                <CardTitle className="text-lg">Filter Events</CardTitle>
+                                <CardTitle className="text-lg font-semibold">Filter Events</CardTitle>
                             </CardHeader>
-                            <CardContent className="pt-6">
+                            <CardContent className="pt-0">
                                 <div className="grid grid-cols-5 gap-4 items-end">
                                     {/* Search Input */}
                                     <div className="col-span-1">

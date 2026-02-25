@@ -2,6 +2,7 @@ package com.eventmanagement.backend.repository;
 
 import com.eventmanagement.backend.constants.EventStatus;
 import com.eventmanagement.backend.model.Event;
+import com.eventmanagement.backend.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,4 +25,8 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
     List<Event> findHotEventsSellingFast(@Param("status") EventStatus status, Pageable pageable);
 
     long countByOrganizer_UserId(UUID organizerId);
+
+    Page<Event> findAll(Pageable pageable);
+
+//    Page<Event> findByOrganizer_UserId(UUID userId, Pageable pageable);
 }
