@@ -105,7 +105,7 @@ public class AuthService {
 
         String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUserId());
 
-        int maxAge = (int) refreshTokenExpiration / 60;
+        int maxAge = request.isRememberMe() ? (int) (refreshTokenExpiration / 60) : -1;
         cookieUtil.addRefreshTokenCookie(response, refreshToken, maxAge);
 
         return LoginResponse.builder()
@@ -213,6 +213,13 @@ public class AuthService {
         return RefreshTokenResponse.builder()
                 .accessToken(newAccessToken)
                 .tokenType("Bearer")
+                .user(LoginResponse.UserInfor.builder()
+                        .user_id(user.getUserId())
+                        .email(user.getEmail())
+                        .full_name(user.getFullName())
+                        .avatar_url(user.getAvatarUrl())
+                        .role(user.getRole())
+                        .build())
                 .build();
     }
 

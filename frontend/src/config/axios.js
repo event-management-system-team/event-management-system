@@ -1,4 +1,6 @@
 import axios from "axios";
+import { store } from "../store/index";
+import { setAccessToken, setUser, logoutUser } from "../store/slices/auth.slice";
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -23,13 +25,15 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
-// Request Interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = sessionStorage.getItem("accessToken");
+    const state = store.getState();
+    const token = state.auth.accessToken;
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
   },
   (error) => Promise.reject(error),
@@ -57,18 +61,26 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const response = await axiosInstance.post("/auth/refresh");
-        const { accessToken } = response.data;
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URL}/auth/refresh`,
+          {},
+          { withCredentials: true },
+        );
 
-        sessionStorage.setItem("accessToken", accessToken);
-        processQueue(null, accessToken);
+        const newAccessToken = response.data.accessToken;
 
-        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        store.dispatch(setAccessToken(newAccessToken));
+        if (response.data.user) {
+          store.dispatch(setUser(response.data.user));
+        }
+
+        processQueue(null, newAccessToken);
+
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        sessionStorage.removeItem("accessToken");
-        sessionStorage.removeItem("user");
+        store.dispatch(logoutUser());
         window.location.href = "/login";
         return Promise.reject(refreshError);
       } finally {

@@ -31,30 +31,56 @@ const authService = {
     }
   },
 
-  saveAccessToken: (accessToken) => {
-    sessionStorage.setItem("accessToken", accessToken);
+  saveAccessToken: (accessToken, rememberMe) => {
+    if (rememberMe) {
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("rememberMe", "true");
+    } else {
+      sessionStorage.setItem("accessToken", accessToken);
+      localStorage.removeItem("rememberMe");
+    }
   },
 
   getAccessToken: () => {
-    return sessionStorage.getItem("accessToken");
+    return (
+      localStorage.getItem("accessToken") ||
+      sessionStorage.getItem("accessToken")
+    );
   },
 
-  saveUser: (user) => {
-    sessionStorage.setItem("user", JSON.stringify(user));
+  saveUser: (user, rememberMe) => {
+    const userStr = JSON.stringify(user);
+    if (rememberMe) {
+      localStorage.setItem("user", userStr);
+    } else {
+      sessionStorage.setItem("user", userStr);
+    }
   },
 
   getUser: () => {
-    const userStr = sessionStorage.getItem("user");
+    const userStr =
+      localStorage.getItem("user") || sessionStorage.getItem("user");
     return userStr ? JSON.parse(userStr) : null;
   },
 
   clearSession: () => {
-    sessionStorage.removeItem("accessToken");
-    sessionStorage.removeItem("user");
+    sessionStorage.clear();
+    localStorage.removeItem("user");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("rememberMe");
   },
 
   isAuthenticated: () => {
-    return !!sessionStorage.getItem("accessToken");
+    const hasToken =
+      !!localStorage.getItem("accessToken") ||
+      !!sessionStorage.getItem("accessToken");
+    const hasUser =
+      !!localStorage.getItem("user") || !!sessionStorage.getItem("user");
+    return hasToken && hasUser;
+  },
+
+  isRememberMe: () => {
+    return localStorage.getItem("rememberMe") === "true";
   },
 };
 

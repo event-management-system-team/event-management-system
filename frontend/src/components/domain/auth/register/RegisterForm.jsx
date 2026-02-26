@@ -11,9 +11,9 @@ import {
 } from "../../../../store/slices/auth.slice";
 import { InputField } from "../../../common/InputField";
 import { Button } from "../../../common/Button";
-import { SiEventbrite } from "react-icons/si";
 import { MdArrowForward } from "react-icons/md";
 import { FaRegCheckCircle, FaRegCircle } from "react-icons/fa";
+import LogoImg from "../../../../assets/logo.png";
 
 export const RegisterForm = () => {
   const dispatch = useDispatch();
@@ -98,7 +98,7 @@ export const RegisterForm = () => {
     <div className="w-full md:w-1/2 bg-[#F1F0E8] flex flex-col items-center justify-center px-6 py-12 md:px-20 lg:px-32">
       <div className="w-full max-w-md">
         <div className="md:hidden flex items-center gap-2 mb-8 justify-center">
-          <SiEventbrite className="size-12 text-primary" />
+          <img src={LogoImg} alt="EventHub Logo" className="w-12 h-12 object-contain" />
           <span className="text-xl font-bold text-gray-900">EventHub</span>
         </div>
 
