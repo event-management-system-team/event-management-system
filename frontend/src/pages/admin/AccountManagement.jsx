@@ -43,6 +43,7 @@ export function AccountManagement() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [status, setStatus] = useState("all");
+    const [role, setRole] = useState("all");
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [sortOption, setSortOption] = useState("newest");
@@ -121,17 +122,6 @@ export function AccountManagement() {
         } catch (error) {
             showAlert("error", "Operation failed", 4000);
         }
-
-        // if (window.confirm(`Are you sure you want to ${action} this account?`)) {
-        //     try {
-        //         const res = await adminService.toggleBan(account.userId);
-        //         showAlert("success", `${action} account successfully`, 2500);
-        //         await loadAllAccounts();
-        //         await loadData();
-        //     } catch (error) {
-        //         showAlert("error", "Operation failed", 4000);
-        //     }
-        // }
     }
 
     const processedAccounts = useMemo(() => {
@@ -147,8 +137,10 @@ export function AccountManagement() {
         }
 
         // filter by status
-        if (!status) return originalAccounts;
         list = list.filter(account => status === "all" || account.status === status);
+
+        // filter by user role
+        list = list.filter(account => role === "all" || account.role === role);
 
         // filter by date range
         list = list.filter(account => {
@@ -174,7 +166,7 @@ export function AccountManagement() {
         });
 
         return list;
-    }, [originalAccounts, searchTerm, status, startDate, endDate, sortOption]);
+    }, [originalAccounts, searchTerm, status, role, startDate, endDate, sortOption]);
 
     const pageSize = 10;
     const startItem = currentPage * pageSize + 1;
@@ -224,14 +216,6 @@ export function AccountManagement() {
         setAccounts(prevAccounts => [newAccount, ...prevAccounts]);
         setOriginalAccounts(prevOriginal => [newAccount, ...prevOriginal]);
     }
-
-    // const showAlert = (type, message, duration = 3000) => {
-    //     setAlert({ type, message });
-
-    //     setTimeout(() => {
-    //         setAlert((prev) => ({ ...prev, message: "" }));
-    //     }, duration);
-    // };
 
     const formatDate = (isoString) => {
         const date = new Date(isoString);
@@ -411,6 +395,22 @@ export function AccountManagement() {
                                     <SelectItem value="all">All Status</SelectItem>
                                     <SelectItem value="ACTIVE">Active</SelectItem>
                                     <SelectItem value="BANNED">Banned</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            {/* Role Filter */}
+                            <Select
+                                value={role}
+                                onValueChange={(value) => setRole(value)}
+                            >
+                                <SelectTrigger
+                                    className="w-[160px] border border-gray-200 cursor-pointer bg-[#f7f7f7] hover:bg-[#B3C8CF]">
+                                    <SelectValue placeholder="Role" />
+                                </SelectTrigger>
+                                <SelectContent className='border border-gray-200'>
+                                    <SelectItem value="all">All Users</SelectItem>
+                                    <SelectItem value="ORGANIZER">Organizer</SelectItem>
+                                    <SelectItem value="ATTENDEE">Attendee</SelectItem>
                                 </SelectContent>
                             </Select>
 
