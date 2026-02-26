@@ -1,0 +1,84 @@
+package com.eventmanagement.backend.controller.admin;
+
+import com.eventmanagement.backend.dto.request.CreateOrganizerRequest;
+import com.eventmanagement.backend.dto.request.UserUpdateRequest;
+import com.eventmanagement.backend.dto.response.UserResponse;
+import com.eventmanagement.backend.model.User;
+import com.eventmanagement.backend.repository.EventRepository;
+import com.eventmanagement.backend.repository.UserRepository;
+import com.eventmanagement.backend.service.AdminService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/admin/accounts")
+@RequiredArgsConstructor
+public class AdminAccountController {
+    private final AdminService adminService;
+    private final UserRepository userRepository;
+    private final EventRepository eventRepository;
+
+    @GetMapping
+    public ResponseEntity<Page<UserResponse>> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(adminService.getAllAccounts(page, size));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<UserResponse>> getAll() {
+        List<UserResponse> users = adminService.getAllAccountsPlain();
+        return ResponseEntity.ok(users);
+    }
+
+//    @GetMapping("/search")
+//    public ResponseEntity<List<UserResponse>> search(@RequestParam("q") String q) {
+//        List<UserResponse> results = adminService.searchAccounts(q);
+//        return ResponseEntity.ok(results);
+//    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<UserResponse>> search(
+            @RequestParam("q") String q,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size)    {
+        return ResponseEntity.ok(adminService.searchAccounts(q, page, size));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse> getDetail(@PathVariable UUID id) {
+        return ResponseEntity.ok(adminService.getAccountById(id));
+    }
+
+    @GetMapping("/{id}/event-count")
+    public ResponseEntity<Long> getEventCount(@PathVariable UUID id) {
+        return ResponseEntity.ok(eventRepository.countByOrganizer_UserId(id));
+    }
+
+    @PutMapping("/{id}/profile")
+    public ResponseEntity<UserResponse> updateProfile(@PathVariable UUID id, @RequestBody UserUpdateRequest request) {
+        return ResponseEntity.ok(adminService.updateProfile(id, request));
+    }
+
+    @PatchMapping("/{id}/toggle-ban")
+    public ResponseEntity<UserResponse> toggleBan(@PathVariable UUID id) {
+        return ResponseEntity.ok(adminService.toggleBanAccount(id));
+    }
+
+    @PostMapping("/organizer")
+    public ResponseEntity<UserResponse> createOrganizer(@Valid @RequestBody CreateOrganizerRequest request) {
+        return ResponseEntity.ok(adminService.createOrganizer(request));
+    }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
+        return ResponseEntity.ok(userRepository.existsByEmail(email));
+    }
+}
