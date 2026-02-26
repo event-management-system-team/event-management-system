@@ -31,6 +31,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {adminService} from "../../services/admin.service.js";
 import {AccountsPagination} from "../../components/domain/admin/AccountsPagination.jsx";
+import {Alert} from "../../components/common/Alert.jsx";
 
 export function AccountManagement() {
 
@@ -45,6 +46,7 @@ export function AccountManagement() {
     const [sortOption, setSortOption] = useState("newest");
     const [searchTerm, setSearchTerm] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [alert, setAlert] = useState({ type: "success", message: "" });
 
     const loadAllAccounts = async () => {
         try {
@@ -208,6 +210,14 @@ export function AccountManagement() {
         setAccounts(prevAccounts => [newAccount, ...prevAccounts]);
         setOriginalAccounts(prevOriginal => [newAccount, ...prevOriginal]);
     }
+
+    const showAlert = (type, message, duration = 3000) => {
+        setAlert({ type, message });
+
+        setTimeout(() => {
+            setAlert((prev) => ({ ...prev, message: "" }));
+        }, duration);
+    };
 
     const formatDate = (isoString) => {
         const date = new Date(isoString);
@@ -566,8 +576,22 @@ export function AccountManagement() {
                     </div>
                 </main>
 
+                {/* Global Alert */}
+                <div className="fixed top-6 right-6 z-[999] w-[360px]">
+                    <Alert
+                        type={alert.type}
+                        message={alert.message}
+                        onClose={() => setAlert({ ...alert, message: "" })}
+                    />
+                </div>
+
                 {/* Create Organizer Modal */}
-                <CreateOrganizerModal isOpen={isModalOpen} onClose={closeModal} onCreated={handleOrganizerCreated}/>
+                <CreateOrganizerModal
+                    isOpen={isModalOpen}
+                    onClose={closeModal}
+                    onCreated={handleOrganizerCreated}
+                    onAlert={showAlert}
+                />
             </div>
         </>
     );

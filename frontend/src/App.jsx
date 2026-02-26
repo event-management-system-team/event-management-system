@@ -12,7 +12,7 @@ import {EventManagement} from "./pages/admin/EventManagement.jsx";
 import {EventDetail} from "./pages/admin/EventDetail.jsx";
 import {EventAnalytics} from "./pages/admin/EventAnalytics.jsx";
 import { useEffect } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+// import { Routes, Route, Navigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { autoRefreshToken } from "./store/slices/auth.slice";
 
