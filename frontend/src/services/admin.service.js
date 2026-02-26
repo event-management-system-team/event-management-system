@@ -55,4 +55,8 @@ export const adminService = {
             params: {page, size}
         });
     },
+
+    getAllCategories: () => {
+        return axiosInstance.get(`/admin/events/categories`);
+    }
 };

@@ -30,6 +30,7 @@ export function EventManagement() {
     const [events, setEvents] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [originalEvents, setOriginalEvents] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [status, setStatus] = useState("all");
@@ -69,9 +70,23 @@ export function EventManagement() {
         }
     }
 
+    const fetchCategories = async () => {
+        try {
+            setLoading(true)
+            const response = await adminService.getAllCategories()
+            setCategories(response.data)
+        } catch (error) {
+            setError("Cannot load category list");
+            console.error(error)
+        } finally {
+            setLoading(false);
+        }
+    }
+
     useEffect(() => {
-        loadData();
-        loadAllEvents();
+        loadData()
+        loadAllEvents()
+        fetchCategories()
     }, [currentPage]);
 
     const handleSearchChange = (e) => {
@@ -109,7 +124,7 @@ export function EventManagement() {
         list = list.filter(e => status === "all" || e.status === status);
 
         // filter by category
-        // list = list.filter(account => role === "all" || account.role === role);
+        list = list.filter(e => category === "all" || e.category?.categorySlug === category);
 
         // filter by price type
         list = list.filter(e => {
@@ -389,12 +404,14 @@ export function EventManagement() {
                                         </SelectTrigger>
                                         <SelectContent className='border border-gray-200'>
                                             <SelectItem value="all">All Category</SelectItem>
-                                            <SelectItem value="technology">Technology</SelectItem>
-                                            <SelectItem value="music">Music</SelectItem>
-                                            <SelectItem value="education">Education</SelectItem>
-                                            <SelectItem value="business">Business</SelectItem>
-                                            <SelectItem value="food">Food & Beverage</SelectItem>
-                                            <SelectItem value="arts">Arts & Culture</SelectItem>
+                                            {categories?.map(c => (
+                                                <SelectItem
+                                                    key={c.categoryId}
+                                                    value={c.categorySlug}
+                                                >
+                                                    {c.categoryName}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -424,12 +441,6 @@ export function EventManagement() {
                                     <label className="text-sm text-gray-600 mb-2 block">
                                         Date
                                     </label>
-                                    {/* <Input
-                                        type="text"
-                                        placeholder="mm/dd/yyyy"
-                                        className="border-gray-300"
-                                    /> */}
-
                                     <Space vertical className=''>
                                         <DatePicker
                                             size="large"
