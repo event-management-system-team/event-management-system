@@ -24,6 +24,7 @@ public class CookieUtil {
         Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken);
         cookie.setHttpOnly(true);
         cookie.setSecure(cookieSecure);
+        cookie.setAttribute("SameSite", "Strict");
         cookie.setPath("/");
         cookie.setMaxAge(maxAge);
         cookie.setDomain(cookieDomain);

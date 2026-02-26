@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/admin/events")
 @RequiredArgsConstructor
@@ -23,5 +25,11 @@ public class AdminEventController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(eventService.getAllEvents(page, size));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<EventResponse>> getAll() {
+        List<EventResponse> events = eventService.getAllEventsPlain();
+        return ResponseEntity.ok(events);
     }
 }

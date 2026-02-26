@@ -18,10 +18,10 @@ public class CreateOrganizerRequest {
 
     @NotBlank(message = "Password is required")
     @Size(min = 8, message = "Password must be at least 8 characters long")
-    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=!]).*$", message = "Password must contain at least one uppercase letter, one lowercase letter, and one number")
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[^A-Za-z0-9]).*$",
+            message = "Password must contain uppercase, lowercase, number and special character")
     private String password;
 
-    @NotBlank(message = "Phone number is required")
     @Size(min = 10, max = 10, message = "Phone number must be 10 digits long")
     @Pattern(regexp = "^[0-9]+$", message = "Phone number must contain only digits")
     private String phone;

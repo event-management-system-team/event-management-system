@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +34,33 @@ public class EventService {
         return events.stream().map((event) -> mapToResponse(event)).collect(Collectors.toList());
     }
 
+    public Page<EventResponse> searchEvents(String keyword, String location,
+                                            List<String> categories, LocalDate date,
+                                            BigDecimal price, Boolean isFree,
+                                            int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        String kw = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
+        String loc = (location != null && !location.trim().isEmpty()) ? location.trim() : null;
+        List<String> cat = (categories != null && !categories.isEmpty()) ? categories : null;
+
+        LocalDateTime startOfDay = null;
+        LocalDateTime endOfDay = null;
+
+        if (date != null) {
+            startOfDay = date.atStartOfDay(); // Tương đương 00:00:00
+            endOfDay = date.atTime(23, 59, 59); // Tương đương 23:59:59
+        }
+
+        Page<Event> events = eventRepository.searchEvents(EventStatus.APPROVED, kw, loc, cat, startOfDay, endOfDay, price, isFree,
+                pageable);
+        return events.map(event -> mapToResponse(event));
+    }
+
+    public EventResponse getEventBySlug(String eventSlug) {
+        Event event = eventRepository.findEventByEventSlug(eventSlug);
+        return mapToResponse(event);
+    }
 
     private EventResponse mapToResponse(Event event) {
 

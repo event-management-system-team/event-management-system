@@ -1,5 +1,6 @@
-import { SiEventbrite } from "react-icons/si";
 import { StatCard } from "./StatCard";
+import LogoImg from '../../../../assets/logo.png'
+
 export const VisualSidebar = () => {
   return (
     <div className="hidden md:flex md:w-1/2 bg-login-gradient relative overflow-hidden flex-col items-center justify-center p-12 text-white">
@@ -16,8 +17,11 @@ export const VisualSidebar = () => {
 
       <div className="relative z-10 flex flex-col items-center text-center max-w-lg">
         <div className="mb-12">
-          <div className="size-24 bg-white/20 rounded-full flex items-center justify-center glass-effect mb-4 mx-auto">
-            <SiEventbrite className="size-12 text-white" />
+          <div className="size-24 bg-white rounded-full flex items-center justify-center glass-effect mb-4 mx-auto">
+            <img
+              src={LogoImg}
+              alt="EventHub Logo"
+              className="w-24 h-24 object-contain" />
           </div>
           <h1 className="text-4xl font-extrabold tracking-tight">EventHub</h1>
         </div>

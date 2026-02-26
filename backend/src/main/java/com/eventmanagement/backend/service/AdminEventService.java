@@ -1,5 +1,6 @@
 package com.eventmanagement.backend.service;
 
+import com.eventmanagement.backend.dto.response.UserResponse;
 import com.eventmanagement.backend.dto.response.admin.EventResponse;
 import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.repository.EventRepository;
@@ -9,6 +10,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +24,13 @@ public class AdminEventService {
         Page<Event> eventPage = eventRepository.findAll(pageable);
 
         return eventPage.map(this::mapToResponse);
+    }
+
+    public List<EventResponse> getAllEventsPlain() {
+        return eventRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
     private EventResponse mapToResponse(Event event) {

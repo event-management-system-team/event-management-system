@@ -89,6 +89,14 @@ export const ProfileCard = () => {
       });
 
       setProfileData(updatedProfile);
+      dispatch(
+        setUser({
+          ...user,
+          fullName: data.fullName,
+          full_name: data.fullName,
+        })
+      );
+
       setSuccess("Profile updated successfully!");
 
       // Check if password fields are filled
