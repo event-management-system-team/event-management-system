@@ -11,16 +11,16 @@ import {
     UserX,
     Eye
 } from 'lucide-react';
-import {Link} from 'react-router';
-import {AdminSidebar} from "../../components/domain/admin/AdminSidebar.jsx";
-import {CreateOrganizerModal} from "../../components/domain/admin/CreateOrganizerModal.jsx";
-import {useEffect, useMemo, useState} from "react";
-import {Button} from "../../components/domain/admin/Button.jsx";
-import {Avatar, AvatarFallback, AvatarImage} from "../../components/domain/admin/Avatar.jsx";
-import {Card, CardContent} from "../../components/domain/admin/Card.jsx";
-import {Input} from "../../components/domain/admin/Input.jsx";
-import {Badge} from "../../components/domain/admin/Badge.jsx";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "../../components/domain/admin/Select.jsx";
+import { Link } from 'react-router';
+import { AdminSidebar } from "../../components/domain/admin/AdminSidebar.jsx";
+import { CreateOrganizerModal } from "../../components/domain/admin/CreateOrganizerModal.jsx";
+import { useEffect, useMemo, useState } from "react";
+import { Button } from "../../components/domain/admin/Button.jsx";
+import { Avatar, AvatarFallback, AvatarImage } from "../../components/domain/admin/Avatar.jsx";
+import { Card, CardContent } from "../../components/domain/admin/Card.jsx";
+import { Input } from "../../components/domain/admin/Input.jsx";
+import { Badge } from "../../components/domain/admin/Badge.jsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/domain/admin/Select.jsx";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -29,9 +29,11 @@ import {
 } from "../../components/domain/admin/Dropdown-Menu.jsx";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import {adminService} from "../../services/admin.service.js";
-import {AccountsPagination} from "../../components/domain/admin/AccountsPagination.jsx";
-import {Alert} from "../../components/common/Alert.jsx";
+import { adminService } from "../../services/admin.service.js";
+import { AccountsPagination } from "../../components/domain/admin/AccountsPagination.jsx";
+import { Alert } from "../../components/common/Alert.jsx";
+import { useAlert } from '../../hooks/useAlert.js';
+import { Popconfirm } from 'antd';
 
 export function AccountManagement() {
 
@@ -46,7 +48,7 @@ export function AccountManagement() {
     const [sortOption, setSortOption] = useState("newest");
     const [searchTerm, setSearchTerm] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [alert, setAlert] = useState({ type: "success", message: "" });
+    const { alert, showAlert, closeAlert } = useAlert();
 
     const loadAllAccounts = async () => {
         try {
@@ -108,16 +110,28 @@ export function AccountManagement() {
         const isBanned = account.status === "BANNED";
         const action = isBanned ? "ACTIVATE" : "BAN";
 
-        if (window.confirm(`Are you sure you want to ${action} this account?`)) {
-            try {
-                const res = await adminService.toggleBan(account.userId);
-                alert(`${action} successfully!`);
-                await loadAllAccounts();
-                await loadData();
-            } catch (error) {
-                alert('Operation failed');
-            }
+        try {
+            await adminService.toggleBan(account.userId);
+            showAlert("success", `${action} account successfully`, 2500);
+
+            setTimeout(() => {
+                loadAllAccounts();
+                loadData();
+            }, 300);
+        } catch (error) {
+            showAlert("error", "Operation failed", 4000);
         }
+
+        // if (window.confirm(`Are you sure you want to ${action} this account?`)) {
+        //     try {
+        //         const res = await adminService.toggleBan(account.userId);
+        //         showAlert("success", `${action} account successfully`, 2500);
+        //         await loadAllAccounts();
+        //         await loadData();
+        //     } catch (error) {
+        //         showAlert("error", "Operation failed", 4000);
+        //     }
+        // }
     }
 
     const processedAccounts = useMemo(() => {
@@ -211,13 +225,13 @@ export function AccountManagement() {
         setOriginalAccounts(prevOriginal => [newAccount, ...prevOriginal]);
     }
 
-    const showAlert = (type, message, duration = 3000) => {
-        setAlert({ type, message });
+    // const showAlert = (type, message, duration = 3000) => {
+    //     setAlert({ type, message });
 
-        setTimeout(() => {
-            setAlert((prev) => ({ ...prev, message: "" }));
-        }, duration);
-    };
+    //     setTimeout(() => {
+    //         setAlert((prev) => ({ ...prev, message: "" }));
+    //     }, duration);
+    // };
 
     const formatDate = (isoString) => {
         const date = new Date(isoString);
@@ -287,14 +301,14 @@ export function AccountManagement() {
 
     const metrics = summaryMetrics(accounts);
 
-    if (loading) return <div className="absolute top-0 left-0 w-full h-1 bg-blue-500 animate-pulse z-10"/>
+    if (loading) return <div className="absolute top-0 left-0 w-full h-1 bg-blue-500 animate-pulse z-10" />
     if (error) return <div>Something went wrong: {error}</div>;
 
     return (
         <>
             <div className="flex h-screen bg-[#F1F0E8]">
                 {/* Sidebar */}
-                <AdminSidebar/>
+                <AdminSidebar />
 
                 {/* Main Content */}
                 <main className="flex-1 overflow-auto">
@@ -303,13 +317,13 @@ export function AccountManagement() {
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2 text-sm text-gray-600">
                                 <span>Dashboard</span>
-                                <ChevronRight className="h-4 w-4"/>
+                                <ChevronRight className="h-4 w-4" />
                                 <span>Account Management</span>
                             </div>
                             <div className="flex items-center gap-3">
                                 {/* Notification Icon */}
                                 <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
-                                    <Bell className="h-5 w-5 text-gray-600"/>
+                                    <Bell className="h-5 w-5 text-gray-600" />
                                 </Button>
                                 {/* Profile Icon */}
                                 <Avatar className="w-9 h-9 cursor-pointer">
@@ -330,7 +344,7 @@ export function AccountManagement() {
                                 className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5"
                                 onClick={openModal}
                             >
-                                <Plus className="h-4 w-4"/>
+                                <Plus className="h-4 w-4" />
                                 Create Organizer Account
                             </Button>
                         </div>
@@ -347,12 +361,11 @@ export function AccountManagement() {
                                             <div
                                                 className={`w-10 h-10 ${metric.iconBg} rounded-lg flex items-center justify-center`}
                                             >
-                                                <Icon className={`h-5 w-5 ${metric.iconColor}`}/>
+                                                <Icon className={`h-5 w-5 ${metric.iconColor}`} />
                                             </div>
                                             <div
-                                                className={`flex items-center gap-1 text-xs ${
-                                                    metric.trending === "up" ? "text-green-600" : "text-red-600"
-                                                }`}
+                                                className={`flex items-center gap-1 text-xs ${metric.trending === "up" ? "text-green-600" : "text-red-600"
+                                                    }`}
                                             >
                                             </div>
                                         </div>
@@ -375,7 +388,7 @@ export function AccountManagement() {
                             {/* Search Input */}
                             <div className="relative flex-1">
                                 <Search
-                                    className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"/>
+                                    className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                                 <Input
                                     type="text"
                                     placeholder="Search organizer, full name, email or phone number..."
@@ -392,7 +405,7 @@ export function AccountManagement() {
                             >
                                 <SelectTrigger
                                     className="w-[160px] border border-gray-200 cursor-pointer bg-[#f7f7f7] hover:bg-[#B3C8CF]">
-                                    <SelectValue placeholder="Status"/>
+                                    <SelectValue placeholder="Status" />
                                 </SelectTrigger>
                                 <SelectContent className='border border-gray-200'>
                                     <SelectItem value="all">All Status</SelectItem>
@@ -417,7 +430,7 @@ export function AccountManagement() {
                                         variant="outline"
                                         className="gap-2 min-w-[210px] justify-start cursor-pointer bg-[#f7f7f7] hover:bg-[#B3C8CF]"
                                     >
-                                        <Calendar className="h-4 w-4 text-gray-500"/>
+                                        <Calendar className="h-4 w-4 text-gray-500" />
                                         <span>
                                             {startDate && endDate
                                                 ? `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`
@@ -434,7 +447,7 @@ export function AccountManagement() {
                             >
                                 <SelectTrigger
                                     className="w-[140px] border border-gray-200 cursor-pointer bg-[#f7f7f7] hover:bg-[#B3C8CF]">
-                                    <SelectValue placeholder="Sort by"/>
+                                    <SelectValue placeholder="Sort by" />
                                 </SelectTrigger>
                                 <SelectContent className='border border-gray-200'>
                                     <SelectItem value="newest">Newest</SelectItem>
@@ -469,9 +482,9 @@ export function AccountManagement() {
                                         <div className="col-span-4 flex items-center gap-3 ml-5">
                                             <Avatar className="w-10 h-10 mr-4">
                                                 {account.avatarUrl ? (
-                                                    <AvatarImage src={account.avatarUrl} alt={account.fullName}/>
+                                                    <AvatarImage src={account.avatarUrl} alt={account.fullName} />
                                                 ) : (
-                                                    <AvatarFallback className="bg-gray-300"/>
+                                                    <AvatarFallback className="bg-gray-300" />
                                                 )}
                                             </Avatar>
 
@@ -507,40 +520,65 @@ export function AccountManagement() {
                                                     className="h-8 w-8 hover:bg-gray-100 cursor-pointer"
                                                     title="View account details"
                                                 >
-                                                    <Eye className="h-4 w-4 text-gray-500"/>
+                                                    <Eye className="h-4 w-4 text-gray-500" />
                                                 </Button>
                                             </Link>
                                             <DropdownMenu modal={false}>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" size="icon"
-                                                            className="h-8 w-8 hover:bg-gray-100 cursor-pointer">
-                                                        <MoreVertical className="h-4 w-4 text-gray-500"/>
+                                                        className="h-8 w-8 hover:bg-gray-100 cursor-pointer">
+                                                        <MoreVertical className="h-4 w-4 text-gray-500" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end"
-                                                                     className="bg-[#f7f7f7] border-2 border-gray-200">
+                                                    className="bg-[#f7f7f7] border-2 border-gray-200">
                                                     <Link to={`/admin/accounts/account-detail/${account.userId}`}>
                                                         <DropdownMenuItem>
-                                                            <UserCircle className="mr-2 h-4 w-4"/>
+                                                            <UserCircle className="mr-2 h-4 w-4" />
                                                             View account details
                                                         </DropdownMenuItem>
                                                     </Link>
-                                                    <DropdownMenuItem
-                                                        className="flex items-center gap-2 cursor-pointer"
-                                                        onClick={() => handleToggleBan(account)}
-                                                    >
+
+                                                    <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
                                                         {account.status === "BANNED" ? (
                                                             <>
-                                                                <CheckCircle className="mr-2 h-4 w-4"/>
+                                                            <Popconfirm
+                                                                title="Activate account"
+                                                                description="Are you sure to activate this account?"
+                                                                onConfirm={() => handleToggleBan(account)}
+                                                                okText="Yes"
+                                                                cancelText="No"
+                                                            >
+                                                                <div
+                                                                    className="flex items-center gap-2 w-full"
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                >
+                                                                <CheckCircle className="mr-2 h-4 w-4" />
                                                                 Activate account
+                                                                </div>
+                                                            </Popconfirm>
                                                             </>
                                                         ) : (
                                                             <>
-                                                                <UserX className="mr-2 h-4 w-4"/>
+                                                            <Popconfirm
+                                                                title="Ban account"
+                                                                description="Are you sure to ban this account?"
+                                                                onConfirm={() => handleToggleBan(account)}
+                                                                okText="Yes"
+                                                                cancelText="No"
+                                                            >
+                                                            <div
+                                                                className="flex items-center gap-2 w-full"
+                                                                onClick={(e) => e.stopPropagation()}
+                                                            >
+                                                                <UserX className="mr-2 h-4 w-4" />
                                                                 Ban account
+                                                            </div>
+                                                            </Popconfirm>
                                                             </>
                                                         )}
                                                     </DropdownMenuItem>
+
                                                     {/*<DropdownMenuItem>*/}
                                                     {/*    <Settings className="mr-2 h-4 w-4"/>*/}
                                                     {/*    Reset password*/}
@@ -581,7 +619,7 @@ export function AccountManagement() {
                     <Alert
                         type={alert.type}
                         message={alert.message}
-                        onClose={() => setAlert({ ...alert, message: "" })}
+                        onClose={closeAlert}
                     />
                 </div>
 

@@ -1,52 +1,34 @@
 import {
-    Calendar,
-    Users,
-    TrendingUp,
     CheckCircle,
-    Plus,
-    Settings,
-    BarChart3,
     Bell,
-    LogOut,
-    LayoutDashboard,
-    UserCircle,
-    CalendarCog,
     ChevronRight,
-    Search,
-    MapPin,
-    Shield,
-    HardDrive,
-    Key,
     Edit,
     Ban,
     Mail,
-    Phone,
-    Cake,
-    Home as HomeIcon,
-    FileText,
-    TrendingDown,
     ExternalLink
 } from 'lucide-react';
-import {Progress} from '../../components/domain/admin/Progress.jsx'
-import {Tabs, TabsContent, TabsList, TabsTrigger} from '../../components/domain/admin/Tabs.jsx';
-import {Link, useParams} from 'react-router';
-import {AdminSidebar} from "../../components/domain/admin/AdminSidebar.jsx";
-import {Button} from "../../components/domain/admin/Button.jsx";
-import {Avatar, AvatarFallback, AvatarImage} from "../../components/domain/admin/Avatar.jsx";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "../../components/domain/admin/Card.jsx";
-import {Input} from "../../components/domain/admin/Input.jsx";
-import {Badge} from "../../components/domain/admin/Badge.jsx";
-import {useEffect, useState} from "react";
-import {adminService} from "../../services/admin.service.js";
-import {EditAccountModal} from "../../components/domain/admin/EditAccountModal.jsx";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/domain/admin/Tabs.jsx';
+import { Link, useParams } from 'react-router';
+import { AdminSidebar } from "../../components/domain/admin/AdminSidebar.jsx";
+import { Button } from "../../components/domain/admin/Button.jsx";
+import { Avatar, AvatarFallback, AvatarImage } from "../../components/domain/admin/Avatar.jsx";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/domain/admin/Card.jsx";
+import { Badge } from "../../components/domain/admin/Badge.jsx";
+import { useEffect, useState } from "react";
+import { adminService } from "../../services/admin.service.js";
+import { EditAccountModal } from "../../components/domain/admin/EditAccountModal.jsx";
+import { Alert } from "../../components/common/Alert.jsx";
+import { useAlert } from '../../hooks/useAlert.js';
+import { Popconfirm } from 'antd';
 
 export function AccountDetail() {
-    const {id} = useParams();
+    const { id } = useParams();
     const [loading, setLoading] = useState(true);
     const [account, setAccount] = useState(null);
     const [error, setError] = useState(null);
     const [eventCount, setEventCount] = useState(0);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const { alert, showAlert, closeAlert } = useAlert();
 
     const fetchAccount = async () => {
         if (!id) return;
@@ -90,14 +72,16 @@ export function AccountDetail() {
 
     const handleToggleBan = async () => {
         const action = account.status === "ACTIVE" ? 'BAN' : 'ACTIVATE';
-        if (window.confirm(`Are you sure you want to ${action} this account?`)) {
-            try {
-                const res = await adminService.toggleBan(id);
-                alert(`${action} successfully!`);
-                await fetchAccount();
-            } catch (error) {
-                alert('Operation failed');
-            }
+
+        try {
+            await adminService.toggleBan(id);
+            showAlert("success", `${action} account successfully`, 2500);
+
+            setTimeout(() => {
+                fetchAccount();
+            }, 300);
+        } catch (error) {
+            showAlert("error", "Operation failed", 4000);
         }
     }
 
@@ -123,7 +107,7 @@ export function AccountDetail() {
         }
     };
 
-    function formatDateTime(isoString) {
+    const formatDateTime = (isoString) => {
         if (!isoString) return "—";
 
         const sanitized = isoString.replace(
@@ -150,14 +134,14 @@ export function AccountDetail() {
         return `${datePart} at ${timePart}`;
     }
 
-    if (loading) return <div className="absolute top-0 left-0 w-full h-1 bg-blue-500 animate-pulse z-10"/>
+    if (loading) return <div className="absolute top-0 left-0 w-full h-1 bg-blue-500 animate-pulse z-10" />
     if (error) return <div>Something went wrong: {error}</div>;
     if (!account) return <div>Cannot find account detail.</div>;
 
     return (
         <div className="flex h-screen bg-[#F1F0E8]">
             {/* Sidebar */}
-            <AdminSidebar/>
+            <AdminSidebar />
 
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
@@ -168,11 +152,11 @@ export function AccountDetail() {
                             <Link to="/admin" className="hover:text-gray-900">
                                 Dashboard
                             </Link>
-                            <ChevronRight className="h-4 w-4"/>
+                            <ChevronRight className="h-4 w-4" />
                             <Link to="/admin/accounts" className="hover:text-gray-900">
                                 Account Management
                             </Link>
-                            <ChevronRight className="h-4 w-4"/>
+                            <ChevronRight className="h-4 w-4" />
                             <span>Account Detail</span>
                         </div>
                         <div className="flex items-center gap-3">
@@ -182,7 +166,7 @@ export function AccountDetail() {
                                 size="icon"
                                 className="h-9 w-9 rounded-full"
                             >
-                                <Bell className="h-5 w-5 text-gray-600"/>
+                                <Bell className="h-5 w-5 text-gray-600" />
                             </Button>
                             {/* Profile Icon */}
                             <Avatar className="w-9 h-9 cursor-pointer">
@@ -201,9 +185,9 @@ export function AccountDetail() {
                             {/* Large Avatar */}
                             <Avatar className="w-20 h-20">
                                 {account?.avatarUrl ? (
-                                    <AvatarImage src={account?.avatarUrl} alt={account?.fullName}/>
+                                    <AvatarImage src={account?.avatarUrl} alt={account?.fullName} />
                                 ) : (
-                                    <AvatarFallback className="bg-gray-300"/>
+                                    <AvatarFallback className="bg-gray-300" />
                                 )}
                             </Avatar>
 
@@ -222,7 +206,7 @@ export function AccountDetail() {
                                 </div>
                                 <div className="flex items-center gap-4 text-sm text-gray-600">
                                     <div className="flex items-center gap-1.5">
-                                        <Mail className="h-4 w-4"/>
+                                        <Mail className="h-4 w-4" />
                                         <span>{account?.email}</span>
                                     </div>
                                 </div>
@@ -238,20 +222,36 @@ export function AccountDetail() {
                                             className="gap-2 bg-[#7FA5A5] hover:bg-[#6D9393] text-white"
                                             onClick={() => setIsEditModalOpen(true)}
                                         >
-                                            <Edit className="h-4 w-4"/>
+                                            <Edit className="h-4 w-4" />
                                             Edit Profile
                                         </Button>
-                                        <Button variant="destructive" className="gap-2" onClick={handleToggleBan}>
-                                            <Ban className="h-4 w-4"/>
-                                            Ban Account
-                                        </Button>
+                                        <Popconfirm
+                                            title="Ban account"
+                                            description="Are you sure to ban this account?"
+                                            onConfirm={handleToggleBan}
+                                            okText="Yes"
+                                            cancelText="No"
+                                        >
+                                            <Button variant="destructive" className="gap-2">
+                                                <Ban className="h-4 w-4" />
+                                                Ban Account
+                                            </Button>
+                                        </Popconfirm>
                                     </div>
                                 ) : (
                                     <div className="flex gap-2">
-                                        <Button className="gap-2 bg-green-600 hover:bg-green-700 text-white" onClick={handleToggleBan}>
-                                            <CheckCircle className="h-4 w-4"/>
-                                            Activate Account
-                                        </Button>
+                                        <Popconfirm
+                                            title="Activate account"
+                                            description="Are you sure to activate this account?"
+                                            onConfirm={handleToggleBan}
+                                            okText="Yes"
+                                            cancelText="No"
+                                        >
+                                            <Button className="gap-2 bg-green-600 hover:bg-green-700 text-white">
+                                                <CheckCircle className="h-4 w-4" />
+                                                Activate Account
+                                            </Button>
+                                        </Popconfirm>
                                     </div>
                                 )}
                             </>
@@ -312,7 +312,7 @@ export function AccountDetail() {
                                                     className="text-sm text-[#7FA5A5] hover:underline flex items-center gap-1"
                                                 >
                                                     {account?.email}
-                                                    <ExternalLink className="h-3 w-3"/>
+                                                    <ExternalLink className="h-3 w-3" />
                                                 </a>
                                             </div>
                                             <div>
@@ -336,15 +336,6 @@ export function AccountDetail() {
                                             </CardDescription>
                                         </CardHeader>
                                         <CardContent className="pt-6 space-y-4">
-                                            {/*<div>*/}
-                                            {/*    <label*/}
-                                            {/*        className="text-xs text-gray-500 uppercase tracking-wide mb-1 block">*/}
-                                            {/*        System ID*/}
-                                            {/*    </label>*/}
-                                            {/*    <div className="text-sm text-gray-900 font-mono">*/}
-                                            {/*        {account.systemId}*/}
-                                            {/*    </div>*/}
-                                            {/*</div>*/}
                                             <div>
                                                 <label
                                                     className="text-xs text-gray-500 uppercase tracking-wide mb-1 block">
@@ -419,6 +410,15 @@ export function AccountDetail() {
                     setAccount(updatedAccount)
                 }}
             />
+
+            {/* Global Alert */}
+            <div className="fixed top-6 right-6 z-[999] w-[360px]">
+                <Alert
+                    type={alert.type}
+                    message={alert.message}
+                    onClose={closeAlert}
+                />
+            </div>
         </div>
     )
 }
