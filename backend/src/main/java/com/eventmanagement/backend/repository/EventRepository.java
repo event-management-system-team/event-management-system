@@ -17,32 +17,36 @@ import java.util.UUID;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, UUID> {
-        List<Event> findTop6ByStatusOrderByRegisteredCountDesc(EventStatus status);
+    List<Event> findTop6ByStatusOrderByRegisteredCountDesc(EventStatus status);
 
-        @Query("SELECT e FROM Event e " +
-                        "WHERE e.status = :status " +
-                        "AND e.totalCapacity > 0 " +
-                        "AND (e.registeredCount * 1.0 / e.totalCapacity) >= 0.8 " +
-                        "ORDER BY (e.totalCapacity - e.registeredCount) ASC")
-        List<Event> findHotEventsSellingFast(@Param("status") EventStatus status, Pageable pageable);
+    @Query("SELECT e FROM Event e " +
+            "WHERE e.status = :status " +
+            "AND e.totalCapacity > 0 " +
+            "AND (e.registeredCount * 1.0 / e.totalCapacity) >= 0.8 " +
+            "ORDER BY (e.totalCapacity - e.registeredCount) ASC")
+    List<Event> findHotEventsSellingFast(@Param("status") EventStatus status, Pageable pageable);
 
-        @Query("SELECT e FROM Event e " +
-                        "WHERE e.status = :status " +
-                        "AND (:keyword IS NULL OR LOWER(e.eventName) LIKE LOWER(CONCAT('%', cast(:keyword as string), '%'))) "
-                        +
-                        "AND (:location IS NULL OR LOWER(e.location) LIKE LOWER(CONCAT('%', cast(:location as string), '%'))) "
-                        +
-                        "AND (:categorySlug IS NULL OR e.category.categorySlug IN :categorySlug ) " +
-                        "AND (cast(:date as timestamp) IS NULL OR (e.startDate <= :date AND e.endDate >= :date)) " +
-                        "AND (:price IS NULL OR EXISTS (SELECT t FROM e.ticketTypes t WHERE t.price <= :price))" +
-                        "AND (:isFree IS NULL OR e.isFree = :isFree) ")
-        Page<Event> searchEvents(@Param("status") EventStatus status,
-                        @Param("keyword") String keyword,
-                        @Param("location") String location,
-                        @Param("categorySlug") List<String> categorySlug,
-                        @Param("date") LocalDateTime date,
-                        @Param("price") BigDecimal price,
-                        @Param("isFree") Boolean isFree,
-                        Pageable pageable);
+    @Query("SELECT e FROM Event e " +
+            "WHERE e.status = :status " +
+            "AND (:keyword IS NULL OR LOWER(e.eventName) LIKE LOWER(CONCAT('%', cast(:keyword as string), '%'))) "
+            +
+            "AND (:location IS NULL OR LOWER(e.location) LIKE LOWER(CONCAT('%', cast(:location as string), '%'))) "
+            +
+            "AND (:categorySlug IS NULL OR e.category.categorySlug IN :categorySlug ) " +
+            "AND (CAST(:startOfDay AS timestamp) IS NULL OR CAST(:endOfDay AS timestamp) IS NULL OR " +
+            "(e.startDate <= :endOfDay AND e.endDate >= :startOfDay)) " +
+            "AND (:price IS NULL OR EXISTS (SELECT t FROM e.ticketTypes t WHERE t.price <= :price))" +
+            "AND (:isFree IS NULL OR e.isFree = :isFree) ")
+    Page<Event> searchEvents(@Param("status") EventStatus status,
+                             @Param("keyword") String keyword,
+                             @Param("location") String location,
+                             @Param("categorySlug") List<String> categorySlug,
+                             @Param("startOfDay") LocalDateTime startOfDay,
+                             @Param("endOfDay") LocalDateTime endOfDay,
+                             @Param("price") BigDecimal price,
+                             @Param("isFree") Boolean isFree,
+                             Pageable pageable);
+
+    Event findEventByEventSlug(String eventSlug);
 
 }
