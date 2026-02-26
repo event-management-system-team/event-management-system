@@ -44,16 +44,22 @@ public class EventService {
         String loc = (location != null && !location.trim().isEmpty()) ? location.trim() : null;
         List<String> cat = (categories != null && !categories.isEmpty()) ? categories : null;
 
-        LocalDateTime dateTime = null;
+        LocalDateTime startOfDay = null;
+        LocalDateTime endOfDay = null;
+
         if (date != null) {
-            // Biến ngày "25/04/2026" thành "25/04/2026 23:59:59" để tìm các sự kiện đang
-            // diễn ra trong ngày đó
-            dateTime = date.atTime(23, 59, 59);
+            startOfDay = date.atStartOfDay(); // Tương đương 00:00:00
+            endOfDay = date.atTime(23, 59, 59); // Tương đương 23:59:59
         }
 
-        Page<Event> events = eventRepository.searchEvents(EventStatus.APPROVED, kw, loc, cat, dateTime, price, isFree,
+        Page<Event> events = eventRepository.searchEvents(EventStatus.APPROVED, kw, loc, cat, startOfDay, endOfDay, price, isFree,
                 pageable);
         return events.map(event -> mapToResponse(event));
+    }
+
+    public EventResponse getEventBySlug(String eventSlug) {
+        Event event = eventRepository.findEventByEventSlug(eventSlug);
+        return mapToResponse(event);
     }
 
     private EventResponse mapToResponse(Event event) {

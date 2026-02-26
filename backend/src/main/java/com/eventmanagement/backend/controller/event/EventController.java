@@ -47,4 +47,9 @@ public class EventController {
         return ResponseEntity.ok(events);
     }
 
+    @GetMapping("{eventSlug}")
+    public ResponseEntity<EventResponse> getEventBySlug(@PathVariable("eventSlug") String eventSlug) {
+        EventResponse event = eventService.getEventBySlug(eventSlug);
+        return ResponseEntity.ok(event);
+    }
 }
