@@ -7,7 +7,7 @@ import AppRoutes from "./routes";
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 
 function App() {
-  /*const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((state) => state.auth);
 
   useEffect(() => {
@@ -23,14 +23,12 @@ function App() {
     };
 
     initAuth();
-  }, [dispatch, isAuthenticated]);*/
+  }, [dispatch, isAuthenticated]);
 
   return (
-    /*<Routes>
+    <Routes>
       <Route path="/*" element={<AppRoutes />} />
-    </Routes>*/
-
-    <ForgotPasswordPage />
+    </Routes>
   );
 }
 
