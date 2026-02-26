@@ -1,21 +1,13 @@
 import {
     Calendar,
-    Users,
-    TrendingUp,
     CheckCircle,
     Bell,
     Zap,
     CalendarCheck,
     ChevronRight,
     Search,
-    TrendingDown,
     Eye,
-    Music,
-    Briefcase,
-    Utensils,
-    GraduationCap,
     X,
-    UserX
 } from 'lucide-react';
 import { Link } from 'react-router';
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/domain/admin/Avatar.jsx";
@@ -25,174 +17,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/domai
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/domain/admin/Select.jsx";
 import { AdminSidebar } from "../../components/domain/admin/AdminSidebar.jsx";
 import { Badge } from "../../components/domain/admin/Badge.jsx";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAlert } from '../../hooks/useAlert.js';
 import { adminService } from '../../services/admin.service.js';
 import { DatePicker, Space } from 'antd';
 import dayjs from "dayjs";
-
-// Mock event data
-// const events = [{
-//     id: 1,
-//     name: "Tech Conference 2026",
-//     category: "Technology",
-//     categoryIcon: Briefcase,
-//     thumbnail: "TC",
-//     thumbnailBg: "bg-slate-800",
-//     organizer: "Sarah Johnson",
-//     organization: "TechEvents Inc.",
-//     date: "Mar 15, 2026",
-//     time: "09:00 AM",
-//     ticketsSold: 847,
-//     ticketsTotal: 1000,
-//     ticketsProgress: 85,
-//     status: "Approved",
-//     statusVariant: "default"
-// }, {
-//     id: 2,
-//     name: "Summer Music Festival",
-//     category: "Music",
-//     categoryIcon: Music,
-//     thumbnail: "SM",
-//     thumbnailBg: "bg-blue-600",
-//     organizer: "Michael Chen",
-//     organization: "MusicFest Productions",
-//     date: "Jun 20, 2026",
-//     time: "02:00 PM",
-//     ticketsSold: 2340,
-//     ticketsTotal: 5000,
-//     ticketsProgress: 47,
-//     status: "Approved",
-//     statusVariant: "default"
-// }, {
-//     id: 3,
-//     name: "Workshop Series: Design Thinking",
-//     category: "Education",
-//     categoryIcon: GraduationCap,
-//     thumbnail: "WS",
-//     thumbnailBg: "bg-amber-700",
-//     organizer: "Emma Williams",
-//     organization: "Workshop Co.",
-//     date: "Feb 28, 2026",
-//     time: "10:00 AM",
-//     ticketsSold: 156,
-//     ticketsTotal: 200,
-//     ticketsProgress: 78,
-//     status: "Pending",
-//     statusVariant: "secondary"
-// }, {
-//     id: 4,
-//     name: "Charity Gala Evening",
-//     category: "Charity",
-//     categoryIcon: Users,
-//     thumbnail: "CG",
-//     thumbnailBg: "bg-slate-600",
-//     organizer: "David Martinez",
-//     organization: "Charity Now",
-//     date: "Apr 5, 2026",
-//     time: "06:00 PM",
-//     ticketsSold: 420,
-//     ticketsTotal: 500,
-//     ticketsProgress: 84,
-//     status: "Approved",
-//     statusVariant: "default"
-// }, {
-//     id: 5,
-//     name: "Digital Marketing Summit",
-//     category: "Business",
-//     categoryIcon: Briefcase,
-//     thumbnail: "DM",
-//     thumbnailBg: "bg-green-700",
-//     organizer: "Jennifer Lee",
-//     organization: "Digital Market Summit",
-//     date: "Jan 22, 2026",
-//     time: "08:30 AM",
-//     ticketsSold: 650,
-//     ticketsTotal: 650,
-//     ticketsProgress: 100,
-//     status: "Approved",
-//     statusVariant: "default"
-// }, {
-//     id: 6,
-//     name: "Sports Tournament Championship",
-//     category: "Sports",
-//     categoryIcon: Users,
-//     thumbnail: "ST",
-//     thumbnailBg: "bg-indigo-600",
-//     organizer: "Robert Taylor",
-//     organization: "Sports Event Group",
-//     date: "Mar 30, 2026",
-//     time: "01:00 PM",
-//     ticketsSold: 1850,
-//     ticketsTotal: 3000,
-//     ticketsProgress: 62,
-//     status: "Approved",
-//     statusVariant: "default"
-// }, {
-//     id: 7,
-//     name: "Indie Film Festival",
-//     category: "Arts & Culture",
-//     categoryIcon: Users,
-//     thumbnail: "IF",
-//     thumbnailBg: "bg-rose-600",
-//     organizer: "Amanda Garcia",
-//     organization: "Arts & Culture Foundation",
-//     date: "May 18, 2026",
-//     time: "07:00 PM",
-//     ticketsSold: 0,
-//     ticketsTotal: 400,
-//     ticketsProgress: 0,
-//     status: "Pending",
-//     statusVariant: "secondary"
-// }, {
-//     id: 8,
-//     name: "Virtual Reality Gaming Expo",
-//     category: "Technology",
-//     categoryIcon: Briefcase,
-//     thumbnail: "VR",
-//     thumbnailBg: "bg-teal-600",
-//     organizer: "James Anderson",
-//     organization: "Business Conference Ltd",
-//     date: "Apr 22, 2026",
-//     time: "11:00 AM",
-//     ticketsSold: 0,
-//     ticketsTotal: 800,
-//     ticketsProgress: 0,
-//     status: "Rejected",
-//     statusVariant: "destructive"
-// }, {
-//     id: 9,
-//     name: "Food & Wine Festival",
-//     category: "Food & Beverage",
-//     categoryIcon: Utensils,
-//     thumbnail: "FW",
-//     thumbnailBg: "bg-orange-600",
-//     organizer: "Lisa Brown",
-//     organization: "Food Festival Co.",
-//     date: "Aug 12, 2026",
-//     time: "12:00 PM",
-//     ticketsSold: 980,
-//     ticketsTotal: 1500,
-//     ticketsProgress: 65,
-//     status: "Approved",
-//     statusVariant: "default"
-// }, {
-//     id: 10,
-//     name: "Education Summit 2026",
-//     category: "Education",
-//     categoryIcon: GraduationCap,
-//     thumbnail: "ES",
-//     thumbnailBg: "bg-cyan-600",
-//     organizer: "Thomas Wilson",
-//     organization: "Education Events",
-//     date: "Jul 8, 2026",
-//     time: "09:30 AM",
-//     ticketsSold: 540,
-//     ticketsTotal: 600,
-//     ticketsProgress: 90,
-//     status: "Approved",
-//     statusVariant: "default"
-// }]
+import { AccountsPagination } from '../../components/domain/admin/AccountsPagination.jsx';
+import { Alert } from '../../components/common/Alert.jsx';
 
 export function EventManagement() {
 
@@ -204,16 +35,11 @@ export function EventManagement() {
     const [status, setStatus] = useState("all");
     const [category, setCategory] = useState("all");
     const [priceType, setPriceType] = useState("all");
-    const [startDate, setStartDate] = useState(null);
-    const [endDate, setEndDate] = useState(null);
+    const [date, setDate] = useState(null);
     const [sortOption, setSortOption] = useState("newest");
     const [searchTerm, setSearchTerm] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { alert, showAlert, closeAlert } = useAlert();
-
-    const onChange = (date, dateString) => {
-        console.log(date, dateString);
-    };
 
     const loadAllEvents = async () => {
         try {
@@ -233,7 +59,7 @@ export function EventManagement() {
             setLoading(true);
             const response = await adminService.getAllEvents(currentPage, 10);
 
-            setEndDate(response.data.content);
+            setEvents(response.data.content);
             setCurrentPage(response.data.number)
         } catch (error) {
             setError("Cannot load event list");
@@ -246,11 +72,11 @@ export function EventManagement() {
     useEffect(() => {
         loadData();
         loadAllEvents();
-    }, []);
+    }, [currentPage]);
 
     const handleSearchChange = (e) => {
-        const value = e.target.value;
-        setSearchTerm(value);
+        const value = e.target.value
+        setSearchTerm(value)
 
         if (!value.trim()) {
             setEvents(originalEvents);
@@ -259,7 +85,7 @@ export function EventManagement() {
 
         const lower = value.toLowerCase();
         const filtered = originalEvents.filter(e =>
-            e.eventNames?.toLowerCase().includes(lower) ||
+            e.eventName?.toLowerCase().includes(lower) ||
             e.location?.toLowerCase().includes(lower) ||
             e.organizer?.fullName?.toLowerCase().includes(value)
         );
@@ -267,9 +93,90 @@ export function EventManagement() {
         setEvents(filtered);
     };
 
+    const processedEvents = useMemo(() => {
+        let list = [...originalEvents];
+
+        if (searchTerm.trim()) {
+            const lower = searchTerm.toLowerCase();
+            list = list.filter(e =>
+                e.eventName?.toLowerCase().includes(lower) ||
+                e.location?.toLowerCase().includes(lower) ||
+                e.organizer?.fullName?.toLowerCase().includes(lower)
+            );
+        }
+
+        // filter by status
+        list = list.filter(e => status === "all" || e.status === status);
+
+        // filter by category
+        // list = list.filter(account => role === "all" || account.role === role);
+
+        // filter by price type
+        list = list.filter(e => {
+            if (priceType === 'all') return true
+            return priceType === 'free' ? e.isFree : !e.isFree
+        })
+
+        // filter by date 
+        list = list.filter(e => {
+            if (!date) return true;
+
+            return dayjs(e.createdAt).isSame(date, "day");
+        });
+
+        // sort by option
+        list.sort((a, b) => {
+            switch (sortOption) {
+                case "newest":
+                    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+                case "oldest":
+                    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+                default:
+                    return 0;
+            }
+        });
+
+        return list;
+    }, [originalEvents, searchTerm, status, category, priceType, date, sortOption]);
+
+    const pageSize = 10;
+    const startItem = currentPage * pageSize + 1;
+    const isSearching = searchTerm.trim().length > 0;
+
+    const totalItems = processedEvents.length;
+    const totalPages = Math.max(
+        1,
+        Math.ceil(totalItems / pageSize)
+    );
+
+    useEffect(() => {
+        if (currentPage > totalPages - 1) {
+            setCurrentPage(0);
+        }
+    }, [totalPages]);
+
+    const paginatedEvents = processedEvents.slice(
+        currentPage * pageSize,
+        (currentPage + 1) * pageSize
+    );
+
+    const handlePrev = () => {
+        if (isSearching || currentPage === 0) return;
+        setCurrentPage(prev => prev - 1);
+    };
+
+    const handleNext = () => {
+        if (isSearching || currentPage >= totalPages - 1) return;
+        setCurrentPage(prev => prev + 1);
+    };
+
+    const handlePageChange = (p) => {
+        if (isSearching) return;
+        setCurrentPage(p - 1);
+    };
+
     const ticketProgress = (total, registered) => {
         if (!total || total <= 0) return 0;
-
         const progress = (registered / total) * 100;
 
         return Math.min(100, Math.round(progress));
@@ -339,7 +246,7 @@ export function EventManagement() {
                 title: "COMPLETED",
                 value: completed,
                 icon: CheckCircle,
-                iconBg: "bg-gray-100",
+                iconBg: "bg-gray-200",
                 iconColor: "text-gray-600"
             }
         ]
@@ -426,7 +333,7 @@ export function EventManagement() {
                             <CardTitle className="text-lg font-semibold">Filter Events</CardTitle>
                         </CardHeader>
                         <CardContent className="pt-0">
-                            <div className="grid grid-cols-6 gap-4 items-end">
+                            <div className="grid grid-cols-7 gap-4 items-end">
 
                                 {/* Search Input */}
                                 <div className="col-span-2">
@@ -527,9 +434,29 @@ export function EventManagement() {
                                         <DatePicker
                                             size="large"
                                             style={{ height: 36, backgroundColor: '#f7f7f7' }}
-                                            onChange={onChange}
+                                            onChange={(date) => setDate(date)}
                                         />
                                     </Space>
+                                </div>
+
+                                {/* Sort Dropdown */}
+                                <div className="col-span-1">
+                                    <label className="text-sm text-gray-600 mb-2 block">
+                                        Sort by
+                                    </label>
+                                    <Select
+                                        value={sortOption}
+                                        onValueChange={(value) => setSortOption(value)}
+                                    >
+                                        <SelectTrigger
+                                            className="w-[140px] border border-gray-200 cursor-pointer bg-[#f7f7f7] hover:bg-[#B3C8CF]">
+                                            <SelectValue placeholder="Sort by" />
+                                        </SelectTrigger>
+                                        <SelectContent className='border border-gray-200'>
+                                            <SelectItem value="newest">Newest</SelectItem>
+                                            <SelectItem value="oldest">Oldest</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             </div>
                         </CardContent>
@@ -552,7 +479,7 @@ export function EventManagement() {
                             </div>
 
                             {/* Event Rows */}
-                            {originalEvents.map(event => {
+                            {paginatedEvents.map(event => {
                                 // const CategoryIcon = event.categoryIcon
                                 const progress = ticketProgress(event?.totalCapacity, event?.registeredCount);
 
@@ -651,39 +578,36 @@ export function EventManagement() {
 
                             {/* Footer with Pagination */}
                             <div className="px-6 py-4 flex items-center justify-between text-sm text-gray-600">
-                                <div>Showing 1–10 of 1,284 events</div>
-                                <div className="flex gap-2">
-                                    <Button variant="outline" size="sm">
-                                        Previous
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="bg-[#7FA5A5] text-white border-[#7FA5A5] hover:bg-[#6D9393]"
-                                    >
-                                        1
-                                    </Button>
-                                    <Button variant="outline" size="sm">
-                                        2
-                                    </Button>
-                                    <Button variant="outline" size="sm">
-                                        3
-                                    </Button>
-                                    <Button variant="outline" size="sm">
-                                        ...
-                                    </Button>
-                                    <Button variant="outline" size="sm">
-                                        128
-                                    </Button>
-                                    <Button variant="outline" size="sm">
-                                        Next
-                                    </Button>
+                                <div>
+                                    {isSearching ? (
+                                        <>Showing {processedEvents.length} search results</>
+                                    ) : (
+                                        <>Showing {totalItems === 0 ? 0 : startItem}–{Math.min((currentPage + 1) * pageSize, totalItems)} of {totalItems} results</>
+                                    )}
                                 </div>
+
+                                <AccountsPagination
+                                    handleNext={handleNext}
+                                    handlePrev={handlePrev}
+                                    handlePageChange={handlePageChange}
+                                    page={currentPage + 1}
+                                    totalPages={totalPages}
+                                    isSearching={isSearching}
+                                />
                             </div>
                         </CardContent>
                     </Card>
                 </div>
             </main>
+
+            {/* Global Alert */}
+            <div className="fixed top-6 right-6 z-[999] w-[360px]">
+                <Alert
+                    type={alert.type}
+                    message={alert.message}
+                    onClose={closeAlert}
+                />
+            </div>
         </div>
     )
 }
