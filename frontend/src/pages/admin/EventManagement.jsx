@@ -555,7 +555,7 @@ export function EventManagement() {
                                             </Badge>
                                         </div>
                                         <div className="col-span-1 flex justify-end gap-1">
-                                            <Link to={`event-detail/${event.eventId}`}>
+                                            <Link to={`/admin/events/event-detail/${event.eventId}`}>
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"

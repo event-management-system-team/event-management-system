@@ -58,5 +58,10 @@ export const adminService = {
 
     getAllCategories: () => {
         return axiosInstance.get(`/admin/events/categories`);
-    }
+    },
+
+    getEventDetail: (id) => {
+        return axiosInstance.get(`/admin/events/${id}`);
+    },
+
 };

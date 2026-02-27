@@ -8,12 +8,10 @@ import com.eventmanagement.backend.service.EventCategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/events")
@@ -40,5 +38,10 @@ public class AdminEventController {
     public ResponseEntity<List<EventCategoryResponse>> getAllCategories() {
         List<EventCategoryResponse> categoryResponses = eventCategoryService.getAllCategories();
         return ResponseEntity.ok(categoryResponses);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<EventResponse> getDetail(@PathVariable UUID id) {
+        return ResponseEntity.ok(eventService.getEventById(id));
     }
 }
