@@ -13,10 +13,10 @@ const PublicRoutes = () => {
       <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/events" element={<EventsPage />} />
-        <Route path="/event-detail/:idEvent" element={<EventDetailPage />} />
+        <Route path="/events/:eventSlug" element={<EventDetailPage />} />
         <Route path="/recruitments" element={<RecruitmentsPage />} />
         <Route
-          path="/recruitment-detail/:idRecruitment"
+          path="/recruitments/:idRecruitment"
           element={<RecruitmentDetailPage />}
         />
         <Route path="/me" element={<ProfilePage />} />
