@@ -9,9 +9,7 @@ import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "events")
@@ -48,7 +46,7 @@ public class Event {
 
     @Column(name = "location", columnDefinition = "TEXT")
     private String location;
-    
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "location_coordinates", columnDefinition = "jsonb")
     private Map<String, Object> locationCoordinates;
@@ -113,6 +111,10 @@ public class Event {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<TicketType> ticketTypes;
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<TicketType> ticketTypes = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("orderIndex ASC, startTime ASC")
+    private Set<EventAgenda> agendas = new LinkedHashSet<>();
 }
