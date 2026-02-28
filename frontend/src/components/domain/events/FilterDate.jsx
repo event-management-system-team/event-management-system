@@ -3,7 +3,7 @@ import { DatePicker } from 'antd';
 import dayjs from 'dayjs';
 import useDateFilter from '../../../hooks/useDateFilter';
 
-const FilterDate = ({ date, setDate }) => {
+const FilterDate = ({ date, setDate, className = 'Date' }) => {
 
     const { DATE_FORMAT, dateValue, handleDateChange, handleQuickSelect } = useDateFilter(date, setDate)
 
@@ -19,7 +19,7 @@ const FilterDate = ({ date, setDate }) => {
 
             <div className="flex items-center gap-2 mb-4">
                 <CalendarDays className="text-primary w-5 h-5" strokeWidth={2.5} />
-                <span className="font-bold text-sm">Date</span>
+                <span className="font-bold text-sm">{className}</span>
             </div>
 
             <div className="px-1">

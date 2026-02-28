@@ -1,10 +1,7 @@
 package com.eventmanagement.backend.service;
 
 import com.eventmanagement.backend.constants.EventStatus;
-import com.eventmanagement.backend.dto.response.attendee.EventAgendaResponse;
-import com.eventmanagement.backend.dto.response.attendee.EventCategoryResponse;
-import com.eventmanagement.backend.dto.response.attendee.EventResponse;
-import com.eventmanagement.backend.dto.response.attendee.TicketTypeResponse;
+import com.eventmanagement.backend.dto.response.attendee.*;
 import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
@@ -79,9 +76,9 @@ public class EventService {
                     .build();
         }
 
-        EventResponse.OrganizerDto organizerDto = null;
+        OrganizerResponse organizerResponse = null;
         if (event.getOrganizer() != null) {
-            organizerDto = EventResponse.OrganizerDto.builder()
+            organizerResponse = OrganizerResponse.builder()
                     .userId(event.getOrganizer().getUserId())
                     .fullName(event.getOrganizer().getFullName())
                     .avatarUrl(event.getOrganizer().getAvatarUrl())
@@ -152,7 +149,7 @@ public class EventService {
                 .createdAt(event.getCreatedAt())
                 .updatedAt(event.getUpdatedAt())
                 .category(eventCategoryResponse)
-                .organizer(organizerDto)
+                .organizer(organizerResponse)
                 .minPrice(minPrice)
                 .agendas(eventAgendaResponse)
                 .ticketTypes(ticketTypeResponses)
