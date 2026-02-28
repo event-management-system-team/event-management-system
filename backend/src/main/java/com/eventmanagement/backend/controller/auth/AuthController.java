@@ -1,12 +1,18 @@
 package com.eventmanagement.backend.controller.auth;
 
+import com.cloudinary.api.ApiResponse;
+import com.eventmanagement.backend.dto.request.ForgotPasswordRequest;
 import com.eventmanagement.backend.dto.request.GoogleLoginRequest;
 import com.eventmanagement.backend.dto.request.LoginRequest;
 import com.eventmanagement.backend.dto.request.RegisterRequest;
+import com.eventmanagement.backend.dto.request.ResetPasswordRequest;
+import com.eventmanagement.backend.dto.request.VerifyOtpRequest;
 import com.eventmanagement.backend.dto.response.LoginResponse;
 import com.eventmanagement.backend.dto.response.RefreshTokenResponse;
 import com.eventmanagement.backend.dto.response.RegisterResponse;
+import com.eventmanagement.backend.dto.response.VerifyOtpResponse;
 import com.eventmanagement.backend.service.AuthService;
+import com.eventmanagement.backend.service.ForgotPasswordService;
 import com.eventmanagement.backend.util.CookieUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,6 +36,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final CookieUtil cookieUtil;
+    private final ForgotPasswordService forgotPasswordService;
 
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(
@@ -72,5 +79,29 @@ public class AuthController {
 
         RefreshTokenResponse tokenResponse = authService.refreshToken(refreshToken, response);
         return ResponseEntity.ok(tokenResponse);
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request) {
+
+        forgotPasswordService.sendOtp(request);
+        return ResponseEntity.ok("OTP sent successfully");
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<String> verifyOtp(
+            @Valid @RequestBody VerifyOtpRequest request) {
+
+        forgotPasswordService.verifyOtp(request);
+        return ResponseEntity.ok("OTP verified successfully");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request) {
+
+        forgotPasswordService.resetPassword(request);
+        return ResponseEntity.ok("Password reset successfully");
     }
 }
