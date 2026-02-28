@@ -40,6 +40,7 @@ public class TicketTypeService {
                     .ticketTypeId(ticket.getTicketTypeId())
                     .ticketName(ticket.getTicketName())
                     .price(ticket.getPrice())
+                    .quantity(ticket.getQuantity())
                     .available(available)
                     .description(ticket.getDescription())
                     .saleStatus(saleStatus)

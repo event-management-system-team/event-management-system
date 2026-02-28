@@ -7,15 +7,15 @@ export const adminService = {
         return axiosInstance.get(`/admin/accounts/all`);
     },
 
-    getAllAccounts: (page = 0, size= 10) => {
+    getAllAccounts: (page = 0, size = 10) => {
         return axiosInstance.get(`/admin/accounts`, {
-            params: {page, size}
+            params: { page, size }
         });
     },
 
     searchAccounts: (keyword) => {
         return axiosInstance.get(`/admin/accounts/search`, {
-            params: {q: keyword}
+            params: { q: keyword }
         })
     },
 
@@ -50,9 +50,9 @@ export const adminService = {
         return axiosInstance.get(`/admin/events/all`);
     },
 
-    getAllEvents: (page = 0, size= 10) => {
+    getAllEvents: (page = 0, size = 10) => {
         return axiosInstance.get(`/admin/events`, {
-            params: {page, size}
+            params: { page, size }
         });
     },
 
@@ -62,6 +62,10 @@ export const adminService = {
 
     getEventDetail: (id) => {
         return axiosInstance.get(`/admin/events/${id}`);
+    },
+
+    getTicketTypes: (id) => {
+        return axiosInstance.get(`/admin/events/${id}/ticket-types`)
     },
 
 };

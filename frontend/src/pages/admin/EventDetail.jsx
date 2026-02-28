@@ -245,9 +245,10 @@ import dayjs from "dayjs";
 // }
 
 export function EventDetail() {
-    const { id } = useParams()
+    const { id } = useParams();
     const [loading, setLoading] = useState(true);
     const [event, setEvent] = useState(null);
+    const [ticketTypes, setTicketTypes] = useState([]);
     const [error, setError] = useState(null);
     const { alert, showAlert, closeAlert } = useAlert();
 
@@ -255,7 +256,7 @@ export function EventDetail() {
         if (!id) return;
 
         try {
-            setLoading(true);
+            setLoading(true)
             const response = await adminService.getEventDetail(id)
             setEvent(response.data)
         } catch (error) {
@@ -266,9 +267,49 @@ export function EventDetail() {
         }
     }
 
+    const fetchTicketTypes = async () => {
+        if (!id) return;
+
+        try {
+            setLoading(true)
+            const response = await adminService.getTicketTypes(id)
+            setTicketTypes(response.data)
+        } catch (error) {
+            setError("Cannot load event ticket types");
+            console.error(error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
     useEffect(() => {
-        if (id) fetchEvent()
+        if (id) {
+            fetchEvent()
+            fetchTicketTypes()
+        }
     }, [id]);
+
+    const SALE_STATUS_CONFIG = {
+        NOT_STARTED: {
+            label: "Coming Soon",
+            className: "bg-yellow-100 text-yellow-700 hover:bg-yellow-100",
+        },
+        ON_SALE: {
+            label: "On Sale",
+            className: "bg-green-100 text-green-700 hover:bg-green-100",
+        },
+        SOLD_OUT: {
+            label: "Sold Out",
+            className: "bg-red-100 text-red-700 hover:bg-red-100",
+        },
+        ENDED: {
+            label: "Ended",
+            className: "bg-gray-200 text-gray-700 hover:bg-gray-200",
+        },
+    }
+
+    const formatPrice = (price) =>
+        new Intl.NumberFormat("vi-VN").format(price);
 
     const isPending = event?.status === "PENDING"
 
@@ -487,7 +528,7 @@ export function EventDetail() {
                                             Ticket tiers and availability
                                         </CardDescription>
                                     </CardHeader>
-                                    <CardContent className="pt-6">
+                                    <CardContent className="pt-2">
                                         <div className="overflow-x-auto">
                                             <table className="w-full">
                                                 <thead>
@@ -499,60 +540,59 @@ export function EventDetail() {
                                                             Quantity
                                                         </th>
                                                         <th className="text-right py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                                                            Price (USD)
+                                                            Price (VND)
                                                         </th>
                                                         <th className="text-right py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">
                                                             Available
                                                         </th>
                                                         <th className="text-center py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                                                            Fee Status
+                                                            Sale Status
                                                         </th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {/* {event.tickets.map((ticket, index) => (
-                                                        <tr
-                                                            key={index}
-                                                            className="border-b border-gray-100 last:border-0"
-                                                        >
-                                                            <td className="py-3 px-4 text-sm font-medium text-gray-900">
-                                                                {ticket.tier}
-                                                            </td>
-                                                            <td className="py-3 px-4 text-sm text-gray-900 text-right">
-                                                                {ticket.quantity}
-                                                            </td>
-                                                            <td className="py-3 px-4 text-sm font-semibold text-gray-900 text-right">
-                                                                ${ticket.price.toFixed(2)}
-                                                            </td>
-                                                            <td className="py-3 px-4 text-sm text-gray-900 text-right">
-                                                                <span
-                                                                    className={
-                                                                        ticket.available === 0
-                                                                            ? "text-red-600 font-medium"
-                                                                            : ""
-                                                                    }
-                                                                >
-                                                                    {ticket.available}
-                                                                </span>
-                                                            </td>
-                                                            <td className="py-3 px-4 text-center">
-                                                                <Badge
-                                                                    variant={
-                                                                        ticket.feeStatus === "Included"
-                                                                            ? "default"
-                                                                            : "secondary"
-                                                                    }
-                                                                    className={
-                                                                        ticket.feeStatus === "Included"
-                                                                            ? "bg-blue-100 text-blue-700 hover:bg-blue-100"
-                                                                            : "bg-gray-100 text-gray-700 hover:bg-gray-100"
-                                                                    }
-                                                                >
-                                                                    {ticket.feeStatus}
-                                                                </Badge>
-                                                            </td>
-                                                        </tr>
-                                                    ))} */}
+                                                    {ticketTypes.map((ticket, index) => {
+                                                        const status = SALE_STATUS_CONFIG[ticket.saleStatus] || {
+                                                            label: ticket.saleStatus,
+                                                            className: "bg-gray-100 text-gray-700",
+                                                        }
+
+                                                        return (
+                                                            <tr
+                                                                key={index}
+                                                                className="border-b border-gray-100 last:border-0"
+                                                            >
+                                                                <td className="py-3 px-4 text-sm font-medium text-gray-900">
+                                                                    {ticket.ticketName}
+                                                                </td>
+                                                                <td className="py-3 px-4 text-sm text-gray-900 text-right">
+                                                                    {ticket.quantity}
+                                                                </td>
+                                                                <td className="py-3 px-4 text-sm font-semibold text-gray-900 text-right">
+                                                                    {formatPrice(ticket.price)}
+                                                                </td>
+                                                                <td className="py-3 px-4 text-sm text-gray-900 text-right">
+                                                                    <span
+                                                                        className={
+                                                                            ticket.available === 0
+                                                                                ? "text-red-600 font-medium"
+                                                                                : ""
+                                                                        }
+                                                                    >
+                                                                        {ticket.available}
+                                                                    </span>
+                                                                </td>
+                                                                <td className="py-3 px-4 text-center">
+                                                                    <Badge
+                                                                        variant="secondary"
+                                                                        className={status.className}
+                                                                    >
+                                                                        {status.label}
+                                                                    </Badge>
+                                                                </td>
+                                                            </tr>
+                                                        )
+                                                    })}
                                                 </tbody>
                                             </table>
                                         </div>

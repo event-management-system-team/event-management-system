@@ -13,6 +13,7 @@ public class TicketTypeResponse {
     private UUID ticketTypeId;
     private String ticketName;
     private BigDecimal price;
+    private Integer quantity;
     private Integer available;
     private String description;
     private String saleStatus;
