@@ -24,12 +24,9 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { Avatar, AvatarFallback } from "../../components/domain/admin/Avatar.jsx";
 import { Button } from "../../components/domain/admin/Button.jsx";
-import { Input } from "../../components/domain/admin/Input.jsx";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/domain/admin/Card.jsx";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/domain/admin/Select.jsx";
 import { AdminSidebar } from "../../components/domain/admin/AdminSidebar.jsx";
 import { Badge } from "../../components/domain/admin/Badge.jsx";
-import { Progress } from '../../components/domain/admin/Progress.jsx'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/domain/admin/Tabs.jsx';
 import { Checkbox } from '../../components/domain/admin/Checkbox.jsx'
 import { Textarea } from '../../components/domain/admin/Textarea.jsx'

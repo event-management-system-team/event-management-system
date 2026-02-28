@@ -493,6 +493,7 @@ export function EventManagement() {
                             {paginatedEvents.map(event => {
                                 // const CategoryIcon = event.categoryIcon
                                 const progress = ticketProgress(event?.totalCapacity, event?.registeredCount);
+                                const detailUrl = `/admin/events/event-detail/${event.eventId}`;
 
                                 return (
                                     <div
@@ -555,7 +556,7 @@ export function EventManagement() {
                                             </Badge>
                                         </div>
                                         <div className="col-span-1 flex justify-end gap-1">
-                                            <Link to={`/admin/events/event-detail/${event.eventId}`}>
+                                            <Link to={detailUrl}>
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
@@ -566,22 +567,27 @@ export function EventManagement() {
                                                 </Button>
                                             </Link>
                                             {event?.status === "PENDING" && (<>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-8 w-8"
-                                                    title="Approve event"
-                                                >
-                                                    <CheckCircle className="h-4 w-4 text-green-600" />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-8 w-8"
-                                                    title="Reject event"
-                                                >
-                                                    <X className="h-4 w-4 text-red-600" />
-                                                </Button>
+                                                <Link to={detailUrl}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8"
+                                                        title="Approve event"
+                                                    >
+                                                        <CheckCircle className="h-4 w-4 text-green-600" />
+                                                    </Button>
+                                                </Link>
+
+                                                <Link to={detailUrl}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8"
+                                                        title="Reject event"
+                                                    >
+                                                        <X className="h-4 w-4 text-red-600" />
+                                                    </Button>
+                                                </Link>
                                             </>)}
                                         </div>
                                     </div>)

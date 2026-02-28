@@ -1,5 +1,4 @@
 import {
-    Calendar,
     Users,
     CheckCircle,
     Plus,
@@ -27,10 +26,10 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger
 } from "../../components/domain/admin/Dropdown-Menu.jsx";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import { adminService } from "../../services/admin.service.js";
 import { AccountsPagination } from "../../components/domain/admin/AccountsPagination.jsx";
+import { DatePicker, Space } from 'antd';
+import dayjs from "dayjs";
 import { Alert } from "../../components/common/Alert.jsx";
 import { useAlert } from '../../hooks/useAlert.js';
 import { Popconfirm } from 'antd';
@@ -44,8 +43,7 @@ export function AccountManagement() {
     const [error, setError] = useState(null);
     const [status, setStatus] = useState("all");
     const [role, setRole] = useState("all");
-    const [startDate, setStartDate] = useState(null);
-    const [endDate, setEndDate] = useState(null);
+    const [date, setDate] = useState(null);
     const [sortOption, setSortOption] = useState("newest");
     const [searchTerm, setSearchTerm] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -70,7 +68,6 @@ export function AccountManagement() {
             const response = await adminService.getAllAccounts(currentPage, 10);
 
             setAccounts(response.data.content);
-            // setTotalPages(response.data.totalPages);
             setCurrentPage(response.data.number)
         } catch (error) {
             setError("Cannot load account list");
@@ -120,7 +117,8 @@ export function AccountManagement() {
                 loadData();
             }, 300);
         } catch (error) {
-            showAlert("error", "Operation failed", 4000);
+            console.error(error)
+            showAlert("error", "Operation failed", 4000)
         }
     }
 
@@ -142,13 +140,11 @@ export function AccountManagement() {
         // filter by user role
         list = list.filter(account => role === "all" || account.role === role);
 
-        // filter by date range
+        // filter by date
         list = list.filter(account => {
-            if (!startDate || !endDate) return true;
-            const createdDate = new Date(account.createdAt);
-            const endOfDay = new Date(endDate);
-            endOfDay.setHours(23, 59, 59, 999);
-            return (createdDate >= startDate && createdDate <= endOfDay);
+            if (!date) return true;
+
+            return dayjs(account.createdAt).isSame(date, "day");
         });
 
         // sort by option
@@ -166,7 +162,7 @@ export function AccountManagement() {
         });
 
         return list;
-    }, [originalAccounts, searchTerm, status, role, startDate, endDate, sortOption]);
+    }, [originalAccounts, searchTerm, status, role, date, sortOption]);
 
     const pageSize = 10;
     const startItem = currentPage * pageSize + 1;
@@ -414,31 +410,13 @@ export function AccountManagement() {
                             </SelectContent>
                         </Select>
 
-                        {/* Date Range Picker */}
-                        <DatePicker
-                            selectsRange
-                            startDate={startDate}
-                            endDate={endDate}
-                            onChange={(update) => {
-                                const [start, end] = update;
-                                setStartDate(start);
-                                setEndDate(end);
-                            }}
-                            isClearable
-                            customInput={
-                                <Button
-                                    variant="outline"
-                                    className="gap-2 min-w-[210px] justify-start cursor-pointer bg-[#f7f7f7] hover:bg-[#B3C8CF]"
-                                >
-                                    <Calendar className="h-4 w-4 text-gray-500" />
-                                    <span>
-                                        {startDate && endDate
-                                            ? `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`
-                                            : "Date Range"}
-                                    </span>
-                                </Button>
-                            }
-                        />
+                        <Space vertical className=''>
+                            <DatePicker
+                                size="large"
+                                style={{ height: 36, backgroundColor: '#f7f7f7' }}
+                                onChange={(date) => setDate(date)}
+                            />
+                        </Space>
 
                         {/* Sort Dropdown */}
                         <Select
