@@ -11,7 +11,6 @@ export const verifyOtpSchema = z.object({
     .regex(/^\d+$/, "Code must only contain digits"),
 });
 
-// Step 3: New Password
 export const resetPasswordSchema = z
   .object({
     newPassword: z

@@ -23,6 +23,29 @@ const authService = {
     return response.data;
   },
 
+  sendForgotPasswordEmail: async (email) => {
+    const response = await axiosInstance.post("/auth/forgot-password", {
+      email,
+    });
+    return response.data;
+  },
+
+  verifyOtp: async ({ email, otp }) => {
+    const response = await axiosInstance.post("/auth/verify-otp", {
+      email,
+      otp,
+    });
+    return response.data;
+  },
+
+  resetPassword: async ({ resetToken, newPassword }) => {
+    const response = await axiosInstance.post("/auth/reset-password", {
+      resetToken,
+      newPassword,
+    });
+    return response.data;
+  },
+
   logout: async () => {
     try {
       await axiosInstance.post("/auth/logout");
