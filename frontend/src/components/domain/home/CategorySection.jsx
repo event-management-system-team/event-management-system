@@ -41,7 +41,7 @@ const CategorySection = () => {
   const scroll = (direction) => {
     const container = scrollContainerRef.current;
     if (container) {
-      const scrollAmount = 300;
+      const scrollAmount = 350;
       container.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth'
@@ -71,7 +71,7 @@ const CategorySection = () => {
             <div className="relative">
               <button
                 onClick={() => scroll('left')}
-                className="hidden md:flex absolute left-0 top-[40%] -translate-y-1/2 translate-x-2 z-9 w-8 h-8 bg-white/30 backdrop-blur-md rounded-full shadow-sm border border-white/40 items-center justify-center text-gray-500 hover:bg-white/60 hover:text-gray-700 hover:scale-105 transition-all duration-300 cursor-pointer"
+                className="flex absolute left-0 top-[40%] -translate-y-1/2 translate-x-2 z-9 w-8 h-8 bg-white/30 backdrop-blur-md rounded-full shadow-sm border border-white/40 items-center justify-center text-gray-500 hover:bg-white/60 hover:text-gray-700 hover:scale-105 transition-all duration-300 cursor-pointer"
               >
                 <ChevronLeft size={15} />
               </button>
@@ -97,7 +97,7 @@ const CategorySection = () => {
 
               <button
                 onClick={() => scroll('right')}
-                className="hidden md:flex absolute right-0 top-[40%] -translate-y-1/2 translate-x-2  z-9 w-8 h-8 bg-white/30 backdrop-blur-md rounded-full shadow-sm border border-white/40 items-center justify-center text-gray-500 hover:bg-white/60 hover:text-gray-700 hover:scale-105 transition-all duration-300 cursor-pointer"
+                className="flex absolute right-0 top-[40%] -translate-y-1/2 translate-x-2  z-9 w-8 h-8 bg-white/30 backdrop-blur-md rounded-full shadow-sm border border-white/40 items-center justify-center text-gray-500 hover:bg-white/60 hover:text-gray-700 hover:scale-105 transition-all duration-300 cursor-pointer"
               >
                 <ChevronRight size={15} />
               </button>

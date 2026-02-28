@@ -17,7 +17,7 @@ const EventSection = () => {
   const scroll = (direction) => {
     const container = scrollContainerRef.current;
     if (container) {
-      const scrollAmount = 300;
+      const scrollAmount = 1000;
       container.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth'
@@ -46,12 +46,12 @@ const EventSection = () => {
               <div className="relative">
                 <button
                   onClick={() => scroll('left')}
-                  className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-7 h-10 bg-black/30 rounded-r-2xl items-center justify-center text-white hover:bg-black/60 transition-all duration-300 cursor-pointer"
+                  className="flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-7 h-10 bg-black/30 rounded-r-2xl items-center justify-center text-white hover:bg-black/60 transition-all duration-300 cursor-pointer"
                 >
                   <ChevronLeft size={20} />
                 </button>
                 <div ref={scrollContainerRef}
-                  className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-8 pt-4 -mx-6 px-6 md:mx-0 md:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                  className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-8 pt-4 mx-0 px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                   {featuredEvents.map((event) => (
                     <div
                       key={event.eventId}
@@ -63,7 +63,7 @@ const EventSection = () => {
                 </div>
                 <button
                   onClick={() => scroll('right')}
-                  className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-7 h-10 bg-black/30 rounded-l-2xl items-center justify-center text-white hover:bg-black/60 transition-all duration-300 cursor-pointer"
+                  className="flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-7 h-10 bg-black/30 rounded-l-2xl items-center justify-center text-white hover:bg-black/60 transition-all duration-300 cursor-pointer"
                 >
                   <ChevronRight size={28} />
                 </button>
