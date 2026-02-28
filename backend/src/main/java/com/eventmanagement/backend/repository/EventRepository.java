@@ -50,4 +50,8 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
     Event findEventByEventSlug(String eventSlug);
 
     long countByOrganizer_UserId(UUID organizerId);
+
+    Page<Event> findAll(Pageable pageable);
+
+//    Page<Event> findByOrganizer_UserId(UUID userId, Pageable pageable);
 }

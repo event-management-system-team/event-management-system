@@ -1,19 +1,21 @@
 import axiosInstance from "../config/axios";
 
 export const adminService = {
+
+    // ACCOUNT-MANAGEMENT
     getAllAccountsPlain: () => {
         return axiosInstance.get(`/admin/accounts/all`);
     },
 
-    getAllAccounts: (page = 0, size= 10) => {
+    getAllAccounts: (page = 0, size = 10) => {
         return axiosInstance.get(`/admin/accounts`, {
-            params: {page, size}
+            params: { page, size }
         });
     },
 
     searchAccounts: (keyword) => {
         return axiosInstance.get(`/admin/accounts/search`, {
-            params: {q: keyword}
+            params: { q: keyword }
         })
     },
 
@@ -41,5 +43,41 @@ export const adminService = {
         return axiosInstance.get(`/admin/accounts/check-email`, {
             params: { email }
         });
-    }
+    },
+
+    // EVENT-MANAGEMENT
+    getAllEventsPlain: () => {
+        return axiosInstance.get(`/admin/events/all`);
+    },
+
+    getAllEvents: (page = 0, size = 10) => {
+        return axiosInstance.get(`/admin/events`, {
+            params: { page, size }
+        });
+    },
+
+    getAllCategories: () => {
+        return axiosInstance.get(`/admin/events/categories`);
+    },
+
+    getEventDetail: (id) => {
+        return axiosInstance.get(`/admin/events/${id}`);
+    },
+
+    getTicketTypes: (id) => {
+        return axiosInstance.get(`/admin/events/${id}/ticket-types`)
+    },
+
+    getEventAgenda: (id) => {
+        return axiosInstance.get(`/admin/events/${id}/agenda`)
+    },
+
+    approveEvent: (id) => {
+        return axiosInstance.patch(`/admin/events/${id}/approve`)
+    },
+
+    rejectEvent: (id, reason) => {
+        return axiosInstance.patch(`/admin/events/${id}/reject`, { reason })
+    },
+
 };
