@@ -1,7 +1,8 @@
 import { MapPin, ShoppingCart, Users } from "lucide-react";
-import { Link } from "react-router-dom";
 
-const EventCard = ({ startDate, totalCapacity, registeredCount, bannerUrl, eventName, category, location, isFree, minPrice, eventSlug }) => {
+const EventCard = ({ startDate, totalCapacity, registeredCount, bannerUrl, eventName, category, location, isFree, minPrice }) => {
+
+
 
     const dateObj = new Date(startDate);
     const month = dateObj.toLocaleString('vi-VN', { month: 'short' });
@@ -10,9 +11,7 @@ const EventCard = ({ startDate, totalCapacity, registeredCount, bannerUrl, event
     const isAlmostFull = totalCapacity > 0 && (totalCapacity - registeredCount <= 5);
 
     return (
-        <Link className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1 duration-300 flex flex-col"
-            to={`/events/${eventSlug}`}>
-
+        <div className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1 duration-300 flex flex-col">
             <div className="relative aspect-[4/3] overflow-hidden">
                 <img className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     src={bannerUrl}
@@ -81,8 +80,7 @@ const EventCard = ({ startDate, totalCapacity, registeredCount, bannerUrl, event
                     </button>
                 </div>
             </div>
-        </Link>
-
+        </div>
     );
 };
 export default EventCard;

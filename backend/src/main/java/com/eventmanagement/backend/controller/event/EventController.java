@@ -42,11 +42,12 @@ public class EventController {
             @RequestParam(required = false) Boolean isFree,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Page<EventResponse> events = eventService.searchEvents(keyword, location, categories, date, price, isFree, page, size);
+        Page<EventResponse> events = eventService.searchEvents(keyword, location, categories, date, price, isFree, page,
+                size);
         return ResponseEntity.ok(events);
     }
 
-    @GetMapping("/{eventSlug}")
+    @GetMapping("{eventSlug}")
     public ResponseEntity<EventResponse> getEventBySlug(@PathVariable("eventSlug") String eventSlug) {
         EventResponse event = eventService.getEventBySlug(eventSlug);
         return ResponseEntity.ok(event);

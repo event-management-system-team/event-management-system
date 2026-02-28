@@ -21,7 +21,7 @@ public class EventAgenda {
     private UUID agendaId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "event_id", nullable = false)
+    @JoinColumn(name = "event_id")
     private Event event;
 
     @Column(name = "title", nullable = false)
@@ -58,5 +58,4 @@ public class EventAgenda {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-
 }

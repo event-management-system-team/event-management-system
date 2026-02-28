@@ -1,10 +1,7 @@
 package com.eventmanagement.backend.service;
 
 import com.eventmanagement.backend.constants.EventStatus;
-import com.eventmanagement.backend.dto.response.attendee.EventAgendaResponse;
-import com.eventmanagement.backend.dto.response.attendee.EventCategoryResponse;
 import com.eventmanagement.backend.dto.response.attendee.EventResponse;
-import com.eventmanagement.backend.dto.response.attendee.TicketTypeResponse;
 import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,9 +64,9 @@ public class EventService {
 
     private EventResponse mapToResponse(Event event) {
 
-        EventCategoryResponse eventCategoryResponse = null;
+        EventResponse.CategoryDto categoryDto = null;
         if (event.getCategory() != null) {
-            eventCategoryResponse = EventCategoryResponse.builder()
+            categoryDto = EventResponse.CategoryDto.builder()
                     .categoryId(event.getCategory().getCategoryId())
                     .categoryName(event.getCategory().getCategoryName())
                     .categorySlug(event.getCategory().getCategorySlug())
@@ -85,7 +81,6 @@ public class EventService {
                     .userId(event.getOrganizer().getUserId())
                     .fullName(event.getOrganizer().getFullName())
                     .avatarUrl(event.getOrganizer().getAvatarUrl())
-                    .email(event.getOrganizer().getEmail())
                     .build();
         }
 
@@ -97,40 +92,6 @@ public class EventService {
                     .min((price1, price2) -> price1.compareTo(price2))
                     .orElse(null);
         }
-
-        List<TicketTypeResponse> ticketTypeResponses = new ArrayList<>();
-        if (event.getTicketTypes() != null && !event.getTicketTypes().isEmpty()) {
-            ticketTypeResponses = event.getTicketTypes().stream()
-                    .map(ticket -> TicketTypeResponse.builder()
-                            .ticketTypeId(ticket.getTicketTypeId())
-                            .ticketName(ticket.getTicketName())
-                            .price(ticket.getPrice())
-                            .isActive(ticket.getIsActive())
-                            .description(ticket.getDescription())
-                            .quantity(ticket.getQuantity())
-                            .reservedCount(ticket.getReservedCount())
-                            .soldCount(ticket.getSoldCount())
-                            .saleStart(ticket.getSaleStart())
-                            .saleEnd(ticket.getSaleEnd())
-                            .build())
-                    .collect(Collectors.toList());
-        }
-
-        List<EventAgendaResponse> eventAgendaResponse = new ArrayList<>();
-        if (!event.getAgendas().isEmpty()) {
-            eventAgendaResponse = event.getAgendas().stream()
-                    .map((agenda) -> EventAgendaResponse.builder()
-                            .agendaId((agenda.getAgendaId()))
-                            .title(agenda.getTitle())
-                            .description(agenda.getDescription())
-                            .startTime(agenda.getStartTime())
-                            .endTime(agenda.getEndTime())
-                            .location(agenda.getLocation())
-                            .orderIndex(agenda.getOrderIndex())
-                            .build())
-                    .collect(Collectors.toList());
-        }
-
 
         return EventResponse.builder()
                 .eventId(event.getEventId())
@@ -151,11 +112,9 @@ public class EventService {
                 .metadata(event.getMetadata())
                 .createdAt(event.getCreatedAt())
                 .updatedAt(event.getUpdatedAt())
-                .category(eventCategoryResponse)
+                .category(categoryDto)
                 .organizer(organizerDto)
                 .minPrice(minPrice)
-                .agendas(eventAgendaResponse)
-                .ticketTypes(ticketTypeResponses)
                 .build();
     }
 }

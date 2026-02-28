@@ -27,10 +27,6 @@ const eventService = {
 
         const response = await axiosInstance.get(`events/search?${params.toString()}`)
         return response.data
-    },
-    getEventBySlug: async (eventSlug) => {
-        const response = await axiosInstance.get(`events/${eventSlug}`)
-        return response.data
     }
 }
 
