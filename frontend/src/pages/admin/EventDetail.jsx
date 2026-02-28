@@ -94,23 +94,6 @@ export function EventDetail() {
         }
     }
 
-    const handleApproveEvent = async () => {
-        if (!id) return
-
-        try {
-            setLoading(true)
-            await adminService.approveEvent(id)
-            showAlert("success", 'Approve event successfully', 2500)
-
-            setTimeout(() => {
-                fetchEvent()
-            }, 300);
-        } catch (error) {
-            showAlert("error", "Operation failed", 4000)
-            console.error(error)
-        }
-    }
-
     useEffect(() => {
         if (id) {
             fetchEvent()
@@ -155,6 +138,7 @@ export function EventDetail() {
 
     const isPending = event?.status === "PENDING"
 
+    const [adminNotes, setAdminNotes] = useState("")
     const [checklist, setChecklist] = useState({
         basicInfo: false,
         imagesPolicy: false,
@@ -163,18 +147,73 @@ export function EventDetail() {
         legalPolicy: false
     })
 
-    const [adminNotes, setAdminNotes] = useState("")
+    const checklistLables = {
+        basicInfo: "Basic Info Verified",
+        imagesPolicy: "Images Policy Compliant",
+        contentQuality: "Content Quality Audit",
+        pricingTransparency: "Pricing Transparency",
+        legalPolicy: "Legal / Policy Review"
+    }
+
+    const handleApproveEvent = async () => {
+        if (!id) return
+
+        try {
+            setLoading(true)
+            await adminService.approveEvent(id)
+            showAlert("success", 'Approve event successfully', 2500)
+            await fetchEvent()
+        } catch (error) {
+            showAlert("error", "Operation failed", 4000)
+            console.error(error)
+        }
+    }
+
+    const buildRejectReason = () => {
+        const failedItems = Object.entries(checklist)
+            .filter(([_, value]) => !value)
+            .map(([key]) => `- ${checklistLables[key]}`)
+        let reason = ''
+
+        if (failedItems.length > 0) {
+            reason += 'The following review items were not satisfied:\n'
+            reason += failedItems.join('\n')
+            reason += '\n\n'
+        }
+
+        if (adminNotes.trim()) {
+            reason += 'Admin Notes:\n'
+            reason += adminNotes.trim()
+        }
+
+        return reason.trim()
+    }
+
+    const handleRejectEvent = async () => {
+        if (!id) return
+
+        const rejectionReason = buildRejectReason()
+
+        if (!rejectionReason) {
+            alert("Please provide rejection reason or checklist feedback.")
+            return
+        }
+
+        try {
+            setLoading(true)
+            await adminService.rejectEvent(id, rejectionReason)
+            showAlert("success", 'Reject event successfully', 2500)
+            await fetchEvent()
+        } catch (error) {
+            showAlert("error", "Operation failed", 4000)
+            console.error(error)
+        }
+    }
 
     const allChecklistComplete = Object.values(checklist).every(value => value)
 
     const handleChecklistChange = key => {
         setChecklist({ ...checklist, [key]: !checklist[key] })
-    }
-
-    const handleReject = () => {
-        if (window.confirm("Are you sure you want to reject this event?")) {
-            alert("Event rejected.")
-        }
     }
 
     const getStatusVariant = (status) => {
@@ -629,14 +668,22 @@ export function EventDetail() {
                                             <CheckCircle className="mr-2 h-4 w-4" />
                                             Approve Event
                                         </Button>
-                                        <Button
-                                            variant="destructive"
-                                            className="w-full"
-                                            onClick={handleReject}
+
+                                        <Popconfirm
+                                            title="Reject event"
+                                            description="Are you sure to reject this event?"
+                                            onConfirm={handleRejectEvent}
+                                            okText="Yes"
+                                            cancelText="No"
                                         >
-                                            <X className="mr-2 h-4 w-4" />
-                                            Reject Submission
-                                        </Button>
+                                            <Button
+                                                variant="destructive"
+                                                className="w-full"
+                                            >
+                                                <X className="mr-2 h-4 w-4" />
+                                                Reject Submission
+                                            </Button>
+                                        </Popconfirm>
                                     </div>
 
                                     {!allChecklistComplete && (

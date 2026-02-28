@@ -76,4 +76,8 @@ export const adminService = {
         return axiosInstance.patch(`/admin/events/${id}/approve`)
     },
 
+    rejectEvent: (id, reason) => {
+        return axiosInstance.patch(`/admin/events/${id}/reject`, { reason })
+    },
+
 };
