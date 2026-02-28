@@ -9,9 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -35,7 +33,7 @@ public class RecruitmentController {
             @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate deadline,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Page<RecruitmentResponse> responses = recruitmentService.searchRecruiments(keyword, location, deadline, page, size);
+        Page<RecruitmentResponse> responses = recruitmentService.searchRecruitments(keyword, location, deadline, page, size);
         return ResponseEntity.ok(responses);
     }
 }

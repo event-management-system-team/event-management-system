@@ -46,9 +46,9 @@ public class RecruitmentService {
         return groupRecruitmentByEvent(recruitments);
     }
 
-    public Page<RecruitmentResponse> searchRecruiments(String keyword, String location,
-                                                       LocalDate deadline,
-                                                       int page, int size) {
+    public Page<RecruitmentResponse> searchRecruitments(String keyword, String location,
+                                                        LocalDate deadline,
+                                                        int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         String kw = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
