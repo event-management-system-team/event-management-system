@@ -1,6 +1,9 @@
 // src/pages/auth/forgot-password/ResetPasswordForm.jsx
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { resetPassword } from "../../../../store/slices/auth.slice";
+import { message } from "antd";
 import { InputField } from "../../../common/InputField";
 import { Button } from "../../../common/Button";
 import { MdArrowForward } from "react-icons/md";
@@ -8,10 +11,12 @@ import { FaRegCheckCircle, FaRegCircle } from "react-icons/fa";
 import { RiLockPasswordFill } from "react-icons/ri";
 import LogoImg from "../../../../assets/logo.png";
 
-export const ResetPasswordForm = () => {
+export const ResetPasswordForm = ({ resetToken }) => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const passwordStrength = {
     length: newPassword.length >= 8,
@@ -20,9 +25,25 @@ export const ResetPasswordForm = () => {
     match: confirmPassword.length > 0 && newPassword === confirmPassword,
   };
 
-  const handleSubmit = (e) => {
+  const isFormValid = Object.values(passwordStrength).every(Boolean);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: gắn logic sau
+    if (!isFormValid) {
+      message.error("Please ensure the password meets all requirements");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await dispatch(resetPassword({ resetToken, newPassword, confirmPassword })).unwrap();
+      message.success("Password reset successfully. You can now log in.");
+      navigate("/login");
+    } catch (error) {
+      message.error(error || "Failed to reset password");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -104,7 +125,7 @@ export const ResetPasswordForm = () => {
           </div>
 
           <div className="pt-2">
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading || !isFormValid}>
               <span>{isLoading ? "Resetting..." : "Reset Password"}</span>
               <span className="group-hover:translate-x-1 transition-transform">
                 <MdArrowForward className="text-xl" />

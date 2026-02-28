@@ -38,10 +38,11 @@ const authService = {
     return response.data;
   },
 
-  resetPassword: async ({ resetToken, newPassword }) => {
+  resetPassword: async ({ resetToken, newPassword, confirmPassword }) => {
     const response = await axiosInstance.post("/auth/reset-password", {
       resetToken,
       newPassword,
+      confirmPassword,
     });
     return response.data;
   },

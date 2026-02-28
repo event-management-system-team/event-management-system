@@ -38,18 +38,21 @@ public class ForgotPasswordService {
             throw new RuntimeException("Email not found");
         }
 
-        tokenRepository.deleteByEmail(email);
+        String rawOtp = otpUtil.generateOtp();
+        String hashOtp = otpUtil.hashOtp(rawOtp);
 
-        String hashOtp = otpUtil.hashOtp(otpUtil.generateOtp());
+        PasswordResetToken token = tokenRepository.findByEmail(email).orElse(new PasswordResetToken());
+        token.setEmail(email);
+        token.setOtpHash(hashOtp);
+        token.setOtpExpiresAt(LocalDateTime.now().plusMinutes(1));
+        token.setAttempts(0);
+        token.setVerified(false);
+        token.setResetToken(null);
+        token.setResetTokenExpiresAt(null);
 
-        PasswordResetToken token = PasswordResetToken.builder()
-                .email(email)
-                .otpHash(hashOtp)
-                .otpExpiresAt(LocalDateTime.now().plusMinutes(1))
-                .build();
         tokenRepository.save(token);
 
-        emailService.sendOtpEmail(email, otpUtil.generateOtp());
+        emailService.sendOtpEmail(email, rawOtp);
     }
 
     @Transactional

@@ -138,7 +138,7 @@ export const LoginForm = () => {
             </label>
             <div className="text-sm font-bold text-[#FF6B35] hover:opacity-80 transition-opacity">
               <Link
-              //to="/forgot-password"
+              to="/forgot-password"
               >
                 Forgot password?
               </Link>

@@ -1,18 +1,37 @@
 // src/pages/auth/forgot-password/ForgotPasswordForm.jsx
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { sendForgotPasswordEmail } from "../../../../store/slices/auth.slice";
+import { message } from "antd";
 import { InputField } from "../../../common/InputField";
 import { Button } from "../../../common/Button";
 import { MdArrowForward } from "react-icons/md";
 import { MdLockReset } from "react-icons/md";
 import LogoImg from "../../../../assets/logo.png";
 
-export const ForgotPasswordForm = () => {
+export const ForgotPasswordForm = ({ onSuccess }) => {
+  const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: gắn logic sau
+    if (!email) {
+      message.error("Please enter your registered email");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await dispatch(sendForgotPasswordEmail(email)).unwrap();
+      message.success("Verification code sent to your email");
+      if (onSuccess) onSuccess(email);
+    } catch (error) {
+      message.error(error || "Failed to send verification code");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -46,9 +65,11 @@ export const ForgotPasswordForm = () => {
             label="Registered Email"
             placeholder="example@email.com"
             type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
 
-          <Button type="submit">
+          <Button type="submit" disabled={isLoading}>
             <span>{isLoading ? "Sending..." : "Send Verification Code"}</span>
             <span className="group-hover:translate-x-1 transition-transform">
               <MdArrowForward className="text-xl" />

@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { autoRefreshToken } from "./store/slices/auth.slice";
 
 import AppRoutes from "./routes";
-import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 
 function App() {
   const dispatch = useDispatch();

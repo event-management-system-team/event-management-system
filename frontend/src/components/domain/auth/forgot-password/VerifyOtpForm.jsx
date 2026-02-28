@@ -1,6 +1,9 @@
 // src/pages/auth/forgot-password/VerifyOtpForm.jsx
 import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { verifyOtp, sendForgotPasswordEmail } from "../../../../store/slices/auth.slice";
+import { message } from "antd";
 import { Button } from "../../../common/Button";
 import { MdArrowForward } from "react-icons/md";
 import { MdMarkEmailRead } from "react-icons/md";
@@ -11,15 +14,15 @@ const OTP_LENGTH = 6;
 
 export const VerifyOtpForm = ({
   email = "example@email.com",
-  onSubmit,
-  isLoading,
-  onResend,
+  onSuccess,
   onBack,
 }) => {
   const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(""));
   const [error, setError] = useState("");
   const [countdown, setCountdown] = useState(60);
+  const [isLoading, setIsLoading] = useState(false);
   const inputRefs = useRef([]);
+  const dispatch = useDispatch();
 
   // Countdown timer
   useEffect(() => {
@@ -66,22 +69,36 @@ export const VerifyOtpForm = ({
     inputRefs.current[Math.min(pasted.length, OTP_LENGTH - 1)]?.focus();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const otpStr = otp.join("");
     if (otpStr.length < OTP_LENGTH) {
       setError("Please enter all 6 digits");
       return;
     }
-    // TODO: gắn logic sau
-    onSubmit?.({ otp: otpStr });
+    
+    setIsLoading(true);
+    try {
+      const result = await dispatch(verifyOtp({ email, otp: otpStr })).unwrap();
+      message.success("OTP verified successfully");
+      if (onSuccess) onSuccess(result.resetToken);
+    } catch (err) {
+      setError(err || "Invalid OTP verification");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleResend = () => {
-    setCountdown(60);
-    setOtp(Array(OTP_LENGTH).fill(""));
-    setError("");
-    onResend?.();
+  const handleResend = async () => {
+    try {
+      await dispatch(sendForgotPasswordEmail(email)).unwrap();
+      setCountdown(60);
+      setOtp(Array(OTP_LENGTH).fill(""));
+      setError("");
+      message.success("New OTP sent to your email");
+    } catch (err) {
+      message.error(err || "Failed to resend OTP");
+    }
   };
 
   const maskedEmail = email.replace(
