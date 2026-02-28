@@ -12,11 +12,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -46,14 +47,20 @@ public class RecruitmentService {
     }
 
     public Page<RecruitmentResponse> searchRecruiments(String keyword, String location,
-                                                       LocalDateTime deadline,
+                                                       LocalDate deadline,
                                                        int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         String kw = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
         String loc = (location != null && !location.trim().isEmpty()) ? location.trim() : null;
 
-        Page<String> eventSlugs = recruitmentRepository.searchEventSlug(EventStatus.APPROVED, kw, loc, deadline, pageable);
+        LocalDateTime dl = null;
+        if (deadline != null) {
+            dl = deadline.atTime(LocalTime.MAX);
+        }
+
+
+        Page<String> eventSlugs = recruitmentRepository.searchEventSlug(EventStatus.APPROVED, kw, loc, dl, pageable);
 
         if (eventSlugs.isEmpty()) {
             return Page.empty(pageable);

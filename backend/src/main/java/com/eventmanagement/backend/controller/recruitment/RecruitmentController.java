@@ -32,7 +32,7 @@ public class RecruitmentController {
     public ResponseEntity<Page<RecruitmentResponse>> searchRecruitment(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String location,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDateTime deadline,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate deadline,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Page<RecruitmentResponse> responses = recruitmentService.searchRecruiments(keyword, location, deadline, page, size);
