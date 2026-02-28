@@ -4,6 +4,7 @@ import com.eventmanagement.backend.constants.EventStatus;
 import com.eventmanagement.backend.constants.RecruitmentStatus;
 import com.eventmanagement.backend.dto.response.attendee.OrganizerResponse;
 import com.eventmanagement.backend.dto.response.attendee.RecruitmentResponse;
+import com.eventmanagement.backend.model.BenefitRecruitment;
 import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.model.Recruitment;
 import com.eventmanagement.backend.repository.RecruitmentRepository;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
 
 import java.time.LocalDate;
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RecruitmentService {
     private final RecruitmentRepository recruitmentRepository;
+    private final RestClient.Builder builder;
 
     public List<RecruitmentResponse> getRecentRecruitments() {
 
@@ -72,6 +75,16 @@ public class RecruitmentService {
         return new PageImpl<>(groupByEvent, pageable, eventSlugs.getTotalElements());
     }
 
+    public RecruitmentResponse getRecruitmentByEventSlug(String eventSlug) {
+        List<Recruitment> recruitments = recruitmentRepository.findByEvent_EventSlug(eventSlug);
+
+        if (recruitments.isEmpty()) return null;
+
+        Event event = recruitments.get(0).getEvent();
+
+        return mapToResponse(event, recruitments);
+    }
+
     private List<RecruitmentResponse> groupRecruitmentByEvent(List<Recruitment> recruitments) {
         Map<Event, List<Recruitment>> groupedByEvent = recruitments.stream()
                 .collect(Collectors.groupingBy(Recruitment::getEvent));
@@ -83,10 +96,10 @@ public class RecruitmentService {
         return responseList;
     }
 
-    private RecruitmentResponse mapToResponse(Event event, List<Recruitment> positions) {
+    private RecruitmentResponse mapToResponse(Event event, List<Recruitment> recruitments) {
 
-        Recruitment recruitment = positions.get(0);
-        List<RecruitmentResponse.PositionDto> positionDTO = positions.stream()
+        Recruitment recruitment = recruitments.get(0);
+        List<RecruitmentResponse.PositionDto> positionDTO = recruitments.stream()
                 .map((position) -> RecruitmentResponse.PositionDto.builder()
                         .recruitmentId(position.getRecruitmentId())
                         .positionName(position.getPositionName())
@@ -106,6 +119,14 @@ public class RecruitmentService {
                     .build();
         }
 
+        List<BenefitRecruitment> benefits = recruitment.getBenefits();
+        List<RecruitmentResponse.BenefitRecruitmentDto> benefitResponse = benefits.stream()
+                .map(benefit -> RecruitmentResponse.BenefitRecruitmentDto.builder()
+                        .icon(benefit.getIcon())
+                        .title(benefit.getTitle())
+                        .description(benefit.getDescription())
+                        .build()).toList();
+
 
         return RecruitmentResponse.builder()
                 .eventId(event.getEventId())
@@ -119,6 +140,7 @@ public class RecruitmentService {
                 .status(recruitment.getStatus())
                 .positions(positionDTO)
                 .organizer(organizerResponses)
+                .benefits(benefitResponse)
                 .build();
     }
 }

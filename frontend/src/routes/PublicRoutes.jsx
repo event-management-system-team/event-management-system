@@ -3,7 +3,7 @@ import MainLayout from "../components/layout/MainLayout";
 import HomePage from "../pages/public/Home";
 import EventsPage from "../pages/public/Events";
 import EventDetailPage from "../pages/public/EventDetail";
-import RecruitmentsPage from "../pages/public/Recriutments";
+import RecruitmentsPage from "../pages/public/Recruitments";
 import RecruitmentDetailPage from "../pages/public/RecruitmentDetail";
 import ProfilePage from "../pages/profile/ProfilePage";
 
