@@ -5,6 +5,7 @@ import com.eventmanagement.backend.model.Event;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,10 +29,8 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
 
     @Query("SELECT e FROM Event e " +
             "WHERE e.status = :status " +
-            "AND (:keyword IS NULL OR LOWER(e.eventName) LIKE LOWER(CONCAT('%', cast(:keyword as string), '%'))) "
-            +
-            "AND (:location IS NULL OR LOWER(e.location) LIKE LOWER(CONCAT('%', cast(:location as string), '%'))) "
-            +
+            "AND (:keyword IS NULL OR LOWER(e.eventName) LIKE LOWER(CONCAT('%', cast(:keyword as string), '%'))) " +
+            "AND (:location IS NULL OR LOWER(e.location) LIKE LOWER(CONCAT('%', cast(:location as string), '%'))) " +
             "AND (:categorySlug IS NULL OR e.category.categorySlug IN :categorySlug ) " +
             "AND (CAST(:startOfDay AS timestamp) IS NULL OR CAST(:endOfDay AS timestamp) IS NULL OR " +
             "(e.startDate <= :endOfDay AND e.endDate >= :startOfDay)) " +
@@ -47,6 +46,7 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
                              @Param("isFree") Boolean isFree,
                              Pageable pageable);
 
+    @EntityGraph(attributePaths = {"agendas", "ticketTypes"})
     Event findEventByEventSlug(String eventSlug);
 
     long countByOrganizer_UserId(UUID organizerId);
