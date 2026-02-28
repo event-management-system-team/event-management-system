@@ -6,6 +6,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eventmanagement.backend.exception.BadRequestException;
+
 import com.eventmanagement.backend.dto.request.ForgotPasswordRequest;
 import com.eventmanagement.backend.dto.request.ResetPasswordRequest;
 import com.eventmanagement.backend.dto.request.VerifyOtpRequest;
@@ -35,7 +37,7 @@ public class ForgotPasswordService {
 
         Boolean exists = userRepository.existsByEmail(email);
         if (!exists) {
-            throw new RuntimeException("Email not found");
+            throw new BadRequestException("Email not found");
         }
 
         String rawOtp = otpUtil.generateOtp();
@@ -61,22 +63,22 @@ public class ForgotPasswordService {
         String email = request.getEmail().toLowerCase().trim();
 
         PasswordResetToken token = tokenRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("OTP not found for email: " + email));
+                .orElseThrow(() -> new BadRequestException("OTP not found for email: " + email));
 
         if (token.getAttempts() >= 5) {
             tokenRepository.delete(token);
-            throw new RuntimeException("Too many failed attempts. Please request a new OTP.");
+            throw new BadRequestException("Too many failed attempts. Please request a new OTP.");
         }
 
         if (token.getOtpExpiresAt().isBefore(LocalDateTime.now())) {
             tokenRepository.delete(token);
-            throw new RuntimeException("OTP has expired.");
+            throw new BadRequestException("OTP has expired.");
         }
 
         if (!otpUtil.verifyOtp(request.getOtp(), token.getOtpHash())) {
             token.setAttempts(token.getAttempts() + 1);
             tokenRepository.save(token);
-            throw new RuntimeException("Invalid OTP.");
+            throw new BadRequestException("Invalid OTP.");
         }
 
         String resetToken = resetTokenUtil.generateResetToken();
@@ -93,15 +95,15 @@ public class ForgotPasswordService {
     public void resetPassword(ResetPasswordRequest request) {
 
         PasswordResetToken token = tokenRepository.findByResetToken(request.getResetToken())
-                .orElseThrow(() -> new RuntimeException("Invalid reset token."));
+                .orElseThrow(() -> new BadRequestException("Invalid reset token."));
 
         if (!token.isVerified()) {
-            throw new RuntimeException("OTP not verified.");
+            throw new BadRequestException("OTP not verified.");
         }
 
         if (token.getResetTokenExpiresAt().isBefore(LocalDateTime.now())) {
             tokenRepository.delete(token);
-            throw new RuntimeException("Reset token has expired.");
+            throw new BadRequestException("Reset token has expired.");
         }
 
         userRepository.findByEmail(token.getEmail()).ifPresent(user -> {

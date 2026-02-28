@@ -23,10 +23,10 @@ public class CookieUtil {
     public void addRefreshTokenCookie(HttpServletResponse response, String refreshToken, int maxAge) {
         Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken);
         cookie.setHttpOnly(true);
-        cookie.setSecure(cookieSecure);
-        cookie.setAttribute("SameSite", "Strict");
+        cookie.setSecure(false);
         cookie.setPath("/");
         cookie.setMaxAge(maxAge);
+        cookie.setAttribute("SameSite", "Strict");
         cookie.setDomain(cookieDomain);
 
         response.addCookie(cookie);

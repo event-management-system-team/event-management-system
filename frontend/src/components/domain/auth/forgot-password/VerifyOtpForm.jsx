@@ -2,7 +2,7 @@
 import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { verifyOtp, sendForgotPasswordEmail } from "../../../../store/slices/auth.slice";
+import { verifyOTP, sendOTP } from "../../../../store/slices/auth.slice";
 import { message } from "antd";
 import { Button } from "../../../common/Button";
 import { MdArrowForward } from "react-icons/md";
@@ -79,7 +79,7 @@ export const VerifyOtpForm = ({
     
     setIsLoading(true);
     try {
-      const result = await dispatch(verifyOtp({ email, otp: otpStr })).unwrap();
+      const result = await dispatch(verifyOTP({ email, otpCode: otpStr })).unwrap();
       message.success("OTP verified successfully");
       if (onSuccess) onSuccess(result.resetToken);
     } catch (err) {
@@ -91,7 +91,7 @@ export const VerifyOtpForm = ({
 
   const handleResend = async () => {
     try {
-      await dispatch(sendForgotPasswordEmail(email)).unwrap();
+      await dispatch(sendOTP(email)).unwrap();
       setCountdown(60);
       setOtp(Array(OTP_LENGTH).fill(""));
       setError("");

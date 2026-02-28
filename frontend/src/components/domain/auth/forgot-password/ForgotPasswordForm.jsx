@@ -2,7 +2,7 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { sendForgotPasswordEmail } from "../../../../store/slices/auth.slice";
+import { sendOTP } from "../../../../store/slices/auth.slice";
 import { message } from "antd";
 import { InputField } from "../../../common/InputField";
 import { Button } from "../../../common/Button";
@@ -24,7 +24,7 @@ export const ForgotPasswordForm = ({ onSuccess }) => {
 
     setIsLoading(true);
     try {
-      await dispatch(sendForgotPasswordEmail(email)).unwrap();
+      await dispatch(sendOTP(email)).unwrap();
       message.success("Verification code sent to your email");
       if (onSuccess) onSuccess(email);
     } catch (error) {

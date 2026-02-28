@@ -1,6 +1,5 @@
 package com.eventmanagement.backend.controller.auth;
 
-import com.cloudinary.api.ApiResponse;
 import com.eventmanagement.backend.dto.request.ForgotPasswordRequest;
 import com.eventmanagement.backend.dto.request.GoogleLoginRequest;
 import com.eventmanagement.backend.dto.request.LoginRequest;
@@ -75,7 +74,8 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response) {
         String refreshToken = cookieUtil.getRefreshTokenFromCookie(request)
-                .orElseThrow(() -> new RuntimeException("Refresh token not found"));
+                .orElseThrow(() -> new com.eventmanagement.backend.exception.UnauthorizedException(
+                        "Refresh token not found"));
 
         RefreshTokenResponse tokenResponse = authService.refreshToken(refreshToken, response);
         return ResponseEntity.ok(tokenResponse);
