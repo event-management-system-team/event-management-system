@@ -3,13 +3,11 @@ package com.eventmanagement.backend.controller.admin;
 import com.eventmanagement.backend.dto.request.CreateOrganizerRequest;
 import com.eventmanagement.backend.dto.request.UserUpdateRequest;
 import com.eventmanagement.backend.dto.response.UserResponse;
-import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.repository.EventRepository;
 import com.eventmanagement.backend.repository.UserRepository;
 import com.eventmanagement.backend.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
@@ -37,12 +35,6 @@ public class AdminAccountController {
         List<UserResponse> users = adminService.getAllAccountsPlain();
         return ResponseEntity.ok(users);
     }
-
-//    @GetMapping("/search")
-//    public ResponseEntity<List<UserResponse>> search(@RequestParam("q") String q) {
-//        List<UserResponse> results = adminService.searchAccounts(q);
-//        return ResponseEntity.ok(results);
-//    }
 
     @GetMapping("/search")
     public ResponseEntity<Page<UserResponse>> search(
