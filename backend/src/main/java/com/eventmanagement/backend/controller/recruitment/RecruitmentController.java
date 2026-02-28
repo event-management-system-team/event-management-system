@@ -4,12 +4,14 @@ package com.eventmanagement.backend.controller.recruitment;
 import com.eventmanagement.backend.dto.response.attendee.RecruitmentResponse;
 import com.eventmanagement.backend.service.RecruitmentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -24,5 +26,16 @@ public class RecruitmentController {
     public ResponseEntity<List<RecruitmentResponse>> getRecentRecruitment() {
         List<RecruitmentResponse> recruitments = recruitmentService.getRecentRecruitments();
         return ResponseEntity.ok(recruitments);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<RecruitmentResponse>> searchRecruitment(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDateTime deadline,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Page<RecruitmentResponse> responses = recruitmentService.searchRecruiments(keyword, location, deadline, page, size);
+        return ResponseEntity.ok(responses);
     }
 }

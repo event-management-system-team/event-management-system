@@ -15,7 +15,7 @@ const HeroSearchBar = ({ keyword, setKeyword, location, setLocation, handleSearc
                 <div className="flex flex-col w-full min-w-0">
                     <span className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest truncate">Keyword</span>
                     <input className="bg-transparent border-none p-0 focus:ring-0 text-xs md:text-sm text-gray-700 w-full placeholder:text-gray-400 outline-none truncate"
-                        placeholder="Concerts, Workshops..."
+                        placeholder="Input keyword..."
                         type="text"
                         value={keyword}
                         onChange={(e) => setKeyword(e.target.value)}

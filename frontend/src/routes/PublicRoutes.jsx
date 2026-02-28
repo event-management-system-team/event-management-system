@@ -16,7 +16,7 @@ const PublicRoutes = () => {
         <Route path="/events/:eventSlug" element={<EventDetailPage />} />
         <Route path="/recruitments" element={<RecruitmentsPage />} />
         <Route
-          path="/recruitments/:idRecruitment"
+          path="/recruitments/:eventSlug"
           element={<RecruitmentDetailPage />}
         />
         <Route path="/me" element={<ProfilePage />} />
