@@ -1,7 +1,7 @@
 package com.eventmanagement.backend.controller.admin;
 
-import com.eventmanagement.backend.dto.response.admin.TicketTypeResponse;
-import com.eventmanagement.backend.service.TicketTypeService;
+import com.eventmanagement.backend.dto.response.admin.EventAgendaResponse;
+import com.eventmanagement.backend.service.EventAgendaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,11 +15,12 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/admin/events")
 @RequiredArgsConstructor
-public class TicketTypeController {
-    private final TicketTypeService service;
+public class EventAgendaController {
 
-    @GetMapping("/{id}/ticket-types")
-    public ResponseEntity<List<TicketTypeResponse>> getTicketTypes(@PathVariable UUID id) {
-        return ResponseEntity.ok(service.getTicketTypes(id));
+    private final EventAgendaService service;
+
+    @GetMapping("/{id}/agenda")
+    public ResponseEntity<List<EventAgendaResponse>> getEventAgenda(@PathVariable UUID id) {
+        return ResponseEntity.ok(service.getEventAgenda(id));
     }
 }

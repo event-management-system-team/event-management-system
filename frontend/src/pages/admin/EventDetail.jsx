@@ -551,7 +551,7 @@ export function EventDetail() {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {ticketTypes.map((ticket, index) => {
+                                                    {ticketTypes?.map((ticket, index) => {
                                                         const status = SALE_STATUS_CONFIG[ticket.saleStatus] || {
                                                             label: ticket.saleStatus,
                                                             className: "bg-gray-100 text-gray-700",
