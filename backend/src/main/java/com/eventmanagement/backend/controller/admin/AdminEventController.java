@@ -1,10 +1,12 @@
 package com.eventmanagement.backend.controller.admin;
 
+import com.eventmanagement.backend.dto.request.RejectEventRequest;
 import com.eventmanagement.backend.dto.response.admin.EventResponse;
 import com.eventmanagement.backend.dto.response.attendee.EventCategoryResponse;
 import com.eventmanagement.backend.repository.EventRepository;
 import com.eventmanagement.backend.service.AdminEventService;
 import com.eventmanagement.backend.service.EventCategoryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -43,5 +45,17 @@ public class AdminEventController {
     @GetMapping("/{id}")
     public ResponseEntity<EventResponse> getDetail(@PathVariable UUID id) {
         return ResponseEntity.ok(eventService.getEventById(id));
+    }
+
+    @PatchMapping("/{id}/approve")
+    public ResponseEntity<Void> approveEvent(@PathVariable UUID id) {
+        eventService.approveEvent(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/reject")
+    public ResponseEntity<Void> rejectEvent(@PathVariable UUID id, @RequestBody @Valid RejectEventRequest request) {
+        eventService.rejectEvent(id, request.getReason());
+        return ResponseEntity.noContent().build();
     }
 }

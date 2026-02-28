@@ -40,210 +40,6 @@ import { useAlert } from '../../hooks/useAlert.js';
 import { Popconfirm } from 'antd';
 import dayjs from "dayjs";
 
-// Mock event data - in a real app, this would be fetched based on the ID
-// const eventData = {
-//     "1": {
-//         id: 1,
-//         name: "Tech Conference 2026",
-//         status: "Approved",
-//         statusVariant: "default",
-//         date: "March 15, 2026",
-//         time: "09:00 AM - 05:00 PM",
-//         location: "San Francisco Convention Center, CA",
-//         organizer: "Sarah Johnson",
-//         organization: "TechEvents Inc.",
-//         bannerUrl: null,
-//         description:
-//             "Join us for the most anticipated technology conference of 2026! This year's Tech Conference brings together industry leaders, innovators, and developers from around the globe to explore the latest trends in artificial intelligence, cloud computing, cybersecurity, and software development.\n\nOur conference features 50+ expert speakers, hands-on workshops, networking sessions, and an expo showcasing cutting-edge technology products and services. Whether you're a seasoned professional or just starting your tech career, this conference offers valuable insights and connections that will shape your future in the technology industry.",
-//         tickets: [
-//             {
-//                 tier: "Early Bird",
-//                 quantity: 300,
-//                 price: 45,
-//                 available: 0,
-//                 feeStatus: "Included"
-//             },
-//             {
-//                 tier: "General Admission",
-//                 quantity: 500,
-//                 price: 65,
-//                 available: 153,
-//                 feeStatus: "Included"
-//             },
-//             {
-//                 tier: "VIP Pass",
-//                 quantity: 150,
-//                 price: 120,
-//                 available: 50,
-//                 feeStatus: "Excluded"
-//             },
-//             {
-//                 tier: "Student Discount",
-//                 quantity: 50,
-//                 price: 30,
-//                 available: 3,
-//                 feeStatus: "Included"
-//             }
-//         ],
-//         timeline: [
-//             {
-//                 time: "09:00 AM",
-//                 title: "Registration & Breakfast",
-//                 location: "Main Lobby",
-//                 speaker: "Event Staff"
-//             },
-//             {
-//                 time: "10:00 AM",
-//                 title: "Opening Keynote: The Future of AI",
-//                 location: "Grand Hall",
-//                 speaker: "Dr. Emily Chen, AI Research Lead"
-//             },
-//             {
-//                 time: "11:30 AM",
-//                 title: "Workshop: Building Scalable Applications",
-//                 location: "Room A",
-//                 speaker: "Michael Rodriguez, Senior Architect"
-//             },
-//             {
-//                 time: "01:00 PM",
-//                 title: "Lunch & Networking",
-//                 location: "Terrace Level",
-//                 speaker: "Open Networking"
-//             },
-//             {
-//                 time: "02:30 PM",
-//                 title: "Panel: Cybersecurity Best Practices",
-//                 location: "Grand Hall",
-//                 speaker: "Industry Experts Panel"
-//             },
-//             {
-//                 time: "04:00 PM",
-//                 title: "Closing Remarks & Q&A",
-//                 location: "Grand Hall",
-//                 speaker: "Sarah Johnson, Event Director"
-//             }
-//         ]
-//     },
-//     "3": {
-//         id: 3,
-//         name: "Workshop Series: Design Thinking",
-//         status: "Pending",
-//         statusVariant: "secondary",
-//         date: "February 28, 2026",
-//         time: "10:00 AM - 04:00 PM",
-//         location: "Workshop Co. Studio, New York, NY",
-//         organizer: "Emma Williams",
-//         organization: "Workshop Co.",
-//         bannerUrl: null,
-//         description:
-//             "Unlock your creative potential with our comprehensive Design Thinking workshop. This interactive session is designed for professionals, entrepreneurs, and anyone interested in human-centered design principles.\n\nLearn the five stages of design thinking: Empathize, Define, Ideate, Prototype, and Test. Through hands-on activities and real-world case studies, you'll develop practical skills to solve complex problems and drive innovation in your organization.",
-//         tickets: [
-//             {
-//                 tier: "Individual Pass",
-//                 quantity: 150,
-//                 price: 85,
-//                 available: 44,
-//                 feeStatus: "Included"
-//             },
-//             {
-//                 tier: "Team Pass (3 people)",
-//                 quantity: 50,
-//                 price: 220,
-//                 available: 50,
-//                 feeStatus: "Excluded"
-//             }
-//         ],
-//         timeline: [
-//             {
-//                 time: "10:00 AM",
-//                 title: "Welcome & Introduction to Design Thinking",
-//                 location: "Main Studio",
-//                 speaker: "Emma Williams"
-//             },
-//             {
-//                 time: "11:00 AM",
-//                 title: "Empathy Mapping Exercise",
-//                 location: "Break-out Rooms",
-//                 speaker: "Workshop Facilitators"
-//             },
-//             {
-//                 time: "12:30 PM",
-//                 title: "Lunch Break",
-//                 location: "Cafeteria",
-//                 speaker: ""
-//             },
-//             {
-//                 time: "01:30 PM",
-//                 title: "Ideation & Prototyping Session",
-//                 location: "Design Lab",
-//                 speaker: "Emma Williams"
-//             },
-//             {
-//                 time: "03:00 PM",
-//                 title: "Group Presentations & Feedback",
-//                 location: "Main Studio",
-//                 speaker: "All Participants"
-//             }
-//         ]
-//     },
-//     "7": {
-//         id: 7,
-//         name: "Indie Film Festival",
-//         status: "Pending",
-//         statusVariant: "secondary",
-//         date: "May 18, 2026",
-//         time: "07:00 PM - 11:00 PM",
-//         location: "Regal Cinema Downtown, Los Angeles, CA",
-//         organizer: "Amanda Garcia",
-//         organization: "Arts & Culture Foundation",
-//         bannerUrl: null,
-//         description:
-//             "Celebrate independent cinema at our annual Indie Film Festival! This year's event showcases 12 carefully curated short films and 3 feature-length movies from emerging filmmakers around the world.\n\nExperience powerful storytelling, innovative cinematography, and thought-provoking themes. After each screening, join us for Q&A sessions with the directors and cast members. This is a unique opportunity to support independent artists and discover the next generation of filmmaking talent.",
-//         tickets: [
-//             {
-//                 tier: "General Admission",
-//                 quantity: 300,
-//                 price: 25,
-//                 available: 300,
-//                 feeStatus: "Included"
-//             },
-//             {
-//                 tier: "Premium Seating",
-//                 quantity: 100,
-//                 price: 40,
-//                 available: 100,
-//                 feeStatus: "Excluded"
-//             }
-//         ],
-//         timeline: [
-//             {
-//                 time: "07:00 PM",
-//                 title: "Doors Open & Welcome Reception",
-//                 location: "Main Lobby",
-//                 speaker: "Event Staff"
-//             },
-//             {
-//                 time: "07:30 PM",
-//                 title: "Short Film Block #1",
-//                 location: "Theater 1",
-//                 speaker: "Various Directors"
-//             },
-//             {
-//                 time: "09:00 PM",
-//                 title: "Feature Film Premiere",
-//                 location: "Theater 1",
-//                 speaker: "Director Q&A Following"
-//             },
-//             {
-//                 time: "10:45 PM",
-//                 title: "Closing Remarks & Awards",
-//                 location: "Theater 1",
-//                 speaker: "Festival Director"
-//             }
-//         ]
-//     }
-// }
-
 export function EventDetail() {
     const { id } = useParams();
     const [loading, setLoading] = useState(true);
@@ -295,6 +91,23 @@ export function EventDetail() {
             console.error(error)
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleApproveEvent = async () => {
+        if (!id) return
+
+        try {
+            setLoading(true)
+            await adminService.approveEvent(id)
+            showAlert("success", 'Approve event successfully', 2500)
+
+            setTimeout(() => {
+                fetchEvent()
+            }, 300);
+        } catch (error) {
+            showAlert("error", "Operation failed", 4000)
+            console.error(error)
         }
     }
 
@@ -356,10 +169,6 @@ export function EventDetail() {
 
     const handleChecklistChange = key => {
         setChecklist({ ...checklist, [key]: !checklist[key] })
-    }
-
-    const handleApprove = () => {
-        alert("Event approved successfully!")
     }
 
     const handleReject = () => {
@@ -541,9 +350,13 @@ export function EventDetail() {
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="pt-3">
-                                        <div className="prose max-w-none text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                                        {/* <div className="prose max-w-none text-sm text-gray-700 leading-relaxed whitespace-pre-line">
                                             {event?.description}
-                                        </div>
+                                        </div> */}
+                                        <div
+                                            className="prose max-w-none text-sm text-gray-700 leading-relaxed whitespace-pre-line"
+                                            dangerouslySetInnerHTML={{ __html: event?.description }}
+                                        />
                                     </CardContent>
                                 </Card>
 
@@ -699,16 +512,16 @@ export function EventDetail() {
                     {isPending && (
                         <div className="col-span-4">
                             <Card className="bg-[#f7f7f7] shadow-sm sticky top-8 border border-gray-200">
-                                <CardHeader className="border-b border-gray-100">
-                                    <CardTitle className="text-lg">Review & Approve</CardTitle>
+                                <CardHeader className="border-b border-gray-200">
+                                    <CardTitle className="text-lg font-semibold">Review & Approve</CardTitle>
                                     <CardDescription>
                                         Complete checklist before approval
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="pt-6 space-y-6">
                                     {/* Review Checklist */}
-                                    {/* <div>
-                                        <label className="text-sm font-semibold text-gray-900 mb-3 block">
+                                    <div>
+                                        <label className="text-base font-semibold text-gray-900 mb-3 block">
                                             Review Checklist
                                         </label>
                                         <div className="space-y-3">
@@ -788,11 +601,11 @@ export function EventDetail() {
                                                 </label>
                                             </div>
                                         </div>
-                                    </div> */}
+                                    </div>
 
                                     {/* Internal Admin Notes */}
-                                    {/* <div>
-                                        <label className="text-sm font-semibold text-gray-900 mb-2 block">
+                                    <div>
+                                        <label className="text-base font-semibold text-gray-900 mb-2 block">
                                             Internal Admin Notes
                                         </label>
                                         <Textarea
@@ -802,16 +615,16 @@ export function EventDetail() {
                                             className="min-h-[120px] resize-none border border-gray-200"
                                         />
                                         <p className="text-xs text-gray-500 mt-1">
-                                            Optional but recommended for rejection cases
+                                            For rejection cases only
                                         </p>
-                                    </div> */}
+                                    </div>
 
                                     {/* Action Buttons */}
-                                    {/* <div className="space-y-2 pt-4">
+                                    <div className="space-y-2 pt-4">
                                         <Button
                                             className="w-full bg-green-600 hover:bg-green-700 text-white"
                                             disabled={!allChecklistComplete}
-                                            onClick={handleApprove}
+                                            onClick={handleApproveEvent}
                                         >
                                             <CheckCircle className="mr-2 h-4 w-4" />
                                             Approve Event
@@ -832,13 +645,22 @@ export function EventDetail() {
                                                 Complete all checklist items to enable approval
                                             </p>
                                         </div>
-                                    )} */}
+                                    )}
                                 </CardContent>
                             </Card>
                         </div>
                     )}
                 </div>
             </main>
+
+            {/* Global Alert */}
+            <div className="fixed top-6 right-6 z-[999] w-[360px]">
+                <Alert
+                    type={alert.type}
+                    message={alert.message}
+                    onClose={closeAlert}
+                />
+            </div>
         </div>
     )
 }

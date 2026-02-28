@@ -67,7 +67,8 @@ public class Event {
     private List<String> imageGallery;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "status", columnDefinition = "event_status")
     @Builder.Default
     private EventStatus status = EventStatus.DRAFT;
 

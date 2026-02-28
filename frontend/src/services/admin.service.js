@@ -72,4 +72,8 @@ export const adminService = {
         return axiosInstance.get(`/admin/events/${id}/agenda`)
     },
 
+    approveEvent: (id) => {
+        return axiosInstance.patch(`/admin/events/${id}/approve`)
+    },
+
 };

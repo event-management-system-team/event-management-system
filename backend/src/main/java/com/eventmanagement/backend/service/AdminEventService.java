@@ -1,6 +1,9 @@
 package com.eventmanagement.backend.service;
 
+import com.eventmanagement.backend.constants.EventStatus;
 import com.eventmanagement.backend.dto.response.admin.EventResponse;
+import com.eventmanagement.backend.exception.BadRequestException;
+import com.eventmanagement.backend.exception.NotFoundException;
 import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +12,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -39,6 +44,38 @@ public class AdminEventService {
         EventResponse response = mapToResponse(event);
 
         return response;
+    }
+
+    @Transactional
+    public void approveEvent(UUID id) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Event not found"));
+
+        if (event.getStatus() != EventStatus.PENDING) {
+            throw new BadRequestException("Only PENDING event can be approved");
+        }
+
+        event.setStatus(EventStatus.APPROVED);
+        event.setRejectionReason(null);
+        event.setUpdatedAt(LocalDateTime.now());
+
+        eventRepository.save(event);
+    }
+
+    @Transactional
+    public void rejectEvent(UUID id, String reason) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Event not found"));
+
+        if (event.getStatus() != EventStatus.PENDING) {
+            throw new BadRequestException("Only PENDING event can be rejected");
+        }
+
+        event.setStatus(EventStatus.REJECTED);
+        event.setRejectionReason(reason);
+        event.setUpdatedAt(LocalDateTime.now());
+
+        eventRepository.save(event);
     }
 
     private EventResponse mapToResponse(Event event) {

@@ -382,8 +382,8 @@ export function EventManagement() {
                                         </SelectTrigger>
                                         <SelectContent className='border border-gray-200'>
                                             <SelectItem value="all">All Status</SelectItem>
-                                            <SelectItem value="APPROVED">Approved</SelectItem>
                                             <SelectItem value="PENDING">Pending</SelectItem>
+                                            <SelectItem value="APPROVED">Approved</SelectItem>
                                             <SelectItem value="COMPLETED">Completed</SelectItem>
                                             <SelectItem value="REJECTED">Rejected</SelectItem>
                                         </SelectContent>
