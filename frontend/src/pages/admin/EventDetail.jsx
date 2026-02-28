@@ -249,11 +249,12 @@ export function EventDetail() {
     const [loading, setLoading] = useState(true);
     const [event, setEvent] = useState(null);
     const [ticketTypes, setTicketTypes] = useState([]);
+    const [agenda, setAgenda] = useState([]);
     const [error, setError] = useState(null);
     const { alert, showAlert, closeAlert } = useAlert();
 
     const fetchEvent = async () => {
-        if (!id) return;
+        if (!id) return
 
         try {
             setLoading(true)
@@ -268,7 +269,7 @@ export function EventDetail() {
     }
 
     const fetchTicketTypes = async () => {
-        if (!id) return;
+        if (!id) return
 
         try {
             setLoading(true)
@@ -282,10 +283,26 @@ export function EventDetail() {
         }
     }
 
+    const fetchEventAgenda = async () => {
+        if (!id) return
+
+        try {
+            setLoading(true)
+            const response = await adminService.getEventAgenda(id)
+            setAgenda(response.data)
+        } catch (error) {
+            setError("Cannot load event ticket types");
+            console.error(error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
     useEffect(() => {
         if (id) {
             fetchEvent()
             fetchTicketTypes()
+            fetchEventAgenda()
         }
     }, [id]);
 
@@ -309,7 +326,19 @@ export function EventDetail() {
     }
 
     const formatPrice = (price) =>
-        new Intl.NumberFormat("vi-VN").format(price);
+        new Intl.NumberFormat("vi-VN").format(price)
+
+    const formatTime = (dateString) => {
+        if (!dateString) return "";
+
+        const date = new Date(dateString);
+
+        return new Intl.DateTimeFormat("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+        }).format(date);
+    };
 
     const isPending = event?.status === "PENDING"
 
@@ -438,8 +467,8 @@ export function EventDetail() {
                             <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-3">
                                     <Badge
-                                        variant={getStatusVariant(event.status)}
-                                        className={getStatusClasses(event.status)}
+                                        variant={getStatusVariant(event?.status)}
+                                        className={getStatusClasses(event?.status)}
                                     >
                                         ● {event?.status}
                                     </Badge>
@@ -609,13 +638,13 @@ export function EventDetail() {
                                     </CardHeader>
                                     <CardContent className="pt-6">
                                         <div className="space-y-4">
-                                            {/* {event.timeline.map((item, index) => (
+                                            {agenda?.map((item, index) => (
                                                 <div key={index} className="flex gap-4">
                                                     <div className="flex flex-col items-center">
                                                         <div className="w-8 h-8 bg-[#7FA5A5] text-white rounded-full flex items-center justify-center text-xs font-semibold">
-                                                            {index + 1}
+                                                            {item.orderIndex}
                                                         </div>
-                                                        {index < event.timeline.length - 1 && (
+                                                        {item.orderIndex < agenda.length && (
                                                             <div
                                                                 className="w-0.5 flex-1 bg-gray-200 my-2"
                                                                 style={{ minHeight: "40px" }}
@@ -626,7 +655,7 @@ export function EventDetail() {
                                                         <div className="flex items-center gap-2 mb-1">
                                                             <Clock className="h-4 w-4 text-gray-400" />
                                                             <span className="text-sm font-semibold text-gray-900">
-                                                                {item.time}
+                                                                {formatTime(item.startTime)}
                                                             </span>
                                                         </div>
                                                         <div className="text-base font-medium text-gray-900 mb-1">
@@ -639,16 +668,10 @@ export function EventDetail() {
                                                                     <span>{item.location}</span>
                                                                 </div>
                                                             )}
-                                                            {item.speaker && (
-                                                                <div className="flex items-center gap-1">
-                                                                    <UserCircle className="h-3 w-3" />
-                                                                    <span>{item.speaker}</span>
-                                                                </div>
-                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>
-                                            ))} */}
+                                            ))}
                                         </div>
                                     </CardContent>
                                 </Card>

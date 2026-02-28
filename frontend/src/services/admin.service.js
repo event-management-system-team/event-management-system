@@ -68,4 +68,8 @@ export const adminService = {
         return axiosInstance.get(`/admin/events/${id}/ticket-types`)
     },
 
+    getEventAgenda: (id) => {
+        return axiosInstance.get(`/admin/events/${id}/agenda`)
+    },
+
 };
