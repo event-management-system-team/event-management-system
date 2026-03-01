@@ -1,7 +1,10 @@
 import { MapPin, Calendar, ArrowRight, Flame } from "lucide-react";
 import { Carousel } from 'antd';
+import { useNavigate } from "react-router";
 
 const HeroSlider = ({ events }) => {
+
+    const navigate = useNavigate();
 
     const formatDate = (dateString) => {
         if (!dateString) return 'Updating';
@@ -56,7 +59,8 @@ const HeroSlider = ({ events }) => {
                                     </span>
                                 </div>
 
-                                <button className="bg-red-500 hover:bg-red-600 text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg shadow-red-500/30 transition-all flex items-center gap-2 transform hover:-translate-y-1">
+                                <button className="bg-red-500 hover:bg-red-600 text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg shadow-red-500/30 transition-all flex items-center gap-2 transform hover:-translate-y-1"
+                                    onClick={() => navigate(`/events/${event?.eventSlug}`)}>
                                     Book Tickets Now
                                     <ArrowRight size={20} />
                                 </button>

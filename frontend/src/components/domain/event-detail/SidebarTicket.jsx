@@ -1,6 +1,5 @@
 import { Info, Lock, Minus, Plus, Ticket } from 'lucide-react'
 import { useTicketCart } from '../../../hooks/useTicketCart'
-import EmptyState from '../../common/EmptyState'
 
 const SidebarTicket = ({ minPrice, ticketTypes }) => {
 

@@ -6,7 +6,7 @@ import EmptyState from '../../components/common/EmptyState'
 import { useQuery } from "@tanstack/react-query"
 import { useParams } from "react-router-dom"
 import eventService from "../../services/event.service"
-import { Star } from "lucide-react"
+import OrganizerCard from "../../components/common/attendee/OrganizerCard"
 
 const EventDetailPage = () => {
 
@@ -41,6 +41,7 @@ const EventDetailPage = () => {
 
                     <ContentLeft
                         eventName={events?.eventName}
+                        eventSlug={events?.eventSlug}
                         description={events.description}
                         imageGallery={events.imageGallery}
                         locationCoordinates={events.locationCoordinates}
@@ -57,29 +58,7 @@ const EventDetailPage = () => {
                                 totalCapacity={events?.totalCapacity}
                             />
 
-                            {/* Organizer */}
-                            <div className="bg-white p-6 rounded-3xl border border-[#E5E1DA]">
-                                <h5 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Organizer</h5>
-                                <div className="flex items-center gap-4">
-
-                                    {events?.organizer?.avatarUrl ? (
-                                        <img
-                                            src={events.organizer.avatarUrl}
-                                            alt={events.organizer.fullName}
-                                            className="size-12 rounded-xl object-cover"
-                                        />
-                                    ) : (
-                                        <div className="size-12 rounded-xl bg-slate-100 flex items-center justify-center">
-                                            <Star className="w-6 h-6 text-primary fill-primary/20" />
-                                        </div>
-                                    )}
-
-                                    <div>
-                                        <p className="font-bold">{events?.organizer?.fullName || 'Đang cập nhật'}</p>
-                                        <p className="text-xs text-primary ">{events?.organizer?.email}</p>
-                                    </div>
-                                </div>
-                            </div>
+                            <OrganizerCard events={events} />
                         </div>
                     </aside>
                 </main>

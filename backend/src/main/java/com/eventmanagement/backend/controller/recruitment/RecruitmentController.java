@@ -36,4 +36,10 @@ public class RecruitmentController {
         Page<RecruitmentResponse> responses = recruitmentService.searchRecruitments(keyword, location, deadline, page, size);
         return ResponseEntity.ok(responses);
     }
+
+    @GetMapping("/{eventSlug}")
+    public ResponseEntity<RecruitmentResponse> getRecruitmentByEvent_EventSlug(@PathVariable("eventSlug") String eventSlug) {
+        RecruitmentResponse response = recruitmentService.getRecruitmentByEventSlug(eventSlug);
+        return ResponseEntity.ok(response);
+    }
 }
