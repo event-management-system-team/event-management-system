@@ -41,6 +41,7 @@ const EventDetailPage = () => {
 
                     <ContentLeft
                         eventName={events?.eventName}
+                        eventSlug={events?.eventSlug}
                         description={events.description}
                         imageGallery={events.imageGallery}
                         locationCoordinates={events.locationCoordinates}

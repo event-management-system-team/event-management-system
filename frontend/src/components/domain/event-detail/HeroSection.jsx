@@ -1,4 +1,4 @@
-import { CalendarDays, ChevronRight, Clock, MapPin, Tag } from 'lucide-react'
+import { CalendarDays, Clock, MapPin, Tag } from 'lucide-react'
 import DynamicBreadcrumb from '../../common/DynamicBreadcrumb';
 
 const HeroSection = ({ bannerUrl, location, eventName, startDate, endDate, category }) => {
