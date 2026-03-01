@@ -1,8 +1,18 @@
 import React from 'react';
-import { LayoutDashboard, FileText, Users, MessageSquare, HelpCircle, CalendarDays } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { LayoutDashboard, FileText, Users, MessageSquare, LogOut, CalendarDays } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { logoutUser } from '../../store/slices/auth.slice';
 
 const Sidebar = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        await dispatch(logoutUser());
+        navigate('/login');
+    };
+
     return (
         <div className="w-64 bg-[#1e293b] min-h-screen flex flex-col text-gray-300 fixed left-0 top-0 z-50 font-sans">
             {/* 1. Logo */}
@@ -40,10 +50,13 @@ const Sidebar = () => {
 
             {/* 4. Footer */}
             <div className="p-6 mt-auto">
-                <div className="flex items-center gap-3 text-sm text-gray-400 hover:text-white cursor-pointer transition-colors">
-                    <HelpCircle size={20} />
-                    <span>Help Center</span>
-                </div>
+                <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-3 text-sm text-gray-400 hover:text-red-400 cursor-pointer transition-colors w-full"
+                >
+                    <LogOut size={20} />
+                    <span>Logout</span>
+                </button>
             </div>
         </div>
     );
