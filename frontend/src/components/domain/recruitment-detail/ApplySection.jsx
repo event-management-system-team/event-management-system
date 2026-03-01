@@ -1,7 +1,10 @@
 import { Progress } from 'antd'
 import { ArrowRight, Calendar, MapPin } from 'lucide-react'
+import { useNavigate } from 'react-router';
 
-const ApplySection = ({ status, location, daysLeft, filledPercentage, formattedDeadline, totalAvailable, totalVacancy, deadlineDate }) => {
+const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage, formattedDeadline, totalAvailable, totalVacancy, deadlineDate }) => {
+
+    const navigate = useNavigate();
     return (
         <div className="bg-white rounded-2xl p-7 shadow-xl shadow-slate-200/50 border border-[#E5E1DA]/50">
             <div className="flex justify-between items-center mb-8">
@@ -56,15 +59,16 @@ const ApplySection = ({ status, location, daysLeft, filledPercentage, formattedD
 
 
             <button
-                disabled={totalAvailable === totalVacancy}
+                disabled={totalAvailable <= 0}
                 className="w-full py-4 text-[15px] font-extrabold rounded-xl transition-all duration-300 flex items-center justify-center gap-3 group uppercase
                bg-primary text-white shadow-lg shadow-primary/30 
                hover:bg-primary/90 hover:shadow-primary/50 hover:-translate-y-1
                disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:bg-slate-200"
+                onClick={() => navigate(`/attendee/recruitments/${eventSlug}/apply-staff`)}
             >
-                {(totalAvailable === totalVacancy) ? 'Fully Booked' : 'Apply Now'}
+                {totalAvailable <= 0 ? 'Fully Booked' : 'Apply Now'}
 
-                {!(totalAvailable === totalVacancy) && (
+                {!(totalAvailable <= 0) && (
                     <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1.5" />
                 )}
             </button>
