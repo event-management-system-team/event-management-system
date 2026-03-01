@@ -28,21 +28,35 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-     
 @Bean
-public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-        .csrf(csrf -> csrf.disable())
-        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests(auth -> auth  
-         .requestMatchers("/api/v1/auth/**").permitAll() 
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth  
+                .requestMatchers("/api/v1/auth/**").permitAll() 
                 .requestMatchers("/api/auth/**").permitAll() 
+                .requestMatchers("/api/v1/events/**").permitAll()
                 .requestMatchers("/api/events/**").permitAll()
-            .anyRequest().authenticated()
-        ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-    return http.build();
-}
+                .requestMatchers("/api/v1/categories/**").permitAll()
+                .requestMatchers("/api/categories/**").permitAll()
+                .requestMatchers("/api/v1/recruitments/recent").permitAll()
+                .requestMatchers("/api/recruitments/recent").permitAll()
+                .requestMatchers("/api/v1/feedbacks/**").permitAll()
+                .requestMatchers("/api/feedbacks/**").permitAll()
+
+
+                
+                .requestMatchers("/api/v1/profile/{userId}").permitAll() 
+                .requestMatchers("/api/profile/{userId}").permitAll() 
+                .anyRequest().authenticated()
+            )
+            // Giữ nguyên Filter xử lý JWT cực kỳ quan trọng của bạn
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            
+        return http.build();
+    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

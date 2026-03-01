@@ -6,7 +6,10 @@ const feedbackService = {
     return axiosClient.get(`/events/${eventId}/feedbacks`);
   },
   
-  // Các hàm khác nếu cần (Xóa, chi tiết...)
+  // Lấy chi tiết feedback theo Feedback ID
+  getFeedbackById: (feedbackId) => {
+    return axiosClient.get(`/feedbacks/${feedbackId}`);
+  }
 };
 
 export default feedbackService;

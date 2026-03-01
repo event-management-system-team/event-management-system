@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import Sidebar from '../../components/layout/Sidebar'; 
 
 const ApplicationList = () => {
-  // Trạng thái quản lý việc mở/đóng cửa sổ Modal
+ 
   const [selectedCandidate, setSelectedCandidate] = useState(null);
 
   // Mock Data: Danh sách ứng viên

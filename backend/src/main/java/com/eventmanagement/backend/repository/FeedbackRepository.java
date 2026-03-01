@@ -2,7 +2,7 @@ package com.eventmanagement.backend.repository;
 
 
 import java.util.List;
-import java.util.UUID; // Trỏ tới file Entity của bạn
+import java.util.UUID; 
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -31,5 +31,6 @@ public interface FeedbackRepository extends JpaRepository<Feedback, UUID> {
         JOIN ticket_types tt ON t.ticket_type_id = tt.ticket_type_id
         WHERE f.event_id = CAST(:eventId AS UUID)
     """, nativeQuery = true)
-    List<FeedbackResponseDTO> findFeedbacksByEventId(@Param("eventId") String eventId);
+    List<FeedbackResponseDTO> findFeedbacksByEventId(@Param("eventId") UUID eventId);
+
 }

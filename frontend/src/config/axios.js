@@ -32,7 +32,7 @@ axiosInstance.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error),
+  (error) => Promise.reject(error)
 );
 
 // Response Interceptor
@@ -41,7 +41,9 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // Bắt lỗi 401 và đảm bảo request này chưa từng được retry
     if (error.response?.status === 401 && !originalRequest._retry) {
+      
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
@@ -57,7 +59,13 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const response = await axiosInstance.post("/auth/refresh");
+        // 🔥 FIX 1: Dùng axios gốc (không dùng axiosInstance) để tránh bị chặn lại
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URL}/auth/refresh`, 
+          {}, 
+          { withCredentials: true } // Vẫn phải giữ cái này để gửi httpOnly cookie đi
+        );
+        
         const { accessToken } = response.data;
 
         sessionStorage.setItem("accessToken", accessToken);
@@ -65,11 +73,17 @@ axiosInstance.interceptors.response.use(
 
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return axiosInstance(originalRequest);
+        
       } catch (refreshError) {
         processQueue(refreshError, null);
         sessionStorage.removeItem("accessToken");
         sessionStorage.removeItem("user");
-        window.location.href = "/login";
+        
+        // 🔥 FIX 2: Chặn vòng lặp vô tận gây sập trình duyệt
+        if (window.location.pathname !== "/login") {
+          window.location.href = "/login";
+        }
+        
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
@@ -77,7 +91,7 @@ axiosInstance.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  },
+  }
 );
 
 export default axiosInstance;

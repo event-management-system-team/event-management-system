@@ -4,7 +4,7 @@ import api from "../../services/api";
 // Hook để lấy danh sách feedbacks cho một sự kiện
 const fetchFeedbacks = async (eventId) => {
     // Trỏ tới endpoint trong Spring Boot Controller của bạn để lấy feedbacks theo eventId
-  const response = await api.get(`/events/${eventId}/feedbacks`);
+  const response = await api.get(`/events/${eventId}/feedback`);
   return response.data;
 };
 
