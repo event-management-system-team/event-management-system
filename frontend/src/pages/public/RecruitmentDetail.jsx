@@ -61,6 +61,7 @@ const RecruitmentDetailPage = () => {
                         <div className="sticky top-28 space-y-6">
 
                             <ApplySection
+                                eventSlug={eventSlug}
                                 status={recruitment.status}
                                 formattedDeadline={formattedDeadline}
                                 filledPercentage={filledPercentage}

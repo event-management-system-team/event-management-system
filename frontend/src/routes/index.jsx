@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import PublicRoutes from "./PublicRoutes";
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
+import AttendeeRoutes from "./AttendeeRoutes";
 
 const AppRoutes = () => {
   return (
@@ -12,6 +13,8 @@ const AppRoutes = () => {
 
       {/* Public/Protected Routes */}
       <Route path="/*" element={<PublicRoutes />} />
+      <Route path="/attendee/*" element={<AttendeeRoutes />} />
+
     </Routes>
   );
 };
