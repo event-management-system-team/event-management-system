@@ -45,23 +45,34 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
-        LoginResponse loginResponse = authService.login(request, response);
+    public ResponseEntity<LoginResponse> login(
+            @Valid @RequestBody LoginRequest request,
+            HttpServletRequest httpRequest,
+            HttpServletResponse httpResponse) {
+        String deviceInfo = httpRequest.getHeader("User-Agent");
+        if (deviceInfo == null)
+            deviceInfo = "Unknown Device";
+        LoginResponse loginResponse = authService.login(request, deviceInfo, httpResponse);
         return ResponseEntity.ok(loginResponse);
     }
 
     @PostMapping("/google")
     public ResponseEntity<LoginResponse> loginWithGoogle(
             @Valid @RequestBody GoogleLoginRequest request,
-            HttpServletResponse response) {
+            HttpServletRequest httpRequest,
+            HttpServletResponse httpResponse) {
         log.info("Received Google login request");
-        LoginResponse loginResponse = authService.loginWithGoogle(request, response);
+        String deviceInfo = httpRequest.getHeader("User-Agent");
+        if (deviceInfo == null)
+            deviceInfo = "Unknown Device";
+        LoginResponse loginResponse = authService.loginWithGoogle(request, deviceInfo, httpResponse);
         return ResponseEntity.ok(loginResponse);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Map<String, String>> logout(HttpServletResponse response) {
-        authService.logout(response);
+    public ResponseEntity<Map<String, String>> logout(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = cookieUtil.getRefreshTokenFromCookie(request).orElse(null);
+        authService.logout(refreshToken, response);
 
         Map<String, String> result = new HashMap<>();
         result.put("message", "Logout successful");
@@ -77,7 +88,11 @@ public class AuthController {
                 .orElseThrow(() -> new com.eventmanagement.backend.exception.UnauthorizedException(
                         "Refresh token not found"));
 
-        RefreshTokenResponse tokenResponse = authService.refreshToken(refreshToken, response);
+        String deviceInfo = request.getHeader("User-Agent");
+        if (deviceInfo == null)
+            deviceInfo = "Unknown Device";
+
+        RefreshTokenResponse tokenResponse = authService.refreshToken(refreshToken, deviceInfo, response);
         return ResponseEntity.ok(tokenResponse);
     }
 

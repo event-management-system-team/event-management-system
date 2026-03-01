@@ -16,6 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +40,7 @@ public class RefreshTokenService {
 
         String rawToken = jwtTokenProvider.generateRefreshToken(user.getUserId());
 
-        String hashedToken = passwordEncoder.encode(rawToken);
+        String hashedToken = hashToken(rawToken);
 
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(user)
@@ -67,7 +71,7 @@ public class RefreshTokenService {
 
             RefreshToken matchedToken = null;
             for (RefreshToken token : userTokens) {
-                if (passwordEncoder.matches(rawToken, token.getToken())) {
+                if (hashToken(rawToken).equals(token.getToken())) {
                     matchedToken = token;
                     break;
                 }
@@ -116,7 +120,7 @@ public class RefreshTokenService {
             List<RefreshToken> userTokens = refreshTokenRepository.findByUser(user);
 
             for (RefreshToken token : userTokens) {
-                if (passwordEncoder.matches(rawToken, token.getToken())) {
+                if (hashToken(rawToken).equals(token.getToken())) {
                     token.setRevoked(true);
                     refreshTokenRepository.save(token);
                     log.info("Refresh token revoked for user: {}", userId);
@@ -138,5 +142,15 @@ public class RefreshTokenService {
     public void cleanupExpiredTokens() {
         refreshTokenRepository.deleteExpiredTokens(LocalDateTime.now());
         log.info("Expired refresh tokens cleaned up");
+    }
+
+    private String hashToken(String token) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(token.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Failed to hash token", e);
+        }
     }
 }

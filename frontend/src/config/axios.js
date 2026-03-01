@@ -67,8 +67,9 @@ axiosInstance.interceptors.response.use(
       try {
         console.log("Refreshing token...");
 
+        const baseURL = import.meta.env.VITE_API_URL || "http://localhost:8080/api/v1";
         const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/auth/refresh`,
+          `${baseURL}/auth/refresh`,
           {},
           { withCredentials: true },
         );

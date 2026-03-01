@@ -26,8 +26,10 @@ public class CookieUtil {
         cookie.setSecure(false);
         cookie.setPath("/");
         cookie.setMaxAge(maxAge);
-        cookie.setAttribute("SameSite", "Strict");
-        cookie.setDomain(cookieDomain);
+        cookie.setAttribute("SameSite", "Lax");
+        if (cookieDomain != null && !cookieDomain.trim().isEmpty() && !cookieDomain.equals("localhost")) {
+            cookie.setDomain(cookieDomain);
+        }
 
         response.addCookie(cookie);
     }
@@ -49,7 +51,9 @@ public class CookieUtil {
         cookie.setSecure(cookieSecure);
         cookie.setPath("/");
         cookie.setMaxAge(0);
-        cookie.setDomain(cookieDomain);
+        if (cookieDomain != null && !cookieDomain.trim().isEmpty() && !cookieDomain.equals("localhost")) {
+            cookie.setDomain(cookieDomain);
+        }
 
         response.addCookie(cookie);
     }
