@@ -5,21 +5,32 @@ import com.eventmanagement.backend.dto.response.attendee.ApplicationFormResponse
 import com.eventmanagement.backend.dto.response.attendee.PositionResponse;
 import com.eventmanagement.backend.model.CustomForm;
 import com.eventmanagement.backend.model.Recruitment;
+import com.eventmanagement.backend.model.StaffApplication;
 import com.eventmanagement.backend.repository.CustomFormRepository;
 import com.eventmanagement.backend.repository.RecruitmentRepository;
+import com.eventmanagement.backend.repository.StaffApplicationRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ApplicationFormService {
 
     private final CustomFormRepository customFormRepository;
     private final RecruitmentRepository recruitmentRepository;
+    private final StaffApplicationRepository applicationRepository;
+    private final CloudinaryService cloudinaryService;
+    private final ObjectMapper objectMapper;
 
     @Transactional(readOnly = true)
     public ApplicationFormResponse getFormForAttendee(String eventSlug) {
@@ -36,6 +47,34 @@ public class ApplicationFormService {
 
         return mapToResponse(customForm, recruitments);
     }
+
+    @Transactional
+    public void submitApplication(UUID recruitmentId,
+                                  UUID userId,
+                                  String answersJson,
+                                  MultipartFile cvFile) throws Exception {
+
+        if (applicationRepository.existsByRecruitmentIdAndUserId(recruitmentId, userId)) {
+            throw new IllegalStateException("You have already applied for this position!");
+        }
+
+        log.info("Loading CV to Cloudinary: {}", userId);
+        String cvUrl = cloudinaryService.uploadCV(cvFile);
+
+        ObjectNode applicationDataNode = (ObjectNode) objectMapper.readTree(answersJson);
+
+        applicationDataNode.put("cvUrl", cvUrl);
+
+        StaffApplication application = StaffApplication.builder()
+                .recruitmentId(recruitmentId)
+                .userId(userId)
+                .applicationData(applicationDataNode)
+                .build();
+
+        applicationRepository.save(application);
+        log.info("Apply success. Application ID: {}", application.getApplicationId());
+    }
+
 
     private ApplicationFormResponse mapToResponse(CustomForm customForm, List<Recruitment> recruitments) {
 
@@ -60,5 +99,6 @@ public class ApplicationFormService {
                 .location(location)
                 .recruitments(positionResponses)
                 .build();
+
     }
 }

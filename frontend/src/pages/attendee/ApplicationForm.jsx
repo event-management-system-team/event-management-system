@@ -23,7 +23,6 @@ const ApplicationFormPage = () => {
         enabled: !!eventSlug,
     })
 
-
     const {
         data: userProfile,
         isLoading: isProfileLoading,
@@ -33,10 +32,7 @@ const ApplicationFormPage = () => {
         queryFn: () => profileService.getMyProfile(),
     });
 
-
-
     const { form, selectedRole, setSelectedRole, selectedPosition, isFull, handleSubmit } = useApplicationForm(recruitmentData?.recruitments, userProfile);
-
 
     if (isLoading || isProfileLoading) {
         return <LoadingState />;
@@ -53,8 +49,6 @@ const ApplicationFormPage = () => {
         }
         return e?.fileList;
     };
-
-
 
     const renderDynamicField = (field) => {
 
