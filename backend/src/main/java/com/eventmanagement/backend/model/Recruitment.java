@@ -65,4 +65,5 @@ public class Recruitment {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+    
 }

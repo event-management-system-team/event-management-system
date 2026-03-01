@@ -1,7 +1,7 @@
 package com.eventmanagement.backend.service;
 
 import com.eventmanagement.backend.constants.EventStatus;
-import com.eventmanagement.backend.dto.response.attendee.EventResponse;
+import com.eventmanagement.backend.dto.response.attendee.*;
 import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,23 +45,29 @@ public class EventService {
         String loc = (location != null && !location.trim().isEmpty()) ? location.trim() : null;
         List<String> cat = (categories != null && !categories.isEmpty()) ? categories : null;
 
-        LocalDateTime dateTime = null;
+        LocalDateTime startOfDay = null;
+        LocalDateTime endOfDay = null;
+
         if (date != null) {
-            // Biến ngày "25/04/2026" thành "25/04/2026 23:59:59" để tìm các sự kiện đang
-            // diễn ra trong ngày đó
-            dateTime = date.atTime(23, 59, 59);
+            startOfDay = date.atStartOfDay(); // Tương đương 00:00:00
+            endOfDay = date.atTime(23, 59, 59); // Tương đương 23:59:59
         }
 
-        Page<Event> events = eventRepository.searchEvents(EventStatus.APPROVED, kw, loc, cat, dateTime, price, isFree,
+        Page<Event> events = eventRepository.searchEvents(EventStatus.APPROVED, kw, loc, cat, startOfDay, endOfDay, price, isFree,
                 pageable);
         return events.map(event -> mapToResponse(event));
     }
 
+    public EventResponse getEventBySlug(String eventSlug) {
+        Event event = eventRepository.findEventByEventSlug(eventSlug);
+        return mapToResponse(event);
+    }
+
     private EventResponse mapToResponse(Event event) {
 
-        EventResponse.CategoryDto categoryDto = null;
+        EventCategoryResponse eventCategoryResponse = null;
         if (event.getCategory() != null) {
-            categoryDto = EventResponse.CategoryDto.builder()
+            eventCategoryResponse = EventCategoryResponse.builder()
                     .categoryId(event.getCategory().getCategoryId())
                     .categoryName(event.getCategory().getCategoryName())
                     .categorySlug(event.getCategory().getCategorySlug())
@@ -69,12 +76,13 @@ public class EventService {
                     .build();
         }
 
-        EventResponse.OrganizerDto organizerDto = null;
+        OrganizerResponse organizerResponse = null;
         if (event.getOrganizer() != null) {
-            organizerDto = EventResponse.OrganizerDto.builder()
+            organizerResponse = OrganizerResponse.builder()
                     .userId(event.getOrganizer().getUserId())
                     .fullName(event.getOrganizer().getFullName())
                     .avatarUrl(event.getOrganizer().getAvatarUrl())
+                    .email(event.getOrganizer().getEmail())
                     .build();
         }
 
@@ -86,6 +94,40 @@ public class EventService {
                     .min((price1, price2) -> price1.compareTo(price2))
                     .orElse(null);
         }
+
+        List<TicketTypeResponse> ticketTypeResponses = new ArrayList<>();
+        if (event.getTicketTypes() != null && !event.getTicketTypes().isEmpty()) {
+            ticketTypeResponses = event.getTicketTypes().stream()
+                    .map(ticket -> TicketTypeResponse.builder()
+                            .ticketTypeId(ticket.getTicketTypeId())
+                            .ticketName(ticket.getTicketName())
+                            .price(ticket.getPrice())
+                            .isActive(ticket.getIsActive())
+                            .description(ticket.getDescription())
+                            .quantity(ticket.getQuantity())
+                            .reservedCount(ticket.getReservedCount())
+                            .soldCount(ticket.getSoldCount())
+                            .saleStart(ticket.getSaleStart())
+                            .saleEnd(ticket.getSaleEnd())
+                            .build())
+                    .collect(Collectors.toList());
+        }
+
+        List<EventAgendaResponse> eventAgendaResponse = new ArrayList<>();
+        if (!event.getAgendas().isEmpty()) {
+            eventAgendaResponse = event.getAgendas().stream()
+                    .map((agenda) -> EventAgendaResponse.builder()
+                            .agendaId((agenda.getAgendaId()))
+                            .title(agenda.getTitle())
+                            .description(agenda.getDescription())
+                            .startTime(agenda.getStartTime())
+                            .endTime(agenda.getEndTime())
+                            .location(agenda.getLocation())
+                            .orderIndex(agenda.getOrderIndex())
+                            .build())
+                    .collect(Collectors.toList());
+        }
+
 
         return EventResponse.builder()
                 .eventId(event.getEventId())
@@ -106,9 +148,11 @@ public class EventService {
                 .metadata(event.getMetadata())
                 .createdAt(event.getCreatedAt())
                 .updatedAt(event.getUpdatedAt())
-                .category(categoryDto)
-                .organizer(organizerDto)
+                .category(eventCategoryResponse)
+                .organizer(organizerResponse)
                 .minPrice(minPrice)
+                .agendas(eventAgendaResponse)
+                .ticketTypes(ticketTypeResponses)
                 .build();
     }
 }

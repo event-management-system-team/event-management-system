@@ -1,0 +1,28 @@
+package com.eventmanagement.backend.dto.request;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
+
+@Data
+public class CreateOrganizerRequest {
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
+    private String email;
+
+    @NotBlank(message = "Full name is required")
+    @Size(min = 2, message = "Full name must be at least 2 characters long")
+    private String fullName;
+
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters long")
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[^A-Za-z0-9]).*$",
+            message = "Password must contain uppercase, lowercase, number and special character")
+    private String password;
+
+    @Size(min = 10, max = 10, message = "Phone number must be 10 digits long")
+    @Pattern(regexp = "^[0-9]+$", message = "Phone number must contain only digits")
+    private String phone;
+}

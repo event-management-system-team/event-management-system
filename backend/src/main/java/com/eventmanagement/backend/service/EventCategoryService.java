@@ -32,8 +32,6 @@ public class EventCategoryService {
                 .colorCode(eventCategory.getColorCode())
                 .isActive(eventCategory.getIsActive())
                 .displayOrder(eventCategory.getDisplayOrder())
-                .createdAt(eventCategory.getCreatedAt())
-                .updatedAt(eventCategory.getUpdatedAt())
                 .build();
     }
 }
