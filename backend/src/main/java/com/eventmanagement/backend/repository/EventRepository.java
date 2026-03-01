@@ -53,5 +53,7 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
 
     Page<Event> findAll(Pageable pageable);
 
+    Event findByEventId(UUID eventId);
+
 //    Page<Event> findByOrganizer_UserId(UUID userId, Pageable pageable);
 }
