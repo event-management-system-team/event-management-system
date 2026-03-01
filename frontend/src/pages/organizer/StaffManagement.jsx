@@ -164,59 +164,59 @@ export function StaffManagement() {
         }
     }
 
-    const pageSize = 10;
-    const startItem = currentPage * pageSize + 1;
-    const isSearching = searchTerm.trim().length > 0;
+    // const pageSize = 10;
+    // const startItem = currentPage * pageSize + 1;
+    // const isSearching = searchTerm.trim().length > 0;
 
-    const totalItems = processedAccounts.length;
-    const totalPages = Math.max(
-        1,
-        Math.ceil(totalItems / pageSize)
-    );
+    // const totalItems = processedAccounts.length;
+    // const totalPages = Math.max(
+    //     1,
+    //     Math.ceil(totalItems / pageSize)
+    // );
 
-    useEffect(() => {
-        if (currentPage > totalPages - 1) {
-            setCurrentPage(0);
-        }
-    }, [totalPages]);
+    // useEffect(() => {
+    //     if (currentPage > totalPages - 1) {
+    //         setCurrentPage(0);
+    //     }
+    // }, [totalPages]);
 
     // const paginatedAccounts = processedAccounts.slice(
     //     currentPage * pageSize,
     //     (currentPage + 1) * pageSize
     // );
 
-    const handlePrev = () => {
-        if (isSearching || currentPage === 0) return;
-        setCurrentPage(prev => prev - 1);
-    };
+    // const handlePrev = () => {
+    //     if (isSearching || currentPage === 0) return;
+    //     setCurrentPage(prev => prev - 1);
+    // };
 
-    const handleNext = () => {
-        if (isSearching || currentPage >= totalPages - 1) return;
-        setCurrentPage(prev => prev + 1);
-    };
+    // const handleNext = () => {
+    //     if (isSearching || currentPage >= totalPages - 1) return;
+    //     setCurrentPage(prev => prev + 1);
+    // };
 
-    const handlePageChange = (p) => {
-        if (isSearching) return;
-        setCurrentPage(p - 1);
-    };
+    // const handlePageChange = (p) => {
+    //     if (isSearching) return;
+    //     setCurrentPage(p - 1);
+    // };
 
-    const openModal = () => {
-        setIsModalOpen(true);
-    };
+    // const openModal = () => {
+    //     setIsModalOpen(true);
+    // };
 
-    const closeModal = () => {
-        setIsModalOpen(false);
-    };
+    // const closeModal = () => {
+    //     setIsModalOpen(false);
+    // };
 
-    const formatDate = (isoString) => {
-        const date = new Date(isoString);
+    // const formatDate = (isoString) => {
+    //     const date = new Date(isoString);
 
-        return date.toLocaleDateString("en-US", {
-            month: "short",
-            day: "2-digit",
-            year: "numeric",
-        });
-    };
+    //     return date.toLocaleDateString("en-US", {
+    //         month: "short",
+    //         day: "2-digit",
+    //         year: "numeric",
+    //     });
+    // };
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -253,14 +253,14 @@ export function StaffManagement() {
                         <div className="flex items-center gap-3">
                             <Button
                                 className="gap-2 bg-[#f7f7f7] hover:bg-[#B3C8CF] text-gray rounded-full px-5 py-5 h-12 w-32 border-1 border-gray-400"
-                                onClick={openModal}
+                            // onClick={openModal}
                             >
                                 <Download className="h-4 w-4" />
                                 Export List
                             </Button>
                             <Button
                                 className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5 py-5 h-12 w-32"
-                                onClick={openModal}
+                            // onClick={openModal}
                             >
                                 <Plus className="h-4 w-4" />
                                 Add Staff

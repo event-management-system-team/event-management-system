@@ -1,5 +1,6 @@
 package com.eventmanagement.backend.repository;
 
+import com.eventmanagement.backend.constants.AssignmentStatus;
 import com.eventmanagement.backend.dto.response.organizer.AssignmentFlatProjection;
 import com.eventmanagement.backend.model.StaffAssignment;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -32,4 +33,11 @@ public interface  StaffAssignmentRepository extends JpaRepository<StaffAssignmen
     ORDER BY sa.staff_id, ss.start_time
 """, nativeQuery = true)
     List<AssignmentFlatProjection> findAllAssignmentsByEvent(@Param("eventId") UUID eventId);
+
+    boolean existsBySchedule_ScheduleIdAndStaff_UserId(UUID scheduleId, UUID staffId);
+
+    long countBySchedule_ScheduleIdAndStatusIn(
+            UUID scheduleId,
+            List<AssignmentStatus> statuses
+    );
 }
