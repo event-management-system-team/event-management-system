@@ -9,8 +9,8 @@ import com.eventmanagement.backend.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -29,7 +29,6 @@ public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
-    private final PasswordEncoder passwordEncoder;
 
     @Value("${jwt.refresh-token-expiration}")
     private long refreshTokenExpiration;
@@ -39,7 +38,6 @@ public class RefreshTokenService {
         log.info("Creating refresh token for user: {}", user.getEmail());
 
         String rawToken = jwtTokenProvider.generateRefreshToken(user.getUserId());
-
         String hashedToken = hashToken(rawToken);
 
         RefreshToken refreshToken = RefreshToken.builder()
@@ -57,56 +55,49 @@ public class RefreshTokenService {
         return rawToken;
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public String rotateRefreshToken(String rawToken, String deviceInfo) {
         log.info("Rotating refresh token");
 
-        try {
-            UUID userId = jwtTokenProvider.getUserIdFromToken(rawToken);
+        UUID userId = jwtTokenProvider.getUserIdFromToken(rawToken);
 
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new UnauthorizedException("User not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
 
-            List<RefreshToken> userTokens = refreshTokenRepository.findByUser(user);
+        List<RefreshToken> userTokens = refreshTokenRepository.findByUser(user);
 
-            RefreshToken matchedToken = null;
-            for (RefreshToken token : userTokens) {
-                if (hashToken(rawToken).equals(token.getToken())) {
-                    matchedToken = token;
-                    break;
-                }
+        RefreshToken matchedToken = null;
+        for (RefreshToken token : userTokens) {
+            if (hashToken(rawToken).equals(token.getToken())) {
+                matchedToken = token;
+                break;
             }
-
-            if (matchedToken == null) {
-                log.error("Refresh token not found in database");
-                throw new UnauthorizedException("Invalid refresh token");
-            }
-
-            if (matchedToken.getRevoked()) {
-                log.error("🚨 REUSE DETECTED! Token already revoked for user: {}", userId);
-
-                refreshTokenRepository.revokeAllUserTokens(matchedToken.getUser());
-
-                throw new UnauthorizedException("Token reuse detected. All sessions revoked.");
-            }
-
-            if (matchedToken.isExpired()) {
-                throw new UnauthorizedException("Refresh token expired");
-            }
-
-            matchedToken.setRevoked(true);
-            refreshTokenRepository.save(matchedToken);
-
-            String newRawToken = createRefreshToken(matchedToken.getUser(), deviceInfo);
-
-            log.info("Refresh token rotated successfully for user: {}", userId);
-
-            return newRawToken;
-
-        } catch (Exception e) {
-            log.error("Refresh token rotation failed: {}", e.getMessage());
-            throw new UnauthorizedException("Invalid or expired refresh token");
         }
+
+        if (matchedToken == null) {
+            log.error("Refresh token not found in database");
+            throw new UnauthorizedException("Invalid refresh token");
+        }
+
+        if (matchedToken.getRevoked()) {
+            log.warn("Token already revoked for user: {} — possible duplicate request or reuse attack", userId);
+            refreshTokenRepository.revokeAllUserTokens(user);
+            throw new UnauthorizedException("Token already used. Please login again.");
+        }
+
+        if (matchedToken.isExpired()) {
+            throw new UnauthorizedException("Refresh token expired");
+        }
+
+        matchedToken.setRevoked(true);
+        refreshTokenRepository.save(matchedToken);
+        refreshTokenRepository.flush();
+
+        String newRawToken = createRefreshToken(user, deviceInfo);
+
+        log.info("Refresh token rotated successfully for user: {}", userId);
+
+        return newRawToken;
     }
 
     @Transactional

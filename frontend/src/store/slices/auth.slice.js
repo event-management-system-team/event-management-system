@@ -130,6 +130,7 @@ const initialState = {
   accessToken: null,
   isAuthenticated: authService.isAuthenticated(),
   loading: false,
+  appLoading: true, // Used to block the app render until autoRefresh finishes
   error: null,
   registerSuccess: false,
 };
@@ -152,6 +153,9 @@ const authSlice = createSlice({
       state.user = action.payload;
       const rememberMe = authService.isRememberMe();
       authService.saveUser(action.payload, rememberMe);
+    },
+    setAppLoading: (state, action) => {
+      state.appLoading = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -200,9 +204,13 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
 
+      .addCase(autoRefreshToken.pending, (state) => {
+        state.appLoading = true;
+      })
       .addCase(autoRefreshToken.fulfilled, (state, action) => {
         state.isAuthenticated = true;
         state.accessToken = action.payload.accessToken;
+        state.appLoading = false;
 
         if (action.payload.user) {
           state.user = action.payload.user;
@@ -216,6 +224,7 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.user = null;
         state.accessToken = null;
+        state.appLoading = false;
       })
 
       .addCase(sendOTP.pending, (state) => {
@@ -272,7 +281,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError, clearRegisterSuccess, setAccessToken, setUser } =
+export const { clearError, clearRegisterSuccess, setAccessToken, setUser, setAppLoading } =
   authSlice.actions;
 
 export default authSlice.reducer;

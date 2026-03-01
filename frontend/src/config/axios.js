@@ -31,7 +31,12 @@ axiosInstance.interceptors.request.use(
     const token = state.auth.accessToken;
 
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      if (config.headers instanceof axios.AxiosHeaders) {
+        config.headers.set('Authorization', `Bearer ${token}`);
+      } else {
+        config.headers = config.headers || {};
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
     }
 
     return config;
@@ -44,8 +49,12 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Reject immediately if the request was to login or refresh to prevent loop
-    if (originalRequest.url.includes('/auth/login') || originalRequest.url.includes('/auth/refresh')) {
+    // Reject immediately if the request was to login, refresh, or logout to prevent loop
+    if (
+      originalRequest.url.includes('/auth/login') ||
+      originalRequest.url.includes('/auth/refresh') ||
+      originalRequest.url.includes('/auth/logout')
+    ) {
       return Promise.reject(error);
     }
 
@@ -55,7 +64,12 @@ axiosInstance.interceptors.response.use(
           failedQueue.push({ resolve, reject });
         })
           .then((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
+            if (originalRequest.headers instanceof axios.AxiosHeaders) {
+              originalRequest.headers.set('Authorization', `Bearer ${token}`);
+            } else {
+              originalRequest.headers = originalRequest.headers || {};
+              originalRequest.headers['Authorization'] = `Bearer ${token}`;
+            }
             return axiosInstance(originalRequest);
           })
           .catch((err) => Promise.reject(err));
@@ -67,7 +81,7 @@ axiosInstance.interceptors.response.use(
       try {
         console.log("Refreshing token...");
 
-        const baseURL = import.meta.env.VITE_API_URL || "http://localhost:8080/api/v1";
+        const baseURL = axiosInstance.defaults.baseURL;
         const response = await axios.post(
           `${baseURL}/auth/refresh`,
           {},
@@ -77,16 +91,27 @@ axiosInstance.interceptors.response.use(
         const newAccessToken = response.data.accessToken;
         console.log("Token refreshed");
 
+        // Update store with new token
         store.dispatch(setAccessToken(newAccessToken));
 
+        // Process all queued requests with the new token
         processQueue(null, newAccessToken);
 
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        // Safely retry original request
+        if (originalRequest.headers instanceof axios.AxiosHeaders) {
+          originalRequest.headers.set('Authorization', `Bearer ${newAccessToken}`);
+        } else {
+          originalRequest.headers = originalRequest.headers || {};
+          originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+        }
+
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         console.error("Refresh failed:", refreshError);
 
         processQueue(refreshError, null);
+        
+        // Using window.location.href navigates away, but before that logout
         store.dispatch(logoutUser());
 
         if (window.location.pathname !== "/login") {
