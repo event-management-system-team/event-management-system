@@ -13,9 +13,9 @@ import java.util.UUID;
 @Repository
 public interface RecruitmentRepository extends JpaRepository<Recruitment, UUID> {
 
-
     @Query("SELECT r FROM Recruitment r " +
             "JOIN FETCH r.event e WHERE r.status = 'OPEN' " +
             "ORDER BY r.createdAt DESC")
     List<Recruitment> findRecentRecruitments(Pageable pageable);
+
 }
