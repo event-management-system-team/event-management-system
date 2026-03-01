@@ -122,7 +122,7 @@ class AuthServiceTest {
 
         assertNotNull(result);
 
-        int expectedMaxAge = (int) (604800000L / 60);
+        int expectedMaxAge = (int) (604800000L / 1000);
         verify(cookieUtil).addRefreshTokenCookie(eq(response), eq("mockRefreshToken"), eq(expectedMaxAge));
     }
 
