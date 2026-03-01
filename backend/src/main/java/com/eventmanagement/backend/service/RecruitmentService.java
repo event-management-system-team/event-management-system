@@ -3,6 +3,7 @@ package com.eventmanagement.backend.service;
 import com.eventmanagement.backend.constants.EventStatus;
 import com.eventmanagement.backend.constants.RecruitmentStatus;
 import com.eventmanagement.backend.dto.response.attendee.OrganizerResponse;
+import com.eventmanagement.backend.dto.response.attendee.PositionResponse;
 import com.eventmanagement.backend.dto.response.attendee.RecruitmentResponse;
 import com.eventmanagement.backend.model.BenefitRecruitment;
 import com.eventmanagement.backend.model.Event;
@@ -99,8 +100,8 @@ public class RecruitmentService {
     private RecruitmentResponse mapToResponse(Event event, List<Recruitment> recruitments) {
 
         Recruitment recruitment = recruitments.get(0);
-        List<RecruitmentResponse.PositionDto> positionDTO = recruitments.stream()
-                .map((position) -> RecruitmentResponse.PositionDto.builder()
+        List<PositionResponse> positionResponse = recruitments.stream()
+                .map((position) -> PositionResponse.builder()
                         .recruitmentId(position.getRecruitmentId())
                         .positionName(position.getPositionName())
                         .vacancy(position.getVacancy())
@@ -138,7 +139,7 @@ public class RecruitmentService {
                 .deadline(recruitment.getDeadline())
                 .createdAt(recruitment.getCreatedAt())
                 .status(recruitment.getStatus())
-                .positions(positionDTO)
+                .positions(positionResponse)
                 .organizer(organizerResponses)
                 .benefits(benefitResponse)
                 .build();

@@ -1,7 +1,9 @@
 package com.eventmanagement.backend.controller.recruitment;
 
 
+import com.eventmanagement.backend.dto.response.attendee.ApplicationFormResponse;
 import com.eventmanagement.backend.dto.response.attendee.RecruitmentResponse;
+import com.eventmanagement.backend.service.ApplicationFormService;
 import com.eventmanagement.backend.service.RecruitmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,6 +21,7 @@ import java.util.List;
 public class RecruitmentController {
 
     private final RecruitmentService recruitmentService;
+    private final ApplicationFormService applicationFormService;
 
     @GetMapping("/recent")
     public ResponseEntity<List<RecruitmentResponse>> getRecentRecruitment() {
@@ -40,6 +43,12 @@ public class RecruitmentController {
     @GetMapping("/{eventSlug}")
     public ResponseEntity<RecruitmentResponse> getRecruitmentByEvent_EventSlug(@PathVariable("eventSlug") String eventSlug) {
         RecruitmentResponse response = recruitmentService.getRecruitmentByEventSlug(eventSlug);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{eventSlug}/apply-staff")
+    public ResponseEntity<ApplicationFormResponse> getApplicationForm(@PathVariable String eventSlug) {
+        ApplicationFormResponse response = applicationFormService.getFormForAttendee(eventSlug);
         return ResponseEntity.ok(response);
     }
 }
