@@ -1,13 +1,14 @@
 
 import React from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { logoutUser } from '../../store/slices/auth.slice';
 import { 
   LayoutDashboard, 
   CalendarDays,
   Users, 
   FileText, 
   MessageSquare, 
-  HelpCircle,
   Settings, 
   LogOut 
 } from 'lucide-react';
@@ -35,8 +36,15 @@ const NavItem = ({ to, icon, label, isActive }) => {
 // COMPONENT CHÍNH: Sidebar
 // ==========================================
 const Sidebar = () => {
-  const location = useLocation(); // Lấy đường dẫn hiện tại để biết đang ở trang nào
-  const { eventId } = useParams(); // Lấy ID sự kiện từ thanh URL (nếu có)
+  const location = useLocation();
+  const { eventId } = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await dispatch(logoutUser());
+    navigate('/login');
+  };
 
   // Hàm kiểm tra trang đang đứng để bật trạng thái Active
   const isDashboardActive = location.pathname.includes('/dashboard');
@@ -117,19 +125,14 @@ const Sidebar = () => {
       
       <div className="p-4 mt-auto border-t border-gray-700/50 bg-[#1a2333]">
         <div className="space-y-1">
-          <Link to="/help" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors">
-            <HelpCircle size={18} />
-            <span>Help Center</span>
-          </Link>
-          
           <Link to="/profile" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors">
             <Settings size={18} />
             <span>Settings</span>
           </Link>
           
           <button 
-            onClick={() => alert("Chức năng đăng xuất xử lý ở App.jsx")}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors cursor-pointer"
           >
             <LogOut size={18} />
             <span>Log Out</span>
