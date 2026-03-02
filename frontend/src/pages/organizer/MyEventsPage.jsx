@@ -15,7 +15,10 @@ import {
 import dayjs from 'dayjs';
 import organizerService from '../../services/organizer.service';
 
+//số lượng sự kiện trên 1 trang
+const EVENTS_PER_PAGE = 5;
 
+//config status sự kiện
 const STATUS_CONFIG = {
     APPROVED: { label: 'Active', dotColor: 'bg-green-500', textColor: 'text-green-700', bgColor: 'bg-green-50' },
     ONGOING: { label: 'Active', dotColor: 'bg-green-500', textColor: 'text-green-700', bgColor: 'bg-green-50' },
@@ -39,6 +42,7 @@ const MyEventsPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showSearch, setShowSearch] = useState(false);
 
+    
     const abortRef = useRef(null);
 
     const fetchEvents = useCallback(async (page) => {
@@ -60,8 +64,9 @@ const MyEventsPage = () => {
             setTotalElements(data.totalElements || 0);
         } catch (err) {
             if (controller.signal.aborted) return;
-            setError('Failed to load events');
-            console.error(err);
+            const msg = err.response?.data?.message || err.response?.statusText || err.message || 'Unknown error';
+            setError(`Failed to load events: ${msg} (${err.response?.status || 'network error'})`);
+            console.error('fetchEvents error:', err);
         } finally {
             if (!controller.signal.aborted) setLoading(false);
         }

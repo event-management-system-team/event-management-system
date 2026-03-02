@@ -41,6 +41,7 @@ const Sidebar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  //navavigate ve trang login
   const handleLogout = async () => {
     await dispatch(logoutUser());
     navigate('/login');
