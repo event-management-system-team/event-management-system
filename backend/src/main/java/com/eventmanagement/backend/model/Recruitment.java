@@ -3,8 +3,12 @@ package com.eventmanagement.backend.model;
 import com.eventmanagement.backend.constants.RecruitmentStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Entity
@@ -65,5 +69,9 @@ public class Recruitment {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-    
+
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "benefits", columnDefinition = "jsonb")
+    private List<BenefitRecruitment> benefits;
 }

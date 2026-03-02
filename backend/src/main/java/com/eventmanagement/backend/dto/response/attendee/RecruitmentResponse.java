@@ -1,10 +1,7 @@
 package com.eventmanagement.backend.dto.response.attendee;
 
 import com.eventmanagement.backend.constants.RecruitmentStatus;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,16 +22,19 @@ public class RecruitmentResponse {
     private LocalDateTime createdAt;
 
     private RecruitmentStatus status;
-    private List<PositionDto> positions;
+    private List<PositionResponse> positions;
     private OrganizerResponse organizer;
+    private List<BenefitRecruitmentDto> benefits;
 
-    @Data
+    
     @Builder
-    public static class PositionDto {
-        private UUID recruitmentId;
-        private String positionName;
-        private int vacancy;
-        private int availableSlots;
-        private String requirements;
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Setter
+    public static class BenefitRecruitmentDto {
+        private String icon;
+        private String title;
+        private String description;
     }
 }

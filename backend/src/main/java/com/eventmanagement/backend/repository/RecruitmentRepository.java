@@ -55,4 +55,6 @@ public interface RecruitmentRepository extends JpaRepository<Recruitment, UUID> 
     )
     List<Recruitment> searchRecruitments(@Param("status") RecruitmentStatus status,
                                          @Param("eventSlugs") List<String> eventSlugs);
+
+    List<Recruitment> findByEvent_EventSlug(String eventSlug);
 }

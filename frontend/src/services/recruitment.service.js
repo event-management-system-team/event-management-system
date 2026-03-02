@@ -15,6 +15,14 @@ const recruitmentService = {
 
         const response = await axiosInstance.get(`/recruitments/search?${params.toString()}`)
         return response.data
+    },
+    getRecruitmentDetail: async (eventSlug) => {
+        const response = await axiosInstance.get(`/recruitments/${eventSlug}`)
+        return response.data
+    },
+    getApplicationForm: async (eventSlug) => {
+        const response = await axiosInstance.get(`/recruitments/${eventSlug}/apply-staff`)
+        return response.data
     }
 }
 
