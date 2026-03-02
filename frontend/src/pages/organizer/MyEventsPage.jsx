@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import {
     Calendar,
@@ -15,7 +15,6 @@ import {
 import dayjs from 'dayjs';
 import organizerService from '../../services/organizer.service';
 
-const EVENTS_PER_PAGE = 5;
 
 const STATUS_CONFIG = {
     APPROVED: { label: 'Active', dotColor: 'bg-green-500', textColor: 'text-green-700', bgColor: 'bg-green-50' },
@@ -40,24 +39,35 @@ const MyEventsPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showSearch, setShowSearch] = useState(false);
 
-    const fetchEvents = async (page = 0) => {
-        if (!organizerId) return;
+    const abortRef = useRef(null);
+
+    const fetchEvents = useCallback(async (page) => {
+        if (!organizerId) {
+            setLoading(false);
+            return;
+        }
+
+        if (abortRef.current) abortRef.current.abort();
+        const controller = new AbortController();
+        abortRef.current = controller;
+
         try {
             setLoading(true);
             const data = await organizerService.getMyEvents(organizerId, page, EVENTS_PER_PAGE);
+            if (controller.signal.aborted) return;
             setEvents(data.content || []);
             setTotalPages(data.totalPages || 0);
             setTotalElements(data.totalElements || 0);
-            setCurrentPage(data.number || 0);
         } catch (err) {
+            if (controller.signal.aborted) return;
             setError('Failed to load events');
             console.error(err);
         } finally {
-            setLoading(false);
+            if (!controller.signal.aborted) setLoading(false);
         }
-    };
+    }, [organizerId]);
 
-    const fetchStats = async () => {
+    const fetchStats = useCallback(async () => {
         if (!organizerId) return;
         try {
             const data = await organizerService.getMyEventStats(organizerId);
@@ -65,16 +75,16 @@ const MyEventsPage = () => {
         } catch (err) {
             console.error('Failed to load stats:', err);
         }
-    };
-
-    useEffect(() => {
-        fetchEvents(currentPage);
-        fetchStats();
     }, [organizerId]);
 
     useEffect(() => {
         fetchEvents(currentPage);
-    }, [currentPage]);
+        fetchStats();
+
+        return () => {
+            if (abortRef.current) abortRef.current.abort();
+        };
+    }, [organizerId, currentPage, fetchEvents, fetchStats]);
 
     const filteredEvents = useMemo(() => {
         if (!searchTerm.trim()) return events;
