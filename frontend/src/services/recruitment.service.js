@@ -23,7 +23,17 @@ const recruitmentService = {
     getApplicationForm: async (eventSlug) => {
         const response = await axiosInstance.get(`/recruitments/${eventSlug}/apply-staff`)
         return response.data
+    },
+    postApplicationForm: async (eventSlug, formData) => {
+        const request = await axiosInstance.post(`/recruitments/${eventSlug}/apply-staff`, formData, {
+            headers: {
+
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+        return request.data
     }
+
 }
 
 
