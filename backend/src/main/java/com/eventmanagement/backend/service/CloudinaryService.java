@@ -150,8 +150,13 @@ public class CloudinaryService {
         log.info("Starting document upload to Cloudinary: {}", file.getOriginalFilename());
 
         validateDocument(file);
+        String originalFilename = file.getOriginalFilename();
+        String extension = "";
+        if (originalFilename != null && originalFilename.contains(".")) {
+            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        }
 
-        String publicId = folder + "/cv/" + UUID.randomUUID().toString();
+        String publicId = folder + "/cv/" + UUID.randomUUID().toString() + extension;
 
         try {
             Map uploadResult = cloudinary.uploader().upload(file.getBytes(),

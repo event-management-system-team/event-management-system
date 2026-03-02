@@ -1,11 +1,11 @@
 import SelectionRole from './SelectionRole'
 import PersonalInformation from './PersonalInformation'
 import DynamicQuestion from './DynamicQuestion'
-import { Send } from 'lucide-react'
-import { Checkbox, Form } from 'antd'
+import { Loader2, Send } from 'lucide-react'
+import { Button, Checkbox, Form } from 'antd'
 
 const FormContainer = ({ form, handleSubmit, isFull,
-    selectedRole, setSelectedRole, userProfile,
+    selectedRole, setSelectedRole, userProfile, isSubmitting,
     renderDynamicField, formSchema, recruitments }) => {
 
     return (
@@ -47,7 +47,7 @@ const FormContainer = ({ form, handleSubmit, isFull,
                                     : Promise.reject(new Error('Please agree to the terms.'))
                             }
                         ]}
-                        className="m-0"
+                        className="mx-0"
                     >
                         <Checkbox className="text-sm text-slate-600 leading-relaxed font-medium hover:text-slate-900 transition-colors">
                             I confirm that the information provided is accurate and I agree to the <a className="text-[#89A8B2] underline font-bold" href="#">staff code of conduct</a>.
@@ -56,11 +56,20 @@ const FormContainer = ({ form, handleSubmit, isFull,
 
                     <button
                         type="submit"
-                        disabled={isFull || !selectedRole}
+                        disabled={isFull || !selectedRole || isSubmitting}
                         className="w-full bg-[#89A8B2] hover:opacity-85 hover:scale-[0.98] active:scale-95 disabled:bg-slate-300 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:opacity-100 text-white py-4 rounded-[16px] font-bold text-lg shadow-lg shadow-[#89A8B2]/20 transition-all duration-300 flex items-center justify-center gap-2 uppercase group"
                     >
-                        <span>{isFull ? 'Position Full' : 'Submit Application'}</span>
-                        {!isFull && <Send size={18} className="group-hover:translate-x-1 transition-transform" />}
+                        {isSubmitting ? (
+                            <>
+                                <Loader2 size={22} className="animate-spin" />
+                                <span>Loading...</span>
+                            </>
+                        ) : (
+                            <>
+                                <span>{isFull ? 'Position Full' : 'Submit Application'}</span>
+                                {!isFull && <Send size={18} className="group-hover:translate-x-1 transition-transform" />}
+                            </>
+                        )}
                     </button>
                 </div>
 

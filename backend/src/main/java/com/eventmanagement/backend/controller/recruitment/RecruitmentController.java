@@ -70,7 +70,7 @@ public class RecruitmentController {
             return ResponseEntity.ok().body("Success!!");
 
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

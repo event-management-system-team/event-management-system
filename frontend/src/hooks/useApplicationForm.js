@@ -1,34 +1,45 @@
 import { useState } from 'react';
-import { Form } from 'antd';
+import { Form, message } from 'antd';
+import recruitmentService from '../services/recruitment.service'
 
-export const useApplicationForm = (recruitmentList, userProfile) => {
+export const useApplicationForm = (recruitmentList, userProfile, eventSlug) => {
 
     const [form] = Form.useForm();
     const [selectedRole, setSelectedRole] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const selectedPosition = recruitmentList?.find(r => r.recruitmentId === selectedRole);
     const isFull = selectedPosition && selectedPosition.availableSlots <= 0;
 
-    const handleSubmit = (values) => {
-        const formData = new FormData();
+    const handleSubmit = async (values) => {
+        setIsSubmitting(true);
 
-        formData.append('recruitmentId', selectedRole);
-        formData.append('userId', userProfile.userId);
+        try {
+            const formData = new FormData();
 
-        const cvFile = values.cv[0].originFileObj;
-        formData.append('files', cvFile);
+            formData.append('recruitmentId', selectedRole);
+            formData.append('userId', userProfile.userId);
 
-        const { cv, ...answersOnlyText } = values;
+            const cvFile = values.cv[0].originFileObj;
+            formData.append('files', cvFile);
 
-        formData.append('answers', JSON.stringify(answersOnlyText));
+            const { cv, ...answersOnlyText } = values;
+            formData.append('answers', JSON.stringify(answersOnlyText));
 
-        // axiosInstance.post('/api/recruitments/bridgefest/apply-staff', formData)
+            const responseData = await recruitmentService.postApplicationForm(eventSlug, formData);
 
-        console.log('--- KIỂM TRA KIỆN HÀNG FORMDATA ---');
-        for (let [key, value] of formData.entries()) {
-            console.log(`🔑 Ngăn [${key}]:`, value);
+            message.success("Your application has been submitted successfully!");
+
+            form.resetFields();
+            setSelectedRole('');
+
+        } catch (error) {
+            const errorMsg = error.response?.data || "Failed to submit application. Please try again!";
+            message.error(errorMsg);
+            console.error("Error submit form:", error);
+        } finally {
+            setIsSubmitting(false);
         }
-        console.log('-----------------------------------');
     };
 
     return {
@@ -36,6 +47,7 @@ export const useApplicationForm = (recruitmentList, userProfile) => {
         selectedRole,
         setSelectedRole,
         selectedPosition,
+        isSubmitting,
         isFull,
         handleSubmit
     };

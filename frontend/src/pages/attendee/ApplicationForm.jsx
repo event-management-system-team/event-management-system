@@ -32,7 +32,7 @@ const ApplicationFormPage = () => {
         queryFn: () => profileService.getMyProfile(),
     });
 
-    const { form, selectedRole, setSelectedRole, selectedPosition, isFull, handleSubmit } = useApplicationForm(recruitmentData?.recruitments, userProfile);
+    const { form, selectedRole, setSelectedRole, selectedPosition, isSubmitting, isFull, handleSubmit } = useApplicationForm(recruitmentData?.recruitments, userProfile, eventSlug);
 
     if (isLoading || isProfileLoading) {
         return <LoadingState />;
@@ -152,6 +152,7 @@ const ApplicationFormPage = () => {
                         setSelectedRole={setSelectedRole}
                         userProfile={userProfile}
                         formSchema={formSchema}
+                        isSubmitting={isSubmitting}
                         renderDynamicField={renderDynamicField}
                         isFull={isFull}
                     />
