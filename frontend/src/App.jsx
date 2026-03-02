@@ -65,7 +65,11 @@ function App() {
       <Route path="/admin/analytics" element={<EventAnalytics />} />
 
       {/* Organizer Pages */}
-      <Route path="/organizer" element={<OrganizerLayout />}>
+      <Route path="/organizer" element={
+        <ProtectedRoute>
+          <OrganizerLayout />
+        </ProtectedRoute>
+      }>
         <Route path="my-events" element={<MyEventsPage />} />
       </Route>
     </Routes>
