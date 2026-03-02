@@ -1,314 +1,387 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import {
-    Plus,
     Calendar,
     Zap,
-    Clock,
+    CalendarClock,
     CheckCircle2,
+    Plus,
     SlidersHorizontal,
     Search,
     ChevronLeft,
     ChevronRight,
+    MapPin,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import dayjs from 'dayjs';
+import organizerService from '../../services/organizer.service';
 
-// ── Mock Data ────────────────────────────────────────────────
-const statsCards = [
-    {
-        label: 'TOTAL EVENTS',
-        value: 12,
-        icon: Calendar,
-        iconBg: 'bg-blue-50',
-        iconColor: 'text-blue-600',
-    },
-    {
-        label: 'ACTIVE',
-        value: 3,
-        icon: Zap,
-        iconBg: 'bg-amber-50',
-        iconColor: 'text-amber-500',
-    },
-    {
-        label: 'UPCOMING',
-        value: 5,
-        icon: Clock,
-        iconBg: 'bg-orange-50',
-        iconColor: 'text-orange-500',
-    },
-    {
-        label: 'COMPLETED',
-        value: 4,
-        icon: CheckCircle2,
-        iconBg: 'bg-teal-50',
-        iconColor: 'text-teal-600',
-    },
-];
+const EVENTS_PER_PAGE = 5;
 
-const events = [
-    {
-        id: 1,
-        name: 'Global Tech Summit 2024',
-        location: 'San Francisco, CA',
-        date: '20-21 Nov',
-        time: '09:00 AM - 06:00 PM',
-        status: 'Active',
-        ticketsSold: 1250,
-        ticketsTotal: 2000,
-        avatar: 'https://ui-avatars.com/api/?name=GT&background=1e3a5f&color=fff&rounded=true&size=40',
-    },
-    {
-        id: 2,
-        name: 'Winter Music Festival',
-        location: 'Aspen, CO',
-        date: '15-16 Dec',
-        time: '07:00 PM - 02:00 AM',
-        status: 'Upcoming',
-        ticketsSold: 840,
-        ticketsTotal: 1500,
-        avatar: 'https://ui-avatars.com/api/?name=WM&background=7c3aed&color=fff&rounded=true&size=40',
-    },
-    {
-        id: 3,
-        name: 'Gourmet Food Expo',
-        location: 'New York, NY',
-        date: '05-08 Jan',
-        time: '10:00 AM - 08:00 PM',
-        status: 'Upcoming',
-        ticketsSold: 312,
-        ticketsTotal: 3000,
-        avatar: 'https://ui-avatars.com/api/?name=GF&background=ea580c&color=fff&rounded=true&size=40',
-    },
-];
+const STATUS_CONFIG = {
+    APPROVED: { label: 'Active', dotColor: 'bg-green-500', textColor: 'text-green-700', bgColor: 'bg-green-50' },
+    ONGOING: { label: 'Active', dotColor: 'bg-green-500', textColor: 'text-green-700', bgColor: 'bg-green-50' },
+    PENDING: { label: 'Upcoming', dotColor: 'bg-orange-400', textColor: 'text-orange-600', bgColor: 'bg-orange-50' },
+    COMPLETED: { label: 'Completed', dotColor: 'bg-gray-400', textColor: 'text-gray-600', bgColor: 'bg-gray-100' },
+    REJECTED: { label: 'Rejected', dotColor: 'bg-red-500', textColor: 'text-red-600', bgColor: 'bg-red-50' },
+    DRAFT: { label: 'Draft', dotColor: 'bg-yellow-400', textColor: 'text-yellow-700', bgColor: 'bg-yellow-50' },
+};
 
-const TOTAL_EVENTS = 12;
-const PAGE_SIZE = 3;
-
-// ── Component ────────────────────────────────────────────────
 const MyEventsPage = () => {
-    const [currentPage, setCurrentPage] = useState(1);
-    const totalPages = Math.ceil(TOTAL_EVENTS / PAGE_SIZE);
+    const { user } = useSelector((state) => state.auth);
+    const organizerId = user?.user_id;
 
-    const getStatusStyle = (status) => {
-        switch (status) {
-            case 'Active':
-                return 'text-green-700 bg-green-50 border-green-200';
-            case 'Upcoming':
-                return 'text-amber-700 bg-amber-50 border-amber-200';
-            case 'Completed':
-                return 'text-gray-600 bg-gray-100 border-gray-200';
-            default:
-                return 'text-gray-600 bg-gray-100 border-gray-200';
+    const [events, setEvents] = useState([]);
+    const [stats, setStats] = useState({ totalEvents: 0, activeCount: 0, upcomingCount: 0, completedCount: 0 });
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [showSearch, setShowSearch] = useState(false);
+
+    const fetchEvents = async (page = 0) => {
+        if (!organizerId) return;
+        try {
+            setLoading(true);
+            const data = await organizerService.getMyEvents(organizerId, page, EVENTS_PER_PAGE);
+            setEvents(data.content || []);
+            setTotalPages(data.totalPages || 0);
+            setTotalElements(data.totalElements || 0);
+            setCurrentPage(data.number || 0);
+        } catch (err) {
+            setError('Failed to load events');
+            console.error(err);
+        } finally {
+            setLoading(false);
         }
     };
 
-    const getProgressColor = (status) => {
-        switch (status) {
-            case 'Active':
-                return 'bg-blue-500';
-            case 'Upcoming':
-                return 'bg-amber-400';
-            case 'Completed':
-                return 'bg-teal-500';
-            default:
-                return 'bg-gray-400';
+    const fetchStats = async () => {
+        if (!organizerId) return;
+        try {
+            const data = await organizerService.getMyEventStats(organizerId);
+            setStats(data);
+        } catch (err) {
+            console.error('Failed to load stats:', err);
         }
     };
+
+    useEffect(() => {
+        fetchEvents(currentPage);
+        fetchStats();
+    }, [organizerId]);
+
+    useEffect(() => {
+        fetchEvents(currentPage);
+    }, [currentPage]);
+
+    const filteredEvents = useMemo(() => {
+        if (!searchTerm.trim()) return events;
+        const lower = searchTerm.toLowerCase();
+        return events.filter(
+            (e) =>
+                e.eventName?.toLowerCase().includes(lower) ||
+                e.location?.toLowerCase().includes(lower) ||
+                e.categoryName?.toLowerCase().includes(lower)
+        );
+    }, [events, searchTerm]);
+
+    const getStatusDisplay = (status) => STATUS_CONFIG[status] || STATUS_CONFIG.DRAFT;
+
+    const getTicketProgress = (sold, total) => {
+        if (!total || total <= 0) return 0;
+        return Math.min(100, Math.round((sold / total) * 100));
+    };
+
+    const getProgressBarColor = (percentage) => {
+        if (percentage >= 60) return 'bg-[#7FA5A5]';
+        if (percentage >= 30) return 'bg-[#B3C8CF]';
+        return 'bg-[#d1dfe3]';
+    };
+
+    const formatDateRange = (start, end) => {
+        const s = dayjs(start);
+        const e = dayjs(end);
+        if (s.month() === e.month() && s.year() === e.year()) {
+            return `${s.format('DD')}-${e.format('DD MMM')}`;
+        }
+        return `${s.format('DD MMM')} - ${e.format('DD MMM')}`;
+    };
+
+    const formatTimeRange = (start, end) => {
+        return `${dayjs(start).format('hh:mm A')} - ${dayjs(end).format('hh:mm A')}`;
+    };
+
+    const handlePrev = () => {
+        if (currentPage > 0) setCurrentPage((p) => p - 1);
+    };
+
+    const handleNext = () => {
+        if (currentPage < totalPages - 1) setCurrentPage((p) => p + 1);
+    };
+
+    const statCards = [
+        {
+            title: 'TOTAL EVENTS',
+            value: stats.totalEvents,
+            icon: Calendar,
+            iconBg: 'bg-blue-50',
+            iconColor: 'text-blue-500',
+        },
+        {
+            title: 'ACTIVE',
+            value: stats.activeCount,
+            icon: Zap,
+            iconBg: 'bg-green-50',
+            iconColor: 'text-green-500',
+        },
+        {
+            title: 'UPCOMING',
+            value: stats.upcomingCount,
+            icon: CalendarClock,
+            iconBg: 'bg-orange-50',
+            iconColor: 'text-orange-500',
+        },
+        {
+            title: 'COMPLETED',
+            value: stats.completedCount,
+            icon: CheckCircle2,
+            iconBg: 'bg-gray-100',
+            iconColor: 'text-gray-500',
+        },
+    ];
+
+    if (error) {
+        return (
+            <div className="flex items-center justify-center h-full">
+                <p className="text-red-500">{error}</p>
+            </div>
+        );
+    }
 
     return (
         <div className="p-8 min-h-screen">
-            {/* Breadcrumb */}
-            <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-                <Link to="/" className="hover:text-gray-700 transition-colors">
-                    Home
-                </Link>
-                <span className="text-gray-400">›</span>
-                <span className="text-gray-800 font-medium">My Events</span>
-            </nav>
-
             {/* Header */}
             <div className="flex items-start justify-between mb-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 mb-1">
+                    <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
                         My Events Management
                     </h1>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 mt-1">
                         Overview of your current, upcoming and past event performances.
                     </p>
                 </div>
-                <button className="flex items-center gap-2 bg-[#1e293b] hover:bg-[#334155] text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-colors shadow-sm cursor-pointer">
+                <button className="flex items-center gap-2 bg-[#2d3a4f] hover:bg-[#1e293b] text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
                     <Plus size={18} />
                     Create New Event
                 </button>
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-4 gap-4 mb-8">
-                {statsCards.map((card, idx) => (
-                    <div
-                        key={idx}
-                        className="bg-white rounded-xl border border-gray-100 p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow"
-                    >
+            <div className="grid grid-cols-4 gap-5 mb-8">
+                {statCards.map((card, index) => {
+                    const Icon = card.icon;
+                    return (
                         <div
-                            className={`w-12 h-12 rounded-xl flex items-center justify-center ${card.iconBg}`}
+                            key={index}
+                            className="bg-background-light border border-gray-200 rounded-xl p-5 flex items-center gap-4 shadow-sm"
                         >
-                            <card.icon size={22} className={card.iconColor} />
+                            <div className={`w-12 h-12 ${card.iconBg} rounded-xl flex items-center justify-center`}>
+                                <Icon className={`h-6 w-6 ${card.iconColor}`} />
+                            </div>
+                            <div>
+                                <p className="text-[11px] text-gray-400 uppercase tracking-wider font-medium">
+                                    {card.title}
+                                </p>
+                                <p className="text-2xl font-bold text-gray-900 mt-0.5">
+                                    {loading ? '—' : card.value}
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5">
-                                {card.label}
-                            </p>
-                            <p className="text-2xl font-bold text-gray-900">
-                                {card.value}
-                            </p>
-                        </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
-            {/* Event Listings Card */}
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
-                {/* Card Header */}
-                <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
-                    <h2 className="text-lg font-semibold text-gray-900">
-                        Event Listings
-                    </h2>
+            {/* Event Listings */}
+            <div className="bg-background-light border border-gray-200 rounded-xl shadow-sm">
+                {/* Listings Header */}
+                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                    <h2 className="text-lg font-semibold text-gray-900">Event Listings</h2>
                     <div className="flex items-center gap-2">
-                        <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 cursor-pointer">
-                            <SlidersHorizontal size={18} />
+                        {showSearch && (
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Search events..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#7FA5A5]/30 focus:border-[#7FA5A5] w-60"
+                                    autoFocus
+                                />
+                            </div>
+                        )}
+                        <button
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                            title="Filter"
+                        >
+                            <SlidersHorizontal size={18} className="text-gray-500" />
                         </button>
-                        <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 cursor-pointer">
-                            <Search size={18} />
+                        <button
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                            title="Search"
+                            onClick={() => {
+                                setShowSearch(!showSearch);
+                                if (showSearch) setSearchTerm('');
+                            }}
+                        >
+                            <Search size={18} className="text-gray-500" />
                         </button>
                     </div>
                 </div>
 
                 {/* Table Header */}
-                <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-gray-50/60 text-xs font-semibold text-gray-400 uppercase tracking-wider border-b border-gray-100">
-                    <div className="col-span-3">Event</div>
+                <div className="grid grid-cols-12 gap-4 px-6 py-3 border-b border-gray-100 text-xs text-gray-400 uppercase tracking-wider font-medium">
+                    <div className="col-span-4">Event</div>
                     <div className="col-span-2">Date</div>
                     <div className="col-span-2">Status</div>
                     <div className="col-span-3">Ticket Stats</div>
-                    <div className="col-span-2 text-right">Actions</div>
+                    <div className="col-span-1 text-right">Actions</div>
                 </div>
 
-                {/* Table Rows */}
-                {events.map((event) => {
-                    const pct = Math.round(
-                        (event.ticketsSold / event.ticketsTotal) * 100
-                    );
-                    return (
-                        <div
-                            key={event.id}
-                            className="grid grid-cols-12 gap-4 px-6 py-4 items-center border-b border-gray-50 hover:bg-gray-50/50 transition-colors"
-                        >
-                            {/* Event */}
-                            <div className="col-span-3 flex items-center gap-3">
-                                <img
-                                    src={event.avatar}
-                                    alt={event.name}
-                                    className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-                                />
-                                <div className="min-w-0">
-                                    <p className="text-sm font-semibold text-gray-900 truncate">
-                                        {event.name}
-                                    </p>
-                                    <p className="text-xs text-gray-400 truncate">
-                                        {event.location}
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Date */}
-                            <div className="col-span-2">
-                                <p className="text-sm text-gray-800 font-medium">
-                                    {event.date}
-                                </p>
-                                <p className="text-xs text-gray-400">
-                                    {event.time}
-                                </p>
-                            </div>
-
-                            {/* Status */}
-                            <div className="col-span-2">
-                                <span
-                                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${getStatusStyle(
-                                        event.status
-                                    )}`}
-                                >
-                                    <span
-                                        className={`w-1.5 h-1.5 rounded-full ${event.status === 'Active'
-                                                ? 'bg-green-500'
-                                                : event.status === 'Upcoming'
-                                                    ? 'bg-amber-500'
-                                                    : 'bg-gray-400'
-                                            }`}
-                                    ></span>
-                                    {event.status}
-                                </span>
-                            </div>
-
-                            {/* Ticket Stats */}
-                            <div className="col-span-3">
-                                <div className="flex items-center gap-3 mb-1.5">
-                                    <span className="text-sm text-gray-700 font-medium">
-                                        {event.ticketsSold.toLocaleString()}/
-                                        {event.ticketsTotal.toLocaleString()}
-                                    </span>
-                                    <span className="text-xs text-gray-400 font-medium">
-                                        {pct}%
-                                    </span>
-                                </div>
-                                <div className="w-full bg-gray-100 rounded-full h-1.5">
-                                    <div
-                                        className={`h-1.5 rounded-full transition-all ${getProgressColor(
-                                            event.status
-                                        )}`}
-                                        style={{ width: `${pct}%` }}
-                                    ></div>
-                                </div>
-                            </div>
-
-                            {/* Actions */}
-                            <div className="col-span-2 text-right">
-                                <Link
-                                    to={`/organizer/events/${event.id}`}
-                                    className="text-sm font-medium text-[#6b8e8e] hover:text-[#4a7070] transition-colors"
-                                >
-                                    Manage
-                                </Link>
-                            </div>
-                        </div>
-                    );
-                })}
-
-                {/* Pagination */}
-                <div className="flex items-center justify-between px-6 py-4">
-                    <p className="text-sm text-[#6b8e8e]">
-                        Showing {PAGE_SIZE} of {TOTAL_EVENTS} events
-                    </p>
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={() =>
-                                setCurrentPage((p) => Math.max(1, p - 1))
-                            }
-                            disabled={currentPage === 1}
-                            className="px-4 py-1.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
-                        >
-                            Previous
-                        </button>
-                        <button
-                            onClick={() =>
-                                setCurrentPage((p) =>
-                                    Math.min(totalPages, p + 1)
-                                )
-                            }
-                            disabled={currentPage === totalPages}
-                            className="px-4 py-1.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
-                        >
-                            Next
-                        </button>
+                {/* Loading State */}
+                {loading && (
+                    <div className="px-6 py-16 text-center">
+                        <div className="inline-block w-8 h-8 border-3 border-gray-200 border-t-[#7FA5A5] rounded-full animate-spin" />
+                        <p className="text-sm text-gray-400 mt-3">Loading events...</p>
                     </div>
-                </div>
+                )}
+
+                {/* Empty State */}
+                {!loading && filteredEvents.length === 0 && (
+                    <div className="px-6 py-16 text-center">
+                        <Calendar className="mx-auto h-12 w-12 text-gray-300 mb-3" />
+                        <p className="text-gray-500 font-medium">No events found</p>
+                        <p className="text-sm text-gray-400 mt-1">Create your first event to get started.</p>
+                    </div>
+                )}
+
+                {/* Event Rows */}
+                {!loading &&
+                    filteredEvents.map((event) => {
+                        const statusConfig = getStatusDisplay(event.status);
+                        const progress = getTicketProgress(event.totalSold, event.totalTickets);
+                        const progressColor = getProgressBarColor(progress);
+
+                        return (
+                            <div
+                                key={event.eventId}
+                                className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-gray-50 last:border-0 items-center hover:bg-[#f0f0ec] transition-colors"
+                            >
+                                {/* Event Info */}
+                                <div className="col-span-4 flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-gray-200">
+                                        {event.bannerUrl ? (
+                                            <img
+                                                src={event.bannerUrl}
+                                                alt={event.eventName}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full bg-[#B3C8CF] flex items-center justify-center">
+                                                <Calendar size={18} className="text-white" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="text-sm font-medium text-gray-900 truncate">
+                                            {event.eventName}
+                                        </p>
+                                        <div className="flex items-center gap-1 mt-0.5">
+                                            <MapPin size={12} className="text-gray-400 shrink-0" />
+                                            <span className="text-xs text-gray-400 truncate">
+                                                {event.location || 'No location'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Date */}
+                                <div className="col-span-2">
+                                    <p className="text-sm text-gray-800 font-medium">
+                                        {formatDateRange(event.startDate, event.endDate)}
+                                    </p>
+                                    <p className="text-xs text-gray-400 mt-0.5">
+                                        {formatTimeRange(event.startDate, event.endDate)}
+                                    </p>
+                                </div>
+
+                                {/* Status */}
+                                <div className="col-span-2">
+                                    <span
+                                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${statusConfig.bgColor} ${statusConfig.textColor}`}
+                                    >
+                                        <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dotColor}`} />
+                                        {statusConfig.label}
+                                    </span>
+                                </div>
+
+                                {/* Ticket Stats */}
+                                <div className="col-span-3">
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-sm text-gray-700 font-medium min-w-20">
+                                            {(event.totalSold || 0).toLocaleString()}/
+                                            {(event.totalTickets || 0).toLocaleString()}
+                                        </span>
+                                        <span className="text-xs text-gray-400 min-w-10">
+                                            {progress}%
+                                        </span>
+                                    </div>
+                                    <div className="mt-1.5 h-1.5 bg-gray-200 rounded-full overflow-hidden max-w-45">
+                                        <div
+                                            className={`h-full rounded-full transition-all duration-500 ${progressColor}`}
+                                            style={{ width: `${progress}%` }}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Actions */}
+                                <div className="col-span-1 text-right">
+                                    <button className="text-sm text-[#7FA5A5] hover:text-[#5d8585] font-medium transition-colors">
+                                        Manage
+                                    </button>
+                                </div>
+                            </div>
+                        );
+                    })}
+
+                {/* Footer / Pagination */}
+                {!loading && totalElements > 0 && (
+                    <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
+                        <p className="text-sm text-[#7FA5A5] font-medium">
+                            Showing {filteredEvents.length} of {totalElements} events
+                        </p>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={handlePrev}
+                                disabled={currentPage === 0}
+                                className="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                            >
+                                <ChevronLeft size={16} />
+                                Previous
+                            </button>
+                            <button
+                                onClick={handleNext}
+                                disabled={currentPage >= totalPages - 1}
+                                className="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                            >
+                                Next
+                                <ChevronRight size={16} />
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

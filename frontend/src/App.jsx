@@ -25,7 +25,7 @@ function App() {
   const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((state) => state.auth);
 
-  // ✅ Auto refresh token khi app load
+  // Auto refresh token khi app load
   useEffect(() => {
     const initAuth = async () => {
       // Nếu chưa có access token nhưng có refresh token (cookie)
