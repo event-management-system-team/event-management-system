@@ -4,6 +4,8 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @Data
 public class CreateStaffScheduleRequest {
@@ -29,6 +31,8 @@ public class CreateStaffScheduleRequest {
     @Min(value = 1, message = "Required staff must be at least 1")
     @Max(value = 1000, message = "Required staff exceeds allowed limit")
     private Integer requiredStaff;
+
+    private List<UUID> staffIds;
 
     @AssertTrue(message = "End date must be after start date")
     public boolean isEndDateValid() {

@@ -9,6 +9,7 @@ import com.eventmanagement.backend.model.StaffSchedule;
 import com.eventmanagement.backend.repository.EventRepository;
 import com.eventmanagement.backend.repository.StaffScheduleRepository;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ public class StaffScheduleService {
 
     private final StaffScheduleRepository staffScheduleRepository;
     private final EventRepository eventRepository;
+    private final StaffAssignmentService staffAssignmentService;
 
     @Transactional(readOnly = true)
     public List<StaffScheduleResponse> getSchedulesByEvent(UUID eventId) {
@@ -47,8 +49,33 @@ public class StaffScheduleService {
                 .requiredStaff(req.getRequiredStaff())
                 .build();
 
-        staffScheduleRepository.save(schedule);
+        StaffSchedule savedSchedule = staffScheduleRepository.save(schedule);
 
+        return mapToResponse(savedSchedule);
+    }
+
+    public ScheduleResponse createScheduleAndAssign(UUID eventId, CreateStaffScheduleRequest req) {
+
+        StaffSchedule schedule = staffScheduleRepository.save(
+            StaffSchedule.builder()
+                    .event(eventRepository.getReferenceById(eventId))
+                    .scheduleName(req.getScheduleName())
+                    .startTime(req.getStartTime())
+                    .endTime(req.getEndTime())
+                    .description(req.getDescription())
+                    .location(req.getLocation())
+                    .requiredStaff(req.getRequiredStaff())
+                    .build()
+        );
+
+        if (req.getStaffIds() != null && !req.getStaffIds().isEmpty()) {
+            staffAssignmentService.assignMany(schedule.getScheduleId(), req.getStaffIds());
+        }
+
+        return mapToResponse(schedule);
+    }
+
+    private ScheduleResponse mapToResponse(@NonNull StaffSchedule schedule) {
         return ScheduleResponse.builder()
                 .scheduleId(schedule.getScheduleId())
                 .scheduleName(schedule.getScheduleName())

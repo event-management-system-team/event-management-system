@@ -112,13 +112,28 @@ export function StaffManagement() {
             case "staff":
                 return (
                     <div className="flex gap-3">
-                        <Button variant="outline" className="gap-2">
+                        {/*<Button variant="outline" className="gap-2">*/}
+                        {/*    <Download className="h-4 w-4" />*/}
+                        {/*    Export List*/}
+                        {/*</Button>*/}
+                        {/*<Button*/}
+                        {/*    className="gap-2 bg-[#F1F0E8] text-black"*/}
+                        {/*    onClick={() => setIsAddStaffModalOpen(true)}*/}
+                        {/*>*/}
+                        {/*    <Plus className="h-4 w-4" />*/}
+                        {/*    Add Staff*/}
+                        {/*</Button>*/}
+
+                        <Button
+                            className="gap-2 bg-[#f7f7f7] hover:bg-[#B3C8CF] text-gray rounded-full px-5 py-5 h-12 w-32 border-1 border-gray-400"
+                        // onClick={openModal}
+                        >
                             <Download className="h-4 w-4" />
                             Export List
                         </Button>
                         <Button
-                            className="gap-2 bg-[#F1F0E8] text-black"
-                            onClick={() => setIsAddStaffModalOpen(true)}
+                            className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5 py-5 h-12 w-32"
+                        // onClick={openModal}
                         >
                             <Plus className="h-4 w-4" />
                             Add Staff
@@ -127,16 +142,22 @@ export function StaffManagement() {
                 )
             case "schedule":
                 return (
-                    <Button className="gap-2 bg-[#F1F0E8] text-black">
+                    <Button
+                        className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5 py-5 h-12 w-32"
+                    // onClick={openModal}
+                    >
                         <Plus className="h-4 w-4" />
                         Add Shift
                     </Button>
                 )
             case "resources":
                 return (
-                    <Button className="gap-2 bg-[#F1F0E8] text-black">
-                        <Upload className="h-4 w-4" />
-                        Upload New Resource
+                    <Button
+                        className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5 py-5 h-12 w-40"
+                        // onClick={openModal}
+                    >
+                        <Plus className="h-4 w-4" />
+                        Upload Resource
                     </Button>
                 )
             default:
@@ -251,7 +272,7 @@ export function StaffManagement() {
                             <span>Staff Management</span>
                         </div>
                         <div className="flex items-center gap-3">
-                            <Button
+                            {/* <Button
                                 className="gap-2 bg-[#f7f7f7] hover:bg-[#B3C8CF] text-gray rounded-full px-5 py-5 h-12 w-32 border-1 border-gray-400"
                             // onClick={openModal}
                             >
@@ -264,7 +285,8 @@ export function StaffManagement() {
                             >
                                 <Plus className="h-4 w-4" />
                                 Add Staff
-                            </Button>
+                            </Button> */}
+                            {getTopRightAction()}
                         </div>
                     </div>
                     <div className="flex items-start justify-between">
@@ -500,7 +522,7 @@ export function StaffManagement() {
                                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-[#7FA5A5] transition-colors cursor-pointer">
                                     <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                                     <p className="text-base font-medium text-gray-700 mb-2">Drop new resources here</p>
-                                    <p className="text-sm text-gray-500">Support for PDF, DOCX, XLSX, JPG up to 20MB</p>
+                                    <p className="text-sm text-gray-500">Support for PDF, DOCX, XLSX, JPG up to 10MB</p>
                                     <Button className="mt-4 bg-[#7FA5A5] hover:bg-[#6D9393] text-white">
                                         Click to Upload
                                     </Button>

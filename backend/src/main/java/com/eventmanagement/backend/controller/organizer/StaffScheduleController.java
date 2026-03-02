@@ -35,4 +35,13 @@ public class StaffScheduleController {
                 staffScheduleService.createSchedule(eventId, request)
         );
     }
+
+    // create schedule + assign staff
+    @PostMapping("/{eventId}/staff-schedules/assignments")
+    public ResponseEntity<ScheduleResponse> createScheduleAndAssign(
+            @PathVariable UUID eventId,
+            @RequestBody @Valid CreateStaffScheduleRequest request
+    ) {
+        return ResponseEntity.ok(staffScheduleService.createScheduleAndAssign(eventId, request));
+    }
 }

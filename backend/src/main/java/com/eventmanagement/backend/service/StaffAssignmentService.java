@@ -74,7 +74,6 @@ public class StaffAssignmentService {
         StaffSchedule schedule = staffScheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new NotFoundException("Schedule not found"));
 
-        // 1️⃣ Check staff có phải staff của event không
         boolean isStaffOfEvent =
                 staffApplicationRepository.existsApprovedByUserAndEvent(
                         staffId,
@@ -85,12 +84,10 @@ public class StaffAssignmentService {
             throw new ForbiddenException("User is not staff of this event");
         }
 
-        // 2️⃣ Check đã assign chưa
         if (staffAssignmentRepository.existsBySchedule_ScheduleIdAndStaff_UserId(scheduleId, staffId)) {
             throw new IllegalStateException("Staff already assigned to this schedule");
         }
 
-        // 3️⃣ Check quá số required_staff
         long assignedCount =
                 staffAssignmentRepository.countBySchedule_ScheduleIdAndStatusIn(
                         scheduleId,
@@ -117,5 +114,12 @@ public class StaffAssignmentService {
                 .status(assignment.getStatus().name())
                 .assignedAt(assignment.getAssignedAt())
                 .build();
+    }
+
+    @Transactional
+    public void assignMany(UUID scheduleId, List<UUID> staffIds) {
+        for (UUID staffId : staffIds) {
+            assignStaffToSchedule(scheduleId, staffId);
+        }
     }
 }
