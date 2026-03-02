@@ -6,11 +6,13 @@ import com.eventmanagement.backend.dto.response.attendee.PositionResponse;
 import com.eventmanagement.backend.model.CustomForm;
 import com.eventmanagement.backend.model.Recruitment;
 import com.eventmanagement.backend.model.StaffApplication;
+import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.repository.CustomFormRepository;
 import com.eventmanagement.backend.repository.RecruitmentRepository;
 import com.eventmanagement.backend.repository.StaffApplicationRepository;
+import com.eventmanagement.backend.repository.UserRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -31,6 +34,7 @@ public class ApplicationFormService {
     private final StaffApplicationRepository applicationRepository;
     private final CloudinaryService cloudinaryService;
     private final ObjectMapper objectMapper;
+    private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
     public ApplicationFormResponse getFormForAttendee(String eventSlug) {
@@ -54,21 +58,31 @@ public class ApplicationFormService {
                                   String answersJson,
                                   MultipartFile cvFile) throws Exception {
 
-        if (applicationRepository.existsByRecruitmentIdAndUserId(recruitmentId, userId)) {
+        if (applicationRepository.existsByRecruitment_RecruitmentIdAndUser_UserId(recruitmentId, userId)) {
             throw new IllegalStateException("You have already applied for this position!");
         }
 
         log.info("Loading CV to Cloudinary: {}", userId);
         String cvUrl = cloudinaryService.uploadCV(cvFile);
 
-        ObjectNode applicationDataNode = (ObjectNode) objectMapper.readTree(answersJson);
+        Map<String, Object> applicationDataMap = objectMapper.readValue(
+                answersJson,
+                new TypeReference<Map<String, Object>>() {
+                }
+        );
 
-        applicationDataNode.put("cvUrl", cvUrl);
+        applicationDataMap.put("cvUrl", cvUrl);
+
+        Recruitment recruitment = recruitmentRepository.findById(recruitmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Job position not found!"));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User information not found!"));
 
         StaffApplication application = StaffApplication.builder()
-                .recruitmentId(recruitmentId)
-                .userId(userId)
-                .applicationData(applicationDataNode)
+                .recruitment(recruitment)
+                .user(user)
+                .applicationData(applicationDataMap)
                 .build();
 
         applicationRepository.save(application);

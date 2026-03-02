@@ -27,7 +27,7 @@ const UserDropdown = ({ user }) => {
     },
     {
       key: "applications",
-      label: <Link to="/my-applications">My Applications</Link>,
+      label: <Link to="/attendee/applications">My Applications</Link>,
       icon: <FileText size={16} />,
     },
     {
