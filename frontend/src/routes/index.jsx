@@ -4,6 +4,8 @@ import AdminRoutes from "./AdminRoutes";
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
+import AttendeeRoutes from "./AttendeeRoutes";
+
 
 const AppRoutes = () => {
   return (

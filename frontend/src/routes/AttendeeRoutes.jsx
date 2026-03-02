@@ -1,13 +1,12 @@
 import { Route, Routes } from "react-router-dom";
-import MainLayout from "../components/layout/MainLayout";
+import ProtectedRoute from "../components/common/ProtectedRoute";
 
-import ProfilePage from "../pages/profile/ProfilePage";
 import ApplicationForm from "../pages/attendee/ApplicationForm";
 
 const AttendeeRoutes = () => {
     return (
         <Routes>
-            <Route element={<MainLayout />}>
+            <Route element={<ProtectedRoute allowedRoles={["ATTENDEE"]} />}>
                 <Route path="recruitments/:eventSlug/apply-staff" element={<ApplicationForm />} />
             </Route>
         </Routes>
