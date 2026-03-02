@@ -18,14 +18,33 @@ import organizerService from '../../services/organizer.service';
 //số lượng sự kiện trên 1 trang
 const EVENTS_PER_PAGE = 5;
 
-//config status sự kiện
-const STATUS_CONFIG = {
-    APPROVED: { label: 'Active', dotColor: 'bg-green-500', textColor: 'text-green-700', bgColor: 'bg-green-50' },
-    ONGOING: { label: 'Active', dotColor: 'bg-green-500', textColor: 'text-green-700', bgColor: 'bg-green-50' },
-    PENDING: { label: 'Upcoming', dotColor: 'bg-orange-400', textColor: 'text-orange-600', bgColor: 'bg-orange-50' },
-    COMPLETED: { label: 'Completed', dotColor: 'bg-gray-400', textColor: 'text-gray-600', bgColor: 'bg-gray-100' },
-    REJECTED: { label: 'Rejected', dotColor: 'bg-red-500', textColor: 'text-red-600', bgColor: 'bg-red-50' },
-    DRAFT: { label: 'Draft', dotColor: 'bg-yellow-400', textColor: 'text-yellow-700', bgColor: 'bg-yellow-50' },
+const STATUS_STYLES = {
+    Active: { dotColor: 'bg-green-500', textColor: 'text-green-700', bgColor: 'bg-green-50' },
+    Upcoming: { dotColor: 'bg-orange-400', textColor: 'text-orange-600', bgColor: 'bg-orange-50' },
+    Completed: { dotColor: 'bg-gray-400', textColor: 'text-gray-600', bgColor: 'bg-gray-100' },
+    Rejected: { dotColor: 'bg-red-500', textColor: 'text-red-600', bgColor: 'bg-red-50' },
+    Draft: { dotColor: 'bg-yellow-400', textColor: 'text-yellow-700', bgColor: 'bg-yellow-50' },
+    Pending: { dotColor: 'bg-blue-400', textColor: 'text-blue-600', bgColor: 'bg-blue-50' },
+};
+
+const getEventDisplayStatus = (status, startDate) => {
+    switch (status) {
+        case 'APPROVED':
+            if (dayjs(startDate).isAfter(dayjs())) return { label: 'Upcoming', ...STATUS_STYLES.Upcoming };
+            return { label: 'Active', ...STATUS_STYLES.Active };
+        case 'ONGOING':
+            return { label: 'Active', ...STATUS_STYLES.Active };
+        case 'COMPLETED':
+            return { label: 'Completed', ...STATUS_STYLES.Completed };
+        case 'REJECTED':
+            return { label: 'Rejected', ...STATUS_STYLES.Rejected };
+        case 'PENDING':
+            return { label: 'Pending', ...STATUS_STYLES.Pending };
+        case 'DRAFT':
+            return { label: 'Draft', ...STATUS_STYLES.Draft };
+        default:
+            return { label: status, ...STATUS_STYLES.Draft };
+    }
 };
 
 const MyEventsPage = () => {
@@ -102,7 +121,7 @@ const MyEventsPage = () => {
         );
     }, [events, searchTerm]);
 
-    const getStatusDisplay = (status) => STATUS_CONFIG[status] || STATUS_CONFIG.DRAFT;
+    const getStatusDisplay = (status, startDate) => getEventDisplayStatus(status, startDate);
 
     const getTicketProgress = (sold, total) => {
         if (!total || total <= 0) return 0;
@@ -285,7 +304,7 @@ const MyEventsPage = () => {
                 {/* Event Rows */}
                 {!loading &&
                     filteredEvents.map((event) => {
-                        const statusConfig = getStatusDisplay(event.status);
+                        const statusConfig = getStatusDisplay(event.status, event.startDate);
                         const progress = getTicketProgress(event.totalSold, event.totalTickets);
                         const progressColor = getProgressBarColor(progress);
 
