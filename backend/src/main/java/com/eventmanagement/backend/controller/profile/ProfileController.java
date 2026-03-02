@@ -1,5 +1,7 @@
 package com.eventmanagement.backend.controller.profile;
 
+import com.eventmanagement.backend.exception.UnauthorizedException;
+
 import com.eventmanagement.backend.dto.request.ChangePasswordRequest;
 import com.eventmanagement.backend.dto.request.UpdateProfileRequest;
 import com.eventmanagement.backend.dto.response.ProfileResponse;
@@ -93,9 +95,15 @@ public class ProfileController {
     private UUID getUserIdFromRequest(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new RuntimeException("Missing or invalid Authorization header");
+            throw new UnauthorizedException("Missing or invalid Authorization header");
         }
         String token = authHeader.substring(7);
-        return jwtTokenProvider.getUserIdFromToken(token);
+        try {
+            return jwtTokenProvider.getUserIdFromToken(token);
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new UnauthorizedException("Invalid token");
+        }
     }
 }

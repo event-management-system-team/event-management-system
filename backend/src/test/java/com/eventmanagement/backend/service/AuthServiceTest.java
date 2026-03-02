@@ -49,6 +49,9 @@ class AuthServiceTest {
     private JwtTokenProvider jwtTokenProvider;
 
     @Mock
+    private RefreshTokenService refreshTokenService;
+
+    @Mock
     private GoogleOAuthService googleOAuthService;
 
     @Mock
@@ -91,9 +94,9 @@ class AuthServiceTest {
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
         when(jwtTokenProvider.generateAccessToken(any(UUID.class), anyString(), anyString()))
                 .thenReturn("mockAccessToken");
-        when(jwtTokenProvider.generateRefreshToken(any(UUID.class))).thenReturn("mockRefreshToken");
+        when(refreshTokenService.createRefreshToken(any(User.class), anyString())).thenReturn("mockRefreshToken");
 
-        LoginResponse result = authService.login(loginRequest, response);
+        LoginResponse result = authService.login(loginRequest, "Unknown Device", response);
 
         assertNotNull(result);
         assertEquals("mockAccessToken", result.getAccessToken());
@@ -113,13 +116,13 @@ class AuthServiceTest {
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
         when(jwtTokenProvider.generateAccessToken(any(UUID.class), anyString(), anyString()))
                 .thenReturn("mockAccessToken");
-        when(jwtTokenProvider.generateRefreshToken(any(UUID.class))).thenReturn("mockRefreshToken");
+        when(refreshTokenService.createRefreshToken(any(User.class), anyString())).thenReturn("mockRefreshToken");
 
-        LoginResponse result = authService.login(loginRequest, response);
+        LoginResponse result = authService.login(loginRequest, "Unknown Device", response);
 
         assertNotNull(result);
 
-        int expectedMaxAge = (int) (604800000L / 60);
+        int expectedMaxAge = (int) (604800000L / 1000);
         verify(cookieUtil).addRefreshTokenCookie(eq(response), eq("mockRefreshToken"), eq(expectedMaxAge));
     }
 
@@ -128,7 +131,7 @@ class AuthServiceTest {
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
         UnauthorizedException exception = assertThrows(UnauthorizedException.class, () -> {
-            authService.login(loginRequest, response);
+            authService.login(loginRequest, "Unknown Device", response);
         });
 
         assertEquals("Incorrect email or password", exception.getMessage());
@@ -141,7 +144,7 @@ class AuthServiceTest {
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
 
         UnauthorizedException exception = assertThrows(UnauthorizedException.class, () -> {
-            authService.login(loginRequest, response);
+            authService.login(loginRequest, "Unknown Device", response);
         });
 
         assertEquals("Incorrect email or password", exception.getMessage());
@@ -154,7 +157,7 @@ class AuthServiceTest {
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(testUser));
 
         BadRequestException exception = assertThrows(BadRequestException.class, () -> {
-            authService.login(loginRequest, response);
+            authService.login(loginRequest, "Unknown Device", response);
         });
 
         assertEquals("Your account has been locked.", exception.getMessage());
@@ -180,9 +183,9 @@ class AuthServiceTest {
 
         when(jwtTokenProvider.generateAccessToken(any(UUID.class), anyString(), anyString()))
                 .thenReturn("mockAccessToken");
-        when(jwtTokenProvider.generateRefreshToken(any(UUID.class))).thenReturn("mockRefreshToken");
+        when(refreshTokenService.createRefreshToken(any(User.class), anyString())).thenReturn("mockRefreshToken");
 
-        LoginResponse result = authService.loginWithGoogle(request, response);
+        LoginResponse result = authService.loginWithGoogle(request, "Unknown Device", response);
 
         assertNotNull(result);
         assertEquals("mockAccessToken", result.getAccessToken());
@@ -207,9 +210,9 @@ class AuthServiceTest {
 
         when(jwtTokenProvider.generateAccessToken(any(UUID.class), anyString(), anyString()))
                 .thenReturn("mockAccessToken");
-        when(jwtTokenProvider.generateRefreshToken(any(UUID.class))).thenReturn("mockRefreshToken");
+        when(refreshTokenService.createRefreshToken(any(User.class), anyString())).thenReturn("mockRefreshToken");
 
-        LoginResponse result = authService.loginWithGoogle(request, response);
+        LoginResponse result = authService.loginWithGoogle(request, "Unknown Device", response);
 
         assertNotNull(result);
         assertEquals("googleId123", testUser.getGoogleId()); // Ensure it was linked
@@ -243,9 +246,9 @@ class AuthServiceTest {
 
         when(jwtTokenProvider.generateAccessToken(any(UUID.class), anyString(), anyString()))
                 .thenReturn("mockAccessToken");
-        when(jwtTokenProvider.generateRefreshToken(any(UUID.class))).thenReturn("mockRefreshToken");
+        when(refreshTokenService.createRefreshToken(any(User.class), anyString())).thenReturn("mockRefreshToken");
 
-        LoginResponse result = authService.loginWithGoogle(request, response);
+        LoginResponse result = authService.loginWithGoogle(request, "Unknown Device", response);
 
         assertNotNull(result);
         verify(userRepository, times(2)).save(any(User.class)); // 1 for creation, 1 for update
@@ -266,7 +269,7 @@ class AuthServiceTest {
         when(userRepository.findByGoogleId(anyString())).thenReturn(Optional.of(testUser));
 
         BadRequestException exception = assertThrows(BadRequestException.class, () -> {
-            authService.loginWithGoogle(request, response);
+            authService.loginWithGoogle(request, "Unknown Device", response);
         });
 
         assertEquals("Your account has been locked.", exception.getMessage());
@@ -344,9 +347,9 @@ class AuthServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
         when(jwtTokenProvider.generateAccessToken(any(UUID.class), anyString(), anyString()))
                 .thenReturn("newAccessToken");
-        when(jwtTokenProvider.generateRefreshToken(any(UUID.class))).thenReturn("newRefreshToken");
+        when(refreshTokenService.rotateRefreshToken(anyString(), anyString())).thenReturn("newRefreshToken");
 
-        RefreshTokenResponse result = authService.refreshToken(refreshToken, response);
+        RefreshTokenResponse result = authService.refreshToken(refreshToken, "Unknown Device", response);
 
         assertNotNull(result);
         assertEquals("newAccessToken", result.getAccessToken());
@@ -359,7 +362,7 @@ class AuthServiceTest {
         when(jwtTokenProvider.validateToken(refreshToken)).thenReturn(false);
 
         UnauthorizedException exception = assertThrows(UnauthorizedException.class, () -> {
-            authService.refreshToken(refreshToken, response);
+            authService.refreshToken(refreshToken, "Unknown Device", response);
         });
 
         assertEquals("Invalid refresh token", exception.getMessage());
@@ -375,7 +378,7 @@ class AuthServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         UnauthorizedException exception = assertThrows(UnauthorizedException.class, () -> {
-            authService.refreshToken(refreshToken, response);
+            authService.refreshToken(refreshToken, "Unknown Device", response);
         });
 
         assertEquals("User not found", exception.getMessage());
@@ -392,7 +395,7 @@ class AuthServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
 
         BadRequestException exception = assertThrows(BadRequestException.class, () -> {
-            authService.refreshToken(refreshToken, response);
+            authService.refreshToken(refreshToken, "Unknown Device", response);
         });
 
         assertEquals("Your account has been locked.", exception.getMessage());
@@ -400,7 +403,9 @@ class AuthServiceTest {
 
     @Test
     void logout_Success() {
-        authService.logout(response);
+        String refreshToken = "validRefreshToken";
+        authService.logout(refreshToken, response);
+        verify(refreshTokenService).revokeToken(refreshToken);
         verify(cookieUtil).removeRefreshTokenCookie(response);
     }
 }
