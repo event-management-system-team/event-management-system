@@ -11,10 +11,13 @@ import { EventAnalytics } from "../pages/admin/EventAnalytics.jsx";
 const AdminRoutes = () => {
   return (
     <Routes>
-      <Route element={<ProtectedRoute />}>
+      <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
         <Route path="/" element={<AdminDashboard />} />
         <Route path="/accounts" element={<AccountManagement />} />
-        <Route path="/accounts/account-detail/:id" element={<AccountDetail />} />
+        <Route
+          path="/accounts/account-detail/:id"
+          element={<AccountDetail />}
+        />
         <Route path="/events" element={<EventManagement />} />
         <Route path="/events/event-detail/:id" element={<EventDetail />} />
         <Route path="/analytics" element={<EventAnalytics />} />
