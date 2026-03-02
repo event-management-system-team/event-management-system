@@ -11,7 +11,7 @@ const DISCOVER_LINKS = [
     { label: "Find Events", href: "/events" },
     { label: "Find Jobs", href: "/recruitments" },
     { label: "My Tickets", href: "/attendee/my-tickets" },
-    { label: "My Applications", href: "/attendee/my-applications" },
+    { label: "My Applications", href: "/attendee/applications" },
 ];
 
 const ORGANIZER_LINKS = [

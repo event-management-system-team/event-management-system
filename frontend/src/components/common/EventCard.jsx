@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 const EventCard = ({ startDate, totalCapacity, registeredCount, bannerUrl, eventName, category, location, isFree, minPrice, eventSlug }) => {
 
     const dateObj = new Date(startDate);
-    const month = dateObj.toLocaleString('vi-VN', { month: 'short' });
+    const month = dateObj.toLocaleString('en-US', { month: 'short' });
     const day = dateObj.getDate();
 
     const isAlmostFull = totalCapacity > 0 && (totalCapacity - registeredCount <= 5);
@@ -19,7 +19,7 @@ const EventCard = ({ startDate, totalCapacity, registeredCount, bannerUrl, event
                     alt={eventName} />
 
                 <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-lg text-center shadow-lg">
-                    <span className="block text-xs font-bold text-primary uppercase">{month}</span>
+                    <span className="block text-2xs font-bold text-primary uppercase">{month}</span>
                     <span className="block text-xl font-extrabold leading-none text-gray-900">{day}</span>
                 </div>
 

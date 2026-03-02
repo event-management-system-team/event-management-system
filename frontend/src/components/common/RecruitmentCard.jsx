@@ -6,7 +6,7 @@ const RecruitmentCard = ({ positions = [], eventName, eventSlug, eventBannerUrl,
     const isNew = (new Date() - new Date(createdAt)) / (1000 * 60 * 60 * 24) <= 3;
 
     const dateObj = new Date(deadline);
-    const month = dateObj.toLocaleString('vi-VN', { month: 'short' });
+    const month = dateObj.toLocaleString('en-US', { month: 'short' });
     const day = dateObj.getDate();
 
     return (
@@ -83,7 +83,7 @@ const RecruitmentCard = ({ positions = [], eventName, eventSlug, eventBannerUrl,
                     </div>
 
                     <div className="shrink-0 border-l border-gray-100 pl-3 sm:pl-6 ml-1 flex flex-col items-center justify-center min-w-[50px] sm:min-w-[70px]">
-                        <div className="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest mb-0.5 sm:mb-1 text-center">{month}</div>
+                        <div className="text-[12px] sm:text-[13px] font-black text-slate-400 uppercase tracking-widest mb-0.5 sm:mb-1 text-center">{month}</div>
                         <div className="font-black text-2xl sm:text-3xl flex items-center justify-center leading-none">
                             {day}
                         </div>

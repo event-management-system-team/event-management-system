@@ -8,6 +8,8 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -24,15 +26,17 @@ public class StaffApplication {
     @Column(name = "application_id")
     private UUID applicationId;
 
-    @Column(name = "recruitment_id", nullable = false)
-    private UUID recruitmentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recruitment_id", nullable = false)
+    private Recruitment recruitment;
 
-    @Column(name = "user_id", nullable = false)
-    private UUID userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "application_data", columnDefinition = "jsonb")
-    private JsonNode applicationData;
+    private Map<String, Object> applicationData;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
