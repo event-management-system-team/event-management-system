@@ -18,40 +18,55 @@ import java.util.UUID;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, UUID> {
-    List<Event> findTop6ByStatusOrderByRegisteredCountDesc(EventStatus status);
+        List<Event> findTop6ByStatusOrderByRegisteredCountDesc(EventStatus status);
 
-    @Query("SELECT e FROM Event e " +
-            "WHERE e.status = :status " +
-            "AND e.totalCapacity > 0 " +
-            "AND (e.registeredCount * 1.0 / e.totalCapacity) >= 0.8 " +
-            "ORDER BY (e.totalCapacity - e.registeredCount) ASC")
-    List<Event> findHotEventsSellingFast(@Param("status") EventStatus status, Pageable pageable);
+        @Query("SELECT e FROM Event e " +
+                        "WHERE e.status = :status " +
+                        "AND e.totalCapacity > 0 " +
+                        "AND (e.registeredCount * 1.0 / e.totalCapacity) >= 0.8 " +
+                        "ORDER BY (e.totalCapacity - e.registeredCount) ASC")
+        List<Event> findHotEventsSellingFast(@Param("status") EventStatus status, Pageable pageable);
 
-    @Query("SELECT e FROM Event e " +
-            "WHERE e.status = :status " +
-            "AND (:keyword IS NULL OR LOWER(e.eventName) LIKE LOWER(CONCAT('%', cast(:keyword as string), '%'))) " +
-            "AND (:location IS NULL OR LOWER(e.location) LIKE LOWER(CONCAT('%', cast(:location as string), '%'))) " +
-            "AND (:categorySlug IS NULL OR e.category.categorySlug IN :categorySlug ) " +
-            "AND (CAST(:startOfDay AS timestamp) IS NULL OR CAST(:endOfDay AS timestamp) IS NULL OR " +
-            "(e.startDate <= :endOfDay AND e.endDate >= :startOfDay)) " +
-            "AND (:price IS NULL OR EXISTS (SELECT t FROM e.ticketTypes t WHERE t.price <= :price))" +
-            "AND (:isFree IS NULL OR e.isFree = :isFree) ")
-    Page<Event> searchEvents(@Param("status") EventStatus status,
-                             @Param("keyword") String keyword,
-                             @Param("location") String location,
-                             @Param("categorySlug") List<String> categorySlug,
-                             @Param("startOfDay") LocalDateTime startOfDay,
-                             @Param("endOfDay") LocalDateTime endOfDay,
-                             @Param("price") BigDecimal price,
-                             @Param("isFree") Boolean isFree,
-                             Pageable pageable);
+        @Query("SELECT e FROM Event e " +
+                        "WHERE e.status = :status " +
+                        "AND (:keyword IS NULL OR LOWER(e.eventName) LIKE LOWER(CONCAT('%', cast(:keyword as string), '%'))) "
+                        +
+                        "AND (:location IS NULL OR LOWER(e.location) LIKE LOWER(CONCAT('%', cast(:location as string), '%'))) "
+                        +
+                        "AND (:categorySlug IS NULL OR e.category.categorySlug IN :categorySlug ) " +
+                        "AND (CAST(:startOfDay AS timestamp) IS NULL OR CAST(:endOfDay AS timestamp) IS NULL OR " +
+                        "(e.startDate <= :endOfDay AND e.endDate >= :startOfDay)) " +
+                        "AND (:price IS NULL OR EXISTS (SELECT t FROM e.ticketTypes t WHERE t.price <= :price))" +
+                        "AND (:isFree IS NULL OR e.isFree = :isFree) ")
+        Page<Event> searchEvents(@Param("status") EventStatus status,
+                        @Param("keyword") String keyword,
+                        @Param("location") String location,
+                        @Param("categorySlug") List<String> categorySlug,
+                        @Param("startOfDay") LocalDateTime startOfDay,
+                        @Param("endOfDay") LocalDateTime endOfDay,
+                        @Param("price") BigDecimal price,
+                        @Param("isFree") Boolean isFree,
+                        Pageable pageable);
 
-    @EntityGraph(attributePaths = {"agendas", "ticketTypes"})
-    Event findEventByEventSlug(String eventSlug);
+        @EntityGraph(attributePaths = { "agendas", "ticketTypes" })
+        Event findEventByEventSlug(String eventSlug);
 
-    long countByOrganizer_UserId(UUID organizerId);
+        long countByOrganizer_UserId(UUID organizerId);
 
-    Page<Event> findAll(Pageable pageable);
+        long countByOrganizer_UserIdAndStatus(UUID organizerId, EventStatus status);
 
-//    Page<Event> findByOrganizer_UserId(UUID userId, Pageable pageable);
+        Page<Event> findAll(Pageable pageable);
+
+        Page<Event> findByOrganizer_UserId(UUID userId, Pageable pageable);
+
+        //function to get status upcoming: approved + startDate > now
+        @Query("SELECT COUNT(e) FROM Event e WHERE e.organizer.userId = :organizerId AND e.status = :status AND e.startDate > CURRENT_TIMESTAMP")
+        long countByOrganizer_UserIdAndStatusAndStartDateAfterNow(
+                @Param("organizerId") UUID organizerId,
+                @Param("status") EventStatus status
+        );
+        
+        @EntityGraph(attributePaths = "ticketTypes")
+        @Query("SELECT e FROM Event e WHERE e.eventId IN :eventIds")
+        List<Event> findWithTicketsByEventIdIn(@Param("eventIds") List<UUID> eventIds);
 }
