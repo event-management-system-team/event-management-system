@@ -26,7 +26,8 @@ public class OrganizerEventService {
     private final EventRepository eventRepository;
 
     /**
-     * Lấy danh sách event của organizer có phân trang, sắp xếp theo ngày tạo mới nhất
+     * Lấy danh sách event của organizer có phân trang, sắp xếp theo ngày tạo mới
+     * nhất
      */
     public Page<OrganizerEventResponse> getMyEvents(UUID organizerId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -54,9 +55,16 @@ public class OrganizerEventService {
     public OrganizerEventStatsResponse getMyEventStats(UUID organizerId) {
 
         long total = eventRepository.countByOrganizer_UserId(organizerId);
-        long active = eventRepository.countByOrganizer_UserIdAndStatus(organizerId, EventStatus.APPROVED)
-                + eventRepository.countByOrganizer_UserIdAndStatus(organizerId, EventStatus.ONGOING);
-        long upcoming = eventRepository.countByOrganizer_UserIdAndStatusAndStartDateAfterNow(organizerId, EventStatus.APPROVED);
+        long upcoming = eventRepository.countByOrganizer_UserIdAndStatusAndStartDateAfterNow(organizerId,
+                EventStatus.APPROVED);
+        // tổng số event đã được phê duyệt
+        long allApproved = eventRepository.countByOrganizer_UserIdAndStatus(organizerId, EventStatus.APPROVED);
+        // tổng số event đang diễn ra
+        long ongoing = eventRepository.countByOrganizer_UserIdAndStatus(organizerId, EventStatus.ONGOING);
+        // logic tính tổng số event đang diễn ra: tổng số event đã được phê duyệt trừ đi
+        // tổng số event đang diễn ra
+        long active = (allApproved - upcoming) + ongoing;
+        // tổng số event đã hoàn thành
         long completed = eventRepository.countByOrganizer_UserIdAndStatus(organizerId, EventStatus.COMPLETED);
 
         return OrganizerEventStatsResponse.builder()
