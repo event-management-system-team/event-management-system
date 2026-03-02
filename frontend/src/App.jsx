@@ -46,7 +46,7 @@ function App() {
       <Route path="/organizer/feedback/feedbacklist/:eventId" element={<ProtectedRoute><FeedbackList /></ProtectedRoute>} />
       <Route path="/organizer/feedback/createform/:eventId" element={<ProtectedRoute><FeedbackBuilder /></ProtectedRoute>} />
       <Route path="/organizer/feedback/:feedbackId" element={<ProtectedRoute><FeedbackDetail /></ProtectedRoute>} />
-      <Route path="/organizer/recruitmentlist" element={<ProtectedRoute><RecruitmentList /></ProtectedRoute>} />
+      <Route path="/organizer/recruitmentlist/:eventId" element={<ProtectedRoute><RecruitmentList /></ProtectedRoute>} />
       <Route path="/organizer/recruitmentcreate" element={<ProtectedRoute><RecruitmentBuilder /></ProtectedRoute>} />
       <Route path="/organizer/applications" element={<ProtectedRoute><ApplicationList /></ProtectedRoute>} />
 
