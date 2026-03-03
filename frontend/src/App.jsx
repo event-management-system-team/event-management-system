@@ -20,6 +20,7 @@ import AppRoutes from "./routes";
 
 import OrganizerLayout from "./components/layout/OrganizerLayout";
 import MyEventsPage from "./pages/organizer/MyEventsPage";
+import CreateEventPage from "./pages/organizer/CreateEventPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -71,6 +72,7 @@ function App() {
         </ProtectedRoute>
       }>
         <Route path="my-events" element={<MyEventsPage />} />
+        <Route path="create-event" element={<CreateEventPage />} />
       </Route>
     </Routes>
   );
