@@ -5,6 +5,7 @@ import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
 import AttendeeRoutes from "./AttendeeRoutes";
+import StaffRoutes from "./StaffRoutes";
 
 
 const AppRoutes = () => {
@@ -21,6 +22,7 @@ const AppRoutes = () => {
       {/* Public/Protected Routes */}
       <Route path="/*" element={<PublicRoutes />} />
       <Route path="/attendee/*" element={<AttendeeRoutes />} />
+      <Route path="/staff/*" element={<StaffRoutes />} />
 
     </Routes>
   );

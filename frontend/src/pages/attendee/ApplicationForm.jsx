@@ -1,5 +1,5 @@
-import SidebarPosition from '../../components/domain/application-form/SidebarPosition';
-import FormContainer from '../../components/domain/application-form/FormContainer';
+import SidebarPosition from '../../components/domain/attendee/application-form/SidebarPosition';
+import FormContainer from '../../components/domain/attendee/application-form/FormContainer';
 import { useApplicationForm } from '../../hooks/useApplicationForm';
 import { Upload as UploadIcon, ChevronRight } from 'lucide-react';
 import { Form, Input, Select, Upload } from 'antd'

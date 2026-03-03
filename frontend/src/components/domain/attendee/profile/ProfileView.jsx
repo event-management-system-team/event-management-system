@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "../../common/Button";
+import { Button } from "../../../common/Button";
 
 export const ProfileView = ({ data, onEdit }) => {
   return (

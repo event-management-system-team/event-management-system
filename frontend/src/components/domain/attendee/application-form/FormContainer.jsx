@@ -2,7 +2,7 @@ import SelectionRole from './SelectionRole'
 import PersonalInformation from './PersonalInformation'
 import DynamicQuestion from './DynamicQuestion'
 import { Loader2, Send } from 'lucide-react'
-import { Button, Checkbox, Form } from 'antd'
+import { Checkbox, Form } from 'antd'
 
 const FormContainer = ({ form, handleSubmit, isFull,
     selectedRole, setSelectedRole, userProfile, isSubmitting,
