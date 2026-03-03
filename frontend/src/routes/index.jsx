@@ -18,6 +18,9 @@ const AppRoutes = () => {
       {/* Admin Routes */}
       <Route path="/admin/*" element={<AdminRoutes />} />
 
+      {/* Organizer Routes */}
+      <Route path="/organizer/*" element={<OrganizerRoutes />} />
+
       {/* Public/Protected Routes */}
       <Route path="/*" element={<PublicRoutes />} />
       <Route path="/attendee/*" element={<AttendeeRoutes />} />
