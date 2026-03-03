@@ -10,6 +10,9 @@ const AppRoutes = () => {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
+      {/* Organizer Routes */}
+      <Route path="/organizer/*" element={<OrganizerRoutes />} />
+
       {/* Public/Protected Routes */}
       <Route path="/*" element={<PublicRoutes />} />
     </Routes>
