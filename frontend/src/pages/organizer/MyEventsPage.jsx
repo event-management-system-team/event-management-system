@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import {
     Calendar,
     Zap,
@@ -50,6 +51,7 @@ const getEventDisplayStatus = (status, startDate) => {
 const MyEventsPage = () => {
     const { user } = useSelector((state) => state.auth);
     const organizerId = user?.user_id;
+    const navigate = useNavigate();
 
     const [events, setEvents] = useState([]);
     const [stats, setStats] = useState({ totalEvents: 0, activeCount: 0, upcomingCount: 0, completedCount: 0 });
@@ -61,7 +63,7 @@ const MyEventsPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showSearch, setShowSearch] = useState(false);
 
-    
+
     const abortRef = useRef(null);
 
     const fetchEvents = useCallback(async (page) => {
@@ -206,7 +208,10 @@ const MyEventsPage = () => {
                         Overview of your current, upcoming and past event performances.
                     </p>
                 </div>
-                <button className="flex items-center gap-2 bg-[#2d3a4f] hover:bg-[#1e293b] text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+                <button
+                    onClick={() => navigate('/organizer/create-event')}
+                    className="flex items-center gap-2 bg-[#2d3a4f] hover:bg-[#1e293b] text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm"
+                >
                     <Plus size={18} />
                     Create New Event
                 </button>
