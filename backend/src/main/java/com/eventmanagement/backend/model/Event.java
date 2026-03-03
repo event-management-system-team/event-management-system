@@ -41,7 +41,6 @@ import lombok.NoArgsConstructor;
 @SQLDelete(sql = "UPDATE events SET deleted_at = CURRENT_TIMESTAMP WHERE event_id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class Event {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "event_id", updatable = false, nullable = false)
@@ -135,4 +134,5 @@ public class Event {
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<TicketType> ticketTypes;
 }
+
 
