@@ -9,6 +9,7 @@ import com.eventmanagement.backend.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
@@ -31,45 +32,53 @@ public class AdminAccountController {
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponse>> getAll() {
         List<UserResponse> users = adminService.getAllAccountsPlain();
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<UserResponse>> search(
             @RequestParam("q") String q,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size)    {
+            @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(adminService.searchAccounts(q, page, size));
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> getDetail(@PathVariable UUID id) {
         return ResponseEntity.ok(adminService.getAccountById(id));
     }
 
     @GetMapping("/{id}/event-count")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Long> getEventCount(@PathVariable UUID id) {
         return ResponseEntity.ok(eventRepository.countByOrganizer_UserId(id));
     }
 
     @PutMapping("/{id}/profile")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> updateProfile(@PathVariable UUID id, @RequestBody UserUpdateRequest request) {
         return ResponseEntity.ok(adminService.updateProfile(id, request));
     }
 
     @PatchMapping("/{id}/toggle-ban")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> toggleBan(@PathVariable UUID id) {
         return ResponseEntity.ok(adminService.toggleBanAccount(id));
     }
 
     @PostMapping("/organizer")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> createOrganizer(@Valid @RequestBody CreateOrganizerRequest request) {
         return ResponseEntity.ok(adminService.createOrganizer(request));
     }
 
     @GetMapping("/check-email")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
         return ResponseEntity.ok(userRepository.existsByEmail(email));
     }

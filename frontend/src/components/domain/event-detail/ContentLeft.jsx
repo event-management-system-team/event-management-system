@@ -4,7 +4,7 @@ import AboutTab from './AboutTab'
 import AgendaTab from './AgendaTab'
 import MoreInfoTab from './MoreInfoTab'
 
-const ContentLeft = ({ eventName, description, imageGallery, locationCoordinates, metadata, agendas, ticketTypes }) => {
+const ContentLeft = ({ eventName, description, imageGallery, locationCoordinates, metadata, agendas, eventSlug }) => {
 
     const navItems = [
         { id: "about", label: "About" },
@@ -40,36 +40,35 @@ const ContentLeft = ({ eventName, description, imageGallery, locationCoordinates
         }
     };
     return (
-        <div>
-            <div className="flex-1 space-y-8">
+        <div className="flex-1 space-y-8">
 
-                <div className="sticky top-0 z-40 bg-background-light/80  backdrop-blur-md border-b border-[#E5E1DA]  -mx-6 px-6">
-                    <div className="flex gap-8 py-4">
-                        {navItems.map((item) => (
-                            <button
-                                key={item.id}
-                                onClick={() => setActive(item.id)}
+            <div className="sticky top-0 z-40 bg-background-light/80  backdrop-blur-md border-b border-[#E5E1DA]  -mx-6 px-6">
+                <div className="flex gap-8 py-4">
+                    {navItems.map((item) => (
+                        <button
+                            key={item.id}
+                            onClick={() => setActive(item.id)}
 
-                                className={`transition-colors ${active === item.id
-                                    ? 'text-primary font-bold border-b-2 border-primary pb-4 -mb-4'
-                                    : 'font-semibold text-slate-500 hover:text-primary transition-colors border-transparent'
-                                    }`}
-                            >
-                                {item.label}
-                            </button>
-                        ))}
-                    </div>
+                            className={`transition-colors ${active === item.id
+                                ? 'text-primary font-bold border-b-2 border-primary pb-4 -mb-4'
+                                : 'font-semibold text-slate-500 hover:text-primary transition-colors border-transparent'
+                                }`}
+                        >
+                            {item.label}
+                        </button>
+                    ))}
                 </div>
-
-                <div className="mt-8 min-h-75">
-                    {renderContent()}
-                </div>
-
-
-                <BannerApply />
-
-
             </div>
+
+            <div className="mt-8">
+                {renderContent()}
+            </div>
+
+
+            <BannerApply
+                eventSlug={eventSlug} />
+
+
         </div>
     )
 }

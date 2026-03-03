@@ -1,9 +1,9 @@
 import axios from "axios";
-import { store } from "../store/index";
-import { setAccessToken, setUser, logoutUser } from "../store/slices/auth.slice";
+import { store } from "../store";
+import { setAccessToken, logoutUser } from "../store/slices/auth.slice";
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080/api/v1",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
@@ -31,7 +31,12 @@ axiosInstance.interceptors.request.use(
     const token = state.auth.accessToken;
 
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      if (config.headers instanceof axios.AxiosHeaders) {
+        config.headers.set('Authorization', `Bearer ${token}`);
+      } else {
+        config.headers = config.headers || {};
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
     }
 
     return config;
@@ -39,11 +44,19 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-// Response Interceptor
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+
+    // Reject immediately if the request was to login, refresh, or logout to prevent loop
+    if (
+      originalRequest.url.includes('/auth/login') ||
+      originalRequest.url.includes('/auth/refresh') ||
+      originalRequest.url.includes('/auth/logout')
+    ) {
+      return Promise.reject(error);
+    }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
@@ -51,7 +64,12 @@ axiosInstance.interceptors.response.use(
           failedQueue.push({ resolve, reject });
         })
           .then((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
+            if (originalRequest.headers instanceof axios.AxiosHeaders) {
+              originalRequest.headers.set('Authorization', `Bearer ${token}`);
+            } else {
+              originalRequest.headers = originalRequest.headers || {};
+              originalRequest.headers['Authorization'] = `Bearer ${token}`;
+            }
             return axiosInstance(originalRequest);
           })
           .catch((err) => Promise.reject(err));
@@ -61,27 +79,45 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        console.log("Refreshing token...");
+
+        const baseURL = axiosInstance.defaults.baseURL;
         const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/auth/refresh`,
+          `${baseURL}/auth/refresh`,
           {},
           { withCredentials: true },
         );
 
         const newAccessToken = response.data.accessToken;
+        console.log("Token refreshed");
 
+        // Update store with new token
         store.dispatch(setAccessToken(newAccessToken));
-        if (response.data.user) {
-          store.dispatch(setUser(response.data.user));
-        }
 
+        // Process all queued requests with the new token
         processQueue(null, newAccessToken);
 
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        // Safely retry original request
+        if (originalRequest.headers instanceof axios.AxiosHeaders) {
+          originalRequest.headers.set('Authorization', `Bearer ${newAccessToken}`);
+        } else {
+          originalRequest.headers = originalRequest.headers || {};
+          originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+        }
+
         return axiosInstance(originalRequest);
       } catch (refreshError) {
+        console.error("Refresh failed:", refreshError);
+
         processQueue(refreshError, null);
+        
+        // Using window.location.href navigates away, but before that logout
         store.dispatch(logoutUser());
-        window.location.href = "/login";
+
+        if (window.location.pathname !== "/login") {
+          window.location.href = "/login";
+        }
+
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

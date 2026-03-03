@@ -41,6 +41,7 @@ public class AuthService {
     private final GenerateAvatarUrl generateAvatarUrl;
     private final CookieUtil cookieUtil;
     private final GoogleOAuthService googleOAuthService;
+    private final RefreshTokenService refreshTokenService;
 
     @Value("${jwt.refresh-token-expiration}")
     private long refreshTokenExpiration;
@@ -82,7 +83,7 @@ public class AuthService {
     }
 
     @Transactional
-    public LoginResponse login(LoginRequest request, HttpServletResponse response) {
+    public LoginResponse login(LoginRequest request, String deviceInfo, HttpServletResponse response) {
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UnauthorizedException("Incorrect email or password"));
@@ -103,9 +104,9 @@ public class AuthService {
                 user.getEmail(),
                 user.getRole().name());
 
-        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUserId());
+        String refreshToken = refreshTokenService.createRefreshToken(user, deviceInfo);
 
-        int maxAge = request.isRememberMe() ? (int) (refreshTokenExpiration / 60) : -1;
+        int maxAge = request.isRememberMe() ? (int) (refreshTokenExpiration / 1000) : -1;
         cookieUtil.addRefreshTokenCookie(response, refreshToken, maxAge);
 
         return LoginResponse.builder()
@@ -122,7 +123,7 @@ public class AuthService {
     }
 
     @Transactional
-    public LoginResponse loginWithGoogle(GoogleLoginRequest request, HttpServletResponse response) {
+    public LoginResponse loginWithGoogle(GoogleLoginRequest request, String deviceInfo, HttpServletResponse response) {
         log.info("Processing Google login...");
 
         GoogleLoginResponse googleUser = googleOAuthService.verifyGoogleToken(request.getGoogleToken());
@@ -168,9 +169,9 @@ public class AuthService {
                 user.getEmail(),
                 user.getRole().name());
 
-        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUserId());
+        String refreshToken = refreshTokenService.createRefreshToken(user, deviceInfo);
 
-        int maxAge = (int) refreshTokenExpiration / 60;
+        int maxAge = (int) (refreshTokenExpiration / 1000);
         cookieUtil.addRefreshTokenCookie(response, refreshToken, maxAge);
 
         return LoginResponse.builder()
@@ -187,7 +188,7 @@ public class AuthService {
     }
 
     @Transactional
-    public RefreshTokenResponse refreshToken(String refreshToken, HttpServletResponse response) {
+    public RefreshTokenResponse refreshToken(String refreshToken, String deviceInfo, HttpServletResponse response) {
         if (!jwtTokenProvider.validateToken(refreshToken)) {
             throw new UnauthorizedException("Invalid refresh token");
         }
@@ -201,12 +202,13 @@ public class AuthService {
             throw new BadRequestException("Your account has been locked.");
         }
 
+        String newRefreshToken = refreshTokenService.rotateRefreshToken(refreshToken, deviceInfo);
+
         String newAccessToken = jwtTokenProvider.generateAccessToken(
                 user.getUserId(),
                 user.getEmail(),
                 user.getRole().name());
 
-        String newRefreshToken = jwtTokenProvider.generateRefreshToken(user.getUserId());
         int maxAge = (int) (refreshTokenExpiration / 1000);
         cookieUtil.addRefreshTokenCookie(response, newRefreshToken, maxAge);
 
@@ -223,7 +225,10 @@ public class AuthService {
                 .build();
     }
 
-    public void logout(HttpServletResponse response) {
+    public void logout(String refreshToken, HttpServletResponse response) {
+        if (refreshToken != null) {
+            refreshTokenService.revokeToken(refreshToken);
+        }
         cookieUtil.removeRefreshTokenCookie(response);
     }
 }

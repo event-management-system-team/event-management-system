@@ -38,20 +38,10 @@ public class EventResponse {
     private LocalDateTime updatedAt;
 
     private EventCategoryResponse category;
-    private OrganizerDto organizer;
+    private OrganizerResponse organizer;
     private BigDecimal minPrice;
     private List<EventAgendaResponse> agendas;
     private List<TicketTypeResponse> ticketTypes;
 
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class OrganizerDto {
-        private UUID userId;
-        private String fullName;
-        private String avatarUrl;
-        private String email;
-    }
+    
 }

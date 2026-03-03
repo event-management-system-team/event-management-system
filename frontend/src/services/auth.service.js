@@ -31,29 +31,44 @@ const authService = {
     }
   },
 
-  saveAccessToken: (accessToken, rememberMe) => {
-    if (rememberMe) {
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("rememberMe", "true");
-    } else {
-      sessionStorage.setItem("accessToken", accessToken);
-      localStorage.removeItem("rememberMe");
-    }
-  },
-
-  getAccessToken: () => {
-    return (
-      localStorage.getItem("accessToken") ||
-      sessionStorage.getItem("accessToken")
+  sendOTP: async (email) => {
+    const response = await axiosInstance.post(
+      "/auth/forgot-password",
+      {
+        email,
+      },
     );
+    return response.data;
   },
 
-  saveUser: (user, rememberMe) => {
+  verifyOTP: async (email, otpCode) => {
+    const response = await axiosInstance.post(
+      "/auth/verify-otp",
+      {
+        email,
+        otp: otpCode,
+      },
+    );
+    return response.data;
+  },
+
+  resetPassword: async (resetToken, newPassword, confirmPassword) => {
+    const response = await axiosInstance.post("/auth/reset-password", {
+      resetToken,
+      newPassword,
+      confirmPassword,
+    });
+    return response.data;
+  },
+
+  saveUser: (user, rememberMe = false) => {
     const userStr = JSON.stringify(user);
     if (rememberMe) {
       localStorage.setItem("user", userStr);
+      localStorage.setItem("rememberMe", "true");
     } else {
       sessionStorage.setItem("user", userStr);
+      localStorage.removeItem("rememberMe");
     }
   },
 
@@ -66,17 +81,13 @@ const authService = {
   clearSession: () => {
     sessionStorage.clear();
     localStorage.removeItem("user");
-    localStorage.removeItem("accessToken");
     localStorage.removeItem("rememberMe");
   },
 
   isAuthenticated: () => {
-    const hasToken =
-      !!localStorage.getItem("accessToken") ||
-      !!sessionStorage.getItem("accessToken");
     const hasUser =
       !!localStorage.getItem("user") || !!sessionStorage.getItem("user");
-    return hasToken && hasUser;
+    return hasUser;
   },
 
   isRememberMe: () => {

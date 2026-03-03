@@ -1,12 +1,17 @@
 package com.eventmanagement.backend.controller.auth;
 
+import com.eventmanagement.backend.dto.request.ForgotPasswordRequest;
 import com.eventmanagement.backend.dto.request.GoogleLoginRequest;
 import com.eventmanagement.backend.dto.request.LoginRequest;
 import com.eventmanagement.backend.dto.request.RegisterRequest;
+import com.eventmanagement.backend.dto.request.ResetPasswordRequest;
+import com.eventmanagement.backend.dto.request.VerifyOtpRequest;
 import com.eventmanagement.backend.dto.response.LoginResponse;
 import com.eventmanagement.backend.dto.response.RefreshTokenResponse;
 import com.eventmanagement.backend.dto.response.RegisterResponse;
+import com.eventmanagement.backend.dto.response.VerifyOtpResponse;
 import com.eventmanagement.backend.service.AuthService;
+import com.eventmanagement.backend.service.ForgotPasswordService;
 import com.eventmanagement.backend.util.CookieUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,6 +35,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final CookieUtil cookieUtil;
+    private final ForgotPasswordService forgotPasswordService;
 
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(
@@ -39,23 +45,34 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
-        LoginResponse loginResponse = authService.login(request, response);
+    public ResponseEntity<LoginResponse> login(
+            @Valid @RequestBody LoginRequest request,
+            HttpServletRequest httpRequest,
+            HttpServletResponse httpResponse) {
+        String deviceInfo = httpRequest.getHeader("User-Agent");
+        if (deviceInfo == null)
+            deviceInfo = "Unknown Device";
+        LoginResponse loginResponse = authService.login(request, deviceInfo, httpResponse);
         return ResponseEntity.ok(loginResponse);
     }
 
     @PostMapping("/google")
     public ResponseEntity<LoginResponse> loginWithGoogle(
             @Valid @RequestBody GoogleLoginRequest request,
-            HttpServletResponse response) {
+            HttpServletRequest httpRequest,
+            HttpServletResponse httpResponse) {
         log.info("Received Google login request");
-        LoginResponse loginResponse = authService.loginWithGoogle(request, response);
+        String deviceInfo = httpRequest.getHeader("User-Agent");
+        if (deviceInfo == null)
+            deviceInfo = "Unknown Device";
+        LoginResponse loginResponse = authService.loginWithGoogle(request, deviceInfo, httpResponse);
         return ResponseEntity.ok(loginResponse);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Map<String, String>> logout(HttpServletResponse response) {
-        authService.logout(response);
+    public ResponseEntity<Map<String, String>> logout(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = cookieUtil.getRefreshTokenFromCookie(request).orElse(null);
+        authService.logout(refreshToken, response);
 
         Map<String, String> result = new HashMap<>();
         result.put("message", "Logout successful");
@@ -68,9 +85,38 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response) {
         String refreshToken = cookieUtil.getRefreshTokenFromCookie(request)
-                .orElseThrow(() -> new RuntimeException("Refresh token not found"));
+                .orElseThrow(() -> new com.eventmanagement.backend.exception.UnauthorizedException(
+                        "Refresh token not found"));
 
-        RefreshTokenResponse tokenResponse = authService.refreshToken(refreshToken, response);
+        String deviceInfo = request.getHeader("User-Agent");
+        if (deviceInfo == null)
+            deviceInfo = "Unknown Device";
+
+        RefreshTokenResponse tokenResponse = authService.refreshToken(refreshToken, deviceInfo, response);
         return ResponseEntity.ok(tokenResponse);
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request) {
+
+        forgotPasswordService.sendOtp(request);
+        return ResponseEntity.ok("OTP sent successfully");
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<VerifyOtpResponse> verifyOtp(
+            @Valid @RequestBody VerifyOtpRequest request) {
+
+        VerifyOtpResponse response = forgotPasswordService.verifyOtp(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request) {
+
+        forgotPasswordService.resetPassword(request);
+        return ResponseEntity.ok("Password reset successfully");
     }
 }
