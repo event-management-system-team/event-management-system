@@ -24,4 +24,5 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
     List<Event> findHotEventsSellingFast(@Param("status") EventStatus status, Pageable pageable);
 
 
+
 }

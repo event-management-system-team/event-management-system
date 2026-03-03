@@ -20,6 +20,9 @@ import HomePage from "./pages/public/Home";
 
 import AppRoutes from "./routes";
 import FeedbackBuilder from "./pages/organizer/FeedbackBuilder";
+import RecruitmentDetail from "./pages/organizer/RecruitmentDetail";
+
+
 function App() {
   const dispatch = useDispatch();
 
@@ -47,8 +50,11 @@ function App() {
       <Route path="/organizer/feedback/createform/:eventId" element={<ProtectedRoute><FeedbackBuilder /></ProtectedRoute>} />
       <Route path="/organizer/feedback/:feedbackId" element={<ProtectedRoute><FeedbackDetail /></ProtectedRoute>} />
       <Route path="/organizer/recruitmentlist/:eventId" element={<ProtectedRoute><RecruitmentList /></ProtectedRoute>} />
-      <Route path="/organizer/recruitmentcreate" element={<ProtectedRoute><RecruitmentBuilder /></ProtectedRoute>} />
-      <Route path="/organizer/applications" element={<ProtectedRoute><ApplicationList /></ProtectedRoute>} />
+      <Route path="/organizer/recruitmentcreate/:eventId" element={<ProtectedRoute><RecruitmentBuilder /></ProtectedRoute>} />
+      <Route path="/organizer/applications/:recruitmentId" element={<ProtectedRoute><ApplicationList /></ProtectedRoute>} />
+      <Route path="/organizer/recruitments/:recruitmentId" element={<ProtectedRoute><RecruitmentDetail /></ProtectedRoute>} />
+    
+    
 
       <Route
         path="/"

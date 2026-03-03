@@ -6,9 +6,9 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.eventmanagement.backend.model.Recruitments;
+import com.eventmanagement.backend.model.StaffApplication;
 
 @Repository
-public interface RecruitmentRepository extends JpaRepository<Recruitments, UUID> {
-    List<Recruitments> findByEvent_EventId(UUID eventId);
+public interface ApplicationRepository extends JpaRepository<StaffApplication, UUID> {
+    List<StaffApplication> findByRecruitmentId(UUID recruitmentId);
 }

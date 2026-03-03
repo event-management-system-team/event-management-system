@@ -11,17 +11,15 @@ import {
   LogOut 
 } from 'lucide-react';
 
-// ==========================================
-// COMPONENT PHỤ: Nút bấm trên Menu
-// ==========================================
+
 const NavItem = ({ to, icon, label, isActive }) => {
   return (
     <Link 
       to={to} 
       className={`flex items-center gap-3 px-4 py-3 mb-1 rounded-xl font-medium transition-all duration-200
         ${isActive 
-          ? 'bg-[#3b4758] text-white shadow-lg pointer-events-none' // Trạng thái Active: Nền xám xanh, chữ trắng, khóa click
-          : 'text-gray-400 hover:bg-gray-800 hover:text-white'      // Trạng thái Bình thường
+          ? 'bg-[#3b4758] text-white shadow-lg pointer-events-none' 
+          : 'text-gray-400 hover:bg-gray-800 hover:text-white'      
         }`}
     >
       <span className={isActive ? 'text-gray-100' : 'text-gray-400'}>{icon}</span>
@@ -30,28 +28,25 @@ const NavItem = ({ to, icon, label, isActive }) => {
   );
 };
 
-// ==========================================
-// COMPONENT CHÍNH: Sidebar
-// ==========================================
 const Sidebar = () => {
-  const location = useLocation(); // Lấy đường dẫn hiện tại để biết đang ở trang nào
-  const { eventId } = useParams(); // Lấy ID sự kiện từ thanh URL (nếu có)
+  const location = useLocation(); 
+  const { eventId } = useParams(); 
 
-  // Hàm kiểm tra trang đang đứng để bật trạng thái Active
+
   const isDashboardActive = location.pathname.includes('/dashboard');
   const isMyEventsActive = location.pathname.includes('/my-events');
-  // Hỗ trợ cả 2 link '/staff' hoặc '/recruitment'
-  const isStaffActive = location.pathname.includes('/staff') || location.pathname.includes('/recruitment'); 
+  
+  const isStaffActive = location.pathname.includes('/staff') || location.pathname.includes('/recruitments'); 
   const isAppActive = location.pathname.includes('/applications');
   const isFeedbackActive = location.pathname.includes('/feedback');
 
-  // Xử lý link Feedback an toàn: Nếu đang ở trong 1 sự kiện có ID thì dùng ID đó, nếu không thì truyền tạm ID = 1
+
   const feedbackLink = eventId ? `/organizer/feedback/feedbacklist/${eventId}` : `/organizer/feedbacklist/1`;
 
   return (
     <aside className="w-64 h-screen bg-[#1e293b] flex flex-col text-gray-300 fixed left-0 top-0 z-50 font-sans shadow-xl border-r border-gray-800">
       
-      {/* 1. Phần Logo */}
+      {/*logo*/ }
       <div className="p-6 flex items-center gap-3">
         <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-xs shadow-md">
           EH
@@ -62,7 +57,7 @@ const Sidebar = () => {
         </div>
       </div>
 
-      {/* 2. User Profile (FPT Software) */}
+      {/* 2. user profile */}
       <div className="mx-4 mb-6 p-3 bg-[#2d3a4f] rounded-xl flex items-center gap-3 border border-gray-700 shadow-sm">
         <img
           src="https://ui-avatars.com/api/?name=FPT+Software&background=random"
@@ -75,7 +70,7 @@ const Sidebar = () => {
         </div>
       </div>
 
-      {/* 3. Phần Menu chính (tự cuộn nếu quá dài) */}
+      {/* 3. Phần Menu chính  */}
       <nav className="flex-1 px-4 overflow-y-auto scrollbar-hide space-y-1">
         <p className="px-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3 mt-1">
           Main Menu

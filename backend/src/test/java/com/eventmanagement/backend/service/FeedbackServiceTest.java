@@ -18,7 +18,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.eventmanagement.backend.dto.response.FeedbackResponseDTO;
+import com.eventmanagement.backend.dto.response.organizer.FeedbackResponseDTO;
 import com.eventmanagement.backend.repository.FeedbackRepository;
 
 @ExtendWith(MockitoExtension.class)

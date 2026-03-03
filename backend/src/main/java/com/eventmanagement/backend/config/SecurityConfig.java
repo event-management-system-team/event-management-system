@@ -41,10 +41,13 @@ public class SecurityConfig {
                 .requestMatchers("/api/events/**").permitAll()
                 .requestMatchers("/api/v1/categories/**").permitAll()
                 .requestMatchers("/api/categories/**").permitAll()
-                .requestMatchers("/api/v1/recruitments/recent").permitAll()
-                .requestMatchers("/api/recruitments/recent").permitAll()
+                .requestMatchers("/api/v1/recruitments/**").permitAll()
+                .requestMatchers("/api/recruitments/**").permitAll()
                 .requestMatchers("/api/v1/feedbacks/**").permitAll()
                 .requestMatchers("/api/feedbacks/**").permitAll()
+                .requestMatchers("/api/v1/recruitmentcreate/**").permitAll()
+                .requestMatchers("/api/recruitmentcreate/**").permitAll()
+                
 
 
                 

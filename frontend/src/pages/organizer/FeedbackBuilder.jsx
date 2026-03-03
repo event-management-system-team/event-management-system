@@ -24,40 +24,40 @@ const FeedbackBuilder = () => {
 
   const [isLocked,setIsLocked]=useState(false);
 
-// ================= TỰ ĐỘNG TẢI DỮ LIỆU CŨ =================
+
   React.useEffect(() => {
     const fetchExistingForm = async () => {
       try {
         console.log("1. Đang gọi API lấy dữ liệu cho Event ID:", eventId);
-        const response = await axiosInstance.get(`/events/${eventId}/forms`);
+        const response = await axiosInstance.get(`/events/${eventId}/forms?type=FEEDBACK`);
         
-        // 🔥 MÁY QUÉT SỐ 1: Xem Backend ném lên cái gì?
+     
         console.log("2. Dữ liệu Backend trả về:", response.data); 
 
         if (response.status === 200 && response.data) {
           const dbData = response.data;
-          // Kiểm tra trạng thái isActive để khóa form nếu cần
+          
           if(dbData.isActive === true || dbData.is_active === "true"){
             setIsLocked(true);
           }else{
             setIsLocked(false);
           }
           
-          // 🔥 BAO BỌC CHỐNG LỆCH TÊN BIẾN (Chấp cả camelCase lẫn snake_case)
+          
           const name = dbData.formName || dbData.form_name || "Feedback Form: Giao lưu Văn hóa";
           setFormName(name);
           
           let schemaFromDB = dbData.formSchema || dbData.form_schema || [];
 
-          // 🔥 MÁY QUÉT SỐ 2: Kiểm tra xem schema có phải là mảng Array chuẩn không?
+          
           console.log("3. Schema lấy được:", schemaFromDB);
           
-          // Nếu Backend lỡ trả về 1 chuỗi String thì tự động ép nó thành Mảng
+      
           if (typeof schemaFromDB === 'string') {
             schemaFromDB = JSON.parse(schemaFromDB);
           }
 
-          // Trích xuất phần Mô tả (formDesc)
+        
           if (schemaFromDB.length > 0 && schemaFromDB[0].type === 'Form_description') {
             setFormDesc(schemaFromDB[0].content);
             schemaFromDB = schemaFromDB.slice(1);
@@ -65,13 +65,13 @@ const FeedbackBuilder = () => {
             setFormDesc(dbData.description);
           }
 
-          // Cập nhật giao diện
+          
           if (schemaFromDB.length > 0) {
             setFormSchema(schemaFromDB);
             setActiveId(schemaFromDB[0].field_id);
             console.log("4. Đã render dữ liệu lên màn hình thành công!");
           } else {
-            // Nếu không có câu hỏi nào thì trả về mặc định 1 câu NPS
+          
             setFormSchema([
               { field_id: 'q_1', type: 'NPS', question: 'Mức độ hài lòng của bạn về sự kiện?', required: true, leftLabel: 'Rất tệ', rightLabel: 'Tuyệt vời' }
             ]);

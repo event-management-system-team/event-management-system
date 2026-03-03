@@ -1,13 +1,19 @@
-package com.eventmanagement.backend.repository;
+package com.eventmanagement.backend.dto.response.organizer;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 
 @Data
+@Builder
+@Getter
+@Setter
 public class FeedbackDetailReponseDTO {
     private String eventName;
     private LocalDateTime submittedAt;
