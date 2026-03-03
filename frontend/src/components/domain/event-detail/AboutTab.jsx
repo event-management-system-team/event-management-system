@@ -5,7 +5,7 @@ import { MapPin } from 'lucide-react'
 const AboutTab = ({ eventName, description, imageGallery, locationCoordinates, }) => {
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
-            <div className="bg-cream p-8 min-h-36 rounded-3xl leading-relaxed ">
+            <div className="bg-cream p-8 rounded-3xl leading-relaxed ">
                 <h3 className="text-2xl font-bold mb-4">Experience the {eventName}</h3>
 
                 {description ? (

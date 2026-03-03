@@ -1,5 +1,5 @@
-import { Flex, Timeline, Typography } from 'antd';
-import { Clock, MapPin } from 'lucide-react';
+import { Flex, Timeline } from 'antd';
+import { MapPin } from 'lucide-react';
 import EmptyState from '../../common/EmptyState';
 
 const AgendaTab = ({ agendas }) => {

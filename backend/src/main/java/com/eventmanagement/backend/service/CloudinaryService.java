@@ -144,4 +144,69 @@ public class CloudinaryService {
             return null;
         }
     }
+
+
+    public String uploadCV(MultipartFile file) throws IOException {
+        log.info("Starting document upload to Cloudinary: {}", file.getOriginalFilename());
+
+        validateDocument(file);
+        String originalFilename = file.getOriginalFilename();
+        String extension = "";
+        if (originalFilename != null && originalFilename.contains(".")) {
+            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        }
+
+        String publicId = folder + "/cv/" + UUID.randomUUID().toString() + extension;
+
+        try {
+            Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
+                    ObjectUtils.asMap(
+                            "public_id", publicId,
+                            "resource_type", "auto"
+                    ));
+
+            String url = (String) uploadResult.get("secure_url");
+            log.info("Document uploaded successfully: {}", url);
+
+            return url;
+
+        } catch (Exception e) {
+            log.error("Failed to upload document to Cloudinary: {}", e.getMessage());
+            throw new IOException("Failed to upload document: " + e.getMessage());
+        }
+    }
+
+    private void validateDocument(MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            throw new IOException("File is empty");
+        }
+
+        long maxSize = 5 * 1024 * 1024;
+        if (file.getSize() > maxSize) {
+            throw new IOException("File size exceeds 5MB limit");
+        }
+
+        String contentType = file.getContentType();
+        if (contentType == null) {
+            throw new IOException("Invalid file type");
+        }
+
+        String[] allowedTypes = {
+                "application/pdf",
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document" // .docx
+        };
+
+        boolean isValid = false;
+        for (String type : allowedTypes) {
+            if (type.equals(contentType)) {
+                isValid = true;
+                break;
+            }
+        }
+
+        if (!isValid) {
+            throw new IOException("Only PDF and Word documents (DOC/DOCX) are allowed");
+        }
+    }
 }

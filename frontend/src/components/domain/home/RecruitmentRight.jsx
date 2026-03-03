@@ -24,7 +24,7 @@ const RecruitmentRight = () => {
       ) :
         (
           recruitments.map((recruitment) => (
-            <RecruitmentCard key={recruitment.recruitmentId} {...recruitment} />
+            <RecruitmentCard key={recruitment.eventId} {...recruitment} />
           ))
         )
       }
