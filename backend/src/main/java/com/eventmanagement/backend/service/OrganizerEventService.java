@@ -50,23 +50,21 @@ public class OrganizerEventService {
 
     /**
      * Lấy thống kê event của organizer (total, active, upcoming, completed)
-     *
+     * event upcoming: approved va start date > thoi gian hien tai
+     * event active: (APPROVED - upcoming) + ONGOING
+     * @param: organizerId
+     * @return  number of event status
      */
     public OrganizerEventStatsResponse getMyEventStats(UUID organizerId) {
 
         long total = eventRepository.countByOrganizer_UserId(organizerId);
         long upcoming = eventRepository.countByOrganizer_UserIdAndStatusAndStartDateAfterNow(organizerId,
                 EventStatus.APPROVED);
-        // tổng số event đã được phê duyệt
-        long allApproved = eventRepository.countByOrganizer_UserIdAndStatus(organizerId, EventStatus.APPROVED);
-        // tổng số event đang diễn ra
+        long allApprovedEvent = eventRepository.countByOrganizer_UserIdAndStatus(organizerId, EventStatus.APPROVED);
         long ongoing = eventRepository.countByOrganizer_UserIdAndStatus(organizerId, EventStatus.ONGOING);
-        // logic tính tổng số event đang diễn ra: tổng số event đã được phê duyệt trừ đi
-        // tổng số event đang diễn ra
-        long active = (allApproved - upcoming) + ongoing;
-        // tổng số event đã hoàn thành
+        long active = (allApprovedEvent - upcoming) + ongoing;
         long completed = eventRepository.countByOrganizer_UserIdAndStatus(organizerId, EventStatus.COMPLETED);
-
+        
         return OrganizerEventStatsResponse.builder()
                 .totalEvents(total)
                 .activeCount(active)
