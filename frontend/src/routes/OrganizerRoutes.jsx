@@ -3,7 +3,6 @@ import ProtectedRoute from "../components/common/ProtectedRoute";
 import OrganizerLayout from "../components/layout/OrganizerLayout";
 
 import MyEventsPage from "../pages/organizer/MyEventsPage";
-import CreateEventPage from "../pages/organizer/CreateEventPage";
 
 const OrganizerRoutes = () => {
     return (
@@ -11,7 +10,6 @@ const OrganizerRoutes = () => {
             <Route element={<ProtectedRoute allowedRoles={["ORGANIZER"]} />}>
                 <Route element={<OrganizerLayout />}>
                     <Route path="/my-events" element={<MyEventsPage />} />
-                    <Route path="/create-event" element={<CreateEventPage />} />
                 </Route>
             </Route>
         </Routes>
