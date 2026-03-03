@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import PublicRoutes from "./PublicRoutes";
 import AdminRoutes from "./AdminRoutes";
+import OrganizerRoutes from "./OrganizerRoutes";
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
@@ -17,6 +18,9 @@ const AppRoutes = () => {
 
       {/* Admin Routes */}
       <Route path="/admin/*" element={<AdminRoutes />} />
+
+      {/* Organizer Routes */}
+      <Route path="/organizer/*" element={<OrganizerRoutes />} />
 
       {/* Public/Protected Routes */}
       <Route path="/*" element={<PublicRoutes />} />
