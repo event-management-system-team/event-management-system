@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import ApplicationList from '../../components/domain/my-application/ApplicationList';
+import ApplicationList from '../../components/domain/attendee/my-application/ApplicationList';
 import applicationService from '../../services/application.service'
 
 const MyApplicationPage = () => {

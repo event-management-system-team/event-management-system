@@ -1,6 +1,6 @@
 import React from "react";
-import { InputField } from "../../common/InputField";
-import { Button } from "../../common/Button";
+import { InputField } from "../../../common/InputField";
+import { Button } from "../../../common/Button";
 import { IoLogOut } from "react-icons/io5";
 
 export const ProfileEdit = ({

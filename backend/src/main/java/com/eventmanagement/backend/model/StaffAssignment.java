@@ -1,5 +1,6 @@
 package com.eventmanagement.backend.model;
 
+import com.eventmanagement.backend.constants.AssignmentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -9,11 +10,11 @@ import java.util.UUID;
 
 @Entity
 @Table(
-        name = "event_staffs",
+        name = "staff_assignments",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        name = "unique_event_user",
-                        columnNames = {"event_id", "user_id"}
+                        name = "unique_staff_schedule",
+                        columnNames = {"schedule_id", "event_staff_id"}
                 )
         }
 )
@@ -22,28 +23,25 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class EventStaff {
+public class StaffAssignment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "event_staff_id", updatable = false, nullable = false)
-    private UUID eventStaffId;
+    @Column(name = "assignment_id", updatable = false, nullable = false)
+    private UUID assignmentId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "event_id", nullable = false)
-    private Event event;
+    @JoinColumn(name = "schedule_id", nullable = false)
+    private StaffSchedule schedule;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "event_staff_id", nullable = false)
+    private EventStaff eventStaff;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "assigned_by")
-    private User assignedBy;
-
-    @Column(name = "staff_role", length = 50, nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 20)
     @Builder.Default
-    private String staffRole = "STAFF";
+    private AssignmentStatus status = AssignmentStatus.ASSIGNED;
 
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
@@ -51,4 +49,6 @@ public class EventStaff {
     @CreationTimestamp
     @Column(name = "assigned_at", updatable = false)
     private LocalDateTime assignedAt;
+
+
 }

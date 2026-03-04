@@ -1,6 +1,6 @@
 import ApplicationCard from "./ApplicationCard"
-import LoadingState from '../../common/LoadingState'
-import EmptyState from '../../common/EmptyState'
+import LoadingState from '../../../common/LoadingState'
+import EmptyState from '../../../common/EmptyState'
 
 const ApplicationList = ({ isLoading, filteredApps, getStatusStyle, formatDate, isError }) => {
     return (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSelector, useDispatch } from "react-redux";
@@ -6,13 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { ProfileView } from "./ProfileView";
 import { ProfileEdit } from "./ProfileEdit";
 import { ProfileAvatar } from "./ProfileAvatar";
-import { Alert } from "../../common/Alert";
-import profileService from "../../../services/profile.service";
+import { Alert } from "../../../common/Alert";
+import profileService from "../../../../services/profile.service";
 import {
   updateProfileSchema,
   changePasswordSchema,
-} from "../../../schemas/profile.schema";
-import { logoutUser, setUser } from "../../../store/slices/auth.slice";
+} from "../../../../schemas/profile.schema";
+import { logoutUser, setUser } from "../../../../store/slices/auth.slice";
 
 export const ProfileCard = () => {
   const { user } = useSelector((state) => state.auth);
@@ -231,9 +231,9 @@ export const ProfileCard = () => {
             Member since{" "}
             {profileData.createdAt
               ? new Date(profileData.createdAt).toLocaleDateString("en-US", {
-                  month: "long",
-                  year: "numeric",
-                })
+                month: "long",
+                year: "numeric",
+              })
               : "N/A"}
           </p>
         </div>
