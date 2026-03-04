@@ -38,6 +38,8 @@ public class ApplicationService {
                                 .bannerUrl(app.getRecruitment().getEvent().getBannerUrl())
                                 .appliedAt(app.getAppliedAt())
                                 .reviewedAt(app.getReviewedAt())
+                                .eventId(app.getRecruitment().getEvent().getEventId())
+                                .eventSlug(app.getRecruitment().getEvent().getEventSlug())
                                 .build())
                 .collect(Collectors.toList());
     }

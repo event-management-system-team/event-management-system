@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 
 const ApplicationCard = ({ app, getStatusStyle, formatDate }) => {
     const navigate = useNavigate()
+
     return (
         <>
             <div
@@ -44,7 +45,7 @@ const ApplicationCard = ({ app, getStatusStyle, formatDate }) => {
                     {app.status === 'APPROVED' ? (
                         <button
                             className="flex items-center justify-center gap-2 bg-[#8aa8b2] hover:bg-[#72929d] text-white px-6 py-3 rounded-full text-sm font-bold transition-all w-full md:w-auto shadow-md shadow-[#8aa8b2]/30"
-                            onClick={() => navigate('/staff')}
+                            onClick={() => navigate(`/staff/${app.eventSlug}`)}
                         >
                             <BriefcaseBusiness size={18} />
                             <span>Workspace</span>

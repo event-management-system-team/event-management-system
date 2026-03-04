@@ -22,7 +22,7 @@ const AppRoutes = () => {
       {/* Public/Protected Routes */}
       <Route path="/*" element={<PublicRoutes />} />
       <Route path="/attendee/*" element={<AttendeeRoutes />} />
-      <Route path="/staff/*" element={<StaffRoutes />} />
+      <Route path="/staff/:eventSlug/*" element={<StaffRoutes />} />
 
     </Routes>
   );

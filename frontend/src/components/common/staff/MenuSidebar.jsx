@@ -2,13 +2,15 @@ import { ArrowLeftRight, Briefcase, CalendarDays, FolderOpen, LogOut } from 'luc
 import Logo from '../Logo'
 import { Dropdown } from 'antd';
 import { useDispatch } from 'react-redux';
-import { NavLink, useNavigate } from 'react-router';
+import { NavLink, useNavigate, useParams } from 'react-router';
 import { logoutUser } from "../../../store/slices/auth.slice";
 
 const MenuSidebar = () => {
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
+
+    const { eventSlug } = useParams();
 
     const handleSwitchMode = () => {
         console.log("Chuyển về Attendee Mode...");
@@ -44,18 +46,18 @@ const MenuSidebar = () => {
         {
             title: 'Workplace',
             icon: Briefcase,
-            path: '/staff',
+            path: `/staff/${eventSlug}`,
             end: true,
         },
         {
             title: 'My Schedule',
             icon: CalendarDays,
-            path: '/staff/my-schedule',
+            path: `/staff/${eventSlug}/my-schedule`
         },
         {
             title: 'Resources',
             icon: FolderOpen,
-            path: '/staff/resource',
+            path: `/staff/${eventSlug}/resource`,
         },
     ];
 

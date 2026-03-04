@@ -5,6 +5,7 @@ import StaffLayout from "../components/layout/StaffLayout";
 import StaffWorkspacePage from "../pages/staff/StaffWorkspace";
 import MySchedulePage from "../pages/staff/MySchedule";
 import ResourcesPage from "../pages/staff/Resources";
+import ScanQRPage from "../pages/staff/ScanQRPage";
 
 const StaffRoutes = () => {
     return (
@@ -14,7 +15,7 @@ const StaffRoutes = () => {
                     <Route path="/" element={<StaffWorkspacePage />} />
                     <Route path="/my-schedule" element={<MySchedulePage />} />
                     <Route path="/resource" element={<ResourcesPage />} />
-
+                    <Route path="/scan-qr" element={<ScanQRPage />} />
                 </Route>
             </Route>
         </Routes>

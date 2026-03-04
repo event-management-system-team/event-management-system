@@ -1,17 +1,31 @@
 import { Bell, Clock, Map, MapPin } from 'lucide-react'
 import React from 'react'
 
-const EventBannerCard = () => {
+const EventBannerCard = ({ eventInfo }) => {
+
+
+    const formatDate = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    };
+
+    const formatTime = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    };
+
     return (
         <div className="w-full lg:w-8/12 bg-white rounded-[40px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-3 flex flex-col md:flex-row gap-4 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-shadow duration-500">
             <div className="w-full md:w-5/12 h-48 md:h-auto min-h-[240px] rounded-[32px] overflow-hidden relative group shrink-0">
-                <img src="https://images.pexels.com/photos/2747449/pexels-photo-2747449.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Event" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                <img src={eventInfo.bannerUrl} alt="Event" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
                 <div className="absolute bottom-6 left-6 right-6">
                     <div className="px-3 py-1.5 bg-white/20 backdrop-blur-md rounded-xl w-fit border border-white/30 text-white text-[10px] font-bold uppercase tracking-wider mb-2">
                         Ongoing Event
                     </div>
-                    <h2 className="text-xl 2xl:text-2xl font-black text-white leading-tight">BridgeFest Music Festival</h2>
+                    <h2 className="text-xl 2xl:text-2xl font-black text-white leading-tight">{eventInfo.eventName}</h2>
                 </div>
             </div>
 
@@ -24,7 +38,7 @@ const EventBannerCard = () => {
                             </div>
                             <div>
                                 <p className="text-[10px] 2xl:text-xs font-bold text-gray-400 uppercase tracking-wider">Location</p>
-                                <p className="text-sm 2xl:text-base font-bold text-[#2C3E50]">Ho Chi Minh City</p>
+                                <p className="text-sm 2xl:text-base font-bold text-[#2C3E50]">{eventInfo.location}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-4 text-gray-600">
@@ -33,7 +47,10 @@ const EventBannerCard = () => {
                             </div>
                             <div>
                                 <p className="text-[10px] 2xl:text-xs font-bold text-gray-400 uppercase tracking-wider">Date & Time</p>
-                                <p className="text-sm 2xl:text-base font-bold text-[#2C3E50]">Oct 24, 2026</p>
+                                <p className="text-sm 2xl:text-base font-bold text-[#2C3E50]">
+                                    {formatTime(eventInfo.startDate)} - {formatDate(eventInfo.startDate)}
+
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -50,10 +67,15 @@ const EventBannerCard = () => {
                             +5
                         </div>
                     </div>
-                    <button className="flex items-center justify-center gap-2 px-5 py-2 2xl:px-6 2xl:py-3 bg-[#2C3E50] hover:bg-[#1a252f] text-white rounded-xl 2xl:rounded-2xl text-xs 2xl:text-sm font-bold transition-colors shadow-md">
+                    <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(eventInfo?.location || '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2 px-5 py-2 2xl:px-6 2xl:py-3 bg-[#2C3E50] hover:bg-[#1a252f] text-white rounded-xl 2xl:rounded-2xl text-xs 2xl:text-sm font-bold transition-colors shadow-md"
+                    >
                         <Map size={16} />
                         <span>View Map</span>
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>

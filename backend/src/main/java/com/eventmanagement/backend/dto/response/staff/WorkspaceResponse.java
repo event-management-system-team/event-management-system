@@ -1,11 +1,12 @@
 package com.eventmanagement.backend.dto.response.staff;
 
-import com.eventmanagement.backend.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Data
@@ -26,15 +27,17 @@ public class WorkspaceResponse {
     @Builder
     public static class UserInfo {
         private String fullName;
+        private String avatarUrl;
     }
 
     @Data
     @Builder
     public static class EventInfo {
         private UUID eventId;
-        private String title;
+        private String eventName;
         private String location;
-        private String status;
+        private String bannerUrl;
+        private LocalDateTime startDate;
     }
 
 }

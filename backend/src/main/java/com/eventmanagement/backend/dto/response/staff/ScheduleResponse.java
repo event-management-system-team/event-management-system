@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -12,7 +13,8 @@ import java.util.UUID;
 public class ScheduleResponse {
     private UUID assignmentId;
     private String scheduleName;
-    private String timeRange;
     private String location;
     private String status;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 }
