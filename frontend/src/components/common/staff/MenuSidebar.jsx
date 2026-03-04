@@ -45,20 +45,19 @@ const MenuSidebar = () => {
             title: 'Workplace',
             icon: Briefcase,
             path: '/staff',
+            end: true,
         },
         {
             title: 'My Schedule',
             icon: CalendarDays,
-            path: 'my-schedule',
+            path: '/staff/my-schedule',
         },
         {
             title: 'Resources',
             icon: FolderOpen,
-            path: 'resources',
+            path: '/staff/resource',
         },
     ];
-
-
 
 
     return (
@@ -80,12 +79,13 @@ const MenuSidebar = () => {
                                 <NavLink
                                     key={item.title}
                                     to={item.path}
+                                    end={item.end}
                                     className={({ isActive }) =>
-                                        `flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap 
-                                    ${isActive
-                                            ? "bg-white/20 text-white border border-white/10 font-bold shadow-sm"
-                                            : "text-white/70 hover:bg-white/10 hover:text-white font-medium"
-                                        }`}
+                                        `flex items-center gap-3 px-4 py-3 rounded-xl whitespace-nowrap border-2 transition-all duration-300 ease-in-out ${isActive
+                                            ? "bg-white/20 text-white border-white/20 shadow-lg"
+                                            : "text-white/70 hover:bg-white/10 hover:text-white border-transparent"
+                                        } font-medium`
+                                    }
                                 >
                                     <Icon size={20} className="shrink-0" />
                                     {item.title}
