@@ -1,5 +1,6 @@
 package com.eventmanagement.backend.model;
 
+import com.eventmanagement.backend.constants.AssignmentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -8,7 +9,8 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "staff_assignments",
+@Table(
+        name = "staff_assignments",
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "unique_staff_schedule",
@@ -36,7 +38,6 @@ public class StaffAssignment {
     @JoinColumn(name = "event_staff_id", nullable = false)
     private EventStaff eventStaff;
 
-
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 20)
     @Builder.Default
@@ -49,11 +50,5 @@ public class StaffAssignment {
     @Column(name = "assigned_at", updatable = false)
     private LocalDateTime assignedAt;
 
-    // Enum định nghĩa trạng thái phân công
-    public enum AssignmentStatus {
-        ASSIGNED,   // Đã phân công
-        CONFIRMED,  // Staff đã xác nhận sẽ làm
-        CANCELLED,  // Hủy phân công
-        COMPLETED   // Đã hoàn thành ca
-    }
+
 }
