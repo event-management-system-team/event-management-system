@@ -6,6 +6,7 @@ import RegisterPage from "../pages/auth/RegisterPage";
 import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
 import AttendeeRoutes from "./AttendeeRoutes";
 import OrganizerRoutes from "./OrganizerRoutes";
+import TestTicketExport from "../components/domain/ticket/TestExportTicket";
 
 
 const AppRoutes = () => {
@@ -25,6 +26,11 @@ const AppRoutes = () => {
       {/* Public/Protected Routes */}
       <Route path="/*" element={<PublicRoutes />} />
       <Route path="/attendee/*" element={<AttendeeRoutes />} />
+
+
+      <Route path="/export" element={<TestTicketExport />} />
+
+
 
     </Routes>
   );
