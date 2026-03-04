@@ -15,7 +15,9 @@ import {
     Linkedin,
     Calendar,
     Rocket,
+    AlertCircle,
 } from 'lucide-react';
+import organizerService from '../../services/organizer.service';
 
 // ─────────────────────────────────────────────
 // Step indicator at the top
@@ -184,7 +186,7 @@ const Step1BasicInfo = ({ form, onChange }) => {
                     </div>
                     Schedule Details
                 </h2>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                     <div>
                         <label className="block text-xs font-semibold text-gray-600 mb-1.5">Start Date</label>
                         <input
@@ -209,6 +211,15 @@ const Step1BasicInfo = ({ form, onChange }) => {
                             type="time"
                             value={form.startTime}
                             onChange={(e) => onChange({ startTime: e.target.value })}
+                            className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] transition"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-semibold text-gray-600 mb-1.5">End Time</label>
+                        <input
+                            type="time"
+                            value={form.endTime}
+                            onChange={(e) => onChange({ endTime: e.target.value })}
                             className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] transition"
                         />
                     </div>
@@ -245,6 +256,8 @@ const Step1BasicInfo = ({ form, onChange }) => {
 // Step 2 – Tickets & Pricing
 // ─────────────────────────────────────────────
 const Step2Tickets = ({ form, onChange }) => {
+    const isFree = form.isFree;
+
     const handleTicketChange = (idx, field, value) => {
         const updated = form.tickets.map((t, i) =>
             i === idx ? { ...t, [field]: value } : t
@@ -262,81 +275,116 @@ const Step2Tickets = ({ form, onChange }) => {
         onChange({ tickets: form.tickets.filter((_, i) => i !== idx) });
     };
 
+    const handleToggleFree = (v) => {
+        // Khi bật Free: set tất cả price về 0
+        if (v) {
+            onChange({
+                isFree: true,
+                tickets: form.tickets.map((t) => ({ ...t, price: '0' })),
+            });
+        } else {
+            onChange({ isFree: false });
+        }
+    };
+
     return (
         <div className="space-y-6">
-            <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
-                <h2 className="text-lg font-bold text-gray-800 mb-1">Step 2: Ticket Types &amp; Inventory</h2>
-                <p className="text-sm text-gray-400 mb-6">Configure your pricing tiers and set availability for each category.</p>
-
-                {/* Table header */}
-                <div className="grid grid-cols-12 gap-3 mb-2 px-1">
-                    <div className="col-span-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Ticket Name</div>
-                    <div className="col-span-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Quantity</div>
-                    <div className="col-span-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Price (USD)</div>
-                    <div className="col-span-1" />
+            <section className={`bg-white rounded-2xl shadow-sm border p-7 transition-all ${isFree ? 'border-[#4a9e9e]/40 bg-[#f0fafa]/30' : 'border-gray-100'
+                }`}>
+                <div className="flex items-center justify-between mb-1">
+                    <h2 className="text-lg font-bold text-gray-800">Step 2: Ticket Types &amp; Inventory</h2>
+                    {isFree && (
+                        <span className="px-3 py-1 bg-[#4a9e9e]/10 text-[#4a9e9e] text-xs font-bold rounded-full border border-[#4a9e9e]/20">
+                            FREE EVENT
+                        </span>
+                    )}
                 </div>
+                <p className="text-sm text-gray-400 mb-6">
+                    {isFree
+                        ? 'This is a free event — all tickets are complimentary. Ticket pricing is locked.'
+                        : 'Configure your pricing tiers and set availability for each category.'}
+                </p>
 
-                <div className="space-y-3">
-                    {form.tickets.map((ticket, idx) => (
-                        <div
-                            key={idx}
-                            className="grid grid-cols-12 gap-3 items-center bg-gray-50 rounded-xl px-4 py-3 border border-gray-100"
-                        >
-                            <div className="col-span-5">
-                                <input
-                                    type="text"
-                                    placeholder="e.g. General Admission"
-                                    value={ticket.name}
-                                    onChange={(e) => handleTicketChange(idx, 'name', e.target.value)}
-                                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] transition"
-                                />
-                            </div>
-                            <div className="col-span-3">
-                                <input
-                                    type="number"
-                                    placeholder="0"
-                                    min="0"
-                                    value={ticket.quantity}
-                                    onChange={(e) => handleTicketChange(idx, 'quantity', e.target.value)}
-                                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] transition"
-                                />
-                            </div>
-                            <div className="col-span-3">
-                                <div className="relative">
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">$</span>
+                {/* Ticket table — locked when isFree */}
+                <div className={`transition-all ${isFree ? 'opacity-50 pointer-events-none select-none' : ''}`}>
+                    {/* Table header */}
+                    <div className="grid grid-cols-12 gap-3 mb-2 px-1">
+                        <div className="col-span-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Ticket Name</div>
+                        <div className="col-span-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Quantity</div>
+                        <div className="col-span-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                            {isFree ? 'Price' : 'Price (USD)'}
+                        </div>
+                        <div className="col-span-1" />
+                    </div>
+
+                    <div className="space-y-3">
+                        {form.tickets.map((ticket, idx) => (
+                            <div
+                                key={idx}
+                                className="grid grid-cols-12 gap-3 items-center bg-gray-50 rounded-xl px-4 py-3 border border-gray-100"
+                            >
+                                <div className="col-span-5">
                                     <input
-                                        type="number"
-                                        placeholder="0.00"
-                                        min="0"
-                                        step="0.01"
-                                        value={ticket.price}
-                                        onChange={(e) => handleTicketChange(idx, 'price', e.target.value)}
-                                        className="w-full pl-7 pr-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] transition"
+                                        type="text"
+                                        placeholder="e.g. General Admission"
+                                        value={ticket.name}
+                                        onChange={(e) => handleTicketChange(idx, 'name', e.target.value)}
+                                        className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] transition"
                                     />
                                 </div>
+                                <div className="col-span-3">
+                                    <input
+                                        type="number"
+                                        placeholder="0"
+                                        min="0"
+                                        value={ticket.quantity}
+                                        onChange={(e) => handleTicketChange(idx, 'quantity', e.target.value)}
+                                        className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] transition"
+                                    />
+                                </div>
+                                <div className="col-span-3">
+                                    {isFree ? (
+                                        <div className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-100 text-gray-400 font-medium text-center">
+                                            FREE
+                                        </div>
+                                    ) : (
+                                        <div className="relative">
+                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">$</span>
+                                            <input
+                                                type="number"
+                                                placeholder="0.00"
+                                                min="0"
+                                                step="0.01"
+                                                value={ticket.price}
+                                                onChange={(e) => handleTicketChange(idx, 'price', e.target.value)}
+                                                className="w-full pl-7 pr-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] transition"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="col-span-1 flex justify-end">
+                                    <button
+                                        type="button"
+                                        onClick={() => removeTicket(idx)}
+                                        className="p-1.5 text-gray-300 hover:text-red-400 transition rounded-lg hover:bg-red-50"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                </div>
                             </div>
-                            <div className="col-span-1 flex justify-end">
-                                <button
-                                    type="button"
-                                    onClick={() => removeTicket(idx)}
-                                    className="p-1.5 text-gray-300 hover:text-red-400 transition rounded-lg hover:bg-red-50"
-                                >
-                                    <Trash2 size={16} />
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
 
-                {/* Add ticket */}
-                <button
-                    type="button"
-                    onClick={addTicket}
-                    className="mt-4 w-full border-2 border-dashed border-gray-200 rounded-xl py-3 flex items-center justify-center gap-2 text-sm text-gray-500 hover:border-[#4a9e9e]/50 hover:text-[#4a9e9e] hover:bg-[#f0fafa] transition"
-                >
-                    <Plus size={16} />
-                    Add Another Ticket Type
-                </button>
+                    {/* Add ticket */}
+                    <button
+                        type="button"
+                        onClick={addTicket}
+                        className="mt-4 w-full border-2 border-dashed border-gray-200 rounded-xl py-3 flex items-center justify-center gap-2 text-sm text-gray-500 hover:border-[#4a9e9e]/50 hover:text-[#4a9e9e] hover:bg-[#f0fafa] transition"
+                    >
+                        <Plus size={16} />
+                        Add Another Ticket Type
+                    </button>
+                </div>
             </section>
 
             {/* Advanced Settings */}
@@ -344,6 +392,21 @@ const Step2Tickets = ({ form, onChange }) => {
                 <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">Advanced Settings</p>
 
                 <div className="space-y-4">
+                    {/* Is Free */}
+                    <ToggleSetting
+                        icon={
+                            <div className="w-8 h-8 bg-green-50 rounded-full flex items-center justify-center">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-500">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
+                                    <path d="M8 12l2 2 4-4" />
+                                </svg>
+                            </div>
+                        }
+                        title="Free event"
+                        description="All tickets are complimentary — pricing section will be locked"
+                        checked={isFree}
+                        onChange={handleToggleFree}
+                    />
                     <ToggleSetting
                         icon={
                             <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
@@ -465,6 +528,7 @@ const initialForm = {
     startDate: '',
     endDate: '',
     startTime: '',
+    endTime: '',
     location: '',
     coverFile: null,
     coverPreview: null,
@@ -473,40 +537,77 @@ const initialForm = {
         { name: 'General Admission', quantity: '1000', price: '75.00' },
         { name: 'VIP Access', quantity: '50', price: '250.00' },
     ],
+    isFree: false,
     limitPerPerson: true,
     privateEvent: false,
 };
 
 const CreateEventPage = () => {
     const navigate = useNavigate();
-    const [step, setStep] = useState(1); // 1, 2, or 3 (success)
+    const [step, setStep] = useState(1);
     const [form, setForm] = useState(initialForm);
     const [saving, setSaving] = useState(false);
+    const [error, setError] = useState(null);
 
     const updateForm = (partial) => setForm((prev) => ({ ...prev, ...partial }));
 
-    const handleSaveDraft = () => {
-        // TODO: integrate with API
-        console.log('Save as draft:', form);
+    const buildEventPayload = (isDraft = false) => ({
+        eventName: form.eventName,
+        category: form.category,
+        description: form.description,
+        startDate: form.startDate,
+        endDate: form.endDate,
+        startTime: form.startTime,
+        endTime: form.endTime,
+        location: form.location,
+        tickets: form.tickets.map((t) => ({
+            name: t.name,
+            quantity: parseInt(t.quantity, 10) || 0,
+            price: form.isFree ? 0 : parseFloat(t.price) || 0,
+        })),
+        isFree: form.isFree,
+        limitPerPerson: form.limitPerPerson,
+        privateEvent: form.privateEvent,
+        draft: isDraft,
+    });
+
+    const handleSaveDraft = async () => {
+        setSaving(true);
+        setError(null);
+        try {
+            await organizerService.createEvent(buildEventPayload(true), form.coverFile);
+            navigate('/organizer/my-events');
+        } catch (err) {
+            setError(err.response?.data?.message || 'Failed to save draft. Please try again.');
+        } finally {
+            setSaving(false);
+        }
     };
 
     const handleContinue = () => {
+        setError(null);
         setStep(2);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const handleBack = () => {
+        setError(null);
         setStep(1);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const handleSubmit = async () => {
         setSaving(true);
-        // TODO: integrate with API – POST /api/events
-        await new Promise((r) => setTimeout(r, 800)); // simulate network
-        setSaving(false);
-        setStep(3);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setError(null);
+        try {
+            await organizerService.createEvent(buildEventPayload(false), form.coverFile);
+            setStep(3);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch (err) {
+            setError(err.response?.data?.message || 'Failed to submit event. Please try again.');
+        } finally {
+            setSaving(false);
+        }
     };
 
     if (step === 3) {
@@ -562,6 +663,13 @@ const CreateEventPage = () => {
 
                 {step === 1 && <Step1BasicInfo form={form} onChange={updateForm} />}
                 {step === 2 && <Step2Tickets form={form} onChange={updateForm} />}
+
+                {error && (
+                    <div className="mt-4 flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+                        <AlertCircle size={16} className="shrink-0" />
+                        {error}
+                    </div>
+                )}
 
                 {/* Footer actions */}
                 <div className="flex items-center justify-between mt-6">
