@@ -5,6 +5,7 @@ import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
 import AttendeeRoutes from "./AttendeeRoutes";
+import OrganizerRoutes from "./OrganizerRoutes";
 
 
 const AppRoutes = () => {

@@ -1,0 +1,117 @@
+package com.eventmanagement.backend.controller.feedback;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.eventmanagement.backend.constants.FormType;
+import com.eventmanagement.backend.dto.request.CustomFormRequestDTO;
+import com.eventmanagement.backend.dto.response.organizer.FeedbackDetailResponseDTO;
+import com.eventmanagement.backend.dto.response.organizer.FeedbackResponseDTO;
+import com.eventmanagement.backend.dto.response.organizer.RecruitmentDetailDTO;
+import com.eventmanagement.backend.model.CustomForm;
+import com.eventmanagement.backend.repository.CustomFormRepository;
+import com.eventmanagement.backend.repository.FeedbackRepository;
+import com.eventmanagement.backend.service.attendee.RecruitmentService;
+import com.eventmanagement.backend.service.organizer.CustomFormService;
+import com.eventmanagement.backend.service.organizer.FeedbackService;
+import com.eventmanagement.backend.service.organizer.RecruitmentServiceOrganizer;
+
+
+
+
+@RestController
+@RequestMapping("/api")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials="true") 
+public class FeedbackController {
+
+    private final FeedbackRepository feedbackRepository;
+    private final CustomFormRepository customFormRepository;
+    private final CustomFormService customFormService; 
+    private final FeedbackService feedbackService; 
+    private final RecruitmentService recruitmentService;
+    private final RecruitmentServiceOrganizer recruitmentServiceOrganizer;
+
+     // DI qua constructor
+
+    public FeedbackController(FeedbackRepository feedbackRepository, 
+                              CustomFormRepository customFormRepository, 
+                              CustomFormService customFormService, 
+                              FeedbackService feedbackService,
+                              RecruitmentService recruitmentService,
+                              RecruitmentServiceOrganizer recruitmentServiceOrganizer) {
+        this.feedbackRepository = feedbackRepository;
+        this.customFormRepository = customFormRepository;
+        this.customFormService = customFormService;
+        this.feedbackService = feedbackService;
+        this.recruitmentService = recruitmentService;
+        this.recruitmentServiceOrganizer = recruitmentServiceOrganizer;
+    }
+
+    @GetMapping("/events/{eventId}/feedback")
+    public ResponseEntity<Map<String, Object>> getEventFeedbacks(@PathVariable UUID eventId) {
+        List<FeedbackResponseDTO> feedbacks = feedbackRepository.findFeedbacksByEventId(eventId);
+        Map<String, Object> response = new HashMap<>();
+        response.put("feedbacks", feedbacks);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/events/{eventId}/forms")
+    public ResponseEntity<?> createForm(@PathVariable("eventId") UUID eventId, @RequestBody CustomFormRequestDTO form) {
+        try {
+            CustomForm savedForm = customFormService.saveCustomForm(eventId, form);
+            return ResponseEntity.ok(savedForm);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống: " + e.getMessage());
+        }
+    }
+    
+    @GetMapping("/feedbacks/{feedbackId}")
+    public ResponseEntity<FeedbackDetailResponseDTO> getFeedbackDetail(@PathVariable UUID feedbackId) {
+        return ResponseEntity.ok(feedbackService.getFeedbackDetail(feedbackId));
+    }
+    @GetMapping("event/recruitments/{recruitmentId}")
+    public ResponseEntity<RecruitmentDetailDTO> getRecruitmentDetail(@PathVariable UUID recruitmentId) {
+        RecruitmentDetailDTO detail = recruitmentServiceOrganizer.getRecruitmentDetail(recruitmentId);
+        return ResponseEntity.ok(detail);
+
+    }
+
+    @GetMapping("/events/{eventId}/forms")
+public ResponseEntity<?> getEventForm(
+    @PathVariable("eventId") UUID eventId,
+    @RequestParam(value = "type", defaultValue = "FEEDBACK") String typeStr 
+) {
+    try {
+        // Chuyển String thành Enum trước khi đưa xuống Service
+        FormType type = FormType.valueOf(typeStr.toUpperCase());
+        
+        CustomForm form = customFormService.getFormByType(eventId, type); // Hoặc truyền type tùy logic Service bạn đang viết
+        
+        if (form == null) {
+            // Nếu chưa có form, trả về 204 No Content hoặc 200 kèm object rỗng để React khỏi lỗi
+            return ResponseEntity.ok(Map.of("message", "Chưa có form nào được tạo"));
+        }
+        return ResponseEntity.ok(form);
+    } catch (IllegalArgumentException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại form không hợp lệ (formType)");
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống: " + e.getMessage());
+    }
+}
+}

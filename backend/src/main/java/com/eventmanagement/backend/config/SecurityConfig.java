@@ -1,13 +1,12 @@
 package com.eventmanagement.backend.config;
 
-import com.eventmanagement.backend.security.JwtAuthenticationFilter;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
-import lombok.RequiredArgsConstructor;
+import java.util.Arrays;
 
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,7 +19,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
+import com.eventmanagement.backend.security.JwtAuthenticationFilter;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
@@ -46,6 +48,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/events/**").permitAll()
                         .requestMatchers("/api/categories/**").permitAll()
                         .requestMatchers("/api/recruitments/**").permitAll()
+                            .requestMatchers("/api/profile/{userId}").permitAll() 
 //                        .requestMatchers("/api/applications/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -71,4 +74,9 @@ public class SecurityConfig {
     public Jackson2ObjectMapperBuilderCustomizer jacksonCustomizer() {
         return builder -> builder.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
+    
+    @Bean
+public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    return config.getAuthenticationManager();
+}
 }

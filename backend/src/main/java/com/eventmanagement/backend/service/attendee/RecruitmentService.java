@@ -1,4 +1,19 @@
-package com.eventmanagement.backend.service;
+package com.eventmanagement.backend.service.attendee;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
 import com.eventmanagement.backend.constants.EventStatus;
 import com.eventmanagement.backend.constants.RecruitmentStatus;
@@ -9,23 +24,8 @@ import com.eventmanagement.backend.model.BenefitRecruitment;
 import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.model.Recruitment;
 import com.eventmanagement.backend.repository.RecruitmentRepository;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
-
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 
 @Service
 @RequiredArgsConstructor
@@ -144,4 +144,6 @@ public class RecruitmentService {
                 .benefits(benefitResponse)
                 .build();
     }
+
+    
 }
