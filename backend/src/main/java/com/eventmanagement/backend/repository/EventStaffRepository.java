@@ -14,4 +14,6 @@ public interface EventStaffRepository extends JpaRepository<EventStaff, UUID> {
     @Query("SELECT es FROM EventStaff es JOIN FETCH es.user JOIN FETCH es.event " +
             "WHERE es.event.eventSlug = :eventSlug AND es.user.userId = :userId")
     Optional<EventStaff> findWorkspaceAccess(@Param("eventSlug") String eventSlug, @Param("userId") UUID userId);
+
+    boolean existsByEvent_EventIdAndUser_UserId(UUID eventId, UUID userId);
 }

@@ -1,9 +1,9 @@
 package com.eventmanagement.backend.repository;
 
-import com.eventmanagement.backend.constants.EventStatus;
-import com.eventmanagement.backend.constants.RecruitmentStatus;
-import com.eventmanagement.backend.model.Event;
-import com.eventmanagement.backend.model.Recruitment;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,13 +11,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import com.eventmanagement.backend.constants.EventStatus;
+import com.eventmanagement.backend.constants.RecruitmentStatus;
+import com.eventmanagement.backend.model.Recruitment;
 
 @Repository
 public interface RecruitmentRepository extends JpaRepository<Recruitment, UUID> {
+
+    List<Recruitment> findByEvent_EventId(UUID eventId);
 
 
     @Query("SELECT e.eventSlug FROM Recruitment r JOIN r.event e " +
