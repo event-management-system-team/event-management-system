@@ -1,14 +1,23 @@
 package com.eventmanagement.backend.dto.response.organizer;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public interface StaffResponse {
-    UUID getUserId();
-    String getEmail();
-    String getFullName();
-    String getPhone();
-    String getAvatarUrl();
-    String getPositionName();
-    LocalDateTime getAppliedAt();
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class StaffResponse {
+    private UUID staffId;
+    private String email;
+    private String fullName;
+    private String phone;
+    private String avatarUrl;
+    private String role;
 }
+

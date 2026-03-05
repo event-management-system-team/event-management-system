@@ -2,7 +2,6 @@ package com.eventmanagement.backend.controller.organizer;
 
 import com.eventmanagement.backend.dto.request.CreateStaffScheduleRequest;
 import com.eventmanagement.backend.dto.response.organizer.ScheduleResponse;
-import com.eventmanagement.backend.dto.response.organizer.StaffScheduleResponse;
 import com.eventmanagement.backend.service.StaffScheduleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,30 +17,30 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class StaffScheduleController {
 
-    private final StaffScheduleService staffScheduleService;
-
-    @GetMapping("/{id}/staff-schedules")
-    public ResponseEntity<List<StaffScheduleResponse>> getSchedules(@PathVariable UUID id) {
-        return ResponseEntity.ok(staffScheduleService.getSchedulesByEvent(id));
-    }
-
-    @PostMapping("/{eventId}/staff-schedules")
-//    @PreAuthorize("@eventSecurity.isOrganizerOfEvent(authentication, #eventId)")
-    public ResponseEntity<ScheduleResponse> createSchedule(
-            @PathVariable UUID eventId,
-            @RequestBody @Valid CreateStaffScheduleRequest request
-    ) {
-        return ResponseEntity.ok(
-                staffScheduleService.createSchedule(eventId, request)
-        );
-    }
-
-    // create schedule + assign staff
-    @PostMapping("/{eventId}/staff-schedules/assignments")
-    public ResponseEntity<ScheduleResponse> createScheduleAndAssign(
-            @PathVariable UUID eventId,
-            @RequestBody @Valid CreateStaffScheduleRequest request
-    ) {
-        return ResponseEntity.ok(staffScheduleService.createScheduleAndAssign(eventId, request));
-    }
+//    private final StaffScheduleService staffScheduleService;
+//
+//    @GetMapping("/{id}/staff-schedules")
+//    public ResponseEntity<List<StaffScheduleResponse>> getSchedules(@PathVariable UUID id) {
+//        return ResponseEntity.ok(staffScheduleService.getSchedulesByEvent(id));
+//    }
+//
+//    @PostMapping("/{eventId}/staff-schedules")
+////    @PreAuthorize("@eventSecurity.isOrganizerOfEvent(authentication, #eventId)")
+//    public ResponseEntity<ScheduleResponse> createSchedule(
+//            @PathVariable UUID eventId,
+//            @RequestBody @Valid CreateStaffScheduleRequest request
+//    ) {
+//        return ResponseEntity.ok(
+//                staffScheduleService.createSchedule(eventId, request)
+//        );
+//    }
+//
+//    // create schedule + assign staff
+//    @PostMapping("/{eventId}/staff-schedules/assignments")
+//    public ResponseEntity<ScheduleResponse> createScheduleAndAssign(
+//            @PathVariable UUID eventId,
+//            @RequestBody @Valid CreateStaffScheduleRequest request
+//    ) {
+//        return ResponseEntity.ok(staffScheduleService.createScheduleAndAssign(eventId, request));
+//    }
 }

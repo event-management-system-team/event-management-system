@@ -15,7 +15,12 @@ public class StaffService {
     private final StaffRepository staffRepository;
 
     @Transactional(readOnly = true)
-    public List<StaffResponse> getApprovedStaffByEventId(UUID eventId) {
-        return staffRepository.findApprovedStaffByEventId(eventId);
+    public List<StaffResponse> findStaffByEventId(UUID eventId) {
+        return staffRepository.findStaffByEventId(eventId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<StaffResponse> findStaffByEventIdAndRole(UUID eventId, String role) {
+        return staffRepository.findStaffByEventIdAndOptionalRole(eventId, role);
     }
 }

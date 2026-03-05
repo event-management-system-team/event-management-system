@@ -39,10 +39,6 @@ public class StaffSchedule {
     @Column(name = "location", length = 255)
     private String location;
 
-    @Column(name = "required_staff")
-    @Builder.Default
-    private Integer requiredStaff = 1;
-
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
