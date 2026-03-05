@@ -4,12 +4,9 @@ import java.util.UUID;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import lombok.Data;
-import lombok.Getter;
 import lombok.NonNull;
 
-@Data
-public class ReservationRequest {
+public class CreateOrderRequest {
 
     @NonNull
     private UUID ticketTypeId;
@@ -17,4 +14,7 @@ public class ReservationRequest {
     @Min(1)
     @Max(5)
     private Integer quantity;
+
+    private String fullName;
+    private String email;
 }
