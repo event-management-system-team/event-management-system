@@ -17,7 +17,11 @@ import {
     Rocket,
     AlertCircle,
 } from 'lucide-react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import dayjs from 'dayjs';
 import organizerService from '../../services/organizer.service';
+import useCategories from '../../hooks/useCategories';
 
 // ─────────────────────────────────────────────
 // Step indicator at the top
@@ -71,14 +75,71 @@ const StepIndicator = ({ currentStep }) => {
 // ─────────────────────────────────────────────
 // Step 1 – Basic Info
 // ─────────────────────────────────────────────
-const CATEGORIES = [
-    'Conference', 'Concert', 'Workshop', 'Networking', 'Festival',
-    'Sports', 'Art & Culture', 'Tech', 'Business', 'Other',
-];
 
-const Step1BasicInfo = ({ form, onChange }) => {
+
+const FieldError = ({ msg }) =>
+    msg ? <p className="mt-1 text-xs text-red-500 flex items-center gap-1"><span>⚠</span>{msg}</p> : null;
+
+const Step1BasicInfo = ({ form, onChange, errors = {} }) => {
+    const { categories, isLoading: catLoading } = useCategories();
     const fileInputRef = useRef(null);
     const [preview, setPreview] = useState(form.coverPreview || null);
+
+    // ── Nominatim address autocomplete ──────────────────────────────────────
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [loadingLocation, setLoadingLocation] = useState(false);
+    const debounceRef = useRef(null);
+    const locationWrapperRef = useRef(null);
+
+    const fetchSuggestions = (query) => {
+        if (!query || query.trim().length < 3) {
+            setSuggestions([]);
+            setShowSuggestions(false);
+            return;
+        }
+        setLoadingLocation(true);
+        fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=6&addressdetails=1&countrycodes=vn`,
+            { headers: { 'Accept-Language': 'vi,en' } }
+        )
+            .then((res) => res.json())
+            .then((data) => {
+                setSuggestions(data);
+                setShowSuggestions(data.length > 0);
+            })
+            .catch(() => setSuggestions([]))
+            .finally(() => setLoadingLocation(false));
+    };
+
+    const handleLocationChange = (e) => {
+        const val = e.target.value;
+        onChange({ location: val });
+        clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(() => fetchSuggestions(val), 310);
+    };
+
+    const handleSelectSuggestion = (item) => {
+        onChange({
+            location: item.display_name,
+            lat: parseFloat(item.lat),
+            lng: parseFloat(item.lon),   // Nominatim trả về "lon", đổi sang "lng"
+        });
+        setSuggestions([]);
+        setShowSuggestions(false);
+    };
+
+    // Close dropdown when clicking outside
+    React.useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (locationWrapperRef.current && !locationWrapperRef.current.contains(e.target)) {
+                setShowSuggestions(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+    // ────────────────────────────────────────────────────────────────────────
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -116,23 +177,26 @@ const Step1BasicInfo = ({ form, onChange }) => {
                         placeholder="Enter a catchy title for your event"
                         value={form.eventName}
                         onChange={(e) => onChange({ eventName: e.target.value })}
-                        className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] transition"
+                        className={`w-full px-4 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 transition ${errors.eventName ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
                     />
+                    <FieldError msg={errors.eventName} />
                 </div>
 
                 {/* Category */}
                 <div className="mb-4">
                     <label className="block text-xs font-semibold text-gray-600 mb-1.5">Category</label>
                     <select
-                        value={form.category}
-                        onChange={(e) => onChange({ category: e.target.value })}
-                        className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] bg-white transition appearance-none"
+                        value={form.categoryId}
+                        onChange={(e) => onChange({ categoryId: e.target.value })}
+                        disabled={catLoading}
+                        className={`w-full px-4 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 bg-white transition appearance-none ${errors.categoryId ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
                     >
-                        <option value="">Select Category</option>
-                        {CATEGORIES.map((c) => (
-                            <option key={c} value={c}>{c}</option>
+                        <option value="">{catLoading ? 'Loading...' : 'Select Category'}</option>
+                        {categories.map((c) => (
+                            <option key={c.categoryId} value={c.categoryId}>{c.categoryName}</option>
                         ))}
                     </select>
+                    <FieldError msg={errors.categoryId} />
                 </div>
 
                 {/* Description */}
@@ -143,8 +207,9 @@ const Step1BasicInfo = ({ form, onChange }) => {
                         value={form.description}
                         onChange={(e) => onChange({ description: e.target.value })}
                         rows={5}
-                        className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] resize-y transition"
+                        className={`w-full px-4 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 resize-y transition ${errors.description ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
                     />
+                    <FieldError msg={errors.description} />
                 </div>
 
                 {/* Event Cover Image */}
@@ -189,21 +254,28 @@ const Step1BasicInfo = ({ form, onChange }) => {
                 <div className="grid grid-cols-2 gap-4">
                     <div>
                         <label className="block text-xs font-semibold text-gray-600 mb-1.5">Start Date</label>
-                        <input
-                            type="date"
-                            value={form.startDate}
-                            onChange={(e) => onChange({ startDate: e.target.value })}
-                            className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] transition"
+                        <DatePicker
+                            selected={form.startDate}
+                            onChange={(date) => onChange({ startDate: date })}
+                            dateFormat="dd/MM/yyyy"
+                            placeholderText="dd/mm/yyyy"
+                            className={`w-full px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 transition ${errors.startDate ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
+                            wrapperClassName="w-full"
                         />
+                        <FieldError msg={errors.startDate} />
                     </div>
                     <div>
                         <label className="block text-xs font-semibold text-gray-600 mb-1.5">End Date</label>
-                        <input
-                            type="date"
-                            value={form.endDate}
-                            onChange={(e) => onChange({ endDate: e.target.value })}
-                            className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] transition"
+                        <DatePicker
+                            selected={form.endDate}
+                            onChange={(date) => onChange({ endDate: date })}
+                            dateFormat="dd/MM/yyyy"
+                            placeholderText="dd/mm/yyyy"
+                            minDate={form.startDate}
+                            className={`w-full px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 transition ${errors.endDate ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
+                            wrapperClassName="w-full"
                         />
+                        <FieldError msg={errors.endDate} />
                     </div>
                     <div>
                         <label className="block text-xs font-semibold text-gray-600 mb-1.5">Start Time</label>
@@ -211,8 +283,9 @@ const Step1BasicInfo = ({ form, onChange }) => {
                             type="time"
                             value={form.startTime}
                             onChange={(e) => onChange({ startTime: e.target.value })}
-                            className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] transition"
+                            className={`w-full px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 transition ${errors.startTime ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
                         />
+                        <FieldError msg={errors.startTime} />
                     </div>
                     <div>
                         <label className="block text-xs font-semibold text-gray-600 mb-1.5">End Time</label>
@@ -220,8 +293,9 @@ const Step1BasicInfo = ({ form, onChange }) => {
                             type="time"
                             value={form.endTime}
                             onChange={(e) => onChange({ endTime: e.target.value })}
-                            className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] transition"
+                            className={`w-full px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 transition ${errors.endTime ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
                         />
+                        <FieldError msg={errors.endTime} />
                     </div>
                 </div>
             </section>
@@ -236,16 +310,57 @@ const Step1BasicInfo = ({ form, onChange }) => {
                 </h2>
                 <div>
                     <label className="block text-xs font-semibold text-gray-600 mb-1.5">Venue Address</label>
-                    <div className="relative">
-                        <MapPin size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <div className="relative" ref={locationWrapperRef}>
+                        <MapPin size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 z-10" />
                         <input
                             type="text"
                             placeholder="Search for a location or address"
                             value={form.location}
-                            onChange={(e) => onChange({ location: e.target.value })}
-                            className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] transition"
+                            onChange={handleLocationChange}
+                            onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                            autoComplete="off"
+                            className={`w-full pl-9 pr-9 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 transition ${errors.location ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
                         />
+                        {/* Loading spinner */}
+                        {loadingLocation && (
+                            <div className="absolute right-3.5 top-1/2 -translate-y-1/2">
+                                <svg className="animate-spin h-4 w-4 text-[#4a9e9e]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                                </svg>
+                            </div>
+                        )}
+                        {/* Suggestions dropdown */}
+                        {showSuggestions && (
+                            <ul className="absolute z-50 left-0 right-0 mt-1.5 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden max-h-64 overflow-y-auto">
+                                {suggestions.length === 0 ? (
+                                    <li className="px-4 py-3 text-sm text-gray-400 text-center">No results found</li>
+                                ) : (
+                                    suggestions.map((item) => (
+                                        <li
+                                            key={item.place_id}
+                                            onMouseDown={() => handleSelectSuggestion(item)}
+                                            className="flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-[#f0fafa] transition border-b border-gray-50 last:border-0 group"
+                                        >
+                                            <MapPin size={14} className="text-[#4a9e9e] mt-0.5 shrink-0 group-hover:scale-110 transition-transform" />
+                                            <div className="min-w-0">
+                                                <p className="text-sm font-medium text-gray-700 leading-snug truncate">
+                                                    {item.name || item.display_name.split(',')[0]}
+                                                </p>
+                                                <p className="text-xs text-gray-400 truncate mt-0.5">
+                                                    {item.display_name}
+                                                </p>
+                                            </div>
+                                        </li>
+                                    ))
+                                )}
+                                <li className="px-4 py-2 text-[10px] text-gray-300 text-right border-t border-gray-50">
+                                    © OpenStreetMap contributors
+                                </li>
+                            </ul>
+                        )}
                     </div>
+                    <FieldError msg={errors.location} />
                 </div>
             </section>
         </div>
@@ -255,7 +370,7 @@ const Step1BasicInfo = ({ form, onChange }) => {
 // ─────────────────────────────────────────────
 // Step 2 – Tickets & Pricing
 // ─────────────────────────────────────────────
-const Step2Tickets = ({ form, onChange }) => {
+const Step2Tickets = ({ form, onChange, errors = {} }) => {
     const isFree = form.isFree;
 
     const handleTicketChange = (idx, field, value) => {
@@ -276,8 +391,8 @@ const Step2Tickets = ({ form, onChange }) => {
     };
 
     const handleToggleFree = (v) => {
-        // Khi bật Free: set tất cả price về 0
         if (v) {
+            // Bật Free: set tất cả price về 0
             onChange({
                 isFree: true,
                 tickets: form.tickets.map((t) => ({ ...t, price: '0' })),
@@ -289,8 +404,7 @@ const Step2Tickets = ({ form, onChange }) => {
 
     return (
         <div className="space-y-6">
-            <section className={`bg-white rounded-2xl shadow-sm border p-7 transition-all ${isFree ? 'border-[#4a9e9e]/40 bg-[#f0fafa]/30' : 'border-gray-100'
-                }`}>
+            <section className={`bg-white rounded-2xl shadow-sm border p-7 transition-all ${isFree ? 'border-[#4a9e9e]/40 bg-[#f0fafa]/40' : 'border-gray-100'}`}>
                 <div className="flex items-center justify-between mb-1">
                     <h2 className="text-lg font-bold text-gray-800">Step 2: Ticket Types &amp; Inventory</h2>
                     {isFree && (
@@ -301,18 +415,17 @@ const Step2Tickets = ({ form, onChange }) => {
                 </div>
                 <p className="text-sm text-gray-400 mb-6">
                     {isFree
-                        ? 'This is a free event — all tickets are complimentary. Ticket pricing is locked.'
+                        ? 'This is a free event — enter the total number of available spots below.'
                         : 'Configure your pricing tiers and set availability for each category.'}
                 </p>
 
                 {/* Ticket table — locked when isFree */}
                 <div className={`transition-all ${isFree ? 'opacity-50 pointer-events-none select-none' : ''}`}>
-                    {/* Table header */}
                     <div className="grid grid-cols-12 gap-3 mb-2 px-1">
                         <div className="col-span-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Ticket Name</div>
                         <div className="col-span-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Quantity</div>
                         <div className="col-span-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                            {isFree ? 'Price' : 'Price (USD)'}
+                            {isFree ? 'Price' : 'Price (VND)'}
                         </div>
                         <div className="col-span-1" />
                     </div>
@@ -329,8 +442,9 @@ const Step2Tickets = ({ form, onChange }) => {
                                         placeholder="e.g. General Admission"
                                         value={ticket.name}
                                         onChange={(e) => handleTicketChange(idx, 'name', e.target.value)}
-                                        className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] transition"
+                                        className={`w-full px-3 py-2 text-sm border rounded-lg bg-white focus:outline-none focus:ring-2 transition ${errors[`ticket_${idx}_name`] ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
                                     />
+                                    <FieldError msg={errors[`ticket_${idx}_name`]} />
                                 </div>
                                 <div className="col-span-3">
                                     <input
@@ -339,8 +453,9 @@ const Step2Tickets = ({ form, onChange }) => {
                                         min="0"
                                         value={ticket.quantity}
                                         onChange={(e) => handleTicketChange(idx, 'quantity', e.target.value)}
-                                        className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] transition"
+                                        className={`w-full px-3 py-2 text-sm border rounded-lg bg-white focus:outline-none focus:ring-2 transition ${errors[`ticket_${idx}_quantity`] ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
                                     />
+                                    <FieldError msg={errors[`ticket_${idx}_quantity`]} />
                                 </div>
                                 <div className="col-span-3">
                                     {isFree ? (
@@ -349,15 +464,15 @@ const Step2Tickets = ({ form, onChange }) => {
                                         </div>
                                     ) : (
                                         <div className="relative">
-                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">$</span>
+                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">₫</span>
                                             <input
                                                 type="number"
-                                                placeholder="0.00"
+                                                placeholder="0"
                                                 min="0"
-                                                step="0.01"
+                                                step="1000"
                                                 value={ticket.price}
                                                 onChange={(e) => handleTicketChange(idx, 'price', e.target.value)}
-                                                className="w-full pl-7 pr-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] transition"
+                                                className={`w-full pl-7 pr-3 py-2 text-sm border rounded-lg bg-white focus:outline-none focus:ring-2 transition ${errors[`ticket_${idx}_price`] ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
                                             />
                                         </div>
                                     )}
@@ -387,6 +502,7 @@ const Step2Tickets = ({ form, onChange }) => {
                 </div>
             </section>
 
+
             {/* Advanced Settings */}
             <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
                 <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">Advanced Settings</p>
@@ -407,28 +523,24 @@ const Step2Tickets = ({ form, onChange }) => {
                         checked={isFree}
                         onChange={handleToggleFree}
                     />
-                    <ToggleSetting
-                        icon={
-                            <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                                <Calendar size={14} className="text-gray-500" />
-                            </div>
-                        }
-                        title="Limit tickets per person"
-                        description="Enable to restrict how many tickets a single account can buy"
-                        checked={form.limitPerPerson}
-                        onChange={(v) => onChange({ limitPerPerson: v })}
-                    />
-                    <ToggleSetting
-                        icon={
-                            <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500"><circle cx="12" cy="12" r="10" /><line x1="4.93" y1="4.93" x2="19.07" y2="19.07" /></svg>
-                            </div>
-                        }
-                        title="Private event (invite only)"
-                        description="Your event will only be accessible via a direct secret link"
-                        checked={form.privateEvent}
-                        onChange={(v) => onChange({ privateEvent: v })}
-                    />
+
+                    {/* Free ticket quantity — only visible when isFree */}
+                    {isFree && (
+                        <div className="ml-12 mt-1 animate-in fade-in">
+                            <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                                Total Free Tickets Available
+                            </label>
+                            <input
+                                type="number"
+                                min="1"
+                                placeholder="e.g. 500"
+                                value={form.freeTicketQuantity}
+                                onChange={(e) => onChange({ freeTicketQuantity: e.target.value })}
+                                className="w-48 px-3 py-2 text-sm border border-[#4a9e9e]/40 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] bg-white transition"
+                            />
+                            <p className="mt-1 text-xs text-gray-400">Number of complimentary tickets for this event</p>
+                        </div>
+                    )}
                 </div>
             </section>
         </div>
@@ -487,7 +599,7 @@ const SuccessScreen = ({ form, onBack }) => {
                         <p className="font-bold text-gray-900 text-sm">{form.eventName || 'New Event'}</p>
                         <p className="text-xs text-[#4a9e9e] flex items-center gap-1 mt-0.5">
                             <Calendar size={11} />
-                            {form.startDate || '—'}
+                            {form.startDate ? dayjs(form.startDate).format('DD/MM/YYYY') : '—'}
                         </p>
                         <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
                             <MapPin size={11} />
@@ -523,13 +635,15 @@ const SuccessScreen = ({ form, onBack }) => {
 // ─────────────────────────────────────────────
 const initialForm = {
     eventName: '',
-    category: '',
+    categoryId: '',
     description: '',
-    startDate: '',
-    endDate: '',
+    startDate: null,
+    endDate: null,
     startTime: '',
     endTime: '',
     location: '',
+    lat: null,
+    lng: null,
     coverFile: null,
     coverPreview: null,
     tickets: [
@@ -538,8 +652,31 @@ const initialForm = {
         { name: 'VIP Access', quantity: '50', price: '250.00' },
     ],
     isFree: false,
-    limitPerPerson: true,
-    privateEvent: false,
+    freeTicketQuantity: '',
+};
+
+// ─── Validation helpers ─────────────────────────────────────────────────────
+const validateStep1 = (form) => {
+    const e = {};
+    if (!form.eventName.trim()) e.eventName = 'Event name is required';
+    if (!form.categoryId) e.categoryId = 'Please select a category';
+    if (!form.description.trim()) e.description = 'Description is required';
+    if (!form.startDate) e.startDate = 'Start date is required';
+    if (!form.endDate) e.endDate = 'End date is required';
+    else if (form.startDate && form.endDate.getTime() < form.startDate.getTime()) e.endDate = 'End date must be after start date';
+    if (!form.startTime) e.startTime = 'Start time is required';
+    if (!form.endTime) e.endTime = 'End time is required';
+    if (!form.location.trim()) e.location = 'Venue address is required';
+    return e;
+};
+
+const validateStep2 = (form) => {
+    const e = {};
+    form.tickets.forEach((t, idx) => {
+        if (!t.name.trim()) e[`ticket_${idx}_name`] = 'Ticket name is required';
+        if (!t.quantity || parseInt(t.quantity) <= 0) e[`ticket_${idx}_quantity`] = 'Quantity must be > 0';
+    });
+    return e;
 };
 
 const CreateEventPage = () => {
@@ -548,26 +685,31 @@ const CreateEventPage = () => {
     const [form, setForm] = useState(initialForm);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState(null);
+    const [errors, setErrors] = useState({});
 
     const updateForm = (partial) => setForm((prev) => ({ ...prev, ...partial }));
 
     const buildEventPayload = (isDraft = false) => ({
         eventName: form.eventName,
-        category: form.category,
+        categoryId: form.categoryId,
         description: form.description,
-        startDate: form.startDate,
-        endDate: form.endDate,
+        startDate: form.startDate ? dayjs(form.startDate).format('YYYY-MM-DD') : '',
+        endDate: form.endDate ? dayjs(form.endDate).format('YYYY-MM-DD') : '',
         startTime: form.startTime,
         endTime: form.endTime,
         location: form.location,
-        tickets: form.tickets.map((t) => ({
-            name: t.name,
-            quantity: parseInt(t.quantity, 10) || 0,
-            price: form.isFree ? 0 : parseFloat(t.price) || 0,
-        })),
+        location_coordinates: (form.lat != null && form.lng != null)
+            ? { lat: form.lat, lng: form.lng }
+            : undefined,
+        tickets: form.isFree
+            ? []
+            : form.tickets.map((t) => ({
+                name: t.name,
+                quantity: parseInt(t.quantity, 10) || 0,
+                price: parseFloat(t.price) || 0,
+            })),
         isFree: form.isFree,
-        limitPerPerson: form.limitPerPerson,
-        privateEvent: form.privateEvent,
+        freeTicketQuantity: form.isFree ? (parseInt(form.freeTicketQuantity, 10) || 0) : undefined,
         draft: isDraft,
     });
 
@@ -585,6 +727,9 @@ const CreateEventPage = () => {
     };
 
     const handleContinue = () => {
+        const e = validateStep1(form);
+        if (Object.keys(e).length > 0) { setErrors(e); return; }
+        setErrors({});
         setError(null);
         setStep(2);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -597,6 +742,9 @@ const CreateEventPage = () => {
     };
 
     const handleSubmit = async () => {
+        const e = validateStep2(form);
+        if (Object.keys(e).length > 0) { setErrors(e); return; }
+        setErrors({});
         setSaving(true);
         setError(null);
         try {
@@ -661,8 +809,8 @@ const CreateEventPage = () => {
             <main className="max-w-3xl mx-auto py-10 px-4">
                 <StepIndicator currentStep={step} />
 
-                {step === 1 && <Step1BasicInfo form={form} onChange={updateForm} />}
-                {step === 2 && <Step2Tickets form={form} onChange={updateForm} />}
+                {step === 1 && <Step1BasicInfo form={form} onChange={(v) => { updateForm(v); setErrors((prev) => { const k = Object.keys(v)[0]; const n = { ...prev }; delete n[k]; return n; }); }} errors={errors} />}
+                {step === 2 && <Step2Tickets form={form} onChange={updateForm} errors={errors} />}
 
                 {error && (
                     <div className="mt-4 flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
