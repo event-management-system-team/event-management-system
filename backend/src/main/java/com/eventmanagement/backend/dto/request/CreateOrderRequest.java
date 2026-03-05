@@ -4,8 +4,10 @@ import java.util.UUID;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import lombok.Data;
 import lombok.NonNull;
 
+@Data
 public class CreateOrderRequest {
 
     @NonNull
