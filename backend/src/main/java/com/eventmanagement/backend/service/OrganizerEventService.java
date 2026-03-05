@@ -24,6 +24,138 @@ import java.util.stream.Collectors;
 public class OrganizerEventService {
 
     private final EventRepository eventRepository;
+    private final EventCategoryRepository eventCategoryRepository;
+    private final CloudinaryService cloudinaryService;
+
+    // create event for organizer with cover image
+    @Transactional
+    public CreateEventResponse createEvent(User organizer, CreateEventRequest request, MultipartFile coverFile) {
+        EventCategory category = eventCategoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new NotFoundException("Category not found: " + request.getCategoryId()));
+
+        LocalDateTime startDateTime = parseDateTime(request.getStartDate(), request.getStartTime());
+        LocalDateTime endDateTime = parseDateTime(request.getEndDate(), request.getEndTime());
+
+        if (endDateTime.isBefore(startDateTime)) {
+            throw new BadRequestException("End date/time must be after start date/time");
+        }
+
+        if (!request.isDraft() && startDateTime.isBefore(LocalDateTime.now())) {
+            throw new BadRequestException("Start date/time must be in the future");
+        }
+
+        String bannerUrl = null;
+        if (coverFile != null && !coverFile.isEmpty()) {
+            try {
+                bannerUrl = cloudinaryService.uploadEventBanner(coverFile);
+            } catch (IOException e) {
+                throw new BadRequestException("Failed to upload cover image: " + e.getMessage());
+            }
+        }
+
+        String slug = generateSlug(request.getEventName());
+
+        EventStatus status = request.isDraft() ? EventStatus.DRAFT : EventStatus.PENDING;
+
+        int totalCapacity = 0;
+        if (request.getTickets() != null) {
+            totalCapacity = request.getTickets().stream()
+                    .mapToInt(t -> t.getQuantity() != null ? t.getQuantity() : 0)
+                    .sum();
+        }
+
+        Event event = Event.builder()
+                .organizer(organizer)
+                .category(category)
+                .eventName(request.getEventName())
+                .eventSlug(slug)
+                .description(request.getDescription())
+                .location(request.getLocation())
+                .startDate(startDateTime)
+                .endDate(endDateTime)
+                .bannerUrl(bannerUrl)
+                .isFree(request.isFree())
+                .totalCapacity(totalCapacity)
+                .status(status)
+                .build();
+
+        if (request.getTickets() != null) {
+            Set<TicketType> ticketTypes = new LinkedHashSet<>();
+            for (CreateEventRequest.TicketRequest ticketReq : request.getTickets()) {
+                BigDecimal price = request.isFree() ? BigDecimal.ZERO
+                        : (ticketReq.getPrice() != null ? ticketReq.getPrice() : BigDecimal.ZERO);
+
+                TicketType ticketType = TicketType.builder()
+                        .event(event)
+                        .ticketName(ticketReq.getName())
+                        .quantity(ticketReq.getQuantity() != null ? ticketReq.getQuantity() : 0)
+                        .price(price)
+                        .isActive(true)
+                        .build();
+                ticketTypes.add(ticketType);
+            }
+            event.setTicketTypes(ticketTypes);
+        }
+
+        Event saved = eventRepository.save(event);
+
+        log.info("Event created: id={}, name={}, status={}", saved.getEventId(), saved.getEventName(),
+                saved.getStatus());
+
+        return mapToCreateEventResponse(saved);
+    }
+
+    // parse date time from string
+    private LocalDateTime parseDateTime(String dateStr, String timeStr) {
+        LocalDate date = LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE);
+        LocalTime time = LocalTime.parse(timeStr, DateTimeFormatter.ISO_LOCAL_TIME);
+        return LocalDateTime.of(date, time);
+    }
+
+    // generate slug for event
+    private String generateSlug(String name) {
+        String normalized = Normalizer.normalize(name, Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        String slug = normalized.toLowerCase()
+                .replaceAll("[^a-z0-9\\s-]", "")
+                .replaceAll("[\\s]+", "-")
+                .replaceAll("-{2,}", "-")
+                .replaceAll("^-|-$", "");
+
+        String suffix = UUID.randomUUID().toString().substring(0, 8);
+        return slug + "-" + suffix;
+    }
+
+    // map event to create event response
+    private CreateEventResponse mapToCreateEventResponse(Event event) {
+        List<CreateEventResponse.TicketResponse> ticketResponses = new ArrayList<>();
+        if (event.getTicketTypes() != null) {
+            for (TicketType tt : event.getTicketTypes()) {
+                ticketResponses.add(CreateEventResponse.TicketResponse.builder()
+                        .ticketTypeId(tt.getTicketTypeId())
+                        .ticketName(tt.getTicketName())
+                        .quantity(tt.getQuantity())
+                        .price(tt.getPrice())
+                        .build());
+            }
+        }
+
+        return CreateEventResponse.builder()
+                .eventId(event.getEventId())
+                .eventName(event.getEventName())
+                .eventSlug(event.getEventSlug())
+                .description(event.getDescription())
+                .location(event.getLocation())
+                .bannerUrl(event.getBannerUrl())
+                .startDate(event.getStartDate())
+                .endDate(event.getEndDate())
+                .status(event.getStatus().name())
+                .isFree(event.getIsFree())
+                .totalCapacity(event.getTotalCapacity())
+                .categoryName(event.getCategory() != null ? event.getCategory().getCategoryName() : null)
+                .tickets(ticketResponses)
+                .build();
+    }
 
     /**
      * Lấy danh sách event của organizer có phân trang, sắp xếp theo ngày tạo mới
