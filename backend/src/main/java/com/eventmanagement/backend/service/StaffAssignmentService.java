@@ -1,6 +1,7 @@
 package com.eventmanagement.backend.service;
 
 import com.eventmanagement.backend.constants.AssignmentStatus;
+import com.eventmanagement.backend.dto.response.organizer.AssignmentListProjection;
 import com.eventmanagement.backend.dto.response.organizer.AssignmentResponse;
 import com.eventmanagement.backend.exception.ForbiddenException;
 import com.eventmanagement.backend.exception.NotFoundException;
@@ -19,6 +20,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class StaffAssignmentService {
+    private final EventRepository eventRepository;
     private final StaffAssignmentRepository staffAssignmentRepository;
     private final StaffScheduleRepository staffScheduleRepository;
     private final UserRepository userRepository;
@@ -85,5 +87,13 @@ public class StaffAssignmentService {
                 .toList();
 
         staffAssignmentRepository.saveAll(assignments);
+    }
+
+    public List<AssignmentListProjection> getAssignmentsByEvent(UUID eventId) {
+        if (!eventRepository.existsById(eventId)) {
+            throw new NotFoundException("Event not found");
+        }
+
+        return staffAssignmentRepository.findAssignmentsByEvent(eventId);
     }
 }

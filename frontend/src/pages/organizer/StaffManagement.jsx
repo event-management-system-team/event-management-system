@@ -90,7 +90,22 @@ export function StaffManagement() {
         } finally {
             setLoading(false);
         }
-    };
+    }
+
+    const fetchAssignmentList = async () => {
+        if (!id) return
+
+        try {
+            setLoading(true)
+            const response = await organizerService.getStaffAssignment(id)
+            setAssignments(response.data)
+        } catch (error) {
+            setError('Cannot load assignment list')
+            console.error(error)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     // const fetchShifts = async () => {
     //     if (!id) return
@@ -109,7 +124,7 @@ export function StaffManagement() {
 
     useEffect(() => {
         fetchStaffList()
-        // fetchShifts()
+        fetchAssignmentList()
     }, [id]);
 
     const handleShiftClick = (shift, staff) => {
@@ -264,23 +279,26 @@ export function StaffManagement() {
 
     const eventsService = useState(() => createEventsServicePlugin())[0]
 
+    const tz = "Asia/Bangkok"
+
     const calendar = useCalendarApp({
         views: [createViewDay(), createViewWeek(), createViewMonthGrid(), createViewMonthAgenda()],
-        events: [
-            {
-                id: '1',
-                title: 'Event 1',
-                start: Temporal.PlainDate.from('2023-12-16'),
-                end: Temporal.PlainDate.from('2023-12-16'),
-            },
-        ],
         plugins: [eventsService]
     })
 
     useEffect(() => {
-        // get all events
-        eventsService.getAll()
-    }, [])
+        if (!assignments.length) return
+
+        const events = assignments.map(a => ({
+            id: a.assignmentId,
+            title: `${a.scheduleName} (${a.staffRole} Team)`,
+            start: Temporal.PlainDateTime.from(a.startTime).toZonedDateTime(tz),
+            end: Temporal.PlainDateTime.from(a.endTime).toZonedDateTime(tz),
+            location: a.location
+        }))
+
+        eventsService.set(events)
+    }, [assignments])
 
 
     if (loading) return <div className="absolute top-0 left-0 w-full h-1 bg-blue-500 animate-pulse z-10" />
@@ -451,99 +469,7 @@ export function StaffManagement() {
 
                     {/* TAB 2: Work Schedule */}
                     <TabsContent value="schedule" className="space-y-4">
-
                         <ScheduleXCalendar calendarApp={calendar} />
-
-                        {/* Calendar */}
-                        {/* <div className=" bg-white rounded-xl shadow p-2 justify-end">
-                            <DatePicker
-                                picker="week"
-                                value={currentWeek}
-                                onChange={(date) => date && setCurrentWeek(date)}
-                                className="w-[220px]"
-                            />
-                        </div> */}
-
-                        {/* Schedule Table */}
-                        {/* <div className="flex-1 overflow-x-auto">
-                            <table className="w-full table-fixed border-separate border-spacing-0 px-5 bg-[#f7f7f7]">
-                                <thead>
-                                    <tr>
-                                        <th className="w-56 px-4 py-8 text-left text-sm font-semibold text-gray-600 border-b">
-                                            Staff Member
-                                        </th>
-                                        {weekDays.map((d) => (
-                                            <th
-                                                key={d.format("YYYY-MM-DD")}
-                                                className="px-4 py-3 text-sm font-semibold text-gray-600 border-b"
-                                            >
-                                                <div className="text-xs uppercase text-gray-400">
-                                                    {d.format("ddd")}
-                                                </div>
-                                                <div>{d.format("DD")}</div>
-                                            </th>
-                                        ))}
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                    {staffs?.map((staff) => (
-                                        <tr key={staff.userId} className="hover:bg-gray-50">
-                                            <td className="px-4 py-5 border-b border-gray-300">
-                                                <div className="font-medium">{staff.fullName}</div>
-                                                <div className="text-xs text-gray-400">{staff.positionName}</div>
-                                            </td>
-
-                                            {weekDays.map((d) => {
-                                                const shifts = getShift(staff.userId, d);
-
-                                                return (
-                                                    <td
-                                                        key={d.toString()}
-                                                        className="px-3 py-2 border-b border-gray-300 align-top"
-                                                    >
-                                                        {shifts.map((shift) => (
-                                                            <div
-                                                                key={shift.assignmentId}
-                                                                className={`text-white rounded-xl p-2 text-xs shadow-sm mb-1 ${getStatusColor(shift.status)}`}
-                                                            >
-                                                                <div className="font-semibold">
-                                                                    {dayjs(shift.startTime).format("HH:mm")} –{" "}
-                                                                    {dayjs(shift.endTime).format("HH:mm")}
-                                                                </div>
-
-                                                                <div className="opacity-90">
-                                                                    {shift.scheduleName}
-                                                                </div>
-
-                                                                <div className="text-[10px] opacity-75">
-                                                                    {shift.location}
-                                                                </div>
-                                                            </div>
-                                                        ))}
-                                                    </td>
-                                                );
-                                            })}
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div> */}
-
-                        {/* <Calendar
-                            fullscreen={false}
-
-                            dateFullCellRender={(date) => {
-                                if (date.isSame(currentWeekStart, "week")) {
-                                    return <div>{date.format("DD")}</div>;
-                                }
-                                return null;
-                            }}
-                        /> */}
-
-                        {/* <Calendar />
-
-                        <Calendar fullscreen={false} showWeek /> */}
                     </TabsContent>
 
                     {/* TAB 3: Resources */}
