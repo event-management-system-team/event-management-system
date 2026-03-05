@@ -41,4 +41,13 @@ public class OrganizerEventController {
         OrganizerEventStatsResponse stats = organizerEventService.getMyEventStats(organizerId);
         return ResponseEntity.ok(stats);
     }
+
+    // get authenticated user
+    private User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof User)) {
+            throw new UnauthorizedException("Authentication required");
+        }
+        return (User) authentication.getPrincipal();
+    }
 }
