@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { autoRefreshToken } from "./store/slices/auth.slice";
 
 import AppRoutes from "./routes";
+import TestCalendar from "./pages/organizer/TestCalendar.jsx";
 
 function App() {
   const dispatch = useDispatch();
@@ -64,6 +65,7 @@ function App() {
 
       {/* Organizer Pages */}
       <Route path="/organizer/:id/staff" element={<StaffManagement />} />
+      <Route path="/organizer/test" element={<TestCalendar />} />
     </Routes>
   );
 }

@@ -6,12 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 public interface StaffRepository extends JpaRepository<EventStaff, UUID> {
-//    List<StaffResponse> findEventStaffByEventEventId(UUID eventId);
-
     @Query("""
     SELECT new com.eventmanagement.backend.dto.response.organizer.StaffResponse(
         es.eventStaffId,
@@ -39,10 +38,25 @@ public interface StaffRepository extends JpaRepository<EventStaff, UUID> {
     FROM EventStaff es
     JOIN es.user u
     WHERE es.event.eventId = :eventId
-    AND es.staffRole = :role
+    AND LOWER(es.staffRole) = LOWER(:role)
 """)
     List<StaffResponse> findStaffByEventIdAndOptionalRole(
             @Param("eventId") UUID eventId,
             @Param("role") String role
     );
+
+    @Query("""
+    SELECT es
+    FROM EventStaff es
+    WHERE es.event.eventId = :eventId
+    AND UPPER(es.staffRole) IN :roles
+""")
+    List<EventStaff> findByEventIdAndRoles(
+            @Param("eventId") UUID eventId,
+            @Param("roles") List<String> roles
+    );
+
+    boolean existsByEventEventIdAndEventStaffId(UUID eventEventId, UUID eventStaffId);
+
+    List<EventStaff> findByEventEventIdAndEventStaffIdIn(UUID eventEventId, Collection<UUID> eventStaffIds);
 }

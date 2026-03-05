@@ -38,6 +38,16 @@ import { useAlert } from '../../hooks/useAlert.js';
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
 dayjs.extend(isoWeek);
+import { useCalendarApp, ScheduleXCalendar } from '@schedule-x/react'
+import {
+    createViewDay,
+    createViewMonthAgenda,
+    createViewMonthGrid,
+    createViewWeek,
+} from '@schedule-x/calendar'
+import { createEventsServicePlugin } from '@schedule-x/events-service'
+import 'temporal-polyfill/global'
+import '@schedule-x/theme-default/dist/index.css'
 
 export function StaffManagement() {
 
@@ -82,24 +92,24 @@ export function StaffManagement() {
         }
     };
 
-    const fetchShifts = async () => {
-        if (!id) return
+    // const fetchShifts = async () => {
+    //     if (!id) return
 
-        try {
-            setLoading(true)
-            const response = await organizerService.getAssignment(id)
-            setAssignments(response.data)
-        } catch (error) {
-            setError("Cannot load shifts list");
-            console.error(error)
-        } finally {
-            setLoading(false);
-        }
-    };
+    //     try {
+    //         setLoading(true)
+    //         const response = await organizerService.getAssignment(id)
+    //         setAssignments(response.data)
+    //     } catch (error) {
+    //         setError("Cannot load shifts list");
+    //         console.error(error)
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
     useEffect(() => {
         fetchStaffList()
-        fetchShifts()
+        // fetchShifts()
     }, [id]);
 
     const handleShiftClick = (shift, staff) => {
@@ -154,7 +164,7 @@ export function StaffManagement() {
                 return (
                     <Button
                         className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5 py-5 h-12 w-40"
-                        // onClick={openModal}
+                    // onClick={openModal}
                     >
                         <Plus className="h-4 w-4" />
                         Upload Resource
@@ -251,6 +261,27 @@ export function StaffManagement() {
                 return "bg-gray-400";
         }
     };
+
+    const eventsService = useState(() => createEventsServicePlugin())[0]
+
+    const calendar = useCalendarApp({
+        views: [createViewDay(), createViewWeek(), createViewMonthGrid(), createViewMonthAgenda()],
+        events: [
+            {
+                id: '1',
+                title: 'Event 1',
+                start: Temporal.PlainDate.from('2023-12-16'),
+                end: Temporal.PlainDate.from('2023-12-16'),
+            },
+        ],
+        plugins: [eventsService]
+    })
+
+    useEffect(() => {
+        // get all events
+        eventsService.getAll()
+    }, [])
+
 
     if (loading) return <div className="absolute top-0 left-0 w-full h-1 bg-blue-500 animate-pulse z-10" />
     if (error) return <div>Something went wrong: {error}</div>;
@@ -421,19 +452,20 @@ export function StaffManagement() {
                     {/* TAB 2: Work Schedule */}
                     <TabsContent value="schedule" className="space-y-4">
 
+                        <ScheduleXCalendar calendarApp={calendar} />
 
                         {/* Calendar */}
-                        <div className=" bg-white rounded-xl shadow p-2 justify-end">
+                        {/* <div className=" bg-white rounded-xl shadow p-2 justify-end">
                             <DatePicker
                                 picker="week"
                                 value={currentWeek}
                                 onChange={(date) => date && setCurrentWeek(date)}
                                 className="w-[220px]"
                             />
-                        </div>
+                        </div> */}
 
                         {/* Schedule Table */}
-                        <div className="flex-1 overflow-x-auto">
+                        {/* <div className="flex-1 overflow-x-auto">
                             <table className="w-full table-fixed border-separate border-spacing-0 px-5 bg-[#f7f7f7]">
                                 <thead>
                                     <tr>
@@ -496,7 +528,7 @@ export function StaffManagement() {
                                     ))}
                                 </tbody>
                             </table>
-                        </div>
+                        </div> */}
 
                         {/* <Calendar
                             fullscreen={false}

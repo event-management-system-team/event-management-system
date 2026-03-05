@@ -1,124 +1,89 @@
-//package com.eventmanagement.backend.service;
-//
-//import com.eventmanagement.backend.constants.AssignmentStatus;
-//import com.eventmanagement.backend.dto.response.organizer.AssignmentResponse;
-//import com.eventmanagement.backend.dto.response.organizer.StaffAssignmentResponse;
-//import com.eventmanagement.backend.exception.ForbiddenException;
-//import com.eventmanagement.backend.exception.NotFoundException;
-//import com.eventmanagement.backend.model.StaffAssignment;
-//import com.eventmanagement.backend.model.StaffSchedule;
-//import com.eventmanagement.backend.repository.StaffApplicationRepository;
-//import com.eventmanagement.backend.repository.StaffAssignmentRepository;
-//import com.eventmanagement.backend.repository.StaffScheduleRepository;
-//import com.eventmanagement.backend.repository.UserRepository;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.stereotype.Service;
-//import org.springframework.transaction.annotation.Transactional;
-//
-//import java.time.LocalDate;
-//import java.time.LocalDateTime;
-//import java.util.List;
-//import java.util.Map;
-//import java.util.UUID;
-//import java.util.stream.Collectors;
-//
-//@Service
-//@RequiredArgsConstructor
-//public class StaffAssignmentService {
-////    private final StaffAssignmentRepository staffAssignmentRepository;
-////    private final StaffScheduleRepository staffScheduleRepository;
-////    private final StaffApplicationRepository staffApplicationRepository;
-////    private final UserRepository userRepository;
-////
-////    @Transactional(readOnly = true)
-////    public Map<UUID, Map<LocalDate, List<StaffAssignmentResponse>>>
-////    getAssignmentsGroupedByStaffAndDate(UUID eventId) {
-////
-////        List<AssignmentFlatProjection> flats =
-////                staffAssignmentRepository.findAllAssignmentsByEvent(eventId);
-////
-////        return flats.stream()
-////                .map(this::toResponse)
-////                .collect(Collectors.groupingBy(
-////                        StaffAssignmentResponse::getStaffId,
-////                        Collectors.groupingBy(
-////                                res -> res.getStartTime().toLocalDate(),
-////                                Collectors.toList()
-////                        )
-////                ));
-////    }
-////
-////    private StaffAssignmentResponse toResponse(AssignmentFlatProjection flat) {
-////        return StaffAssignmentResponse.builder()
-////                .staffId(flat.getStaffId())
-////                .assignmentId(flat.getAssignmentId())
-////                .scheduleId(flat.getScheduleId())
-////                .scheduleName(flat.getScheduleName())
-////                .startTime(flat.getStartTime())
-////                .endTime(flat.getEndTime())
-////                .location(flat.getLocation())
-////                .status(flat.getStatus())
-////                .staff(StaffAssignmentResponse.UserDTO.builder()
-////                        .userId(flat.getUserId())
-////                        .fullName(flat.getFullName())
-////                        .email(flat.getEmail())
-////                        .avatarUrl(flat.getAvatarUrl())
-////                        .build())
-////                .build();
-////    }
-////
-////    @Transactional
-////    public AssignmentResponse assignStaffToSchedule(UUID scheduleId, UUID staffId) {
-////
-////        StaffSchedule schedule = staffScheduleRepository.findById(scheduleId)
-////                .orElseThrow(() -> new NotFoundException("Schedule not found"));
-////
-////        boolean isStaffOfEvent =
-////                staffApplicationRepository.existsApprovedByUserAndEvent(
-////                        staffId,
-////                        schedule.getEvent().getEventId()
-////                );
-////
-////        if (!isStaffOfEvent) {
-////            throw new ForbiddenException("User is not staff of this event");
-////        }
-////
-////        if (staffAssignmentRepository.existsBySchedule_ScheduleIdAndStaff_UserId(scheduleId, staffId)) {
-////            throw new IllegalStateException("Staff already assigned to this schedule");
-////        }
-////
-////        long assignedCount =
-////                staffAssignmentRepository.countBySchedule_ScheduleIdAndStatusIn(
-////                        scheduleId,
-////                        List.of(AssignmentStatus.ASSIGNED, AssignmentStatus.CONFIRMED)
-////                );
-////
-////        if (assignedCount >= schedule.getRequiredStaff()) {
-////            throw new IllegalStateException("Schedule is full");
-////        }
-////
-////        StaffAssignment assignment = StaffAssignment.builder()
-////                .schedule(schedule)
-////                .staff(userRepository.getReferenceById(staffId))
-////                .status(AssignmentStatus.ASSIGNED)
-////                .assignedAt(LocalDateTime.now())
-////                .build();
-////
-////        staffAssignmentRepository.save(assignment);
-////
-////        return AssignmentResponse.builder()
-////                .assignmentId(assignment.getAssignmentId())
-////                .staffId(staffId)
-////                .scheduleId(scheduleId)
-////                .status(assignment.getStatus().name())
-////                .assignedAt(assignment.getAssignedAt())
-////                .build();
-////    }
-////
-////    @Transactional
-////    public void assignMany(UUID scheduleId, List<UUID> staffIds) {
-////        for (UUID staffId : staffIds) {
-////            assignStaffToSchedule(scheduleId, staffId);
-////        }
-////    }
-//}
+package com.eventmanagement.backend.service;
+
+import com.eventmanagement.backend.constants.AssignmentStatus;
+import com.eventmanagement.backend.dto.response.organizer.AssignmentResponse;
+import com.eventmanagement.backend.exception.ForbiddenException;
+import com.eventmanagement.backend.exception.NotFoundException;
+import com.eventmanagement.backend.model.EventStaff;
+import com.eventmanagement.backend.model.StaffAssignment;
+import com.eventmanagement.backend.model.StaffSchedule;
+import com.eventmanagement.backend.repository.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class StaffAssignmentService {
+    private final StaffAssignmentRepository staffAssignmentRepository;
+    private final StaffScheduleRepository staffScheduleRepository;
+    private final UserRepository userRepository;
+    private final StaffRepository staffRepository;
+
+    @Transactional
+    public AssignmentResponse assignStaffToSchedule(UUID scheduleId, UUID staffId) {
+
+        StaffSchedule schedule = staffScheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new NotFoundException("Schedule not found"));
+
+        boolean isStaffOfEvent = staffRepository.existsByEventEventIdAndEventStaffId(schedule.getEvent().getEventId(), staffId);
+
+        if (!isStaffOfEvent) {
+            throw new ForbiddenException("User is not staff of this event");
+        }
+
+        StaffAssignment assignment = StaffAssignment.builder()
+                .schedule(schedule)
+                .eventStaff(staffRepository.getReferenceById(staffId))
+                .status(AssignmentStatus.ASSIGNED)
+                .assignedAt(LocalDateTime.now())
+                .build();
+
+        staffAssignmentRepository.save(assignment);
+
+        return AssignmentResponse.builder()
+                .assignmentId(assignment.getAssignmentId())
+                .staffId(staffId)
+                .scheduleId(scheduleId)
+                .status(assignment.getStatus().name())
+                .assignedAt(assignment.getAssignedAt())
+                .build();
+    }
+
+    @Transactional
+    public void assignMany(UUID scheduleId, List<UUID> staffIds) {
+
+        if (staffIds == null || staffIds.isEmpty()) return;
+
+        StaffSchedule schedule = staffScheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new NotFoundException("Schedule not found"));
+
+        UUID eventId = schedule.getEvent().getEventId();
+
+        List<UUID> uniqueStaffIds = staffIds.stream()
+                .distinct()
+                .toList();
+
+        List<EventStaff> validStaffs =
+                staffRepository.findByEventEventIdAndEventStaffIdIn(eventId, uniqueStaffIds);
+
+        if (validStaffs.isEmpty()) {
+            throw new ForbiddenException("No valid staff found for this event");
+        }
+
+        List<StaffAssignment> assignments = validStaffs.stream()
+                .map(eventStaff -> StaffAssignment.builder()
+                        .schedule(schedule)
+                        .eventStaff(eventStaff)
+                        .status(AssignmentStatus.ASSIGNED)
+                        .assignedAt(LocalDateTime.now())
+                        .build())
+                .toList();
+
+        staffAssignmentRepository.saveAll(assignments);
+    }
+}

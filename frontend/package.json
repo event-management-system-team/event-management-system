@@ -23,6 +23,10 @@
     "@radix-ui/react-tabs": "^1.1.13",
     "@react-oauth/google": "^0.13.4",
     "@reduxjs/toolkit": "^2.11.2",
+    "@schedule-x/calendar": "^4.3.0",
+    "@schedule-x/events-service": "^4.3.0",
+    "@schedule-x/react": "^4.1.0",
+    "@schedule-x/theme-default": "^4.3.0",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-query": "^5.90.20",
     "@yudiel/react-qr-scanner": "^2.5.1",
@@ -47,6 +51,7 @@
     "recharts": "^3.7.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",
+    "temporal-polyfill": "^0.3.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

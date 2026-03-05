@@ -5,7 +5,6 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Data
 public class CreateStaffScheduleRequest {
@@ -27,12 +26,8 @@ public class CreateStaffScheduleRequest {
     @Size(max = 255, message = "Location exceeds maximum length")
     private String location;
 
-    @NotNull(message = "Required staff is required")
-    @Min(value = 1, message = "Required staff must be at least 1")
-    @Max(value = 1000, message = "Required staff exceeds allowed limit")
-    private Integer requiredStaff;
-
-    private List<UUID> staffIds;
+    @NotEmpty(message = "At least one staff role is required")
+    private List<@NotBlank String> staffRoles;
 
     @AssertTrue(message = "End date must be after start date")
     public boolean isEndDateValid() {
