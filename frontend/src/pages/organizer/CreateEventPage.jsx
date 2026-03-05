@@ -524,21 +524,20 @@ const Step2Tickets = ({ form, onChange, errors = {} }) => {
                         onChange={handleToggleFree}
                     />
 
-                    {/* Free ticket quantity — only visible when isFree */}
                     {isFree && (
                         <div className="ml-12 mt-1 animate-in fade-in">
                             <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-                                Total Free Tickets Available
+                                Total Capacity
                             </label>
                             <input
                                 type="number"
                                 min="1"
                                 placeholder="e.g. 500"
-                                value={form.freeTicketQuantity}
-                                onChange={(e) => onChange({ freeTicketQuantity: e.target.value })}
+                                value={form.totalCapacity}
+                                onChange={(e) => onChange({ totalCapacity: e.target.value })}
                                 className="w-48 px-3 py-2 text-sm border border-[#4a9e9e]/40 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] bg-white transition"
                             />
-                            <p className="mt-1 text-xs text-gray-400">Number of complimentary tickets for this event</p>
+                            <p className="mt-1 text-xs text-gray-400">Total number of attendees for this free event</p>
                         </div>
                     )}
                 </div>
@@ -652,7 +651,7 @@ const initialForm = {
         { name: 'VIP Access', quantity: '50', price: '250.00' },
     ],
     isFree: false,
-    freeTicketQuantity: '',
+    totalCapacity: '',
 };
 
 // ─── Validation helpers ─────────────────────────────────────────────────────
@@ -709,7 +708,7 @@ const CreateEventPage = () => {
                 price: parseFloat(t.price) || 0,
             })),
         isFree: form.isFree,
-        freeTicketQuantity: form.isFree ? (parseInt(form.freeTicketQuantity, 10) || 0) : undefined,
+        totalCapacity: form.isFree ? (parseInt(form.totalCapacity, 10) || 0) : undefined,
         draft: isDraft,
     });
 
@@ -737,6 +736,7 @@ const CreateEventPage = () => {
 
     const handleBack = () => {
         setError(null);
+        setErrors({});
         setStep(1);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };

@@ -310,7 +310,7 @@ const MyEventsPage = () => {
                 {!loading &&
                     filteredEvents.map((event) => {
                         const statusConfig = getStatusDisplay(event.status, event.startDate);
-                        const progress = getTicketProgress(event.totalSold, event.totalTickets);
+                        const progress = getTicketProgress(event.registeredCount, event.totalCapacity);
                         const progressColor = getProgressBarColor(progress);
 
                         return (
@@ -370,8 +370,8 @@ const MyEventsPage = () => {
                                 <div className="col-span-3">
                                     <div className="flex items-center gap-3">
                                         <span className="text-sm text-gray-700 font-medium min-w-20">
-                                            {(event.totalSold || 0).toLocaleString()}/
-                                            {(event.totalTickets || 0).toLocaleString()}
+                                            {(event.registeredCount || 0).toLocaleString()}/
+                                            {(event.totalCapacity || 0).toLocaleString()}
                                         </span>
                                         <span className="text-xs text-gray-400 min-w-10">
                                             {progress}%
