@@ -1,4 +1,4 @@
-package com.eventmanagement.backend.model;
+package com.eventmanagement.backend.constants;
 
 public enum OrderStatus {
     PENDING,

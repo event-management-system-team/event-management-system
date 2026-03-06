@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.eventmanagement.backend.constants.OrderStatus;
+
 @Entity
 @Table(name = "orders")
 @Data

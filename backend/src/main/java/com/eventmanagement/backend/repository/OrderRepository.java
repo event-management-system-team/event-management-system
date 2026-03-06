@@ -1,7 +1,8 @@
 package com.eventmanagement.backend.repository;
 
+import com.eventmanagement.backend.constants.OrderStatus;
 import com.eventmanagement.backend.model.Order;
-import com.eventmanagement.backend.model.OrderStatus;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

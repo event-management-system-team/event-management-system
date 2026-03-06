@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.eventmanagement.backend.constants.OrderStatus;
 import com.eventmanagement.backend.model.Order;
-import com.eventmanagement.backend.model.OrderStatus;
 
 import lombok.Data;
 
