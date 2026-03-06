@@ -46,7 +46,7 @@ const EventCard = ({ startDate, totalCapacity, registeredCount, bannerUrl, event
 
                 <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
                     <MapPin size={14} />
-                    {location}
+                    <span className="truncate">{location}</span>
                 </div>
 
                 <div className="flex-1">
