@@ -10,7 +10,7 @@ import lombok.NonNull;
 @Data
 public class ReservationRequest {
 
-    @NonNull
+    @NonNull()
     private UUID ticketTypeId;
 
     @Min(1)
