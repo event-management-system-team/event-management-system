@@ -1,7 +1,7 @@
 import axiosInstance from "../config/axios";
 
-const boookingService = () => {
-    reserveTickets: async (ticketTypeId, quantity) => {
+const bookingService = {
+  reserveTickets: async (ticketTypeId, quantity) => {
     const response = await axiosInstance.post("/booking/reserve", {
       ticketTypeId,
       quantity,
@@ -14,9 +14,9 @@ const boookingService = () => {
     return response.data;
   },
 
-   createPaymentUrl: async (orderCode) => {
+  createPaymentUrl: async (orderCode) => {
     const response = await axiosInstance.post(
-      `/payments/vnpay/create?orderCode=${orderCode}`
+      `/payments/vnpay/create?orderCode=${orderCode}`,
     );
     return response.data;
   },
@@ -32,4 +32,4 @@ const boookingService = () => {
   },
 };
 
-export default boookingService;
+export default bookingService;
