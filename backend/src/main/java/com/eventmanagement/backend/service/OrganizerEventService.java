@@ -43,7 +43,7 @@ public class OrganizerEventService {
     private final EventCategoryRepository eventCategoryRepository;
     private final CloudinaryService cloudinaryService;
 
-    // create event for organizer with cover image
+    // create event for organizer that support cover image
     @Transactional
     public CreateEventResponse createEvent(User organizer, CreateEventRequest request, MultipartFile coverFile) {
         EventCategory category = eventCategoryRepository.findById(request.getCategoryId())
