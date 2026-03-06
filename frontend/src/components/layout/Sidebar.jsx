@@ -1,17 +1,16 @@
 
 import React from 'react';
 import { Link, useLocation, useParams, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { logoutUser } from '../../store/slices/auth.slice';
-import useProfile from '../../hooks/useProfile';
-import {
-  LayoutDashboard,
+import { 
+  LayoutDashboard, 
   CalendarDays,
-  Users,
-  FileText,
-  MessageSquare,
-  Settings,
-  LogOut
+  Users, 
+  FileText, 
+  MessageSquare, 
+  Settings, 
+  LogOut 
 } from 'lucide-react';
 
 // ==========================================
@@ -19,10 +18,10 @@ import {
 // ==========================================
 const NavItem = ({ to, icon, label, isActive }) => {
   return (
-    <Link
-      to={to}
+    <Link 
+      to={to} 
       className={`flex items-center gap-3 px-4 py-3 mb-1 rounded-xl font-medium transition-all duration-200
-        ${isActive
+        ${isActive 
           ? 'bg-[#3b4758] text-white shadow-lg pointer-events-none' // Trạng thái Active: Nền xám xanh, chữ trắng, khóa click
           : 'text-gray-400 hover:bg-gray-800 hover:text-white'      // Trạng thái Bình thường
         }`}
@@ -40,8 +39,6 @@ const Sidebar = () => {
   const location = useLocation();
   const { eventId } = useParams();
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
-  const { profile } = useProfile();
   const navigate = useNavigate();
 
   //navavigate ve trang login
@@ -54,7 +51,7 @@ const Sidebar = () => {
   const isDashboardActive = location.pathname.includes('/dashboard');
   const isMyEventsActive = location.pathname.includes('/my-events');
   // Hỗ trợ cả 2 link '/staff' hoặc '/recruitment'
-  const isStaffActive = location.pathname.includes('/staff') || location.pathname.includes('/recruitment');
+  const isStaffActive = location.pathname.includes('/staff') || location.pathname.includes('/recruitment'); 
   const isAppActive = location.pathname.includes('/applications');
   const isFeedbackActive = location.pathname.includes('/feedback');
 
@@ -63,7 +60,7 @@ const Sidebar = () => {
 
   return (
     <aside className="w-64 h-screen bg-[#1e293b] flex flex-col text-gray-300 fixed left-0 top-0 z-50 font-sans shadow-xl border-r border-gray-800">
-
+      
       {/* 1. Phần Logo */}
       <div className="p-6 flex items-center gap-3">
         <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-xs shadow-md">
@@ -75,19 +72,16 @@ const Sidebar = () => {
         </div>
       </div>
 
+      {/* 2. User Profile (FPT Software) */}
       <div className="mx-4 mb-6 p-3 bg-[#2d3a4f] rounded-xl flex items-center gap-3 border border-gray-700 shadow-sm">
         <img
-          src={profile?.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.fullName || user?.fullName || 'User')}&background=random`}
+          src="https://ui-avatars.com/api/?name=FPT+Software&background=random"
           alt="User"
           className="w-10 h-10 rounded-full object-cover border border-gray-500"
         />
         <div className="overflow-hidden">
-          <h3 className="text-white text-sm font-bold truncate">
-            {profile?.fullName || user?.fullName || 'Loading...'}
-          </h3>
-          <p className="text-[11px] text-gray-400 truncate">
-            {profile?.role || user?.role || 'Organizer'}
-          </p>
+          <h3 className="text-white text-sm font-bold truncate">FPT Software</h3>
+          <p className="text-[11px] text-gray-400 truncate">Senior Organizer</p>
         </div>
       </div>
 
@@ -96,48 +90,48 @@ const Sidebar = () => {
         <p className="px-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3 mt-1">
           Main Menu
         </p>
-
-        <NavItem
-          to="/organizer/dashboard"
-          icon={<LayoutDashboard size={20} />}
-          label="Dashboard"
-          isActive={isDashboardActive}
+        
+        <NavItem 
+          to="/organizer/dashboard" 
+          icon={<LayoutDashboard size={20} />} 
+          label="Dashboard" 
+          isActive={isDashboardActive} 
         />
-        <NavItem
-          to="/organizer/my-events"
-          icon={<CalendarDays size={20} />}
-          label="My Events"
-          isActive={isMyEventsActive}
+        <NavItem 
+          to="/organizer/my-events" 
+          icon={<CalendarDays size={20} />} 
+          label="My Events" 
+          isActive={isMyEventsActive} 
         />
-        <NavItem
-          to="/organizer/staff"
-          icon={<Users size={20} />}
-          label="Staff Management"
-          isActive={isStaffActive}
+        <NavItem 
+          to="/organizer/staff" 
+          icon={<Users size={20} />} 
+          label="Staff Management" 
+          isActive={isStaffActive} 
         />
-        <NavItem
-          to="/organizer/applications"
-          icon={<FileText size={20} />}
-          label="Applications"
-          isActive={isAppActive}
+        <NavItem 
+          to="/organizer/applications" 
+          icon={<FileText size={20} />} 
+          label="Applications" 
+          isActive={isAppActive} 
         />
-        <NavItem
-          to={feedbackLink}
-          icon={<MessageSquare size={20} />}
-          label="Feedback & Rating"
-          isActive={isFeedbackActive}
+        <NavItem 
+          to={feedbackLink} 
+          icon={<MessageSquare size={20} />} 
+          label="Feedback & Rating" 
+          isActive={isFeedbackActive} 
         />
       </nav>
 
-
+      
       <div className="p-4 mt-auto border-t border-gray-700/50 bg-[#1a2333]">
         <div className="space-y-1">
           <Link to="/profile" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors">
             <Settings size={18} />
             <span>Settings</span>
           </Link>
-
-          <button
+          
+          <button 
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors cursor-pointer"
           >
