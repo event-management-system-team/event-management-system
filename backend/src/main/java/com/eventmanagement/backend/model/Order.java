@@ -40,13 +40,16 @@ public class Order {
     private BigDecimal totalAmount = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)
+    @Column(name = "status", nullable = false, columnDefinition = "order_status")
     @Builder.Default
     private OrderStatus status = OrderStatus.PENDING;
 
     @Column(name = "payment_method", length = 50)
     @Builder.Default
     private String paymentMethod = "VNPAY";
+
+    @Column(name = "reserved_at")
+    private LocalDateTime reservedAt;
 
     @Column(name = "expires_at")
     private LocalDateTime expiresAt;
@@ -71,6 +74,7 @@ public class Order {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        reservedAt = LocalDateTime.now();
     }
 
     @PreUpdate

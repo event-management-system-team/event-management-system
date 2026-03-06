@@ -6,7 +6,11 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "tickets")
@@ -38,26 +42,27 @@ public class Ticket {
     @JoinColumn(name = "ticket_type_id", nullable = false)
     private TicketType ticketType;
 
-    @Column(name = "ticket_code", unique = true, nullable = false, length = 50)
+    @Column(name = "ticket_code", unique = true, nullable = false, length = 100)
     private String ticketCode;
 
+    @Column(name = "qr_code_url", columnDefinition = "text")
+    private String qrCodeUrl;
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)
+    @Column(name = "status", nullable = false, columnDefinition = "ticket_status")
     @Builder.Default
     private TicketStatus status = TicketStatus.PENDING;
 
     @Column(name = "price", precision = 15, scale = 2)
     private BigDecimal price;
 
-    @Column(name = "qr_code", unique = true, length = 255)
-    private String qrCode;
+    @Column(name = "attendee_info", columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private Map<String, Object> attendeeInfo;
 
-    @Column(name = "is_checked_in")
-    @Builder.Default
-    private Boolean isCheckedIn = false;
-
-    @Column(name = "checked_in_at")
-    private LocalDateTime checkedInAt;
+    @Column(name = "custom_form_data", columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private Map<String, Object> customFormData;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
