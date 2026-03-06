@@ -29,8 +29,9 @@ public class RedisConfig {
                 .setConnectionMinimumIdleSize(1)
                 .setConnectionPoolSize(2)
                 .setConnectTimeout(5000)
-                .setTimeout(5000);
-
+                .setTimeout(5000)
+                .setRetryAttempts(3)
+                .setRetryInterval(1500);
         return Redisson.create(config);
     }
 
