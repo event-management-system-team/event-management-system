@@ -56,6 +56,7 @@ public class OrganizerEventService {
             throw new BadRequestException("End date/time must be after start date/time");
         }
 
+        //start date > now
         if (!request.isDraft() && startDateTime.isBefore(LocalDateTime.now())) {
             throw new BadRequestException("Start date/time must be in the future");
         }
