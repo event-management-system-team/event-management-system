@@ -3,7 +3,9 @@ package com.eventmanagement.backend.service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -139,6 +141,10 @@ public class BookingService {
                                 .build();
                 orderRepository.save(order);
 
+                Map<String, Object> attendeeInfo = new HashMap<>();
+                attendeeInfo.put("name", user.getFullName());
+                attendeeInfo.put("email", user.getEmail());
+
                 List<Ticket> tickets = new ArrayList<>();
                 for (int i = 0; i < request.getQuantity(); i++) {
                         Ticket ticket = Ticket.builder()
@@ -149,6 +155,7 @@ public class BookingService {
                                         .ticketCode(generateCode.generateTicketCode())
                                         .status(TicketStatus.PENDING)
                                         .price(ticketType.getPrice())
+                                        .attendeeInfo(attendeeInfo)
                                         .build();
                         tickets.add(ticket);
                 }
@@ -182,7 +189,7 @@ public class BookingService {
 
                 tickets.forEach(t -> {
                         t.setStatus(TicketStatus.CONFIRMED);
-                        t.setQrCode(buildQrCode(t.getTicketCode()));
+                        t.setQrCodeUrl(buildQrCode(t.getTicketCode()));
                 });
                 ticketRepository.saveAll(tickets);
 
@@ -206,7 +213,7 @@ public class BookingService {
         public void cancelExpiredOrders() {
 
                 List<Order> expiredOrders = orderRepository
-                                .findExpiredPendingOrders(LocalDateTime.now());
+                                .findExpiredPendingOrders(LocalDateTime.now(), OrderStatus.PENDING);
 
                 if (expiredOrders.isEmpty())
                         return;
