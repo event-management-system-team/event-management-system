@@ -1,5 +1,6 @@
 package com.eventmanagement.backend.service;
 
+import com.eventmanagement.backend.dto.response.organizer.EventRoleStatsResponse;
 import com.eventmanagement.backend.dto.response.organizer.StaffResponse;
 import com.eventmanagement.backend.repository.StaffRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,5 +28,10 @@ public class StaffService {
     @Transactional(readOnly = true)
     public List<String> getRolesByEventId(UUID eventId) {
         return staffRepository.findRolesByEventId(eventId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<EventRoleStatsResponse> getRoleStatsByEventId(UUID eventId) {
+        return staffRepository.findRoleStatsByEventId(eventId);
     }
 }

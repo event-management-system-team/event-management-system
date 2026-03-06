@@ -11,7 +11,8 @@ import {
     Eye,
     Download,
     ChevronLeft,
-    Upload
+    Upload,
+    Calendar1
 } from 'lucide-react';
 import { Link, useParams } from 'react-router';
 import { useEffect, useMemo, useState } from "react";
@@ -48,6 +49,7 @@ import {
 import { createEventsServicePlugin } from '@schedule-x/events-service'
 import 'temporal-polyfill/global'
 import '@schedule-x/theme-default/dist/index.css'
+import { CreateScheduleModal } from '../../components/domain/organizer/CreateScheduleModal.jsx';
 
 export function StaffManagement() {
 
@@ -167,13 +169,22 @@ export function StaffManagement() {
                 )
             case "schedule":
                 return (
-                    <Button
-                        className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5 py-5 h-12 w-32"
-                    // onClick={openModal}
-                    >
-                        <Plus className="h-4 w-4" />
-                        Add Shift
-                    </Button>
+                    <div className='flex gap-3'>
+                        <Button
+                            className="gap-2 bg-[#f7f7f7] hover:bg-[#B3C8CF] text-gray rounded-full px-5 py-5 h-12 w-40 border-1 border-gray-400"
+                            onClick={openModal}
+                        >
+                            <Calendar1 className="h-4 w-4" />
+                            Create Schedule
+                        </Button>
+                        <Button
+                            className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5 py-5 h-12 w-32"
+                        // onClick={openModal}
+                        >
+                            <Plus className="h-4 w-4" />
+                            Add Shift
+                        </Button>
+                    </div>
                 )
             case "resources":
                 return (
@@ -246,13 +257,13 @@ export function StaffManagement() {
     //     setCurrentPage(p - 1);
     // };
 
-    // const openModal = () => {
-    //     setIsModalOpen(true);
-    // };
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
 
-    // const closeModal = () => {
-    //     setIsModalOpen(false);
-    // };
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
 
     // const formatDate = (isoString) => {
     //     const date = new Date(isoString);
@@ -535,6 +546,14 @@ export function StaffManagement() {
                     onClose={closeAlert}
                 />
             </div>
+
+            {/* Create Organizer Modal */}
+            <CreateScheduleModal
+                eventId={id}
+                isOpen={isModalOpen}
+                onClose={closeModal}
+                onAlert={showAlert}
+            />
         </div>
 
     );

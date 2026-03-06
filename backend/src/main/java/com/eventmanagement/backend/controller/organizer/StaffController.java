@@ -1,5 +1,6 @@
 package com.eventmanagement.backend.controller.organizer;
 
+import com.eventmanagement.backend.dto.response.organizer.EventRoleStatsResponse;
 import com.eventmanagement.backend.dto.response.organizer.StaffResponse;
 import com.eventmanagement.backend.service.StaffService;
 import lombok.RequiredArgsConstructor;
@@ -35,5 +36,10 @@ public class StaffController {
     @GetMapping("/{id}/role")
     public ResponseEntity<List<String>> getEventRoles(@PathVariable UUID id) {
         return ResponseEntity.ok(staffService.getRolesByEventId(id));
+    }
+
+    @GetMapping("/{id}/role-stats")
+    public ResponseEntity<List<EventRoleStatsResponse>> getRoleStats(@PathVariable UUID id) {
+        return ResponseEntity.ok(staffService.getRoleStatsByEventId(id));
     }
 }

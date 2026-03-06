@@ -1,5 +1,6 @@
 package com.eventmanagement.backend.repository;
 
+import com.eventmanagement.backend.dto.response.organizer.EventRoleStatsResponse;
 import com.eventmanagement.backend.dto.response.organizer.StaffResponse;
 import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.model.EventStaff;
@@ -63,6 +64,17 @@ public interface StaffRepository extends JpaRepository<EventStaff, UUID> {
         WHERE es.event.eventId = :eventId
     """)
     List<String> findRolesByEventId(@Param("eventId") UUID eventId);
+
+    @Query("""
+    SELECT new com.eventmanagement.backend.dto.response.organizer.EventRoleStatsResponse(
+        es.staffRole,
+        COUNT(es.eventStaffId)
+    )
+    FROM EventStaff es
+    WHERE es.event.eventId = :eventId
+    GROUP BY es.staffRole
+""")
+    List<EventRoleStatsResponse> findRoleStatsByEventId(@Param("eventId") UUID eventId);
 
     boolean existsByEventEventIdAndEventStaffId(UUID eventEventId, UUID eventStaffId);
 

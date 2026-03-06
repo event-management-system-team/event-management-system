@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import { organizerService } from '../../services/organizer.service'
 
-function TestCalendar() {
+export function TestCalendar() {
     const { id } = useParams();
     const [assignments, setAssignments] = useState([]);
     const eventsService = useState(() => createEventsServicePlugin())[0]
@@ -79,5 +79,3 @@ function TestCalendar() {
         </div>
     )
 }
-
-export default TestCalendar
