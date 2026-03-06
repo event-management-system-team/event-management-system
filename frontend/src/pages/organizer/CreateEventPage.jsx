@@ -874,12 +874,22 @@ const validateStep3 = (form) => {
     if (form.agenda.length === 0) {
         e._agenda = 'At least one session is required';
     }
+    const eventStart = form.startTime;
+    const eventEnd = form.endTime;
     form.agenda.forEach((item, idx) => {
         if (!item.title.trim()) e[`agenda_${idx}_title`] = 'Session title is required';
-        if (!item.startTime) e[`agenda_${idx}_startTime`] = 'Start time is required';
-        if (!item.endTime) e[`agenda_${idx}_endTime`] = 'End time is required';
-        else if (item.startTime && item.endTime && item.endTime <= item.startTime)
+        if (!item.startTime) {
+            e[`agenda_${idx}_startTime`] = 'Start time is required';
+        } else if (eventStart && item.startTime < eventStart) {
+            e[`agenda_${idx}_startTime`] = `Must be at or after event start time (${eventStart})`;
+        }
+        if (!item.endTime) {
+            e[`agenda_${idx}_endTime`] = 'End time is required';
+        } else if (item.startTime && item.endTime <= item.startTime) {
             e[`agenda_${idx}_endTime`] = 'End time must be after start time';
+        } else if (eventEnd && item.endTime > eventEnd) {
+            e[`agenda_${idx}_endTime`] = `Must be at or before event end time (${eventEnd})`;
+        }
     });
     return e;
 };
