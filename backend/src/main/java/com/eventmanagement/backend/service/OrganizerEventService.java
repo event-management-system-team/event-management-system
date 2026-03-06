@@ -8,6 +8,7 @@ import com.eventmanagement.backend.dto.response.organizer.OrganizerEventStatsRes
 import com.eventmanagement.backend.exception.BadRequestException;
 import com.eventmanagement.backend.exception.NotFoundException;
 import com.eventmanagement.backend.model.Event;
+import com.eventmanagement.backend.model.EventAgenda;
 import com.eventmanagement.backend.model.EventCategory;
 import com.eventmanagement.backend.model.TicketType;
 import com.eventmanagement.backend.model.User;
@@ -131,6 +132,27 @@ public class OrganizerEventService {
         }
         event.setTicketTypes(ticketTypes);
 
+        Set<EventAgenda> agendas = new LinkedHashSet<>();
+        if (request.getAgenda() != null && !request.getAgenda().isEmpty()) {
+            int order = 0;
+            for (CreateEventRequest.AgendaRequest agendaReq : request.getAgenda()) {
+                LocalDateTime agendaStart = parseDateTime(request.getStartDate(), agendaReq.getStartTime());
+                LocalDateTime agendaEnd = parseDateTime(request.getStartDate(), agendaReq.getEndTime());
+
+                EventAgenda agenda = EventAgenda.builder()
+                        .event(event)
+                        .title(agendaReq.getTitle())
+                        .description(agendaReq.getDescription())
+                        .startTime(agendaStart)
+                        .endTime(agendaEnd)
+                        .location(agendaReq.getLocation())
+                        .orderIndex(order++)
+                        .build();
+                agendas.add(agenda);
+            }
+        }
+        event.setAgendas(agendas);
+
         Event saved = eventRepository.save(event);
 
         log.info("Event created: id={}, name={}, status={}", saved.getEventId(), saved.getEventName(),
@@ -174,6 +196,21 @@ public class OrganizerEventService {
             }
         }
 
+        List<CreateEventResponse.AgendaResponse> agendaResponses = new ArrayList<>();
+        if (event.getAgendas() != null) {
+            for (EventAgenda ea : event.getAgendas()) {
+                agendaResponses.add(CreateEventResponse.AgendaResponse.builder()
+                        .agendaId(ea.getAgendaId())
+                        .title(ea.getTitle())
+                        .startTime(ea.getStartTime() != null ? ea.getStartTime().toLocalTime().toString() : null)
+                        .endTime(ea.getEndTime() != null ? ea.getEndTime().toLocalTime().toString() : null)
+                        .description(ea.getDescription())
+                        .location(ea.getLocation())
+                        .orderIndex(ea.getOrderIndex())
+                        .build());
+            }
+        }
+
         return CreateEventResponse.builder()
                 .eventId(event.getEventId())
                 .eventName(event.getEventName())
@@ -188,6 +225,7 @@ public class OrganizerEventService {
                 .totalCapacity(event.getTotalCapacity())
                 .categoryName(event.getCategory() != null ? event.getCategory().getCategoryName() : null)
                 .tickets(ticketResponses)
+                .agendas(agendaResponses)
                 .build();
     }
 
