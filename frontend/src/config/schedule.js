@@ -2,7 +2,8 @@ import {
     viewDay,
     viewMonthAgenda,
     viewMonthGrid,
-    viewWeek
+    viewWeek,
+    viewList
 } from '@schedule-x/calendar';
 import 'temporal-polyfill/global';
 import '@schedule-x/theme-default/dist/index.css';
@@ -11,7 +12,7 @@ export const configSchedule = {
     locale: 'vi-VN',
     timezone: 'Asia/Ho_Chi_Minh',
     firstDayOfWeek: 1,
-    views: [viewMonthGrid, viewMonthAgenda, viewWeek, viewDay],
+    views: [viewMonthGrid, viewMonthAgenda, viewWeek, viewDay, viewList],
     defaultView: viewMonthGrid.name,
 
     weekOptions: {
@@ -32,12 +33,6 @@ export const configSchedule = {
     skipValidation: true,
 
     callbacks: {
-        onRangeUpdate(range) {
-            console.log('Khoảng thời gian hiện tại:', range.start, '->', range.end);
-            // Nơi lý tưởng để gọi API lấy ca trực mới
-        },
-
-
         isCalendarSmall($app) {
             return $app.elements.calendarWrapper?.clientWidth < 700;
         }

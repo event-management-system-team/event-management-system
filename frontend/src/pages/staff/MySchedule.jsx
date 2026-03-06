@@ -1,5 +1,5 @@
 
-import { useEffect, useState, useRef, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import CustomEventModal from '../../components/domain/staff/schedule/CustomEventModal';
 import { configSchedule } from '../../config/schedule';
 import { useCalendarApp, ScheduleXCalendar } from '@schedule-x/react';
@@ -13,13 +13,10 @@ import { useParams } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import LoadingState from '../../components/common/LoadingState';
 import EmptyState from '../../components/common/EmptyState';
-
-const formatTime = (timeStr) => {
-    if (!timeStr) return null;
-    const cleanTime = timeStr.substring(0, 16).replace(' ', 'T');
-    const isoString = `${cleanTime}:00+07:00[Asia/Ho_Chi_Minh]`;
-    return window.Temporal.ZonedDateTime.from(isoString);
-};
+import '../../styles/schedule.css'
+import useNationalHolidays from '../../hooks/useNationalHolidays';
+import { formatTime } from '../../../utils/formatTimeSchedule.utils'
+import CustomHeaderRightAppend, { TOGGLE_EVENT_NAME } from '../../components/domain/staff/schedule/CustomHeaderRightAppend'
 
 const MySchedulePage = () => {
     const { eventSlug } = useParams();
@@ -30,9 +27,19 @@ const MySchedulePage = () => {
         enabled: !!eventSlug
     });
 
+    const [showHolidays, setShowHolidays] = useState(false);
+
+    useEffect(() => {
+        const handleToggle = (e) => setShowHolidays(e.detail);
+        window.addEventListener(TOGGLE_EVENT_NAME, handleToggle);
+        return () => window.removeEventListener(TOGGLE_EVENT_NAME, handleToggle);
+    }, []);
+
     const [eventsService] = useState(() => createEventsServicePlugin());
     const [scrollController] = useState(() => createScrollControllerPlugin({ initialScroll: '07:00' }));
     const [cal, setCal] = useState(null);
+
+    const { rawHolidays } = useNationalHolidays()
 
     const formattedEvents = useMemo(() => {
         if (!data || !data.schedules) return [];
@@ -40,7 +47,7 @@ const MySchedulePage = () => {
         return data.schedules.map(item => ({
             ...item,
             id: String(item.assignmentId),
-            title: item.scheduleName || 'Chưa có tên',
+            title: item.scheduleName || 'Undefined',
             start: formatTime(item.startTime),
             end: formatTime(item.endTime),
         }));
@@ -56,15 +63,23 @@ const MySchedulePage = () => {
     });
 
     useEffect(() => {
-        if (formattedEvents.length > 0) {
-            eventsService.set(formattedEvents);
+        let displayEvents = [...formattedEvents];
+
+        if (showHolidays) {
+            displayEvents = [...displayEvents, ...rawHolidays];
         }
-    }, [formattedEvents, eventsService]);
+
+        eventsService.set(displayEvents);
+    }, [formattedEvents, rawHolidays, showHolidays, eventsService]);
 
     useEffect(() => {
         setCal(calendar);
     }, [calendar]);
 
+    const customComponents = useMemo(() => ({
+        eventModal: CustomEventModal,
+        headerContentRightAppend: CustomHeaderRightAppend
+    }), []);
 
     if (isLoading) return <LoadingState />;
     if (isError || !data) return <EmptyState className='h-[600px]' />;
@@ -74,18 +89,8 @@ const MySchedulePage = () => {
             <div className="flex-1 w-full h-full bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden sx-custom-calendar">
                 <ScheduleXCalendar
                     calendarApp={calendar}
-                    customComponents={{
-                        eventModal: CustomEventModal
-                    }}
+                    customComponents={customComponents}
                 />
-
-                <style>{`
-                    .sx-custom-calendar .sx-react-calendar-wrapper,
-                    .sx-custom-calendar .sx__calendar-wrapper {
-                        height: 100% !important;
-                        width: 100% !important;
-                    }
-                `}</style>
             </div>
         </div>
     );

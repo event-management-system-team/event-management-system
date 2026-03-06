@@ -64,6 +64,7 @@ public class WorkspaceService {
                         .resourceName(r.getResourceName())
                         .fileUrl(r.getFileUrl())
                         .fileType(r.getFileType())
+                        .resourceType(r.getResourceType())
                         .build()
         ).collect(Collectors.toList());
 
