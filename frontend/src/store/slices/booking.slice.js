@@ -126,6 +126,7 @@ export const {
   setSelectedEvent,
   clearBooking,
   clearError,
+  loading,
 } = bookingSlice.actions;
 
 export default bookingSlice.reducer;

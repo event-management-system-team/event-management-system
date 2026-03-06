@@ -55,7 +55,7 @@ const EventDetailPage = () => {
                             <SidebarTicket
                                 minPrice={events?.minPrice}
                                 ticketTypes={events?.ticketTypes}
-                                totalCapacity={events?.totalCapacity}
+                                event={events}
                             />
 
                             <OrganizerCard events={events} />
