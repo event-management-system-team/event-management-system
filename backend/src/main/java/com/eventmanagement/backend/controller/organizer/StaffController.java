@@ -31,4 +31,9 @@ public class StaffController {
 
         return ResponseEntity.ok(staff);
     }
+
+    @GetMapping("/{id}/role")
+    public ResponseEntity<List<String>> getEventRoles(@PathVariable UUID id) {
+        return ResponseEntity.ok(staffService.getRolesByEventId(id));
+    }
 }

@@ -1,6 +1,7 @@
 package com.eventmanagement.backend.repository;
 
 import com.eventmanagement.backend.dto.response.organizer.StaffResponse;
+import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.model.EventStaff;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -56,7 +57,16 @@ public interface StaffRepository extends JpaRepository<EventStaff, UUID> {
             @Param("roles") List<String> roles
     );
 
+    @Query("""
+        SELECT DISTINCT es.staffRole
+        FROM EventStaff es
+        WHERE es.event.eventId = :eventId
+    """)
+    List<String> findRolesByEventId(@Param("eventId") UUID eventId);
+
     boolean existsByEventEventIdAndEventStaffId(UUID eventEventId, UUID eventStaffId);
 
     List<EventStaff> findByEventEventIdAndEventStaffIdIn(UUID eventEventId, Collection<UUID> eventStaffIds);
+
+    UUID event(Event event);
 }

@@ -23,4 +23,9 @@ public class StaffService {
     public List<StaffResponse> findStaffByEventIdAndRole(UUID eventId, String role) {
         return staffRepository.findStaffByEventIdAndOptionalRole(eventId, role);
     }
+
+    @Transactional(readOnly = true)
+    public List<String> getRolesByEventId(UUID eventId) {
+        return staffRepository.findRolesByEventId(eventId);
+    }
 }
