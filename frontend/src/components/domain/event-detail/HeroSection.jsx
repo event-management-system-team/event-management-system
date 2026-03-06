@@ -43,30 +43,30 @@ const HeroSection = ({ bannerUrl, location, eventName, startDate, endDate, categ
                         </h1>
 
 
-                        <div className="flex flex-wrap gap-x-8 gap-y-4 text-white/90 font-medium">
-
-                            {/* Location*/}
-                            <div className="flex items-center gap-2">
-                                <MapPin className="w-5 h-5 text-primary" />
-                                <span>{location}</span>
+                        <div className="flex flex-col gap-4 text-white/90 font-medium">
+                            <div className="flex items-start gap-2 w-full">
+                                <MapPin className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                                <span className="leading-relaxed">{location}</span>
                             </div>
 
-                            {/* Date */}
-                            <div className="flex items-center gap-2">
-                                <CalendarDays className="w-5 h-5 text-primary" />
-                                <span>
-                                    {isSameDay
-                                        ? formatDate(startDate)
-                                        : `${formatDate(startDate)} - ${formatDate(endDate)}`}
-                                </span>
-                            </div>
+                            <div className="flex flex-wrap gap-x-8 gap-y-4">
 
-                            {/* Time */}
-                            <div className="flex items-center gap-2">
-                                <Clock className="w-5 h-5 text-primary" />
-                                <span>
-                                    {formatTime(startDate)} - {formatTime(endDate)}
-                                </span>
+                                <div className="flex items-center gap-2">
+                                    <CalendarDays className="w-5 h-5 text-primary shrink-0" />
+                                    <span>
+                                        {isSameDay
+                                            ? formatDate(startDate)
+                                            : `${formatDate(startDate)} - ${formatDate(endDate)}`}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <Clock className="w-5 h-5 text-primary shrink-0" />
+                                    <span>
+                                        {formatTime(startDate)} - {formatTime(endDate)}
+                                    </span>
+                                </div>
+
                             </div>
 
                         </div>
