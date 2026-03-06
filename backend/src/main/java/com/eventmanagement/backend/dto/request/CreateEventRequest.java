@@ -51,6 +51,9 @@ public class CreateEventRequest {
 
     private boolean draft;
 
+    @Valid
+    private List<AgendaRequest> agenda;
+
     @Data
     public static class TicketRequest {
         @NotBlank(message = "Ticket name is required")
@@ -60,5 +63,20 @@ public class CreateEventRequest {
         private Integer quantity;
 
         private BigDecimal price;
+    }
+
+    @Data
+    public static class AgendaRequest {
+        @NotBlank(message = "Session title is required")
+        private String title;
+
+        @NotBlank(message = "Start time is required")
+        private String startTime;
+
+        @NotBlank(message = "End time is required")
+        private String endTime;
+
+        private String description;
+        private String location;
     }
 }

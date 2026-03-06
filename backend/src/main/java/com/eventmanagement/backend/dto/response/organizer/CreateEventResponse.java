@@ -28,6 +28,7 @@ public class CreateEventResponse {
     private Integer totalCapacity;
     private String categoryName;
     private List<TicketResponse> tickets;
+    private List<AgendaResponse> agendas;
 
     @Data
     @Builder
@@ -38,5 +39,19 @@ public class CreateEventResponse {
         private String ticketName;
         private Integer quantity;
         private java.math.BigDecimal price;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AgendaResponse {
+        private UUID agendaId;
+        private String title;
+        private String startTime;
+        private String endTime;
+        private String description;
+        private String location;
+        private Integer orderIndex;
     }
 }
