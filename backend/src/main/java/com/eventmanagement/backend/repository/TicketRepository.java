@@ -11,7 +11,7 @@ public interface TicketRepository extends JpaRepository<Ticket, UUID> {
 
     List<Ticket> findByOrderOrderId(UUID orderId);
 
-    boolean existsByQrCode(String qrCode);
+    boolean existsByQrCodeUrl(String qrCode);
 
     List<Ticket> findByUserUserId(UUID userId);
 
