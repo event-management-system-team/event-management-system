@@ -1,28 +1,28 @@
+// repository/OrderRepository.java
 package com.eventmanagement.backend.repository;
 
-import com.eventmanagement.backend.constants.OrderStatus;
 import com.eventmanagement.backend.model.Order;
-
+import com.eventmanagement.backend.constants.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Repository
 public interface OrderRepository extends JpaRepository<Order, UUID> {
-
-    List<Order> findByUserUserIdOrderByCreatedAtDesc(UUID userId);
-
-    List<Order> findByEventEventIdOrderByCreatedAtDesc(UUID eventId);
 
     Optional<Order> findByOrderCode(String orderCode);
 
-    @Query("SELECT o FROM Order o WHERE o.status = :status AND o.createdAt <= :expiredTime")
-    List<Order> findExpiredOrders(@Param("status") OrderStatus status, @Param("expiredTime") LocalDateTime expiredTime);
+    List<Order> findByUserUserId(UUID userId);
 
-    @Query("SELECT o FROM Order o WHERE o.status = 'PENDING' AND o.expiresAt < :now")
-    List<Order> findExpiredPendingOrders(@Param("now") LocalDateTime now);
+    @Query("SELECT o FROM Order o WHERE o.status = :status " +
+            "AND o.expiresAt < :now")
+    List<Order> findExpiredPendingOrders(
+            @Param("now") LocalDateTime now,
+            @Param("status") OrderStatus status);
 }
