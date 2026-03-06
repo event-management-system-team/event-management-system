@@ -611,7 +611,7 @@ const Step3Agenda = ({ form, onChange, errors = {} }) => {
                     <span className="text-xs text-gray-400 font-medium">{form.agenda.length} session{form.agenda.length !== 1 ? 's' : ''}</span>
                 </div>
                 <p className="text-sm text-gray-400 mb-6">
-                    Plan out the schedule of your event. Add sessions, talks, or activities in order.
+                    Plan out the schedule of your event. Add sessions, or activities in order.
                 </p>
 
                 {/* Agenda items */}
