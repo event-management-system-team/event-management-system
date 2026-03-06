@@ -16,6 +16,9 @@ import {
     Calendar,
     Rocket,
     AlertCircle,
+    ListOrdered,
+    User,
+    AlignLeft,
 } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -30,6 +33,7 @@ const StepIndicator = ({ currentStep }) => {
     const steps = [
         { id: 1, label: 'Basic Info' },
         { id: 2, label: 'Tickets & Pricing' },
+        { id: 3, label: 'Agenda' },
     ];
 
     return (
@@ -55,14 +59,14 @@ const StepIndicator = ({ currentStep }) => {
                                 className={`text-xs mt-1.5 font-medium ${isActive || isCompleted ? 'text-gray-700' : 'text-gray-400'
                                     }`}
                             >
-                                {isCompleted ? `Step ${step.id}: Details` : isActive && step.id === 2 ? 'Step 2: Tickets & Pricing' : step.label}
+                                {step.label}
                             </span>
                         </div>
                         {idx < steps.length - 1 && (
                             <div
-                                className={`flex-1 h-0.5 mx-3 mt-[-10px] transition-all ${currentStep > 1 ? 'bg-[#4a9e9e]' : 'bg-gray-200'
+                                className={`flex-1 h-0.5 mx-3 mt-[-10px] transition-all ${currentStep > step.id ? 'bg-[#4a9e9e]' : 'bg-gray-200'
                                     }`}
-                                style={{ minWidth: 120, maxWidth: 300 }}
+                                style={{ minWidth: 100, maxWidth: 240 }}
                             />
                         )}
                     </React.Fragment>
@@ -568,7 +572,186 @@ const ToggleSetting = ({ icon, title, description, checked, onChange }) => (
 );
 
 // ─────────────────────────────────────────────
-// Step 3 – Success screen
+// Step 3 – Agenda
+// ─────────────────────────────────────────────
+const emptyAgendaItem = () => ({
+    title: '',
+    startTime: '',
+    endTime: '',
+    location: '',
+    description: '',
+    speaker: '',
+});
+
+const Step3Agenda = ({ form, onChange, errors = {} }) => {
+    const addItem = () => {
+        onChange({ agenda: [...form.agenda, emptyAgendaItem()] });
+    };
+
+    const removeItem = (idx) => {
+        onChange({ agenda: form.agenda.filter((_, i) => i !== idx) });
+    };
+
+    const handleChange = (idx, field, value) => {
+        const updated = form.agenda.map((item, i) =>
+            i === idx ? { ...item, [field]: value } : item
+        );
+        onChange({ agenda: updated });
+    };
+
+    return (
+        <div className="space-y-6">
+            {/* Header section */}
+            <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
+                <div className="flex items-center justify-between mb-1">
+                    <h2 className="text-base font-bold text-gray-800">
+                        Step 3: Event Agenda
+                    </h2>
+                    <span className="text-xs text-gray-400 font-medium">{form.agenda.length} session{form.agenda.length !== 1 ? 's' : ''}</span>
+                </div>
+                <p className="text-sm text-gray-400 mb-6">
+                    Plan out the schedule of your event. Add sessions, talks, or activities in order.
+                </p>
+
+                {/* Agenda items */}
+                <div className="space-y-4">
+                    {form.agenda.length === 0 && (
+                        <div className="text-center py-10 text-gray-300">
+                            <ListOrdered size={36} className="mx-auto mb-3 opacity-40" />
+                            <p className="text-sm font-medium">No sessions yet</p>
+                            <p className="text-xs mt-1">Click &quot;Add Session&quot; to start building your agenda.</p>
+                        </div>
+                    )}
+
+                    {form.agenda.map((item, idx) => (
+                        <div
+                            key={idx}
+                            className="relative bg-[#f9f9f7] border border-gray-100 rounded-2xl p-5 group hover:border-[#4a9e9e]/30 transition-all"
+                        >
+                            {/* Session number badge */}
+                            <div className="absolute -top-3 left-4 w-6 h-6 bg-[#4a9e9e] text-white rounded-full flex items-center justify-center text-xs font-bold shadow-sm">
+                                {idx + 1}
+                            </div>
+
+                            {/* Delete button */}
+                            <button
+                                type="button"
+                                onClick={() => removeItem(idx)}
+                                className="absolute top-3 right-3 p-1.5 text-gray-300 hover:text-red-400 transition rounded-lg hover:bg-red-50"
+                            >
+                                <Trash2 size={15} />
+                            </button>
+
+                            {/* Title */}
+                            <div className="mb-3 mt-2">
+                                <label className="block text-xs font-semibold text-gray-600 mb-1.5">Session Title <span className="text-red-400">*</span></label>
+                                <input
+                                    type="text"
+                                    placeholder="e.g. Opening Keynote, Workshop: UX Design..."
+                                    value={item.title}
+                                    onChange={(e) => handleChange(idx, 'title', e.target.value)}
+                                    className={`w-full px-4 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 transition bg-white ${errors[`agenda_${idx}_title`]
+                                        ? 'border-red-400 focus:ring-red-200'
+                                        : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'
+                                        }`}
+                                />
+                                <FieldError msg={errors[`agenda_${idx}_title`]} />
+                            </div>
+
+                            {/* Time row */}
+                            <div className="grid grid-cols-2 gap-3 mb-3">
+                                <div>
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                                        <Clock size={11} className="inline mr-1 text-[#4a9e9e]" />
+                                        Start Time <span className="text-red-400">*</span>
+                                    </label>
+                                    <input
+                                        type="time"
+                                        value={item.startTime}
+                                        onChange={(e) => handleChange(idx, 'startTime', e.target.value)}
+                                        className={`w-full px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 transition bg-white ${errors[`agenda_${idx}_startTime`]
+                                            ? 'border-red-400 focus:ring-red-200'
+                                            : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'
+                                            }`}
+                                    />
+                                    <FieldError msg={errors[`agenda_${idx}_startTime`]} />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                                        <Clock size={11} className="inline mr-1 text-[#4a9e9e]" />
+                                        End Time <span className="text-red-400">*</span>
+                                    </label>
+                                    <input
+                                        type="time"
+                                        value={item.endTime}
+                                        onChange={(e) => handleChange(idx, 'endTime', e.target.value)}
+                                        className={`w-full px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 transition bg-white ${errors[`agenda_${idx}_endTime`]
+                                            ? 'border-red-400 focus:ring-red-200'
+                                            : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'
+                                            }`}
+                                    />
+                                    <FieldError msg={errors[`agenda_${idx}_endTime`]} />
+                                </div>
+                            </div>
+
+                            {/* Location */}
+                            <div className="mb-3">
+                                <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                                    <MapPin size={11} className="inline mr-1 text-[#4a9e9e]" />
+                                    Location <span className="text-gray-300 font-normal">(optional)</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="e.g. Hall A, Room 202, Main Stage..."
+                                    value={item.location}
+                                    onChange={(e) => handleChange(idx, 'location', e.target.value)}
+                                    className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] transition bg-white"
+                                />
+                            </div>
+
+                            {/* Description */}
+                            <div>
+                                <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                                    <AlignLeft size={11} className="inline mr-1 text-[#4a9e9e]" />
+                                    Description <span className="text-gray-300 font-normal">(optional)</span>
+                                </label>
+                                <textarea
+                                    placeholder="Brief description of this session..."
+                                    value={item.description}
+                                    onChange={(e) => handleChange(idx, 'description', e.target.value)}
+                                    rows={2}
+                                    className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] transition resize-none bg-white"
+                                />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Add session button */}
+                <button
+                    type="button"
+                    onClick={addItem}
+                    className="mt-5 w-full border-2 border-dashed border-gray-200 rounded-xl py-3 flex items-center justify-center gap-2 text-sm text-gray-500 hover:border-[#4a9e9e]/50 hover:text-[#4a9e9e] hover:bg-[#f0fafa] transition"
+                >
+                    <Plus size={16} />
+                    Add Session
+                </button>
+            </section>
+
+
+            {/* Tip */}
+            <div className="flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3">
+                <Info size={15} className="text-blue-400 mt-0.5 shrink-0" />
+                <p className="text-xs text-blue-500 leading-relaxed">
+                    <strong>Tip:</strong> You can skip this step — agenda is optional. Sessions will be shown to attendees on the event page in the order listed.
+                </p>
+            </div>
+        </div>
+    );
+};
+
+// ─────────────────────────────────────────────
+// Step 4 – Success screen
 // ─────────────────────────────────────────────
 const SuccessScreen = ({ form, onBack }) => {
     const navigate = useNavigate();
@@ -628,7 +811,7 @@ const SuccessScreen = ({ form, onBack }) => {
         </div>
     );
 };
-
+``
 // ─────────────────────────────────────────────
 // MAIN COMPONENT
 // ─────────────────────────────────────────────
@@ -652,6 +835,7 @@ const initialForm = {
     ],
     isFree: false,
     totalCapacity: '',
+    agenda: [],
 };
 
 // ─── Validation helpers ─────────────────────────────────────────────────────
@@ -674,6 +858,18 @@ const validateStep2 = (form) => {
     form.tickets.forEach((t, idx) => {
         if (!t.name.trim()) e[`ticket_${idx}_name`] = 'Ticket name is required';
         if (!t.quantity || parseInt(t.quantity) <= 0) e[`ticket_${idx}_quantity`] = 'Quantity must be > 0';
+    });
+    return e;
+};
+
+const validateStep3 = (form) => {
+    const e = {};
+    form.agenda.forEach((item, idx) => {
+        if (!item.title.trim()) e[`agenda_${idx}_title`] = 'Session title is required';
+        if (!item.startTime) e[`agenda_${idx}_startTime`] = 'Start time is required';
+        if (!item.endTime) e[`agenda_${idx}_endTime`] = 'End time is required';
+        else if (item.startTime && item.endTime && item.endTime <= item.startTime)
+            e[`agenda_${idx}_endTime`] = 'End time must be after start time';
     });
     return e;
 };
@@ -709,6 +905,13 @@ const CreateEventPage = () => {
             })),
         isFree: form.isFree,
         totalCapacity: form.isFree ? (parseInt(form.totalCapacity, 10) || 0) : undefined,
+        agenda: form.agenda.map((item) => ({
+            title: item.title,
+            startTime: item.startTime,
+            endTime: item.endTime,
+            description: item.description || '',
+            speaker: item.speaker || '',
+        })),
         draft: isDraft,
     });
 
@@ -737,19 +940,30 @@ const CreateEventPage = () => {
     const handleBack = () => {
         setError(null);
         setErrors({});
-        setStep(1);
+        setStep(step - 1);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handleSubmit = async () => {
+    // Step 2 → Step 3
+    const handleContinueToAgenda = () => {
         const e = validateStep2(form);
+        if (Object.keys(e).length > 0) { setErrors(e); return; }
+        setErrors({});
+        setError(null);
+        setStep(3);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Step 3 → Submit
+    const handleSubmitFinal = async () => {
+        const e = validateStep3(form);
         if (Object.keys(e).length > 0) { setErrors(e); return; }
         setErrors({});
         setSaving(true);
         setError(null);
         try {
             await organizerService.createEvent(buildEventPayload(false), form.coverFile);
-            setStep(3);
+            setStep(4);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to submit event. Please try again.');
@@ -758,7 +972,7 @@ const CreateEventPage = () => {
         }
     };
 
-    if (step === 3) {
+    if (step === 4) {
         return (
             <div className="min-h-screen bg-[#f0f0ec] p-8">
                 <SuccessScreen form={form} />
@@ -766,7 +980,7 @@ const CreateEventPage = () => {
         );
     }
 
-    const progressPct = step === 1 ? 40 : 85;
+    const progressPct = step === 1 ? 30 : step === 2 ? 65 : 95;
 
     return (
         <div className="min-h-screen bg-[#f0f0ec]">
@@ -811,6 +1025,7 @@ const CreateEventPage = () => {
 
                 {step === 1 && <Step1BasicInfo form={form} onChange={(v) => { updateForm(v); setErrors((prev) => { const k = Object.keys(v)[0]; const n = { ...prev }; delete n[k]; return n; }); }} errors={errors} />}
                 {step === 2 && <Step2Tickets form={form} onChange={updateForm} errors={errors} />}
+                {step === 3 && <Step3Agenda form={form} onChange={updateForm} errors={errors} />}
 
                 {error && (
                     <div className="mt-4 flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
@@ -821,7 +1036,7 @@ const CreateEventPage = () => {
 
                 {/* Footer actions */}
                 <div className="flex items-center justify-between mt-6">
-                    {step === 2 ? (
+                    {step > 1 ? (
                         <button
                             onClick={handleBack}
                             className="flex items-center gap-2 px-6 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition"
@@ -845,7 +1060,17 @@ const CreateEventPage = () => {
 
                     {step === 2 && (
                         <button
-                            onClick={handleSubmit}
+                            onClick={handleContinueToAgenda}
+                            className="flex items-center gap-2 bg-[#2d3a4f] hover:bg-[#1e293b] text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition shadow-sm"
+                        >
+                            Continue to Agenda
+                            <ArrowRight size={16} />
+                        </button>
+                    )}
+
+                    {step === 3 && (
+                        <button
+                            onClick={handleSubmitFinal}
                             disabled={saving}
                             className="flex items-center gap-2 bg-[#2d3a4f] hover:bg-[#1e293b] text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition shadow-sm disabled:opacity-60"
                         >
@@ -858,8 +1083,10 @@ const CreateEventPage = () => {
                 {/* Footer hint */}
                 <p className="text-center text-xs text-gray-400 mt-6">
                     {step === 1
-                        ? 'Step 1: Provide basic info about your event to get started.'
-                        : 'Last saved: just now'}
+                        ? 'Step 1 of 3: Provide basic info about your event to get started.'
+                        : step === 2
+                            ? 'Step 2 of 3: Configure your tickets and pricing.'
+                            : 'Step 3 of 3: Agenda is optional — you can skip it by clicking Submit Event.'}
                 </p>
             </main>
         </div>
