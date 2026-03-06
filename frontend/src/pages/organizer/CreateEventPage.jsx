@@ -531,7 +531,7 @@ const Step2Tickets = ({ form, onChange, errors = {} }) => {
                     {isFree && (
                         <div className="ml-12 mt-1 animate-in fade-in">
                             <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-                                Total Capacity
+                                Total Capacity <span className="text-red-400">*</span>
                             </label>
                             <input
                                 type="number"
@@ -539,8 +539,9 @@ const Step2Tickets = ({ form, onChange, errors = {} }) => {
                                 placeholder="e.g. 500"
                                 value={form.totalCapacity}
                                 onChange={(e) => onChange({ totalCapacity: e.target.value })}
-                                className="w-48 px-3 py-2 text-sm border border-[#4a9e9e]/40 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] bg-white transition"
+                                className={`w-48 px-3 py-2 text-sm border rounded-xl focus:outline-none focus:ring-2 bg-white transition ${errors.totalCapacity ? 'border-red-400 focus:ring-red-200' : 'border-[#4a9e9e]/40 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
                             />
+                            <FieldError msg={errors.totalCapacity} />
                             <p className="mt-1 text-xs text-gray-400">Total number of attendees for this free event</p>
                         </div>
                     )}
@@ -616,10 +617,10 @@ const Step3Agenda = ({ form, onChange, errors = {} }) => {
                 {/* Agenda items */}
                 <div className="space-y-4">
                     {form.agenda.length === 0 && (
-                        <div className="text-center py-10 text-gray-300">
-                            <ListOrdered size={36} className="mx-auto mb-3 opacity-40" />
-                            <p className="text-sm font-medium">No sessions yet</p>
-                            <p className="text-xs mt-1">Click &quot;Add Session&quot; to start building your agenda.</p>
+                        <div className={`text-center py-10 rounded-xl ${errors._agenda ? 'bg-red-50 border border-red-200 text-red-400' : 'text-gray-300'}`}>
+                            <ListOrdered size={36} className={`mx-auto mb-3 ${errors._agenda ? 'opacity-70' : 'opacity-40'}`} />
+                            <p className="text-sm font-medium">{errors._agenda || 'No sessions yet'}</p>
+                            <p className={`text-xs mt-1 ${errors._agenda ? 'text-red-300' : ''}`}>Click &quot;Add Session&quot; to start building your agenda.</p>
                         </div>
                     )}
 
@@ -743,7 +744,7 @@ const Step3Agenda = ({ form, onChange, errors = {} }) => {
             <div className="flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3">
                 <Info size={15} className="text-blue-400 mt-0.5 shrink-0" />
                 <p className="text-xs text-blue-500 leading-relaxed">
-                    <strong>Tip:</strong> You can skip this step — agenda is optional. Sessions will be shown to attendees on the event page in the order listed.
+                    <strong>Tip:</strong> At least one session is required. Sessions will be shown to attendees on the event page in the order listed.
                 </p>
             </div>
         </div>
@@ -855,15 +856,24 @@ const validateStep1 = (form) => {
 
 const validateStep2 = (form) => {
     const e = {};
-    form.tickets.forEach((t, idx) => {
-        if (!t.name.trim()) e[`ticket_${idx}_name`] = 'Ticket name is required';
-        if (!t.quantity || parseInt(t.quantity) <= 0) e[`ticket_${idx}_quantity`] = 'Quantity must be > 0';
-    });
+    if (form.isFree) {
+        if (!form.totalCapacity || parseInt(form.totalCapacity, 10) <= 0) {
+            e.totalCapacity = 'Total capacity is required for free events';
+        }
+    } else {
+        form.tickets.forEach((t, idx) => {
+            if (!t.name.trim()) e[`ticket_${idx}_name`] = 'Ticket name is required';
+            if (!t.quantity || parseInt(t.quantity) <= 0) e[`ticket_${idx}_quantity`] = 'Quantity must be > 0';
+        });
+    }
     return e;
 };
 
 const validateStep3 = (form) => {
     const e = {};
+    if (form.agenda.length === 0) {
+        e._agenda = 'At least one session is required';
+    }
     form.agenda.forEach((item, idx) => {
         if (!item.title.trim()) e[`agenda_${idx}_title`] = 'Session title is required';
         if (!item.startTime) e[`agenda_${idx}_startTime`] = 'Start time is required';
@@ -910,6 +920,7 @@ const CreateEventPage = () => {
             startTime: item.startTime,
             endTime: item.endTime,
             description: item.description || '',
+            location: item.location || '',
             speaker: item.speaker || '',
         })),
         draft: isDraft,
@@ -1086,7 +1097,7 @@ const CreateEventPage = () => {
                         ? 'Step 1 of 3: Provide basic info about your event to get started.'
                         : step === 2
                             ? 'Step 2 of 3: Configure your tickets and pricing.'
-                            : 'Step 3 of 3: Agenda is optional — you can skip it by clicking Submit Event.'}
+                            : 'Step 3 of 3: Add at least one session to your event agenda.'}
                 </p>
             </main>
         </div>
