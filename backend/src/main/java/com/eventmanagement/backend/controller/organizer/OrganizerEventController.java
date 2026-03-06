@@ -1,12 +1,22 @@
 package com.eventmanagement.backend.controller.organizer;
 
+import com.eventmanagement.backend.dto.request.CreateEventRequest;
+import com.eventmanagement.backend.dto.response.organizer.CreateEventResponse;
 import com.eventmanagement.backend.dto.response.organizer.OrganizerEventResponse;
 import com.eventmanagement.backend.dto.response.organizer.OrganizerEventStatsResponse;
+import com.eventmanagement.backend.exception.UnauthorizedException;
+import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.service.OrganizerEventService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -18,9 +28,19 @@ public class OrganizerEventController {
 
     private final OrganizerEventService organizerEventService;
 
-    /**
-     * Lấy danh sách event của organizer có phân trang
-     */
+    //endpoint for create event
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CreateEventResponse> createEvent(
+            @RequestPart("event") @Valid CreateEventRequest request,
+            @RequestPart(value = "coverFile", required = false) MultipartFile coverFile) {
+
+        User organizer = getAuthenticatedUser();
+
+        CreateEventResponse response = organizerEventService.createEvent(organizer, request, coverFile);
+        HttpStatus status = "DRAFT".equals(response.getStatus()) ? HttpStatus.OK : HttpStatus.CREATED;
+        return ResponseEntity.status(status).body(response);
+    }
+
     @GetMapping
     public ResponseEntity<Page<OrganizerEventResponse>> getMyEvents(
             @RequestParam UUID organizerId,
@@ -31,9 +51,6 @@ public class OrganizerEventController {
         return ResponseEntity.ok(events);
     }
 
-    /**
-     * Lấy thống kê event của organizer
-     */
     @GetMapping("/stats")
     public ResponseEntity<OrganizerEventStatsResponse> getMyEventStats(
             @RequestParam UUID organizerId) {
