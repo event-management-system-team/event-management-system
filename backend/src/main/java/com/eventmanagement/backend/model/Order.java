@@ -2,6 +2,7 @@ package com.eventmanagement.backend.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.eventmanagement.backend.constants.PaymentMethod;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
@@ -47,9 +48,10 @@ public class Order {
     @Builder.Default
     private OrderStatus status = OrderStatus.PENDING;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "payment_method", length = 50)
     @Builder.Default
-    private String paymentMethod = "VNPAY";
+    private PaymentMethod paymentMethod = PaymentMethod.VNPAY;
 
     @Column(name = "reserved_at")
     private LocalDateTime reservedAt;

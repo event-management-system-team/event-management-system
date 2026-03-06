@@ -161,6 +161,9 @@ public class BookingService {
                 }
                 ticketRepository.saveAll(tickets);
 
+                // Xóa reservation key để tránh tạo order trùng
+                redisTemplate.delete(reservationKey);
+
                 return OrderResponse.from(order);
         }
 

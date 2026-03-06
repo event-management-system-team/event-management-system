@@ -2,13 +2,13 @@
 package com.eventmanagement.backend.service;
 
 import com.eventmanagement.backend.config.VNPayConfig;
+import com.eventmanagement.backend.constants.OrderStatus;
 import com.eventmanagement.backend.constants.PaymentMethod;
 import com.eventmanagement.backend.constants.PaymentStatus;
 import com.eventmanagement.backend.dto.response.PaymentResponse;
 import com.eventmanagement.backend.exception.NotFoundException;
 import com.eventmanagement.backend.model.Order;
 import com.eventmanagement.backend.model.Payment;
-import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.repository.OrderRepository;
 import com.eventmanagement.backend.repository.PaymentRepository;
 import com.eventmanagement.backend.util.VNPayUtil;
@@ -43,7 +43,7 @@ public class PaymentService {
                                 .orElseThrow(() -> new NotFoundException(
                                                 "Order không tồn tại: " + orderCode));
 
-                if (order.getStatus().name().equals("PAID")) {
+                if (order.getStatus() == OrderStatus.CONFIRMED) {
                         throw new RuntimeException("Order đã được thanh toán.");
                 }
 
