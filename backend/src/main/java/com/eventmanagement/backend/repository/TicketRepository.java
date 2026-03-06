@@ -8,11 +8,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface TicketRepository extends JpaRepository<Ticket, UUID> {
+
     List<Ticket> findByOrderOrderId(UUID orderId);
 
     boolean existsByQrCode(String qrCode);
 
-    List<Ticket> findByUserId(UUID userId);
+    List<Ticket> findByUserUserId(UUID userId);
 
     Optional<Ticket> findByTicketCode(String ticketCode);
 

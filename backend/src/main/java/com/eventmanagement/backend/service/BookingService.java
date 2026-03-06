@@ -13,6 +13,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.eventmanagement.backend.constants.TicketStatus;
 import com.eventmanagement.backend.dto.request.CreateOrderRequest;
 import com.eventmanagement.backend.dto.request.ReservationRequest;
 import com.eventmanagement.backend.dto.response.OrderResponse;
@@ -121,7 +122,7 @@ public class BookingService {
                 Order order = Order.builder()
                                 .userId(userId)
                                 .eventId(ticketType.getEvent().getEventId())
-                                .orderCode(codeGenerator.generateOrderCode())
+                                .orderCode(generateCode.generateOrderCode())
                                 .status(OrderStatus.PENDING)
                                 .totalAmount(total)
                                 .expiresAt(LocalDateTime.now().plusSeconds(reservationTtl))
@@ -195,7 +196,7 @@ public class BookingService {
         public void cancelExpiredOrders() {
 
                 List<Order> expiredOrders = orderRepository
-                                .findExpiredPendingOrders(LocalDateTime.now());
+                                .findBy(LocalDateTime.now());
 
                 if (expiredOrders.isEmpty())
                         return;

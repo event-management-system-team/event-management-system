@@ -30,6 +30,9 @@ public class Order {
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
+    @Column(name = "order_code", unique = true, length = 50)
+    private String orderCode;
+
     @Column(name = "total_amount", precision = 15, scale = 2)
     @Builder.Default
     private BigDecimal totalAmount = BigDecimal.ZERO;
@@ -42,6 +45,15 @@ public class Order {
     @Column(name = "payment_method", length = 50)
     @Builder.Default
     private String paymentMethod = "VNPAY";
+
+    @Column(name = "expires_at")
+    private LocalDateTime expiresAt;
+
+    @Column(name = "paid_at")
+    private LocalDateTime paidAt;
+
+    @Column(name = "cancelled_at")
+    private LocalDateTime cancelledAt;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

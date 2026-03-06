@@ -1,8 +1,10 @@
 package com.eventmanagement.backend.model;
 
+import com.eventmanagement.backend.constants.TicketStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -25,8 +27,27 @@ public class Ticket {
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_id", nullable = false)
+    private Event event;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ticket_type_id", nullable = false)
     private TicketType ticketType;
+
+    @Column(name = "ticket_code", unique = true, nullable = false, length = 50)
+    private String ticketCode;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    @Builder.Default
+    private TicketStatus status = TicketStatus.PENDING;
+
+    @Column(name = "price", precision = 15, scale = 2)
+    private BigDecimal price;
 
     @Column(name = "qr_code", unique = true, length = 255)
     private String qrCode;
