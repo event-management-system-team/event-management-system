@@ -1,26 +1,42 @@
 package com.eventmanagement.backend.service;
 
 import com.eventmanagement.backend.constants.EventStatus;
+import com.eventmanagement.backend.dto.request.CreateEventRequest;
+import com.eventmanagement.backend.dto.response.organizer.CreateEventResponse;
 import com.eventmanagement.backend.dto.response.organizer.OrganizerEventResponse;
 import com.eventmanagement.backend.dto.response.organizer.OrganizerEventStatsResponse;
+import com.eventmanagement.backend.exception.BadRequestException;
+import com.eventmanagement.backend.exception.NotFoundException;
 import com.eventmanagement.backend.model.Event;
+import com.eventmanagement.backend.model.EventCategory;
 import com.eventmanagement.backend.model.TicketType;
+import com.eventmanagement.backend.model.User;
+import com.eventmanagement.backend.repository.EventCategoryRepository;
 import com.eventmanagement.backend.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.Normalizer;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrganizerEventService {
 
     private final EventRepository eventRepository;
@@ -57,11 +73,20 @@ public class OrganizerEventService {
 
         EventStatus status = request.isDraft() ? EventStatus.DRAFT : EventStatus.PENDING;
 
-        int totalCapacity = 0;
-        if (request.getTickets() != null) {
-            totalCapacity = request.getTickets().stream()
-                    .mapToInt(t -> t.getQuantity() != null ? t.getQuantity() : 0)
-                    .sum();
+        int totalCapacity;
+        if (request.isFree()) {
+            totalCapacity = request.getTotalCapacity() != null ? request.getTotalCapacity() : 0;
+        } else {
+            totalCapacity = request.getTickets() != null
+                    ? request.getTickets().stream()
+                            .mapToInt(t -> t.getQuantity() != null ? t.getQuantity() : 0)
+                            .sum()
+                    : 0;
+        }
+
+        Map<String, Object> locationCoordinates = null;
+        if (request.getLocationCoordinates() != null && !request.getLocationCoordinates().isEmpty()) {
+            locationCoordinates = new HashMap<>(request.getLocationCoordinates());
         }
 
         Event event = Event.builder()
@@ -71,6 +96,7 @@ public class OrganizerEventService {
                 .eventSlug(slug)
                 .description(request.getDescription())
                 .location(request.getLocation())
+                .locationCoordinates(locationCoordinates)
                 .startDate(startDateTime)
                 .endDate(endDateTime)
                 .bannerUrl(bannerUrl)
@@ -79,12 +105,19 @@ public class OrganizerEventService {
                 .status(status)
                 .build();
 
-        if (request.getTickets() != null) {
-            Set<TicketType> ticketTypes = new LinkedHashSet<>();
+        Set<TicketType> ticketTypes = new LinkedHashSet<>();
+        if (request.isFree()) {
+            TicketType freeTicket = TicketType.builder()
+                    .event(event)
+                    .ticketName("Free Admission")
+                    .quantity(totalCapacity)
+                    .price(BigDecimal.ZERO)
+                    .isActive(true)
+                    .build();
+            ticketTypes.add(freeTicket);
+        } else if (request.getTickets() != null) {
             for (CreateEventRequest.TicketRequest ticketReq : request.getTickets()) {
-                BigDecimal price = request.isFree() ? BigDecimal.ZERO
-                        : (ticketReq.getPrice() != null ? ticketReq.getPrice() : BigDecimal.ZERO);
-
+                BigDecimal price = ticketReq.getPrice() != null ? ticketReq.getPrice() : BigDecimal.ZERO;
                 TicketType ticketType = TicketType.builder()
                         .event(event)
                         .ticketName(ticketReq.getName())
@@ -94,8 +127,8 @@ public class OrganizerEventService {
                         .build();
                 ticketTypes.add(ticketType);
             }
-            event.setTicketTypes(ticketTypes);
         }
+        event.setTicketTypes(ticketTypes);
 
         Event saved = eventRepository.save(event);
 
