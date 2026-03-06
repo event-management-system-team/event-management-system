@@ -50,6 +50,7 @@ import { createEventsServicePlugin } from '@schedule-x/events-service'
 import 'temporal-polyfill/global'
 import '@schedule-x/theme-default/dist/index.css'
 import { CreateScheduleModal } from '../../components/domain/organizer/CreateScheduleModal.jsx';
+import { AddShiftModal } from '../../components/domain/organizer/AddShiftModal.jsx';
 
 export function StaffManagement() {
 
@@ -75,6 +76,8 @@ export function StaffManagement() {
     const [date, setDate] = useState(null);
     const [sortOption, setSortOption] = useState("newest");
     const [searchTerm, setSearchTerm] = useState("");
+    const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+    const [isShiftModalOpen, setIsShiftModalOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { alert, showAlert, closeAlert } = useAlert();
     const currentWeekStart = dayjs().startOf("week");
@@ -129,10 +132,10 @@ export function StaffManagement() {
         fetchAssignmentList()
     }, [id]);
 
-    const handleShiftClick = (shift, staff) => {
-        setSelectedShift({ ...shift, staff })
-        setIsEditShiftModalOpen(true)
-    }
+    // const handleShiftClick = (shift, staff) => {
+    //     setSelectedShift({ ...shift, staff })
+    //     setIsEditShiftModalOpen(true)
+    // }
 
     const getTopRightAction = () => {
         switch (activeTab) {
@@ -172,14 +175,14 @@ export function StaffManagement() {
                     <div className='flex gap-3'>
                         <Button
                             className="gap-2 bg-[#f7f7f7] hover:bg-[#B3C8CF] text-gray rounded-full px-5 py-5 h-12 w-40 border-1 border-gray-400"
-                            onClick={openModal}
+                            onClick={openScheduleModal}
                         >
                             <Calendar1 className="h-4 w-4" />
                             Create Schedule
                         </Button>
                         <Button
                             className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5 py-5 h-12 w-32"
-                        // onClick={openModal}
+                            onClick={openShiftModal}
                         >
                             <Plus className="h-4 w-4" />
                             Add Shift
@@ -257,12 +260,20 @@ export function StaffManagement() {
     //     setCurrentPage(p - 1);
     // };
 
-    const openModal = () => {
-        setIsModalOpen(true);
+    const openScheduleModal = () => {
+        setIsScheduleModalOpen(true)
     };
 
-    const closeModal = () => {
-        setIsModalOpen(false);
+    const openShiftModal = () => {
+        setIsShiftModalOpen(true)
+    };
+
+    const closeScheduleModal = () => {
+        setIsScheduleModalOpen(false);
+    };
+
+    const closeShiftModal = () => {
+        setIsShiftModalOpen(false);
     };
 
     // const formatDate = (isoString) => {
@@ -547,11 +558,19 @@ export function StaffManagement() {
                 />
             </div>
 
-            {/* Create Organizer Modal */}
+            {/* Create Schedule Modal */}
             <CreateScheduleModal
                 eventId={id}
-                isOpen={isModalOpen}
-                onClose={closeModal}
+                isOpen={isScheduleModalOpen}
+                onClose={closeScheduleModal}
+                onAlert={showAlert}
+            />
+
+            {/* Add Shift Modal */}
+            <AddShiftModal
+                eventId={id}
+                isOpen={isShiftModalOpen}
+                onClose={closeShiftModal}
                 onAlert={showAlert}
             />
         </div>
