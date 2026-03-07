@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { ScanLine } from 'lucide-react';
-import ConfirmCheckIn from '../../../../pages/staff/ConfirmCheckIn';
+import ConfirmCheckIn from './ConfirmCheckIn';
 import { Scanner } from '@yudiel/react-qr-scanner';
 import { message } from 'antd';
 
