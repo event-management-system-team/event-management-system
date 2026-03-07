@@ -286,12 +286,18 @@ public class OrganizerEventService {
     private OrganizerEventResponse mapToOrganizerResponse(Event event) {
         int totalSold = 0;
         int totalTickets = 0;
+        BigDecimal totalRevenue = BigDecimal.ZERO;
 
         if (event.getTicketTypes() != null) {
             for (TicketType ticket : event.getTicketTypes()) {
                 if (Boolean.TRUE.equals(ticket.getIsActive())) {
-                    totalSold += ticket.getSoldCount() != null ? ticket.getSoldCount() : 0;
+                    int sold = ticket.getSoldCount() != null ? ticket.getSoldCount() : 0;
+                    totalSold += sold;
                     totalTickets += ticket.getQuantity() != null ? ticket.getQuantity() : 0;
+                    if (ticket.getPrice() != null) {
+                        totalRevenue = totalRevenue.add(
+                                ticket.getPrice().multiply(BigDecimal.valueOf(sold)));
+                    }
                 }
             }
         }
@@ -309,6 +315,7 @@ public class OrganizerEventService {
                 .registeredCount(event.getRegisteredCount())
                 .totalSold(totalSold)
                 .totalTickets(totalTickets)
+                .totalRevenue(totalRevenue)
                 .categoryName(event.getCategory() != null ? event.getCategory().getCategoryName() : null)
                 .build();
     }
