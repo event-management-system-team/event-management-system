@@ -45,7 +45,7 @@ public class WorkspaceController {
         try {
             UUID staffId = currentUser.getUserId();
 
-            CheckInResponse response = checkInService.processCheckIn(eventSlug, request.getTicketId(), staffId);
+            CheckInResponse response = checkInService.processCheckIn(eventSlug, request, staffId);
             return ResponseEntity.ok(response);
 
         } catch (RuntimeException e) {

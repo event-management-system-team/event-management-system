@@ -1,6 +1,7 @@
 package com.eventmanagement.backend.service;
 
 import com.eventmanagement.backend.constants.TicketStatus;
+import com.eventmanagement.backend.dto.request.CheckInRequest;
 import com.eventmanagement.backend.dto.response.staff.CheckInResponse;
 import com.eventmanagement.backend.model.CheckIn;
 import com.eventmanagement.backend.model.Ticket;
@@ -25,20 +26,31 @@ public class CheckInService {
     private final UserRepository userRepository;
 
     @Transactional
-    public CheckInResponse processCheckIn(String eventSlug, UUID ticketId, UUID staffId) {
+    public CheckInResponse processCheckIn(String eventSlug, CheckInRequest request, UUID staffId) {
 
-        Ticket ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new RuntimeException("Not found ticket in system"));
+        Ticket ticket =null;
+
+        if (request.getTicketId() != null) {
+            ticket = ticketRepository.findById(request.getTicketId())
+                    .orElseThrow(() -> new RuntimeException("Ticket code invalid or does not exist!"));
+        }
+        else if (request.getTicketCode() != null && !request.getTicketCode().trim().isEmpty()) {
+            ticket = ticketRepository.findByTicketCode(request.getTicketCode())
+                    .orElseThrow(() -> new RuntimeException("Ticket code invalid or does not exist!"));
+        }
+        else {
+            throw new RuntimeException("Please provide Ticket ID or Ticket Code!");
+        }
 
         if (!ticket.getEvent().getEventSlug().equals(eventSlug)) {
-            throw new RuntimeException("Not found ticket in system");
+            throw new RuntimeException("Ticket code invalid or does not exist!");
         }
 
         if (ticket.getStatus() == TicketStatus.CHECKED_IN) {
             throw new RuntimeException("The ticket has been used!!");
         }
         if (ticket.getStatus() != TicketStatus.PAID) {
-            throw new RuntimeException("Invalid ticket");
+            throw new RuntimeException("Ticket code invalid or does not exist!");
         }
 
         User staff = userRepository.getReferenceById(staffId);

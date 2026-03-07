@@ -77,7 +77,7 @@ const PopUpInfoTicket = ({
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 mt-1 shadow-sm">
+                <div className="grid grid-cols-2 gap-3 mt-1">
                     <div className="bg-[#89A8B2]/5 p-3.5 rounded-2xl border border-[#89A8B2]/20 flex flex-col gap-1 items-start">
                         <div className="flex items-center gap-1.5 text-slate-500 mb-1">
                             <TagOutlined className="text-[#89A8B2]" />

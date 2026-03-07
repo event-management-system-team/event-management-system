@@ -11,6 +11,10 @@ const staffService = {
         if (keyword) params.append('keyword', keyword);
         const response = await axiosInstance.get(`/staff/${eventSlug}/ticket-list?${params.toString()}`)
         return response.data
+    },
+    checkInAttendee: async (eventSlug, request) => {
+        const response = await axiosInstance.post(`/staff/${eventSlug}/check-in`, request)
+        return response.data
     }
 }
 

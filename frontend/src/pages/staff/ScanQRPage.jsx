@@ -4,20 +4,12 @@ import ScannerCamera from '../../components/domain/staff/scanner-qr/ScannerCamer
 import SearchTicket from '../../components/domain/staff/scanner-qr/SearchTicket';
 import EventInfo from '../../components/domain/staff/scanner-qr/EventInfo';
 import CheckInStats from '../../components/domain/staff/scanner-qr/CheckInStats';
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { useQuery, keepPreviousData, useQueryClient, useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import staffService from '../../services/staff.service'
 import LoadingState from '../../components/common/LoadingState';
 import EmptyState from '../../components/common/EmptyState';
 
-
-// Mock data (Nên tách ra 1 file constant hoặc fetch từ useQuery)
-const mockAttendees = [
-    { id: '839210', name: 'Sarah Miller', type: 'VIP Access', status: 'CHECKED_IN', time: 'Just now', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=facearea&facepad=2&w=100&h=100&q=80' },
-    { id: '839112', name: 'David Mitchell', type: 'General Admission', status: 'PENDING', time: '', avatar: null },
-    { id: '839005', name: 'James Wilson', type: 'General Admission', status: 'ERROR', time: '10:45 AM', errorMsg: 'ALREADY SCANNED', avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=facearea&facepad=2&w=100&h=100&q=80' },
-    { id: '839441', name: 'Emma Thompson', type: 'Press', status: 'PENDING', time: '', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=facearea&facepad=2&w=100&h=100&q=80' }
-];
 
 const ticketStats = [
     { type: 'General Admission', icon: Ticket, total: 800, checkedIn: 320, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
@@ -31,28 +23,47 @@ const ScanQRPage = () => {
     const { eventSlug } = useParams();
 
     const [searchParams, setSearchParams] = useSearchParams();
+    const queryClient = useQueryClient();
 
     const searchKeyword = searchParams.get('keyword') || '';
-    const [keyword, setKeyword] = useState(searchKeyword);
 
-    const { data: tickets, isLoading, isError } = useQuery({
-        queryKey: ['event', 'tickets', searchKeyword],
+
+    const { data: tickets, isLoading: isTicketsLoading, isError: isTicketsError } = useQuery({
+        queryKey: ['event', 'tickets', eventSlug, searchKeyword],
         queryFn: () => staffService.searchEventTickets(eventSlug, searchKeyword),
         placeholderData: keepPreviousData
     })
 
-    if (isLoading) return <LoadingState />
-    if (!tickets || isError) return <EmptyState className='h-[600px]' />
+    const checkInMutation = useMutation({
+        mutationFn: (request) => staffService.checkInAttendee(eventSlug, request),
+        onSuccess: (response) => {
+            alert('Check-in successful for: ' + response.customerName);
 
-    const handleSearch = () => {
+            queryClient.invalidateQueries({ queryKey: ['event', 'tickets', eventSlug] });
+        },
+        onError: (error) => {
+            alert(error.response?.data?.message || 'Check-in fail!');
+        }
+    });
+
+    const handleSearch = (keyword) => {
         const params = new URLSearchParams();
         if (keyword.trim()) params.append('keyword', keyword.trim());
         setSearchParams(params);
     }
 
-    const handleKeyDown = (e) => {
-        if (e.key === "Enter") handleSearch();
+
+    const handleSearchCheckIn = (ticketId) => {
+        checkInMutation.mutate({ ticketId });
     }
+
+    const handleScanCheckIn = (ticketCode) => {
+        checkInMutation.mutate({ ticketCode });
+    }
+
+    if (isTicketsLoading) return <LoadingState />
+    if (!tickets || isTicketsError) return <EmptyState className='h-[600px]' />
+
 
 
     return (
@@ -71,11 +82,10 @@ const ScanQRPage = () => {
                 <ScannerCamera />
                 <SearchTicket
                     tickets={tickets}
-                    handleKeyDown={handleKeyDown}
-                    searchParams={searchParams}
-                    setSearchParams={setSearchParams}
-                    setKeyword={setKeyword}
-                    keyword={keyword}
+                    handleSearch={handleSearch}
+                    searchKeyword={searchKeyword}
+                    onCheckIn={handleSearchCheckIn}
+                    isCheckingIn={checkInMutation.isPending}
                 />
             </div>
 

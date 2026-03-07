@@ -2,9 +2,14 @@ import React, { useState } from 'react';
 import { Search, CheckCircle2, AlertCircle, UserCheck } from 'lucide-react';
 import PopUpInfoTicket from './PopUpInfoTicket';
 
-const SearchTicket = ({ tickets, setKeyword, keyword, handleKeyDown }) => {
+const SearchTicket = ({ tickets, searchKeyword, handleSearch, onCheckIn, isCheckingIn }) => {
+    const [keyword, setKeyword] = useState(searchKeyword);
     const [selectedTicket, setSelectedTicket] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
+
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter") handleSearch(keyword);
+    }
 
     const handleTicketClick = (ticket) => {
         setSelectedTicket(ticket);
@@ -12,9 +17,7 @@ const SearchTicket = ({ tickets, setKeyword, keyword, handleKeyDown }) => {
     };
 
     const handleCheckIn = (ticket) => {
-        // Here you will handle the API call to check-in the ticket.
-        // For example: await staffService.checkInTicket(ticket.ticketCode);
-        console.log('Checking in... ', ticket);
+        onCheckIn(ticket.ticketId)
         setIsModalVisible(false);
     };
 
