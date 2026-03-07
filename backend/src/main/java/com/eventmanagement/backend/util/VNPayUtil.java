@@ -40,6 +40,7 @@ public class VNPayUtil {
                     String value = encode
                             ? URLEncoder.encode(
                                     entry.getValue(), StandardCharsets.UTF_8)
+                                    .replace("+", "%20")
                             : entry.getValue();
                     return entry.getKey() + "=" + value;
                 })

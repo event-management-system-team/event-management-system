@@ -27,6 +27,8 @@ public class OrderResponse {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
+    private boolean free;
+
     public static OrderResponse from(Order order) {
         OrderResponse response = new OrderResponse();
         response.setOrderId(order.getOrderId());
@@ -35,6 +37,7 @@ public class OrderResponse {
         response.setStatus(order.getStatus());
         response.setExpiresAt(order.getExpiresAt());
         response.setCreatedAt(order.getCreatedAt());
+        response.setFree(order.getTotalAmount().compareTo(BigDecimal.ZERO) == 0);
         return response;
     }
 }

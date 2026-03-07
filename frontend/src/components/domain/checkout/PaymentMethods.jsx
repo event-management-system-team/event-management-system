@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { MdPayments } from "react-icons/md";
+import { HiCheckCircle } from "react-icons/hi2";
 
-const PaymentMethods = () => {
+const PaymentMethods = ({ isFree }) => {
   const [selected, setSelected] = useState("vnpay");
 
   const methods = [
@@ -13,6 +14,27 @@ const PaymentMethods = () => {
     },
   ];
 
+  // Free event — no payment required
+  if (isFree) {
+    return (
+      <section className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+          <MdPayments className="text-[#89A8B2] size-5" /> Payment Method
+        </h2>
+        <div className="flex items-center gap-4 p-5 rounded-xl bg-green-50 border border-green-100">
+          <HiCheckCircle className="size-10 text-green-500 shrink-0" />
+          <div>
+            <p className="font-bold text-green-800 text-base">Free Admission</p>
+            <p className="text-sm text-green-600 mt-0.5">
+              No payment required — click "Confirm" to get your ticket instantly.
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Paid event — VNPay selector
   return (
     <section className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
       <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
@@ -23,22 +45,24 @@ const PaymentMethods = () => {
           <label
             key={method.id}
             onClick={() => setSelected(method.id)}
-            className={`relative flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all ${selected === method.id ? "border-[#89A8B2] bg-[#89A8B2]/5" : "border-gray-100"}`}
+            className={`relative flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all ${
+              selected === method.id
+                ? "border-[#89A8B2] bg-[#89A8B2]/5"
+                : "border-gray-100"
+            }`}
           >
             <div className="flex items-center gap-4 w-full">
               <div className="size-12 rounded bg-white flex items-center justify-center p-2 border border-gray-100">
-                <img
-                  src={method.icon}
-                  alt={method.name}
-                  className="max-h-full"
-                />
+                <img src={method.icon} alt={method.name} className="max-h-full" />
               </div>
               <div className="flex-1">
                 <p className="font-bold">{method.name}</p>
                 <p className="text-xs text-gray-500">{method.desc}</p>
               </div>
               <div
-                className={`size-5 rounded-full border-2 flex items-center justify-center ${selected === method.id ? "border-[#89A8B2]" : "border-gray-300"}`}
+                className={`size-5 rounded-full border-2 flex items-center justify-center ${
+                  selected === method.id ? "border-[#89A8B2]" : "border-gray-300"
+                }`}
               >
                 {selected === method.id && (
                   <div className="size-2.5 rounded-full bg-[#89A8B2]" />

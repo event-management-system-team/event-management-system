@@ -54,7 +54,7 @@ const SidebarTicket = ({ minPrice, ticketTypes, event }) => {
           bannerUrl: event?.bannerUrl,
         }),
       );
-      navigate("/checkout");
+      navigate("/attendee/checkout");
       return;
     }
 
@@ -92,7 +92,7 @@ const SidebarTicket = ({ minPrice, ticketTypes, event }) => {
           bannerUrl: event?.bannerUrl,
         }),
       );
-      navigate("/checkout");
+      navigate("/attendee/checkout");
     } catch (error) {
       console.error(error);
     }
@@ -236,7 +236,9 @@ const SidebarTicket = ({ minPrice, ticketTypes, event }) => {
                 <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce [animation-delay:-0.15s]" />
                 <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" />
               </span>
-              <span className="text-sm tracking-widest font-bold">Securing your seats...</span>
+              <span className="text-sm tracking-widest font-bold">
+                Securing your seats...
+              </span>
             </span>
           ) : !ticketTypes || ticketTypes.length === 0 ? (
             "Register Now"
@@ -249,10 +251,12 @@ const SidebarTicket = ({ minPrice, ticketTypes, event }) => {
           )}
         </button>
 
-        <div className="mt-4 flex items-center justify-center gap-2 text-[10px] text-slate-500 uppercase tracking-widest font-bold">
-          <Lock className="w-3 h-3" />
-          Safe payment via VNPay
-        </div>
+        {subTotal > 0 && (
+          <div className="mt-4 flex items-center justify-center gap-2 text-[10px] text-slate-500 uppercase tracking-widest font-bold">
+            <Lock className="w-3 h-3" />
+            Safe payment via VNPay
+          </div>
+        )}
       </div>
     </div>
   );

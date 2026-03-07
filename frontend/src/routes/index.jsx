@@ -22,9 +22,11 @@ const AppRoutes = () => {
       {/* Organizer Routes */}
       <Route path="/organizer/*" element={<OrganizerRoutes />} />
 
-      {/* Public/Protected Routes */}
-      <Route path="/*" element={<PublicRoutes />} />
+      {/* Attendee Routes — must be before wildcard */}
       <Route path="/attendee/*" element={<AttendeeRoutes />} />
+
+      {/* Public/Protected Routes (wildcard catch-all — must be last) */}
+      <Route path="/*" element={<PublicRoutes />} />
 
     </Routes>
   );

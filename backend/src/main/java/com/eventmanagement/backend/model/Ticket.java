@@ -40,7 +40,7 @@ public class Ticket {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ticket_type_id", nullable = false)
+    @JoinColumn(name = "ticket_type_id", nullable = true)
     private TicketType ticketType;
 
     @Column(name = "ticket_code", unique = true, nullable = false, length = 100)

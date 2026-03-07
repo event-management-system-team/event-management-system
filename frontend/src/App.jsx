@@ -4,7 +4,6 @@ import { autoRefreshToken } from "./store/slices/auth.slice";
 
 import AppRoutes from "./routes";
 import LoadingState from "./components/common/LoadingState";
-import CheckoutPage from "./pages/attendee/CheckoutPage";
 import { EventDetail } from "./pages/admin/EventDetail";
 
 function App() {

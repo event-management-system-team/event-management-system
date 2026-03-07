@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eventmanagement.backend.constants.OrderStatus;
+import com.eventmanagement.backend.constants.PaymentMethod;
 import com.eventmanagement.backend.constants.TicketStatus;
 import com.eventmanagement.backend.dto.request.CreateOrderRequest;
 import com.eventmanagement.backend.dto.request.ReservationRequest;
@@ -28,6 +29,7 @@ import com.eventmanagement.backend.model.Order;
 import com.eventmanagement.backend.model.Ticket;
 import com.eventmanagement.backend.model.TicketType;
 import com.eventmanagement.backend.model.User;
+import com.eventmanagement.backend.repository.EventRepository;
 import com.eventmanagement.backend.repository.OrderRepository;
 import com.eventmanagement.backend.repository.TicketRepository;
 import com.eventmanagement.backend.repository.TicketTypeRepository;
@@ -43,6 +45,7 @@ public class BookingService {
         private final RedisTemplate<String, Object> redisTemplate;
         private final RedissonClient redissonClient;
         private final TicketTypeRepository ticketTypeRepository;
+        private final EventRepository eventRepository;
         private final OrderRepository orderRepository;
         private final TicketRepository ticketRepository;
         private final UserRepository userRepository;
@@ -104,6 +107,55 @@ public class BookingService {
         public OrderResponse createOrder(
                         CreateOrderRequest request, UUID userId) {
 
+                User user = userRepository.findById(userId)
+                                .orElseThrow(() -> new NotFoundException("User not found"));
+
+                // ── FREE EVENT (no TicketType) ─────────────────────────────────────────
+                if (request.getTicketTypeId() == null) {
+                        if (request.getEventId() == null) {
+                                throw new RuntimeException("eventId is required for free events.");
+                        }
+
+                        com.eventmanagement.backend.model.Event event = eventRepository
+                                        .findById(request.getEventId())
+                                        .orElseThrow(() -> new NotFoundException("Event not found"));
+
+                        Order order = Order.builder()
+                                        .user(user)
+                                        .event(event)
+                                        .orderCode(generateCode.generateOrderCode())
+                                        .status(OrderStatus.PENDING)
+                                        .paymentMethod(PaymentMethod.FREE)
+                                        .totalAmount(BigDecimal.ZERO)
+                                        .build();
+                        orderRepository.save(order);
+
+                        Map<String, Object> attendeeInfo = new HashMap<>();
+                        attendeeInfo.put("name", request.getFullName());
+                        attendeeInfo.put("email", request.getEmail());
+
+                        List<Ticket> tickets = new ArrayList<>();
+                        for (int i = 0; i < request.getQuantity(); i++) {
+                                Ticket ticket = Ticket.builder()
+                                                .order(order)
+                                                .event(event)
+                                                .user(user)
+                                                .ticketCode(generateCode.generateTicketCode())
+                                                .status(TicketStatus.PENDING)
+                                                .price(BigDecimal.ZERO)
+                                                .attendeeInfo(attendeeInfo)
+                                                .build();
+                                tickets.add(ticket);
+                        }
+                        ticketRepository.saveAll(tickets);
+
+                        // Auto-confirm immediately — no payment needed
+                        confirmOrderInternal(order, tickets);
+
+                        return OrderResponse.from(order);
+                }
+
+                // ── PAID EVENT (has TicketType) ────────────────────────────────────────
                 String reservationKey = buildReservationKey(
                                 request.getTicketTypeId(), userId);
                 Object cached = redisTemplate.opsForValue().get(reservationKey);
@@ -118,10 +170,6 @@ public class BookingService {
                         throw new RuntimeException(
                                         "Ticket quantity is invalid. Please select tickets again.");
                 }
-
-                User user = userRepository.findById(userId)
-                                .orElseThrow(() -> new NotFoundException(
-                                                "User not found"));
 
                 TicketType ticketType = ticketTypeRepository
                                 .findById(request.getTicketTypeId())
@@ -161,7 +209,6 @@ public class BookingService {
                 }
                 ticketRepository.saveAll(tickets);
 
-                // Xóa reservation key để tránh tạo order trùng
                 redisTemplate.delete(reservationKey);
 
                 return OrderResponse.from(order);
@@ -178,10 +225,6 @@ public class BookingService {
                         throw new RuntimeException("Order is already processed.");
                 }
 
-                order.setStatus(OrderStatus.CONFIRMED);
-                order.setPaidAt(LocalDateTime.now());
-                orderRepository.save(order);
-
                 List<Ticket> tickets = ticketRepository
                                 .findByOrderOrderId(order.getOrderId());
 
@@ -190,25 +233,41 @@ public class BookingService {
                                         "Not found: " + orderCode);
                 }
 
+                confirmOrderInternal(order, tickets);
+        }
+
+        /**
+         * Shared confirm logic — used by VNPay callback and free-ticket auto-confirm.
+         */
+        private void confirmOrderInternal(Order order, List<Ticket> tickets) {
+
+                order.setStatus(OrderStatus.CONFIRMED);
+                order.setPaidAt(LocalDateTime.now());
+                orderRepository.save(order);
+
                 tickets.forEach(t -> {
                         t.setStatus(TicketStatus.CONFIRMED);
                         t.setQrCodeUrl(buildQrCode(t.getTicketCode()));
                 });
                 ticketRepository.saveAll(tickets);
 
-                UUID ticketTypeId = tickets.get(0).getTicketType().getTicketTypeId();
-                int updated = ticketTypeRepository.confirmTickets(
-                                ticketTypeId, tickets.size());
+                // Only update sold/reserved counts for paid tickets (free tickets have no
+                // TicketType)
+                if (!tickets.isEmpty() && tickets.get(0).getTicketType() != null) {
+                        UUID ticketTypeId = tickets.get(0).getTicketType().getTicketTypeId();
+                        int updated = ticketTypeRepository.confirmTickets(
+                                        ticketTypeId, tickets.size());
 
-                if (updated == 0) {
-                        throw new RuntimeException(
-                                        "Failed to update ticket counts. Please check the order details.");
+                        if (updated == 0) {
+                                throw new RuntimeException(
+                                                "Failed to update ticket counts.");
+                        }
+
+                        String reservationKey = buildReservationKey(
+                                        ticketTypeId,
+                                        order.getUser().getUserId());
+                        redisTemplate.delete(reservationKey);
                 }
-
-                String reservationKey = buildReservationKey(
-                                ticketTypeId,
-                                order.getUser().getUserId());
-                redisTemplate.delete(reservationKey);
         }
 
         @Scheduled(fixedRate = 60_000)
