@@ -10,6 +10,7 @@ import com.eventmanagement.backend.repository.CheckInRepository;
 import com.eventmanagement.backend.repository.TicketRepository;
 import com.eventmanagement.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,9 +25,11 @@ public class CheckInService {
     private final CheckInRepository checkInRepository;
     private final TicketRepository ticketRepository;
     private final UserRepository userRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional
     public CheckInResponse processCheckIn(String eventSlug, CheckInRequest request, UUID staffId) {
+
 
         Ticket ticket =null;
 
@@ -67,7 +70,11 @@ public class CheckInService {
         ticket.setStatus(TicketStatus.CHECKED_IN);
         ticketRepository.save(ticket);
 
-    return mapToResponse(checkIn,ticket, staff);
+        CheckInResponse response = mapToResponse(checkIn,ticket, staff);
+
+        messagingTemplate.convertAndSend("/topic/event/" + eventSlug + "/checkin", response);
+
+    return response;
 
     }
 

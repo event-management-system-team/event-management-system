@@ -1,5 +1,6 @@
 package com.eventmanagement.backend.repository;
 
+import com.eventmanagement.backend.constants.TicketStatus;
 import com.eventmanagement.backend.model.Ticket;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,5 +22,7 @@ public interface TicketRepository extends JpaRepository<Ticket, UUID> {
     List<Ticket> searchTicketsByKeyword(@Param("eventSlug") String eventSlug, @Param("keyword") String keyword);
 
     Optional<Ticket> findByTicketCode(String ticketCode);
+
+    long countByTicketType_TicketTypeIdAndStatus(UUID ticketTypeTicketTypeId, TicketStatus status);
 
 }

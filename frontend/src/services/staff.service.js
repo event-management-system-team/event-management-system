@@ -15,6 +15,10 @@ const staffService = {
     checkInAttendee: async (eventSlug, request) => {
         const response = await axiosInstance.post(`/staff/${eventSlug}/check-in`, request)
         return response.data
+    },
+    getCurrentCheckIn: async (eventSlug) => {
+        const response = await axiosInstance.get(`staff/${eventSlug}/ticket-type-list`)
+        return response.data
     }
 }
 

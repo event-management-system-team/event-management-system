@@ -1,53 +1,124 @@
-import React from 'react';
+import { Flex, Progress, Tag, Typography } from 'antd';
+import { Ticket, Star } from 'lucide-react';
+import { useMemo } from 'react';
+
+
+const { Text } = Typography;
 
 const CheckInStats = ({ ticketStats }) => {
+
+    const getTicketUI = (ticketName) => {
+        const name = (ticketName || '').toLowerCase();
+
+        if (name.includes('vip')) {
+            return { icon: Star, bg: 'bg-purple-50', border: 'border-purple-100', color: 'text-purple-500' };
+        }
+
+        return { icon: Ticket, bg: 'bg-blue-50', border: 'border-blue-100', color: 'text-blue-500' };
+    };
+
+
+    const { totalSold, totalCheckIn, percentage } = useMemo(() => {
+        if (!ticketStats || ticketStats.length === 0) return { totalSold: 0, totalCheckIn: 0, percentage: 0 };
+
+        const sold = ticketStats.reduce((sum, ticket) => sum + ticket.soldCount, 0);
+        const checkIn = ticketStats.reduce((sum, ticket) => sum + ticket.checkInCount, 0);
+        const percent = sold === 0 ? 0 : ((checkIn / sold) * 100).toFixed(1);
+
+        return { totalSold: sold, totalCheckIn: checkIn, percentage: percent };
+    }, [ticketStats]);
+
+
     return (
         <div className="bg-white rounded-3xl flex flex-col shadow-sm border border-slate-100 p-6 h-fit sticky top-0 transition-all flex-1">
-            <div className="flex flex-col gap-5">
-                <div className="flex justify-between items-end mb-2">
-                    <div className="flex flex-col">
-                        <h3 className="text-slate-500 text-xs font-extrabold uppercase tracking-wider">Total Check-In Progress</h3>
-                        <div className="flex items-baseline gap-1 mt-1">
-                            <span className="text-5xl font-black text-[#2C3E50] tracking-tight">450</span>
-                            <span className="text-lg text-slate-400 font-bold">/ 1,200</span>
+            <Flex vertical gap="middle">
+                <Flex justify="space-between" align="flex-end">
+                    <Flex vertical>
+                        <Text
+                            type="secondary"
+                            strong
+                            style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}
+                        >
+                            Total Check-In Progress
+                        </Text>
+
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: '4px' }}>
+                            <span style={{ fontSize: '48px', fontWeight: 900, color: '#2C3E50', lineHeight: 1 }}>
+                                {totalCheckIn}
+                            </span>
+                            <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#94a3b8' }}>
+                                / {totalSold}
+                            </span>
                         </div>
-                    </div>
-                    <div className="bg-green-50 text-green-700 px-3 py-1.5 rounded-lg text-sm font-extrabold border border-green-100 shadow-sm">
-                        37.5%
-                    </div>
-                </div>
+                    </Flex>
 
-                <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden shadow-inner mb-2">
-                    <div className="h-full bg-gradient-to-r from-[#89A8B2] to-[#4ECDC4] rounded-full relative" style={{ width: '37.5%' }}>
-                        <div className="absolute top-0 bottom-0 left-0 right-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-100%] animate-[pulse_2s_infinite]"></div>
-                    </div>
-                </div>
+                    <Tag
+                        color="success"
+                        style={{
+                            margin: 0,
+                            padding: '4px 12px',
+                            fontSize: '14px',
+                            fontWeight: 'bold',
+                            borderRadius: '8px'
+                        }}
+                    >
+                        {percentage}%
+                    </Tag>
+                </Flex>
 
-                <div className="flex flex-col gap-4 pt-5 border-t border-slate-100">
-                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Ticket Type Breakdown</h4>
-                    {ticketStats.map((stat, index) => {
-                        const IconComp = stat.icon;
-                        return (
-                            <div key={index} className="flex items-center justify-between group">
-                                <div className="flex items-center gap-3">
-                                    <div className={`size-8 rounded-lg ${stat.bg} flex items-center justify-center border ${stat.border}`}>
-                                        <IconComp size={16} className={stat.color} />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <p className="text-[#2C3E50] text-sm font-bold">{stat.type}</p>
-                                        <p className="text-[10px] text-slate-400 font-medium">Total: {stat.total}</p>
-                                    </div>
+
+                <Progress
+                    percent={percentage}
+                    showInfo={false}
+                    status="active"
+                    strokeColor={{ '0%': '#89A8B2', '100%': '#4ECDC4' }}
+                    size={['100%', 12]}
+                />
+            </Flex>
+            <div style={{ paddingTop: '20px', borderTop: '1px solid #f1f5f9' }}>
+                <Text
+                    type="secondary"
+                    strong
+                    style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '16px' }}
+                >
+                    Ticket Type Breakdown
+                </Text>
+
+                {ticketStats?.map((stat) => {
+                    const ui = getTicketUI(stat.ticketName);
+                    const IconComp = ui.icon;
+
+                    return (
+                        <Flex key={stat.ticketTypeId} justify="space-between" align="center">
+                            <Flex align="center" gap="12px">
+                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center border ${ui.bg} ${ui.border}`}>
+                                    <IconComp size={16} className={ui.color} />
                                 </div>
-                                <div className="text-right">
-                                    <span className="text-[#2C3E50] font-black text-sm">{stat.checkedIn}</span>
-                                    <span className="text-xs text-slate-400 font-medium"> in</span>
-                                </div>
+
+                                <Flex vertical>
+                                    <Text strong style={{ color: '#2C3E50', fontSize: '14px', lineHeight: 1.2 }}>
+                                        {stat.ticketName}
+                                    </Text>
+                                    <Text type="secondary" style={{ fontSize: '10px', fontWeight: 500 }}>
+                                        Total: {stat.soldCount}
+                                    </Text>
+                                </Flex>
+                            </Flex>
+
+                            <div style={{ textAlign: 'right' }}>
+                                <Text strong style={{ color: '#2C3E50', fontSize: '14px', fontWeight: 900 }}>
+                                    {stat.checkInCount}
+                                </Text>
+                                <Text type="secondary" style={{ fontSize: '12px', fontWeight: 500, marginLeft: '4px' }}>
+                                    in
+                                </Text>
                             </div>
-                        );
-                    })}
-                </div>
+                        </Flex>
+                    );
+                })}
             </div>
         </div>
+
     );
 };
 

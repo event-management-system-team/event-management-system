@@ -1,17 +1,16 @@
 package com.eventmanagement.backend.service;
 
+import com.eventmanagement.backend.constants.TicketStatus;
 import com.eventmanagement.backend.dto.response.staff.ResourceResponse;
 import com.eventmanagement.backend.dto.response.staff.ScheduleResponse;
+import com.eventmanagement.backend.dto.response.staff.TicketTypeStaffResponse;
 import com.eventmanagement.backend.dto.response.staff.WorkspaceResponse;
 import com.eventmanagement.backend.model.*;
-import com.eventmanagement.backend.repository.EventResourceRepository;
-import com.eventmanagement.backend.repository.EventStaffRepository;
-import com.eventmanagement.backend.repository.StaffAssignmentRepository;
+import com.eventmanagement.backend.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -23,6 +22,8 @@ public class WorkspaceService {
     private final EventStaffRepository eventStaffRepo;
     private final StaffAssignmentRepository assignmentRepo;
     private final EventResourceRepository resourceRepo;
+    private final TicketTypeRepository ticketTypeRepo;
+    private final TicketRepository ticketRepo;
 
     @Transactional(readOnly = true)
     public WorkspaceResponse getWorkspaceData(String eventSlug, UUID userId) {
@@ -40,6 +41,25 @@ public class WorkspaceService {
         return mapToResponse(assignments, resources, eventStaff, user, event);
 
     }
+
+    public List<TicketTypeStaffResponse> getTicketType(String eventSlug) {
+        List<TicketType> ticketTypes = ticketTypeRepo.findByEvent_EventSlugAndIsActiveTrue(eventSlug);
+
+
+        List<TicketTypeStaffResponse> responses = ticketTypes.stream().map(
+                (ticketType) -> {
+                    long checkedInTickets = ticketRepo.countByTicketType_TicketTypeIdAndStatus(ticketType.getTicketTypeId(), TicketStatus.CHECKED_IN);
+                    return TicketTypeStaffResponse.builder()
+                            .ticketTypeId(ticketType.getTicketTypeId())
+                            .ticketName(ticketType.getTicketName())
+                            .soldCount(ticketType.getSoldCount())
+                            .checkInCount(checkedInTickets)
+                            .build();
+
+                }).collect(Collectors.toList());
+        return responses;
+    }
+
 
     private WorkspaceResponse mapToResponse(List<StaffAssignment> assignments, List<EventResource> resources,
                                             EventStaff eventStaff, User user, Event event) {
@@ -81,7 +101,6 @@ public class WorkspaceService {
                 .endDate(event.getEndDate())
                 .bannerUrl(event.getBannerUrl())
                 .build();
-
 
         return WorkspaceResponse.builder()
                 .eventStaffId(eventStaff.getEventStaffId())
