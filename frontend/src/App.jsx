@@ -5,8 +5,9 @@ import { autoRefreshToken } from "./store/slices/auth.slice";
 import AppRoutes from "./routes";
 import LoadingState from "./components/common/LoadingState";
 import { EventDetail } from "./pages/admin/EventDetail";
+import PaymentStatus from "./pages/attendee/PaymentSuccess";
 
-function App() {
+/*function App() {
   const hasRefreshed = useRef(false);
   const dispatch = useDispatch();
   const { appLoading } = useSelector((state) => state.auth);
@@ -24,10 +25,10 @@ function App() {
   return <AppRoutes />;
 }
 
-export default App;
+export default App;*/
 
-/*function App() {
-  return <EventDetail />;
+function App() {
+  return <PaymentStatus />;
 }
 
-export default App;*/
+export default App
