@@ -1,11 +1,11 @@
 import { useParams, useOutletContext, useSearchParams } from 'react-router-dom';
 import { Ticket, Star, Mic } from 'lucide-react';
+import { message } from 'antd';
 import ScannerCamera from '../../components/domain/staff/scanner-qr/ScannerCamera';
 import SearchTicket from '../../components/domain/staff/scanner-qr/SearchTicket';
 import EventInfo from '../../components/domain/staff/scanner-qr/EventInfo';
 import CheckInStats from '../../components/domain/staff/scanner-qr/CheckInStats';
 import { useQuery, keepPreviousData, useQueryClient, useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
 import staffService from '../../services/staff.service'
 import LoadingState from '../../components/common/LoadingState';
 import EmptyState from '../../components/common/EmptyState';
@@ -37,12 +37,12 @@ const ScanQRPage = () => {
     const checkInMutation = useMutation({
         mutationFn: (request) => staffService.checkInAttendee(eventSlug, request),
         onSuccess: (response) => {
-            alert('Check-in successful for: ' + response.customerName);
+            message.success(`Check-in successful for: ${response.customerName}`);
 
             queryClient.invalidateQueries({ queryKey: ['event', 'tickets', eventSlug] });
         },
         onError: (error) => {
-            alert(error.response?.data?.message || 'Check-in fail!');
+            message.error(error.response?.data?.message || 'Check-in failed!')
         }
     });
 
@@ -61,6 +61,18 @@ const ScanQRPage = () => {
         checkInMutation.mutate({ ticketCode });
     }
 
+    const handleVerifyTicket = async (ticketCode) => {
+        const data = await staffService.searchEventTickets(eventSlug, ticketCode);
+        const ticket = data.find(t => t.ticketCode === ticketCode) || data[0];
+        if (!ticket) {
+            throw new Error("Invalid or non-existent ticket code!");
+        }
+        if (ticket.status === 'CHECKED_IN') {
+            throw new Error("This ticket has already been checked in!");
+        }
+        return ticket;
+    };
+
     if (isTicketsLoading) return <LoadingState />
     if (!tickets || isTicketsError) return <EmptyState className='h-[600px]' />
 
@@ -69,17 +81,14 @@ const ScanQRPage = () => {
     return (
         <div className="flex-1 flex flex-col lg:flex-row gap-6 h-full w-full overflow-y-auto lg:overflow-hidden bg-[#E5E1DA] p-4 md:p-6 lg:p-8 font-sans">
 
-            <style>{`
-                .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-                @keyframes scan { 0% { top: 10%; } 50% { top: 90%; } 100% { top: 10%; } }
-                .scanner-line { animation: scan 3s ease-in-out infinite; }
-            `}</style>
 
             <div className="flex-1 flex flex-col gap-6 min-w-0 transition-all duration-300">
-                <ScannerCamera />
+                <ScannerCamera
+                    onVerifyQR={handleVerifyTicket}
+                    onScanQR={handleScanCheckIn}
+                    isCheckingIn={checkInMutation.isPending}
+
+                />
                 <SearchTicket
                     tickets={tickets}
                     handleSearch={handleSearch}
