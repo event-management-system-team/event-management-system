@@ -3,8 +3,14 @@ import axiosInstance from "../config/axios";
 export const organizerService = {
 
     // STAFF-MANAGEMENT
-    getEventStaff: (eventId) => {
-        return axiosInstance.get(`/events/${eventId}/staff`);
+    getEventStaffPlain: (eventId) => {
+        return axiosInstance.get(`/events/${eventId}/staff/all`);
+    },
+
+    getEventStaff: (eventId, page = 0, size = 10) => {
+        return axiosInstance.get(`/events/${eventId}/staff`, {
+            params: { page, size }
+        });
     },
 
     getStaffAssignment: (eventId) => {

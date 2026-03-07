@@ -4,6 +4,8 @@ import com.eventmanagement.backend.dto.response.organizer.EventRoleStatsResponse
 import com.eventmanagement.backend.dto.response.organizer.StaffResponse;
 import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.model.EventStaff;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,6 +29,21 @@ public interface StaffRepository extends JpaRepository<EventStaff, UUID> {
     WHERE es.event.eventId = :eventId
 """)
     List<StaffResponse> findStaffByEventId(@Param("eventId") UUID eventId);
+
+    @Query("""
+    SELECT new com.eventmanagement.backend.dto.response.organizer.StaffResponse(
+        es.eventStaffId,
+        u.email,
+        u.fullName,
+        u.phone,
+        u.avatarUrl,
+        es.staffRole
+    )
+    FROM EventStaff es
+    JOIN es.user u
+    WHERE es.event.eventId = :eventId
+""")
+    Page<StaffResponse> findStaffByEventIdPaging(@Param("eventId") UUID eventId, Pageable pageable);
 
     @Query("""
     SELECT new com.eventmanagement.backend.dto.response.organizer.StaffResponse(

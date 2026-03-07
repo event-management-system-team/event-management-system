@@ -18,7 +18,7 @@ import {
     Trash2
 } from 'lucide-react';
 import { Link, useParams } from 'react-router';
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { OrganizerSidebar } from "../../components/domain/organizer/OrganizerSidebar.jsx";
 import { Button } from "../../components/domain/admin/Button.jsx";
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/domain/admin/Avatar.jsx";
@@ -93,47 +93,34 @@ const resources = [
     }
 ]
 
-
 export function StaffManagement() {
 
     const { id } = useParams();
     const [activeTab, setActiveTab] = useState('staff');
-    const [currentWeek, setCurrentWeek] = useState(dayjs());
-
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
     const [staffs, setStaffs] = useState([]);
     const [assignments, setAssignments] = useState([]);
     const [uploadedFiles, setUploadedFiles] = useState(resources)
     const fileInputRef = useRef(null)
-
-
-    const weekDays = useMemo(
-        () =>
-            Array.from({ length: 7 }).map((_, i) =>
-                currentWeek.startOf("week").add(i, "day")
-            ),
-        [currentWeek]
-    );
-
-    const [currentPage, setCurrentPage] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [role, setRole] = useState("all");
-    const [date, setDate] = useState(null);
-    const [sortOption, setSortOption] = useState("newest");
-    const [searchTerm, setSearchTerm] = useState("");
     const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
     const [isShiftModalOpen, setIsShiftModalOpen] = useState(false);
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const { alert, showAlert, closeAlert } = useAlert();
-    const currentWeekStart = dayjs().startOf("week");
 
     const fetchStaffList = async () => {
         if (!id) return
 
         try {
             setLoading(true)
-            const response = await organizerService.getEventStaff(id)
-            setStaffs(response.data)
+            const response = await organizerService.getEventStaff(id, currentPage, 10)
+
+            setStaffs(response.data.content);
+            setCurrentPage(response.data.number)
+            setTotalPages(response.data.totalPages);
+            setTotalItems(response.data.totalElements);
         } catch (error) {
             setError("Cannot load staff list");
             console.error(error)
@@ -159,6 +146,9 @@ export function StaffManagement() {
 
     useEffect(() => {
         fetchStaffList()
+    }, [id, currentPage])
+
+    useEffect(() => {
         fetchAssignmentList()
     }, [id]);
 
@@ -292,43 +282,28 @@ export function StaffManagement() {
         }
     }
 
+    const pageSize = 10;
+    const startItem = currentPage * pageSize + 1;
 
+    useEffect(() => {
+        if (currentPage > totalPages - 1) {
+            setCurrentPage(0);
+        }
+    }, [totalPages]);
 
-    // const pageSize = 10;
-    // const startItem = currentPage * pageSize + 1;
-    // const isSearching = searchTerm.trim().length > 0;
+    const handlePrev = () => {
+        if (currentPage === 0) return;
+        setCurrentPage(prev => prev - 1);
+    };
 
-    // const totalItems = processedAccounts.length;
-    // const totalPages = Math.max(
-    //     1,
-    //     Math.ceil(totalItems / pageSize)
-    // );
+    const handleNext = () => {
+        if (currentPage >= totalPages - 1) return;
+        setCurrentPage(prev => prev + 1);
+    };
 
-    // useEffect(() => {
-    //     if (currentPage > totalPages - 1) {
-    //         setCurrentPage(0);
-    //     }
-    // }, [totalPages]);
-
-    // const paginatedAccounts = processedAccounts.slice(
-    //     currentPage * pageSize,
-    //     (currentPage + 1) * pageSize
-    // );
-
-    // const handlePrev = () => {
-    //     if (isSearching || currentPage === 0) return;
-    //     setCurrentPage(prev => prev - 1);
-    // };
-
-    // const handleNext = () => {
-    //     if (isSearching || currentPage >= totalPages - 1) return;
-    //     setCurrentPage(prev => prev + 1);
-    // };
-
-    // const handlePageChange = (p) => {
-    //     if (isSearching) return;
-    //     setCurrentPage(p - 1);
-    // };
+    const handlePageChange = (p) => {
+        setCurrentPage(p - 1);
+    };
 
     const openScheduleModal = () => {
         setIsScheduleModalOpen(true)
@@ -428,20 +403,6 @@ export function StaffManagement() {
                             <span>Staff Management</span>
                         </div>
                         <div className="flex items-center gap-3">
-                            {/* <Button
-                                className="gap-2 bg-[#f7f7f7] hover:bg-[#B3C8CF] text-gray rounded-full px-5 py-5 h-12 w-32 border-1 border-gray-400"
-                            // onClick={openModal}
-                            >
-                                <Download className="h-4 w-4" />
-                                Export List
-                            </Button>
-                            <Button
-                                className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5 py-5 h-12 w-32"
-                            // onClick={openModal}
-                            >
-                                <Plus className="h-4 w-4" />
-                                Add Staff
-                            </Button> */}
                             {getTopRightAction()}
                         </div>
                     </div>
@@ -480,97 +441,67 @@ export function StaffManagement() {
 
                     {/* TAB 1: Staff Information */}
                     <TabsContent value="staff" className="space-y-4">
-                        <Card className="shadow-sm">
-                            <CardContent className="p-0">
-                                <div className="overflow-x-auto">
-                                    <table className="w-full">
-                                        <thead className="bg-gray-50 border-b border-gray-200">
-                                            <tr>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Staff Member
-                                                </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Role
-                                                </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Shifts Assigned
-                                                </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Status
-                                                </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Actions
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="bg-white divide-y divide-gray-200">
-                                            {/* {staffMembers.map((staff) => (
-                                                <tr key={staff.id} className="hover:bg-gray-50 cursor-pointer transition-colors">
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="flex items-center gap-3">
-                                                            <Avatar className="w-10 h-10">
-                                                                <AvatarFallback className={`${staff.avatarBg} text-white`}>
-                                                                    {staff.avatar}
-                                                                </AvatarFallback>
-                                                            </Avatar>
-                                                            <div>
-                                                                <div className="font-medium text-gray-900">{staff.name}</div>
-                                                                <div className="text-sm text-gray-500">{staff.email}</div>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        <Badge className={`${staff.roleBg} hover:${staff.roleBg}`}>
-                                                            {staff.role}
-                                                        </Badge>
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="text-sm font-medium text-gray-900">{staff.shiftsAssigned} shifts</div>
-                                                        <div className="text-xs text-gray-500">Next: {staff.nextShift}</div>
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        <Badge
-                                                            variant={staff.statusVariant}
-                                                            className={
-                                                                staff.status === 'Active'
-                                                                    ? 'bg-green-100 text-green-700 hover:bg-green-100'
-                                                                    : staff.status === 'On Break'
-                                                                        ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-100'
-                                                                        : 'bg-red-100 text-red-700 hover:bg-red-100'
-                                                            }
-                                                        >
-                                                            {staff.status}
-                                                        </Badge>
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="flex items-center gap-2">
-                                                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                                                <MessageSquare className="h-4 w-4 text-gray-500" />
-                                                            </Button>
-                                                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                                                <Edit className="h-4 w-4 text-gray-500" />
-                                                            </Button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            ))} */}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </CardContent>
-                        </Card>
+                        <div className="px-8 pb-8">
+                            <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
+                                <CardContent className="p-0">
+                                    {/* Table Header */}
+                                    <div
+                                        className="grid grid-cols-12 gap-4 px-6 py-3 border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wide items-center">
+                                        <div className="col-span-5 ml-5">Staff Member</div>
+                                        <div className="col-span-4">Phone Number</div>
+                                        <div className="col-span-3">Role</div>
+                                    </div>
 
-                        {/* Pagination */}
-                        <div className="flex items-center justify-between px-4">
-                            <p className="text-sm text-gray-500">
-                                {/* Showing <span className="font-medium">1-5</span> of <span className="font-medium">{eventData.activeStaffCount}</span> staff members */}
-                            </p>
-                            <div className="flex gap-2">
-                                <Button variant="outline" size="sm">Previous</Button>
-                                <Button variant="outline" size="sm" className="bg-[#7FA5A5] text-white hover:bg-[#6D9393] hover:text-white">1</Button>
-                                <Button variant="outline" size="sm">2</Button>
-                                <Button variant="outline" size="sm">Next</Button>
-                            </div>
+                                    {/* Account Rows */}
+                                    {staffs?.map(staff => (
+                                        <div
+                                            key={staff.staffId}
+                                            className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-[#eef3f5]"
+                                        >
+                                            <div className="col-span-5 flex items-center gap-3 ml-5">
+                                                <Avatar className="w-10 h-10 mr-4">
+                                                    {staff.avatarUrl ? (
+                                                        <AvatarImage src={staff.avatarUrl} alt={staff.fullName} />
+                                                    ) : (
+                                                        <AvatarFallback className="bg-gray-300" />
+                                                    )}
+                                                </Avatar>
+
+                                                <div>
+                                                    <div className="font-medium text-sm text-gray-900">
+                                                        {staff.fullName}
+                                                    </div>
+                                                    <div className="text-xs text-gray-500">{staff.email}</div>
+                                                </div>
+                                            </div>
+                                            <div className="col-span-4 text-sm text-gray-600">
+                                                {staff.phone}
+                                            </div>
+                                            <div className="col-span-3 text-sm text-gray-900 font-medium">
+                                                <Badge className='text-white'>
+                                                    {staff.role}
+                                                </Badge>
+                                            </div>
+                                        </div>
+                                    ))}
+
+                                    {/* Footer with Pagination */}
+                                    <div className="px-6 py-4 flex items-center justify-between text-sm text-gray-600">
+                                        <div>
+                                            Showing {totalItems === 0 ? 0 : startItem}–{Math.min((currentPage + 1) * pageSize, totalItems)} of {totalItems} results
+                                        </div>
+
+                                        <AccountsPagination
+                                            handleNext={handleNext}
+                                            handlePrev={handlePrev}
+                                            handlePageChange={handlePageChange}
+                                            page={currentPage + 1}
+                                            totalPages={totalPages}
+                                        />
+                                    </div>
+
+                                </CardContent>
+                            </Card>
                         </div>
                     </TabsContent>
 
