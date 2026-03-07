@@ -78,6 +78,7 @@ public class WorkspaceService {
                 .eventName(event.getEventName())
                 .location(event.getLocation())
                 .startDate(event.getStartDate())
+                .endDate(event.getEndDate())
                 .bannerUrl(event.getBannerUrl())
                 .build();
 

@@ -29,10 +29,8 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
 
         @Query("SELECT e FROM Event e " +
                         "WHERE e.status = :status " +
-                        "AND (:keyword IS NULL OR LOWER(e.eventName) LIKE LOWER(CONCAT('%', cast(:keyword as string), '%'))) "
-                        +
-                        "AND (:location IS NULL OR LOWER(e.location) LIKE LOWER(CONCAT('%', cast(:location as string), '%'))) "
-                        +
+                        "AND (:keyword IS NULL OR LOWER(e.eventName) LIKE LOWER(CONCAT('%', cast(:keyword as string), '%'))) " +
+                        "AND (:location IS NULL OR LOWER(e.location) LIKE LOWER(CONCAT('%', cast(:location as string), '%'))) " +
                         "AND (:categorySlug IS NULL OR e.category.categorySlug IN :categorySlug ) " +
                         "AND (CAST(:startOfDay AS timestamp) IS NULL OR CAST(:endOfDay AS timestamp) IS NULL OR " +
                         "(e.startDate <= :endOfDay AND e.endDate >= :startOfDay)) " +
