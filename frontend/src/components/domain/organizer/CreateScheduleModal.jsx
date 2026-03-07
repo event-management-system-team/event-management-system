@@ -11,49 +11,23 @@ import { SmileOutlined } from '@ant-design/icons';
 import { Space, TimePicker, DatePicker } from 'antd';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 dayjs.extend(customParseFormat);
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
-const availableRoles = [
-    {
-        id: 1,
-        name: "Security",
-        staffCount: 8,
-        description: "Responsible for venue security and access control"
-    },
-    {
-        id: 2,
-        name: "VIP Host",
-        staffCount: 4,
-        description: "Manage VIP guest services and hospitality"
-    },
-    {
-        id: 3,
-        name: "Registration",
-        staffCount: 6,
-        description: "Handle attendee check-in and registration"
-    },
-    {
-        id: 4,
-        name: "Technical Support",
-        staffCount: 5,
-        description: "Provide technical assistance and equipment management"
-    },
-    {
-        id: 5,
-        name: "Catering Staff",
-        staffCount: 10,
-        description: "Food and beverage service"
-    },
-    {
-        id: 6,
-        name: "Cleaning Crew",
-        staffCount: 7,
-        description: "Maintain venue cleanliness"
-    }
-]
+dayjs.tz.setDefault("Asia/Ho_Chi_Minh");
 
-export function CreateScheduleModal({ eventId, isOpen, onClose, onAlert }) {
+export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAlert }) {
     const [roles, setRoles] = useState([])
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [selectedDate, setSelectedDate] = useState(null)
+    const [timeRange, setTimeRange] = useState(null)
+
+    const disabledDate = (current) => {
+        return current && current < dayjs().startOf("day");
+    };
 
     const fetchRoleList = async () => {
         try {
@@ -69,29 +43,184 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onAlert }) {
         fetchRoleList()
     }, [])
 
-    const onChange = (time, timeString) => {
-        console.log(time, timeString);
-    };
-
     const [formData, setFormData] = useState({
         scheduleName: "",
         description: "",
         location: "",
-        date: "",
         startTime: "",
         endTime: ""
     })
 
     const [selectedRoles, setSelectedRoles] = useState([])
-    const [errors, setErrors] = useState({})
+    const [errors, setErrors] = useState({
+        scheduleName: "",
+        description: "",
+        location: "",
+        date: "",
+        time: ""
+    });
 
-    const handleInputChange = (field, value) => {
-        setFormData({ ...formData, [field]: value })
-        // Clear error when user starts typing
-        if (errors[field]) {
-            setErrors({ ...errors, [field]: "" })
-        }
+    const handleDateChange = (date) => {
+        setSelectedDate(date)
+        setTimeRange(null)
+
+        setErrors((prev) => ({
+            ...prev,
+            date: !date ? "Date is required" : null,
+        }));
     }
+
+    const handleTimeChange = (times) => {
+        if (!times || !selectedDate) return
+
+        let startTime = selectedDate
+            .hour(times[0].hour())
+            .minute(times[0].minute())
+            .second(0)
+
+        let endTime = selectedDate
+            .hour(times[1].hour())
+            .minute(times[1].minute())
+            .second(0)
+
+        if (startTime.isSame(endTime)) {
+            endTime = endTime.add(1, "minute");
+        }
+
+        setTimeRange([startTime, endTime])
+
+        setFormData((prev) => ({
+            ...prev,
+            startTime,
+            endTime,
+        }))
+
+        setErrors((prev) => ({
+            ...prev,
+            time: null,
+        }));
+    }
+
+    const validateScheduleName = (scheduleName = "") => {
+        const value = scheduleName.trim();
+        if (!value) {
+            return "Schedule name is required";
+        } else if (value.length > 100) {
+            return "Schedule name must be no more than 100 characters";
+        }
+        return null;
+    }
+
+    const validateDescription = (description = "") => {
+        const value = description.trim();
+        if (value.length > 255) {
+            return "Description must be no more than 255 characters";
+        }
+        return null;
+    }
+
+    const validateLocation = (location = "") => {
+        const value = location.trim();
+        if (!value) {
+            return "Location is required";
+        } else if (value.length > 100) {
+            return "Location must be no more than 100 characters";
+        }
+        return null;
+    }
+
+    const validateTime = (startTime, endTime) => {
+        if (!startTime || !endTime) {
+            return "Start time and end time are required"
+        }
+
+        if (startTime === endTime) {
+            return "Start time and end time cannot be the same"
+        }
+
+        return null
+    }
+
+    const disabledRangeTime = (_, type) => {
+        if (!selectedDate) return {};
+
+        const now = dayjs();
+
+        if (!selectedDate.isSame(now, "day")) {
+            return {};
+        }
+
+        const currentHour = now.hour();
+        const currentMinute = now.minute();
+
+        if (type === "start") {
+            return {
+                disabledHours: () => [...Array(currentHour).keys()],
+                disabledMinutes: (hour) =>
+                    hour === currentHour ? [...Array(currentMinute).keys()] : [],
+            };
+        }
+
+        return {
+            disabledHours: () => [...Array(currentHour).keys()],
+            disabledMinutes: (hour) =>
+                hour === currentHour ? [...Array(currentMinute).keys()] : [],
+        };
+    }
+
+    const validateField = async (fieldName) => {
+        let error = null;
+
+        switch (fieldName) {
+            case "scheduleName":
+                error = validateScheduleName(formData.scheduleName);
+                break;
+
+            case "description":
+                error = validateDescription(formData.description);
+                break;
+
+            case "location":
+                error = validateLocation(formData.location);
+                break;
+
+            case "time":
+                error = validateTime(formData.startTime, formData.endTime);
+                break;
+
+            default:
+                break;
+        }
+
+        setErrors((prev) => ({
+            ...prev,
+            [fieldName]: error,
+        }));
+    };
+
+    const validateForm = async () => {
+        const newErrors = {};
+
+        const scheduleNameError = validateScheduleName(formData.scheduleName);
+        if (scheduleNameError) newErrors.scheduleName = scheduleNameError;
+
+        const descriptionError = validateDescription(formData.description);
+        if (descriptionError) newErrors.description = descriptionError;
+
+        const locationError = validateLocation(formData.location);
+        if (locationError) newErrors.location = locationError;
+
+        const timeError = validateTime(formData.startTime, formData.endTime);
+        if (timeError) newErrors.time = timeError;
+
+        setErrors({
+            scheduleName: scheduleNameError || null,
+            description: descriptionError || null,
+            location: locationError || null,
+            time: timeError || null,
+        });
+        return Object.keys(newErrors).length === 0;
+    };
 
     const handleRoleToggle = roleId => {
         if (selectedRoles.includes(roleId)) {
@@ -109,87 +238,50 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onAlert }) {
         }
     }
 
-    const validateForm = () => {
-        const newErrors = {}
+    const isFormValid =
+        !!formData.scheduleName &&
+        !!formData.location &&
+        !!formData.startTime &&
+        !!formData.endTime &&
+        !errors.scheduleName &&
+        !errors.description &&
+        !errors.location &&
+        !errors.time
 
-        // Basic validation
-        if (!formData.scheduleName.trim()) {
-            newErrors.scheduleName = "Schedule name is required"
-        }
-        if (!formData.location.trim()) {
-            newErrors.location = "Location is required"
-        }
-        if (!formData.date.trim()) {
-            newErrors.date = "Date is required"
-        }
-        if (!formData.startTime.trim()) {
-            newErrors.startTime = "Start time is required"
-        }
-        if (!formData.endTime.trim()) {
-            newErrors.endTime = "End time is required"
-        }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (isSubmitting) return;
 
-        // Time validation
-        if (formData.startTime && formData.endTime) {
-            const [startHour, startMin] = formData.startTime.split(":").map(Number)
-            const [endHour, endMin] = formData.endTime.split(":").map(Number)
-
-            if (
-                endHour < startHour ||
-                (endHour === startHour && endMin <= startMin)
-            ) {
-                newErrors.endTime = "End time must be later than start time"
-            }
+        const isValid = await validateForm();
+        if (!isValid) {
+            onAlert("error", "Please fix the validation errors before submitting");
+            return;
         }
 
-        // Role validation
-        if (selectedRoles.length === 0) {
-            newErrors.roles = "Please select at least one role"
-        }
+        try {
+            setIsSubmitting(true)
 
-        setErrors(newErrors)
-        return Object.keys(newErrors).length === 0
-    }
-
-    const handleCreate = () => {
-        if (validateForm()) {
-            const selectedRoleNames = availableRoles
-                .filter(role => selectedRoles.includes(role.id))
-                .map(role => role.name)
-
-            console.log("Creating schedule:", {
+            const data = {
                 ...formData,
-                assignedRoles: selectedRoleNames
-            })
+                startTime: formData.startTime.format("YYYY-MM-DDTHH:mm:ss"),
+                endTime: formData.endTime.format("YYYY-MM-DDTHH:mm:ss"),
+                staffRoles: selectedRoles
+            }
 
-            // toast.success("Schedule created successfully", {
-            //     description: `${formData.scheduleName} has been added to the event`
-            // })
+            console.log("payload", data)
+            const response = await organizerService.createSchedule(eventId, data)
+            onAlert("success", "Created schedule successfully")
 
-            onClose()
-            // Reset form
-            setFormData({
-                scheduleName: "",
-                description: "",
-                location: "",
-                date: "",
-                startTime: "",
-                endTime: ""
-            })
-            setSelectedRoles([])
-            setErrors({})
+            onCreated(response.data);
+            setTimeout(() => {
+                onClose();
+            }, 500);
+        } catch (error) {
+            const msg = error.response?.data?.message || "Failed to create schedule. Please try again";
+            onAlert("error", msg)
+        } finally {
+            setIsSubmitting(false);
         }
-    }
-
-    const isFormValid = () => {
-        return (
-            formData.scheduleName.trim() &&
-            formData.location.trim() &&
-            formData.date.trim() &&
-            formData.startTime.trim() &&
-            formData.endTime.trim() &&
-            selectedRoles.length > 0
-        )
     }
 
     if (!isOpen) return null
@@ -241,19 +333,25 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onAlert }) {
                                     type="text"
                                     placeholder="e.g. Morning Setup Crew"
                                     value={formData.scheduleName}
-                                    onChange={e =>
-                                        handleInputChange("scheduleName", e.target.value)
-                                    }
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+
+                                        setFormData({ ...formData, scheduleName: value });
+
+                                        const error = validateScheduleName(value);
+                                        setErrors((prev) => ({
+                                            ...prev,
+                                            scheduleName: error,
+                                        }));
+                                    }}
+                                    onBlur={() => validateField("scheduleName")}
                                     className={cn(
                                         "h-10",
                                         errors.scheduleName && "border-red-500"
                                     )}
                                 />
                                 {errors.scheduleName && (
-                                    <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                                        <AlertCircle className="h-3 w-3" />
-                                        {errors.scheduleName}
-                                    </p>
+                                    <p className="text-xs text-red-500 mt-1">{errors.scheduleName}</p>
                                 )}
                             </div>
 
@@ -268,11 +366,23 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onAlert }) {
                                     id="description"
                                     placeholder="Optional description of this schedule"
                                     value={formData.description}
-                                    onChange={e =>
-                                        handleInputChange("description", e.target.value)
-                                    }
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+
+                                        setFormData({ ...formData, description: value });
+
+                                        const error = validateDescription(value);
+                                        setErrors((prev) => ({
+                                            ...prev,
+                                            description: error,
+                                        }));
+                                    }}
+                                    onBlur={() => validateField("description")}
                                     className="min-h-[80px] border border-gray-200"
                                 />
+                                {errors.description && (
+                                    <p className="text-xs text-red-500 mt-1">{errors.description}</p>
+                                )}
                             </div>
 
                             <div>
@@ -289,9 +399,18 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onAlert }) {
                                         type="text"
                                         placeholder="e.g. Main Entrance"
                                         value={formData.location}
-                                        onChange={e =>
-                                            handleInputChange("location", e.target.value)
-                                        }
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+
+                                            setFormData({ ...formData, location: value });
+
+                                            const error = validateLocation(value);
+                                            setErrors((prev) => ({
+                                                ...prev,
+                                                location: error,
+                                            }));
+                                        }}
+                                        onBlur={() => validateField("location")}
                                         className={cn(
                                             "h-10 pl-10",
                                             errors.location && "border-red-500"
@@ -299,10 +418,7 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onAlert }) {
                                     />
                                 </div>
                                 {errors.location && (
-                                    <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                                        <AlertCircle className="h-3 w-3" />
-                                        {errors.location}
-                                    </p>
+                                    <p className="text-xs text-red-500 mt-1">{errors.location}</p>
                                 )}
                             </div>
                         </div>
@@ -321,22 +437,13 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onAlert }) {
                                 >
                                     Select Date <span className="text-red-500">*</span>
                                 </Label>
-                                {/* <div className="relative">
-                                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                    <Input
-                                        id="date"
-                                        type="date"
-                                        value={formData.date}
-                                        onChange={e => handleInputChange("date", e.target.value)}
-                                        className={cn(
-                                            "h-10 pl-10",
-                                            errors.date && "border-red-500"
-                                        )}
-                                    />
-                                </div> */}
 
                                 <Space vertical>
-                                    <DatePicker onChange={onChange} className="w-60 h-10" />
+                                    <DatePicker
+                                        onChange={handleDateChange}
+                                        className="w-60 h-10"
+                                        disabledDate={disabledDate}
+                                    />
                                 </Space>
 
                                 {errors.date && (
@@ -356,28 +463,20 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onAlert }) {
                                 </Label>
 
                                 <Space vertical size={12}>
-                                    <TimePicker.RangePicker prefix={<SmileOutlined />} className="w-80 h-10" />
+                                    <TimePicker.RangePicker
+                                        prefix={<SmileOutlined />}
+                                        className="w-80 h-10"
+                                        disabledTime={disabledRangeTime}
+                                        onChange={handleTimeChange}
+                                        value={timeRange}
+                                        format="HH:mm"
+                                    />
                                 </Space>
 
-                                {/* <div className="relative">
-                                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                        <Input
-                                            id="startTime"
-                                            type="time"
-                                            value={formData.startTime}
-                                            onChange={e =>
-                                                handleInputChange("startTime", e.target.value)
-                                            }
-                                            className={cn(
-                                                "h-10 pl-10",
-                                                errors.startTime && "border-red-500"
-                                            )}
-                                        />
-                                    </div> */}
-                                {errors.startTime && (
+                                {errors.time && (
                                     <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
                                         <AlertCircle className="h-3 w-3" />
-                                        {errors.startTime}
+                                        {errors.time}
                                     </p>
                                 )}
                             </div>
@@ -474,8 +573,8 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onAlert }) {
                         Cancel
                     </Button>
                     <Button
-                        onClick={handleCreate}
-                        disabled={!isFormValid()}
+                        onClick={handleSubmit}
+                        disabled={!isFormValid}
                         className="px-6 bg-[#7FA5A5] hover:bg-[#6D9393] text-white disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Create Schedule

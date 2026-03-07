@@ -11,6 +11,10 @@ export const organizerService = {
         return axiosInstance.get(`/events/${eventId}/assignments`);
     },
 
+    getStaffAssignmentByRole: (eventId) => {
+        return axiosInstance.get(`/events/${eventId}/assignments/by-role`);
+    },
+
     getStaffRoleList: (eventId) => {
         return axiosInstance.get(`/events/${eventId}/role`)
     },
@@ -21,6 +25,10 @@ export const organizerService = {
 
     getStaffByRole: (eventId) => {
         return axiosInstance.get(`/events/${eventId}/staff`)
+    },
+
+    createSchedule: (eventId, data) => {
+        return axiosInstance.post(`/events/${eventId}/schedules`, data)
     },
 
 

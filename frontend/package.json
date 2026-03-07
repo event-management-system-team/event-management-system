@@ -27,6 +27,7 @@
     "@schedule-x/events-service": "^4.3.0",
     "@schedule-x/react": "^4.1.0",
     "@schedule-x/theme-default": "^4.3.0",
+    "@schedule-x/timezone-select": "^4.3.0",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-query": "^5.90.20",
     "@yudiel/react-qr-scanner": "^2.5.1",

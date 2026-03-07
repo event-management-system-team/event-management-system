@@ -1,5 +1,6 @@
 package com.eventmanagement.backend.repository;
 
+import com.eventmanagement.backend.dto.response.organizer.AssignmentByRoleResponse;
 import com.eventmanagement.backend.dto.response.organizer.AssignmentListProjection;
 import com.eventmanagement.backend.model.StaffAssignment;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,4 +31,29 @@ public interface  StaffAssignmentRepository extends JpaRepository<StaffAssignmen
         """,
             nativeQuery = true)
     List<AssignmentListProjection> findAssignmentsByEvent(UUID eventId);
+
+    @Query("""
+    SELECT new com.eventmanagement.backend.dto.response.organizer.AssignmentByRoleResponse(
+        s.scheduleId,
+        s.scheduleName,
+        es.staffRole,
+        COUNT(sa.assignmentId),
+        s.startTime,
+        s.endTime,
+        s.location
+    )
+    FROM StaffAssignment sa
+    JOIN sa.schedule s
+    JOIN sa.eventStaff es
+    WHERE s.event.eventId = :eventId
+    GROUP BY 
+        s.scheduleId,
+        s.scheduleName,
+        es.staffRole,
+        s.startTime,
+        s.endTime,
+        s.location
+    ORDER BY s.startTime
+""")
+    List<AssignmentByRoleResponse> findAssignmentsByRole(UUID eventId);
 }

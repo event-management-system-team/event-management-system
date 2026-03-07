@@ -1,5 +1,6 @@
 package com.eventmanagement.backend.controller.organizer;
 
+import com.eventmanagement.backend.dto.response.organizer.AssignmentByRoleResponse;
 import com.eventmanagement.backend.dto.response.organizer.AssignmentListProjection;
 import com.eventmanagement.backend.service.StaffAssignmentService;
 import lombok.RequiredArgsConstructor;
@@ -22,5 +23,12 @@ public class StaffAssignmentController {
     @GetMapping("/{eventId}/assignments")
     public ResponseEntity<List<AssignmentListProjection>> getAssignments(@PathVariable  UUID eventId) {
         return ResponseEntity.ok(staffAssignmentService.getAssignmentsByEvent(eventId));
+    }
+
+    @GetMapping("/{eventId}/assignments/by-role")
+    public ResponseEntity<List<AssignmentByRoleResponse>> getAssignmentsByRole(
+            @PathVariable UUID eventId) {
+
+        return ResponseEntity.ok(staffAssignmentService.getAssignmentsByRole(eventId));
     }
 }

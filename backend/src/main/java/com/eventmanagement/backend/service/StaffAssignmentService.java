@@ -1,6 +1,7 @@
 package com.eventmanagement.backend.service;
 
 import com.eventmanagement.backend.constants.AssignmentStatus;
+import com.eventmanagement.backend.dto.response.organizer.AssignmentByRoleResponse;
 import com.eventmanagement.backend.dto.response.organizer.AssignmentListProjection;
 import com.eventmanagement.backend.dto.response.organizer.AssignmentResponse;
 import com.eventmanagement.backend.exception.ForbiddenException;
@@ -93,7 +94,16 @@ public class StaffAssignmentService {
         if (!eventRepository.existsById(eventId)) {
             throw new NotFoundException("Event not found");
         }
-
         return staffAssignmentRepository.findAssignmentsByEvent(eventId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<AssignmentByRoleResponse> getAssignmentsByRole(UUID eventId) {
+
+        if (!eventRepository.existsById(eventId)) {
+            throw new NotFoundException("Event not found");
+        }
+
+        return staffAssignmentRepository.findAssignmentsByRole(eventId);
     }
 }
