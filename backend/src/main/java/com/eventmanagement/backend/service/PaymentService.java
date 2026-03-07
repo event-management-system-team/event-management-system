@@ -63,8 +63,7 @@ public class PaymentService {
                 params.put("vnp_Amount", String.valueOf(amount));
                 params.put("vnp_CurrCode", "VND");
                 params.put("vnp_TxnRef", order.getOrderCode());
-                params.put("vnp_OrderInfo",
-                                "Thanh toan ve su kien " + order.getOrderCode());
+                params.put("vnp_OrderInfo", "Thanh toan don hang " + order.getOrderCode());
                 params.put("vnp_OrderType", "other");
                 params.put("vnp_Locale", "vn");
                 params.put("vnp_ReturnUrl", vnPayConfig.getVnpReturnUrl());
@@ -72,9 +71,8 @@ public class PaymentService {
                 params.put("vnp_CreateDate", createDate);
                 params.put("vnp_ExpireDate", expireDate);
 
-                String hashData = vnPayUtil.buildQueryString(params, false);
-                String secureHash = vnPayUtil.hmacSHA512(
-                                vnPayConfig.getVnpHashSecret(), hashData);
+                // VNPay spec: use HashAllFields which sorts and encodes correctly
+                String secureHash = vnPayConfig.hashAllFields(params);
 
                 String queryString = vnPayUtil.buildQueryString(params, true);
                 String paymentUrl = vnPayConfig.getVnpUrl()
@@ -108,11 +106,17 @@ public class PaymentService {
                 verifyParams.remove("vnp_SecureHash");
                 verifyParams.remove("vnp_SecureHashType");
 
-                String hashData = vnPayUtil.buildQueryString(verifyParams, false);
-                String calculatedHash = vnPayUtil.hmacSHA512(
-                                vnPayConfig.getVnpHashSecret(), hashData);
+                // Calculate hash exactly according to VNPay spec
+                String calculatedHash = vnPayConfig.hashAllFields(verifyParams);
 
                 boolean isValid = calculatedHash.equalsIgnoreCase(vnpSecureHash);
+
+                log.info("=== VNPay Debug ===");
+                log.info("CalculatedHash: {}", calculatedHash);
+                log.info("ReceivedHash: {}", vnpSecureHash);
+                log.info("TmnCode: {}", vnPayConfig.getVnpTmnCode());
+                log.info("HashSecret length: {}",
+                                vnPayConfig.getVnpHashSecret() != null ? vnPayConfig.getVnpHashSecret().length() : 0);
 
                 if (!isValid) {
                         log.warn("[Payment] VNPay callback verification failed — " +
