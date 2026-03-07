@@ -33,8 +33,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger
 } from "../../components/domain/admin/Dropdown-Menu.jsx";
-import { organizerService } from "../../services/organizer.service.js";
-import { adminService } from "../../services/admin.service.js";
+import organizerService from "../../services/organizer.service.js";
 import { AccountsPagination } from "../../components/domain/admin/AccountsPagination.jsx";
 import { DatePicker, Space, Popconfirm, Calendar } from 'antd';
 import { Alert } from "../../components/common/Alert.jsx";
@@ -93,7 +92,7 @@ const resources = [
     }
 ]
 
-export function StaffManagement() {
+export default function StaffManagement() {
 
     const { id } = useParams();
     const [activeTab, setActiveTab] = useState('staff');

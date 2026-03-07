@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,29 +32,34 @@ public class AdminEventController {
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<EventResponse>> getAll() {
         List<EventResponse> events = eventService.getAllEventsPlain();
         return ResponseEntity.ok(events);
     }
 
     @GetMapping("/categories")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<EventCategoryResponse>> getAllCategories() {
         List<EventCategoryResponse> categoryResponses = eventCategoryService.getAllCategories();
         return ResponseEntity.ok(categoryResponses);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EventResponse> getDetail(@PathVariable UUID id) {
         return ResponseEntity.ok(eventService.getEventById(id));
     }
 
     @PatchMapping("/{id}/approve")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> approveEvent(@PathVariable UUID id) {
         eventService.approveEvent(id);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/reject")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> rejectEvent(@PathVariable UUID id, @RequestBody @Valid RejectEventRequest request) {
         eventService.rejectEvent(id, request.getReason());
         return ResponseEntity.noContent().build();

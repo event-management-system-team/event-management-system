@@ -18,6 +18,4 @@ public class EventCategoryResponse {
     private String colorCode;
     private Boolean isActive;
     private Integer displayOrder;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }

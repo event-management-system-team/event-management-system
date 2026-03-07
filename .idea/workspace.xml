@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b61f3f50-8065-4f51-be19-f5261948bd35" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/constants/FormType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/application/ApplicationController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/feedback/FeedbackController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/organizer/OrganizerEventController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/staff/WorkspaceController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/request/CustomFormRequestDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/request/ForgotPasswordRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/request/ResetPasswordRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/request/UpdateApplicationStatusRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/request/VerifyOtpRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/request/WorkspaceRequestDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/VerifyOtpResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/attendee/ApplicationFormResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/attendee/EventAgendaResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/attendee/OrganizerResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/attendee/PositionResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/attendee/StaffApplicationResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/attendee/TicketTypeResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/organizer/ApplicationResponseDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/organizer/FeedbackDetailResponseDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/organizer/FeedbackResponseDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/organizer/OrganizerEventResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/organizer/OrganizerEventStatsResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/organizer/RecruitmentDashBoardDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/organizer/RecruitmentDetailDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/staff/ResourceResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/staff/ScheduleResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/staff/WorkspaceResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/model/BenefitRecruitment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/model/CustomForm.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/model/Feedback.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/model/PasswordResetToken.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/model/RefreshToken.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/ApplicationRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/CustomFormRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/EventStaffRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/FeedbackRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/PasswordResetTokenRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/RefreshTokenRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/StaffApplicationRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/scheduler/TokenCleanupScheduler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/security/JwtAuthenticationFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/ApplicationFormService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/ApplicationService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/EmailService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/ForgotPasswordService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/OrganizerEventService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/RefreshTokenService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/WorkspaceService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/attendee/RecruitmentService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/organizer/ApplicationServiceOrganizer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/organizer/CustomFormService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/organizer/FeedbackService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/organizer/RecruitmentServiceOrganizer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/util/OtpUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/util/ResetTokenUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/test/java/com/eventmanagement/backend/controller/event/EventControllerTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/test/java/com/eventmanagement/backend/controller/profile/ProfileControllerTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/common/attendee/OrganizerCard.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/common/staff/MenuSidebar.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/common/staff/UserDropdown.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/attendee/application-form/DynamicQuestion.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/attendee/application-form/FormContainer.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/attendee/application-form/PersonalInformation.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/attendee/application-form/SelectionRole.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/attendee/application-form/SidebarPosition.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/attendee/my-application/ApplicationCard.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/attendee/my-application/ApplicationList.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/auth/forgot-password/ForgotPasswordForm.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/auth/forgot-password/ResetPasswordForm.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/auth/forgot-password/StatCard.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/auth/forgot-password/VerifyOtpForm.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/auth/forgot-password/VisualSidebar.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/event-detail/AboutTab.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/event-detail/AgendaTab.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/event-detail/BannerApply.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/event-detail/ContentLeft.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/event-detail/HeroSection.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/event-detail/MoreInfoTab.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/event-detail/SidebarTicket.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/recruitment-detail/ApplySection.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/recruitment-detail/BenefitSection.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/recruitment-detail/DescriptionSection.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/recruitment-detail/HeroSection.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/recruitments/FilterLocation.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/recruitments/HeroBanner.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/recruitments/HeroSearchBar.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/recruitments/RecruitmentList.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/recruitments/SidebarFilter.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/staff/resources/HeaderSearch.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/staff/resources/MainContent.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/staff/resources/ResourceCard.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/staff/schedule/CustomEventModal.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/staff/schedule/CustomHeaderRightAppend.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/staff/workspace/EventBannerCard.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/staff/workspace/ProfileCard.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/staff/workspace/ResourcesWidget.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/domain/staff/workspace/ScheduleWidget.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/layout/OrganizerLayout.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/layout/Sidebar.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/layout/StaffLayout.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/config/queryClient.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/config/schedule.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/hooks/useApplicationForm.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/hooks/useFeedback.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/hooks/useFilterRecruitment.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/hooks/useNationalHolidays.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/hooks/useRecruitmentDetail.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/hooks/useScrollToTop.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/hooks/useTicketCart.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/attendee/ApplicationForm.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/attendee/MyApplication.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/attendee/SubmitFeedback.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/auth/ForgotPasswordPage.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/organizer/ApplicationList.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/organizer/FeedbackBuilder.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/organizer/FeedbackDetail.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/organizer/FeedbackList.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/organizer/MyEventsPage.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/organizer/RecruitmentBuilder.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/organizer/RecruitmentDetail.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/organizer/RecruitmentList.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/public/Recruitments.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/staff/MySchedule.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/staff/Resources.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/staff/ScanQRPage.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/staff/StaffWorkspace.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/routes/AdminRoutes.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/routes/AttendeeRoutes.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/routes/OrganizerRoutes.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/routes/StaffRoutes.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/schemas/forgotpassword.schema.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/services/api.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/services/application.service.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/services/feedback.service.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/services/staff.service.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/styles/schedule.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/utils/fomatDate.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/utils/formatTimeSchedule.utils.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/utils/resource.utils.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/event-management-system.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/BackendApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/BackendApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/constants/AssignmentStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/constants/AssignmentStatus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/constants/ResourceType.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/constants/ResourceType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/admin/AdminAccountController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/admin/AdminAccountController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/admin/AdminEventController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/admin/AdminEventController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/admin/EventAgendaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/admin/EventAgendaController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/admin/TicketTypeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/admin/TicketTypeController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/auth/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/auth/AuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/event/EventController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/event/EventController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/profile/ProfileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/profile/ProfileController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/recruitment/RecruitmentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/recruitment/RecruitmentController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/attendee/EventCategoryResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/attendee/EventCategoryResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/attendee/EventResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/attendee/EventResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/attendee/RecruitmentResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/attendee/RecruitmentResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/model/Event.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/model/Event.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/model/EventAgenda.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/model/EventAgenda.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/model/EventResource.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/model/EventResource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/model/EventStaff.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/model/EventStaff.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/model/Recruitment.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/model/Recruitment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/model/StaffApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/model/StaffApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/model/StaffAssignment.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/model/StaffAssignment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/EventRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/EventRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/EventResourceRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/EventResourceRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/RecruitmentRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/RecruitmentRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/StaffAssignmentRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/StaffAssignmentRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/AuthService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/CloudinaryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/CloudinaryService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/EventCategoryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/EventCategoryService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/EventService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/EventService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/RecruitmentService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/util/CookieUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/util/CookieUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/com/eventmanagement/backend/controller/auth/AuthControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/com/eventmanagement/backend/controller/auth/AuthControllerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/com/eventmanagement/backend/service/AuthServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/com/eventmanagement/backend/service/AuthServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/common/DynamicBreadcrumb.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/common/DynamicBreadcrumb.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/common/EventCard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/common/EventCard.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/common/Footer.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/common/Footer.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/common/ProtectedRoute.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/common/ProtectedRoute.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/common/RecruitmentCard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/common/RecruitmentCard.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/common/attendee/NavMenu.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/common/attendee/NavMenu.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/common/attendee/UserDropdown.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/common/attendee/UserDropdown.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/domain/auth/login/LoginForm.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/domain/auth/login/LoginForm.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/domain/events/FilterDate.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/domain/events/FilterDate.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/domain/events/HeroSearchBar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/domain/events/HeroSearchBar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/domain/home/CategorySection.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/domain/home/CategorySection.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/domain/home/EventSection.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/domain/home/EventSection.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/domain/home/HeroSearchBar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/domain/home/HeroSearchBar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/domain/home/HeroSlider.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/domain/home/HeroSlider.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/domain/home/RecruitmentRight.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/domain/home/RecruitmentRight.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/domain/profile/ProfileAvatar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/domain/attendee/profile/ProfileAvatar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/domain/profile/ProfileCard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/domain/attendee/profile/ProfileCard.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/domain/profile/ProfileEdit.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/domain/attendee/profile/ProfileEdit.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/domain/profile/ProfileView.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/domain/attendee/profile/ProfileView.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/layout/MainLayout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/layout/MainLayout.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/config/axios.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/config/axios.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/hooks/useCategories.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/hooks/useCategories.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/organizer/StaffManagement.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/organizer/StaffManagement.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/profile/ProfilePage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/profile/ProfilePage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/public/EventDetail.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/public/EventDetail.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/public/Recriutments.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/public/RecruitmentDetail.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/public/RecruitmentDetail.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/routes/PublicRoutes.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/routes/PublicRoutes.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/routes/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/routes/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/auth.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/auth.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/event.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/event.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/organizer.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/organizer.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/recruitment.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/recruitment.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/store/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/store/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/store/slices/auth.slice.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/store/slices/auth.slice.js" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaScript File" />
+        <option value="JSX File" />
+        <option value="Enum" />
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="39eWDGaeSKlK83qu4nFoxNGU9pq" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
+    &quot;Application.BackendApplication.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Node.js.AccountDetail.jsx.executor&quot;: &quot;Run&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;Spring Boot.BackendApplication.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Merging feature/staff-list&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/1_SWP/project/new/event-management-system&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.projectsettings.compiler.annotationProcessors&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\IntelliJ IDEA 2025.3.3\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\1_SWP\project\new\event-management-system\frontend\src\components\admin" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.eventmanagement.backend.controller.organizer" />
+    </key>
+  </component>
+  <component name="RunAnythingCache">
+    <myKeys>
+      <visibility group="Gradle Tasks" flag="true" />
+      <visibility group="Grunt" flag="true" />
+      <visibility group="Gulp" flag="true" />
+      <visibility group="HTTP Requests" flag="true" />
+      <visibility group="Maven Goals" flag="true" />
+      <visibility group="Node.js" flag="true" />
+      <visibility group="Recent projects" flag="true" />
+      <visibility group="Run Configurations" flag="true" />
+      <visibility group="Run configurations" flag="true" />
+      <visibility group="npm" flag="true" />
+      <visibility group="pnpm" flag="true" />
+      <visibility group="yarn" flag="true" />
+    </myKeys>
+  </component>
+  <component name="RunManager">
+    <configuration name="BackendApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="ALTERNATIVE_JRE_PATH" value="17" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="backend" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.eventmanagement.backend.BackendApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.31033.145" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.31033.145" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b61f3f50-8065-4f51-be19-f5261948bd35" name="Changes" comment="" />
+      <created>1771056895534</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1771056895534</updated>
+      <workItem from="1771057769195" duration="2986000" />
+      <workItem from="1771127253463" duration="8137000" />
+      <workItem from="1771230925921" duration="7246000" />
+      <workItem from="1771421827081" duration="3358000" />
+      <workItem from="1771472582718" duration="12836000" />
+      <workItem from="1771660685627" duration="6227000" />
+      <workItem from="1771776229897" duration="1516000" />
+      <workItem from="1771811423598" duration="61000" />
+      <workItem from="1771811505620" duration="468000" />
+      <workItem from="1771811995128" duration="1181000" />
+      <workItem from="1771813430117" duration="1082000" />
+      <workItem from="1771815013905" duration="1448000" />
+      <workItem from="1771833547495" duration="5541000" />
+      <workItem from="1771941025065" duration="8265000" />
+      <workItem from="1771985350697" duration="9596000" />
+      <workItem from="1772002805465" duration="2672000" />
+      <workItem from="1772013167271" duration="11154000" />
+      <workItem from="1772074675188" duration="28381000" />
+      <workItem from="1772175130594" duration="3406000" />
+      <workItem from="1772198546143" duration="6053000" />
+      <workItem from="1772250103228" duration="14883000" />
+      <workItem from="1772283674554" duration="1450000" />
+      <workItem from="1772285200179" duration="990000" />
+      <workItem from="1772286215362" duration="4340000" />
+      <workItem from="1772335132683" duration="18454000" />
+      <workItem from="1772368445625" duration="12243000" />
+      <workItem from="1772405485663" duration="2293000" />
+      <workItem from="1772412147268" duration="7070000" />
+      <workItem from="1772605389549" duration="1549000" />
+      <workItem from="1772676055631" duration="24322000" />
+      <workItem from="1772781590463" duration="2872000" />
+      <workItem from="1772806593374" duration="3774000" />
+      <workItem from="1772869835737" duration="13174000" />
+      <workItem from="1772898102150" duration="1535000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

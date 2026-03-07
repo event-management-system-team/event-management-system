@@ -1,6 +1,7 @@
 package com.eventmanagement.backend.model;
 
 import com.eventmanagement.backend.constants.ApplicationStatus;
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -8,7 +9,9 @@ import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.spi.ToolProvider;
 
 @Entity
 @Table(name = "staff_applications")
@@ -40,10 +43,11 @@ public class StaffApplication {
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "status", columnDefinition = "application_status")
     @Builder.Default
-    private ApplicationStatus status = ApplicationStatus.PENDING;
+    private ApplicationStatus applicationStatus  = ApplicationStatus.PENDING;
 
-    @Column(name = "applied_at", updatable = false)
-    private LocalDateTime appliedAt;
+    @Column(name = "applied_at")
+    @Builder.Default
+    private LocalDateTime appliedAt = LocalDateTime.now();
 
     @Column(name = "reviewed_at", updatable = false)
     private LocalDateTime reviewedAt;

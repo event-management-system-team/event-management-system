@@ -1,73 +1,28 @@
-import React from "react";
-import { Routes, Route } from "react-router-dom";
-import RegisterPage from "./pages/auth/RegisterPage";
-import LoginPage from "./pages/auth/LoginPage";
-import ProtectedRoute from "./components/common/ProtectedRoute";
-import { ProfileCard } from "./components/domain/profile/ProfileCard";
-
-import { AdminDashboard } from "./pages/admin/AdminDashboard.jsx";
-import { AccountManagement } from "./pages/admin/AccountManagement.jsx";
-import { AccountDetail } from "./pages/admin/AccountDetail.jsx";
-import { EventManagement } from "./pages/admin/EventManagement.jsx";
-import { EventDetail } from "./pages/admin/EventDetail.jsx";
-import { EventAnalytics } from "./pages/admin/EventAnalytics.jsx";
-import { StaffManagement } from "./pages/organizer/StaffManagement.jsx";
-import { TestCalendar } from "./pages/organizer/TestCalendar.jsx"
-import { useEffect } from "react";
-// import { Routes, Route, Navigate } from "react-router-dom";
+import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { autoRefreshToken } from "./store/slices/auth.slice";
 
 import AppRoutes from "./routes";
 
 function App() {
+  const hasRefreshed = useRef(false);
   const dispatch = useDispatch();
-  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { appLoading } = useSelector((state) => state.auth);
 
-  // ✅ Auto refresh token khi app load
   useEffect(() => {
-    const initAuth = async () => {
-      // Nếu chưa có access token nhưng có refresh token (cookie)
-      if (!isAuthenticated) {
-        try {
-          await dispatch(autoRefreshToken()).unwrap();
-          console.log("Auto refresh successful");
-        } catch {
-          console.log("No valid session");
-        }
-      }
-    };
+    if (hasRefreshed.current) return;
+    hasRefreshed.current = true;
+    dispatch(autoRefreshToken());
+  }, [dispatch]);
 
-    initAuth();
-  }, [dispatch, isAuthenticated]);
-
-  return (
-    <Routes>
-      <Route path="/*" element={<AppRoutes />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route
-        path="/me"
-        element={
-          <ProtectedRoute>
-            <ProfileCard />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Admin Pages */}
-      <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="/admin/accounts" element={<AccountManagement />} />
-      <Route path="/admin/accounts/account-detail/:id" element={<AccountDetail />} />
-      <Route path="/admin/events" element={<EventManagement />} />
-      <Route path="/admin/events/event-detail/:id" element={<EventDetail />} />
-      <Route path="/admin/analytics" element={<EventAnalytics />} />
-
-      {/* Organizer Pages */}
-      <Route path="/organizer/:id/staff" element={<StaffManagement />} />
-      <Route path="/organizer/:id/test" element={<TestCalendar />} />
-    </Routes>
-  );
+  if (appLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  };
+  return <AppRoutes />;
 }
 
 export default App;

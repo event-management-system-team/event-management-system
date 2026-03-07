@@ -5,6 +5,8 @@ import com.eventmanagement.backend.dto.response.organizer.AssignmentListProjecti
 import com.eventmanagement.backend.model.StaffAssignment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
@@ -56,4 +58,9 @@ public interface  StaffAssignmentRepository extends JpaRepository<StaffAssignmen
     ORDER BY s.startTime
 """)
     List<AssignmentByRoleResponse> findAssignmentsByRole(UUID eventId);
+
+    @Query("SELECT a FROM StaffAssignment a JOIN FETCH a.schedule " +
+            "WHERE a.eventStaff.eventStaffId = :eventStaffId " +
+            "ORDER BY a.schedule.startTime ASC")
+    List<StaffAssignment> findAssignmentsByStaffId(@Param("eventStaffId") UUID eventStaffId);
 }

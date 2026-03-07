@@ -23,11 +23,13 @@ public class CookieUtil {
     public void addRefreshTokenCookie(HttpServletResponse response, String refreshToken, int maxAge) {
         Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken);
         cookie.setHttpOnly(true);
-        cookie.setSecure(cookieSecure);
-        cookie.setAttribute("SameSite", "Strict");
+        cookie.setSecure(false);
         cookie.setPath("/");
         cookie.setMaxAge(maxAge);
-        cookie.setDomain(cookieDomain);
+        cookie.setAttribute("SameSite", "Lax");
+        if (cookieDomain != null && !cookieDomain.trim().isEmpty() && !cookieDomain.equals("localhost")) {
+            cookie.setDomain(cookieDomain);
+        }
 
         response.addCookie(cookie);
     }
@@ -49,7 +51,9 @@ public class CookieUtil {
         cookie.setSecure(cookieSecure);
         cookie.setPath("/");
         cookie.setMaxAge(0);
-        cookie.setDomain(cookieDomain);
+        if (cookieDomain != null && !cookieDomain.trim().isEmpty() && !cookieDomain.equals("localhost")) {
+            cookie.setDomain(cookieDomain);
+        }
 
         response.addCookie(cookie);
     }

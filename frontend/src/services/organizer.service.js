@@ -1,6 +1,6 @@
 import axiosInstance from "../config/axios";
 
-export const organizerService = {
+const organizerService = {
 
     // STAFF-MANAGEMENT
     getEventStaffPlain: (eventId) => {
@@ -17,8 +17,21 @@ export const organizerService = {
         return axiosInstance.get(`/events/${eventId}/assignments`);
     },
 
+    getMyEvents: async (organizerId, page = 0, size = 5) => {
+        const response = await axiosInstance.get('/organizer/events', {
+            params: { organizerId, page, size }
+        })
+        return response.data
+    },
+
     getStaffAssignmentByRole: (eventId) => {
         return axiosInstance.get(`/events/${eventId}/assignments/by-role`);
+    },
+    getMyEventStats: async (organizerId) => {
+        const response = await axiosInstance.get('/organizer/events/stats', {
+            params: { organizerId }
+        })
+        return response.data
     },
 
     getStaffRoleList: (eventId) => {
@@ -37,5 +50,6 @@ export const organizerService = {
         return axiosInstance.post(`/events/${eventId}/schedules`, data)
     },
 
-
 };
+
+export default organizerService;

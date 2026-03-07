@@ -6,7 +6,7 @@ import { Textarea } from "../admin/Textarea"
 import { Checkbox } from "../admin/Checkbox"
 import { useEffect, useState } from "react"
 import { cn } from "../admin/utils"
-import { organizerService } from "../../../services/organizer.service"
+import organizerService from "../../../services/organizer.service"
 import { SmileOutlined } from '@ant-design/icons';
 import { Space, TimePicker, DatePicker } from 'antd';
 import dayjs from 'dayjs';

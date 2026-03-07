@@ -1,6 +1,5 @@
 {
-  "cSpell.words": [
-    "Infor"
-  ],
-  "java.compile.nullAnalysis.mode": "disabled"
+  "cSpell.words": ["Infor"],
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "java.debug.settings.onBuildFailureProceed": true
 }

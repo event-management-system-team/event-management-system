@@ -20,9 +20,11 @@ export const loginUser = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const data = await authService.login(credentials);
+
+      // ✅ Chỉ lưu user info, KHÔNG lưu token
       const rememberMe = credentials.rememberMe || false;
-      authService.saveAccessToken(data.accessToken, rememberMe);
       authService.saveUser(data.user, rememberMe);
+
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Login failed");
@@ -35,8 +37,10 @@ export const loginWithGoogle = createAsyncThunk(
   async (googleToken, { rejectWithValue }) => {
     try {
       const data = await authService.loginWithGoogle(googleToken);
-      authService.saveAccessToken(data.accessToken);
-      authService.saveUser(data.user);
+
+      // ✅ Google login luôn remember (30 ngày)
+      authService.saveUser(data.user, true);
+
       return data;
     } catch (error) {
       return rejectWithValue(
@@ -51,16 +55,59 @@ export const autoRefreshToken = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const data = await authService.refreshToken();
-      const rememberMe = authService.isRememberMe();
-      authService.saveAccessToken(data.accessToken, rememberMe);
-      if (data.user) {
-        authService.saveUser(data.user, rememberMe);
-      }
-
       return data;
     } catch {
       authService.clearSession();
       return rejectWithValue("Session expired");
+    }
+  },
+);
+
+export const sendOTP = createAsyncThunk(
+  "auth/sendOTP",
+  async (email, { rejectWithValue }) => {
+    try {
+      const data = await authService.sendOTP(email);
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to send OTP",
+      );
+    }
+  },
+);
+
+export const verifyOTP = createAsyncThunk(
+  "auth/verifyOTP",
+  async ({ email, otpCode }, { rejectWithValue }) => {
+    try {
+      const data = await authService.verifyOTP(email, otpCode);
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "OTP verification failed",
+      );
+    }
+  },
+);
+
+export const resetPassword = createAsyncThunk(
+  "auth/resetPassword",
+  async (
+    { resetToken, newPassword, confirmPassword },
+    { rejectWithValue },
+  ) => {
+    try {
+      const data = await authService.resetPassword(
+        resetToken,
+        newPassword,
+        confirmPassword,
+      );
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Password reset failed",
+      );
     }
   },
 );
@@ -80,9 +127,10 @@ export const logoutUser = createAsyncThunk(
 
 const initialState = {
   user: authService.getUser(),
-  accessToken: authService.getAccessToken(),
+  accessToken: null,
   isAuthenticated: authService.isAuthenticated(),
   loading: false,
+  appLoading: true, // Used to block the app render until autoRefresh finishes
   error: null,
   registerSuccess: false,
 };
@@ -100,16 +148,18 @@ const authSlice = createSlice({
     setAccessToken: (state, action) => {
       state.accessToken = action.payload;
       state.isAuthenticated = true;
-      authService.saveAccessToken(action.payload, authService.isRememberMe());
     },
     setUser: (state, action) => {
       state.user = action.payload;
-      authService.saveUser(action.payload, authService.isRememberMe());
+      const rememberMe = authService.isRememberMe();
+      authService.saveUser(action.payload, rememberMe);
+    },
+    setAppLoading: (state, action) => {
+      state.appLoading = action.payload;
     },
   },
   extraReducers: (builder) => {
     builder
-      // Register
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -124,7 +174,6 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
 
-      // Login
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -155,13 +204,19 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
 
+      .addCase(autoRefreshToken.pending, (state) => {
+        state.appLoading = true;
+      })
       .addCase(autoRefreshToken.fulfilled, (state, action) => {
         state.isAuthenticated = true;
         state.accessToken = action.payload.accessToken;
-        // Restore user from payload if available, else fallback to localStorage
+        state.appLoading = false;
+
         if (action.payload.user) {
           state.user = action.payload.user;
-        } else {
+          const rememberMe = authService.isRememberMe();
+          authService.saveUser(action.payload.user, rememberMe);
+        } else if (!state.user) {
           state.user = authService.getUser();
         }
       })
@@ -169,9 +224,45 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.user = null;
         state.accessToken = null;
+        state.appLoading = false;
       })
 
-      // Logout
+      .addCase(sendOTP.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(sendOTP.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(sendOTP.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(verifyOTP.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(verifyOTP.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(verifyOTP.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(resetPassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(resetPassword.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
       .addCase(logoutUser.pending, (state) => {
         state.loading = true;
       })
@@ -190,6 +281,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError, clearRegisterSuccess, setAccessToken, setUser } =
+export const { clearError, clearRegisterSuccess, setAccessToken, setUser, setAppLoading } =
   authSlice.actions;
+
 export default authSlice.reducer;

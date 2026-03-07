@@ -2,6 +2,7 @@ package com.eventmanagement.backend.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -33,22 +34,18 @@ public class EventStaff {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "staff_role", nullable = false)
-    @Builder.Default
-    private String staffRole = "STAFF";
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "assigned_by", nullable = false)
+    @JoinColumn(name = "assigned_by")
     private User assignedBy;
 
-    @Column(name = "assigned_at", nullable = false, updatable = false)
-    private LocalDateTime assignedAt;
+    @Column(name = "staff_role", length = 50, nullable = false)
+    @Builder.Default
+    private String staffRole = "STAFF";
 
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 
-    @PrePersist
-    protected void onCreate() {
-        assignedAt = LocalDateTime.now();
-    }
+    @CreationTimestamp
+    @Column(name = "assigned_at", updatable = false)
+    private LocalDateTime assignedAt;
 }

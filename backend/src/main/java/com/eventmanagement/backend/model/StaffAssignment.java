@@ -3,6 +3,7 @@ package com.eventmanagement.backend.model;
 import com.eventmanagement.backend.constants.AssignmentStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -52,11 +53,6 @@ public class StaffAssignment {
     private String notes;
 
     @Column(name = "assigned_at", nullable = false, updatable = false)
+    @CreationTimestamp
     private LocalDateTime assignedAt;
-
-
-    @PrePersist
-    protected void onCreate() {
-        this.assignedAt = LocalDateTime.now();
     }
-}

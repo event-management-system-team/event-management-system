@@ -37,30 +37,11 @@ public class EventResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    private CategoryDto category;
-    private OrganizerDto organizer;
+    private EventCategoryResponse category;
+    private OrganizerResponse organizer;
     private BigDecimal minPrice;
+    private List<EventAgendaResponse> agendas;
+    private List<TicketTypeResponse> ticketTypes;
 
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class CategoryDto {
-        private UUID categoryId;
-        private String categoryName;
-        private String categorySlug;
-        private String iconUrl;
-        private String colorCode;
-    }
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class OrganizerDto {
-        private UUID userId;
-        private String fullName;
-        private String avatarUrl;
-    }
+    
 }

@@ -1,24 +1,25 @@
 import { MapPin, ShoppingCart, Users } from "lucide-react";
+import { Link } from "react-router-dom";
 
-const EventCard = ({ startDate, totalCapacity, registeredCount, bannerUrl, eventName, category, location, isFree, minPrice }) => {
-
-
+const EventCard = ({ startDate, totalCapacity, registeredCount, bannerUrl, eventName, category, location, isFree, minPrice, eventSlug }) => {
 
     const dateObj = new Date(startDate);
-    const month = dateObj.toLocaleString('vi-VN', { month: 'short' });
+    const month = dateObj.toLocaleString('en-US', { month: 'short' });
     const day = dateObj.getDate();
 
     const isAlmostFull = totalCapacity > 0 && (totalCapacity - registeredCount <= 5);
 
     return (
-        <div className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1 duration-300 flex flex-col">
+        <Link className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1 duration-300 flex flex-col"
+            to={`/events/${eventSlug}`}>
+
             <div className="relative aspect-[4/3] overflow-hidden">
                 <img className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     src={bannerUrl}
                     alt={eventName} />
 
                 <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-lg text-center shadow-lg">
-                    <span className="block text-xs font-bold text-primary uppercase">{month}</span>
+                    <span className="block text-2xs font-bold text-primary uppercase">{month}</span>
                     <span className="block text-xl font-extrabold leading-none text-gray-900">{day}</span>
                 </div>
 
@@ -45,7 +46,7 @@ const EventCard = ({ startDate, totalCapacity, registeredCount, bannerUrl, event
 
                 <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
                     <MapPin size={14} />
-                    {location}
+                    <span className="truncate">{location}</span>
                 </div>
 
                 <div className="flex-1">
@@ -80,7 +81,8 @@ const EventCard = ({ startDate, totalCapacity, registeredCount, bannerUrl, event
                     </button>
                 </div>
             </div>
-        </div>
+        </Link>
+
     );
 };
 export default EventCard;
