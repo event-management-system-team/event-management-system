@@ -118,11 +118,11 @@ const SearchTicket = ({ tickets, searchKeyword, handleSearch, onCheckIn, isCheck
                                 </span>
                                 <span className="text-[10px] text-slate-400 truncate mb-1">{attendee.email}</span>
 
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[9px] font-bold text-slate-500 bg-slate-200/50 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                                <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
+                                    <span className="text-[8px] sm:text-[9px] font-bold text-slate-500 bg-slate-200/50 px-1.5 py-0.5 rounded uppercase tracking-wider truncate max-w-[60px] sm:max-w-[120px] md:max-w-[150px] inline-block">
                                         {attendee.ticketCode}
                                     </span>
-                                    <span className="text-[9px] font-bold text-[#89A8B2] bg-[#89A8B2]/10 px-1.5 py-0.5 rounded">
+                                    <span className="text-[8px] sm:text-[9px] font-bold text-[#89A8B2] bg-[#89A8B2]/10 px-1.5 py-0.5 rounded truncate max-w-[60px] sm:max-w-[120px] md:max-w-[150px] inline-block">
                                         {attendee.ticketType}
                                     </span>
                                 </div>

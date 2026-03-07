@@ -82,7 +82,7 @@ const ScanQRPage = () => {
         <div className="flex-1 flex flex-col lg:flex-row gap-6 h-full w-full overflow-y-auto lg:overflow-hidden bg-[#E5E1DA] p-4 md:p-6 lg:p-8 font-sans">
 
 
-            <div className="flex-1 flex flex-col gap-6 min-w-0 transition-all duration-300">
+            <div className="flex-1 flex flex-col gap-6 min-w-0 transition-all duration-300 order-2 lg:order-1">
                 <ScannerCamera
                     onVerifyQR={handleVerifyTicket}
                     onScanQR={handleScanCheckIn}
@@ -98,7 +98,7 @@ const ScanQRPage = () => {
                 />
             </div>
 
-            <aside className="w-full lg:w-80 flex flex-col shrink-0 h-fit lg:h-full gap-6">
+            <aside className="w-full lg:w-80 flex flex-col shrink-0 h-fit lg:h-full gap-6 order-1 lg:order-2">
                 <EventInfo
                     eventInfo={data?.eventInfo} />
                 <CheckInStats ticketStats={ticketStats} />
