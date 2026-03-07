@@ -8,7 +8,6 @@ import {
     MapPin,
     Calendar,
     ArrowRight,
-    TrendingUp,
     ChevronDown,
 } from 'lucide-react';
 import dayjs from 'dayjs';
@@ -44,6 +43,9 @@ const getCategoryColor = (name) =>
     CATEGORY_COLORS[name] || '#F97316';
 
 const DONUT_COLORS = ['#1E293B', '#F97316', '#FDBA74'];
+
+const formatVND = (value) =>
+    new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(value);
 
 const StatCard = ({ icon: Icon, label, value, loading }) => (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-5 flex items-center gap-4">
@@ -92,7 +94,7 @@ const CustomBarTooltip = ({ active, payload, label }) => {
                         className="inline-block w-2 h-2 rounded-full"
                         style={{ backgroundColor: p.color }}
                     />
-                    {p.name}: {p.value.toLocaleString()}
+                    {p.name}: {formatVND(p.value)}
                 </p>
             ))}
         </div>
@@ -144,6 +146,11 @@ const OrganizerDashboardPage = () => {
     );
     const totalBookings = totalTicketsSold;
 
+    const totalRevenue = useMemo(
+        () => events.reduce((sum, e) => sum + (e.totalRevenue || 0), 0),
+        [events],
+    );
+
     const donutData = useMemo(() => {
         const sold = totalTicketsSold;
         const available = Math.max(0, totalCapacity - sold);
@@ -166,12 +173,12 @@ const OrganizerDashboardPage = () => {
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const map = {};
         months.forEach((m) => {
-            map[m] = { month: m, bookings: 0 };
+            map[m] = { month: m, revenue: 0 };
         });
         events.forEach((e) => {
             const m = dayjs(e.startDate).format('MMM');
             if (map[m]) {
-                map[m].bookings += e.registeredCount || 0;
+                map[m].revenue += e.totalRevenue || 0;
             }
         });
         return months.map((m) => map[m]);
@@ -226,206 +233,167 @@ const OrganizerDashboardPage = () => {
                 />
             </div>
 
-            {/* Charts Row */}
+            {/* Charts Row — Ticket Sales (left, full height) | Sales Revenue + Popular Events (right) */}
             <div className="grid grid-cols-12 gap-6 mb-8">
                 {/* Ticket Sales - Donut */}
-                <div className="col-span-5 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-base font-bold text-gray-800">Ticket Sales</h2>
+                <div className="col-span-5 bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col">
+                    <div className="flex items-center justify-between mb-2">
+                        <h2 className="text-lg font-bold text-gray-900">Ticket Sales</h2>
                         <button className="flex items-center gap-1 text-xs text-gray-400 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition">
                             This Week <ChevronDown size={14} />
                         </button>
                     </div>
 
                     {totalCapacity === 0 && !loading ? (
-                        <div className="flex items-center justify-center h-52 text-sm text-gray-400">
+                        <div className="flex items-center justify-center flex-1 text-sm text-gray-400">
                             No ticket data yet
                         </div>
                     ) : (
-                        <div className="flex items-center gap-4">
-                            <div className="w-44 h-44 shrink-0">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <PieChart>
-                                        <Pie
-                                            data={donutData}
-                                            dataKey="value"
-                                            innerRadius={50}
-                                            outerRadius={70}
-                                            paddingAngle={3}
-                                            startAngle={90}
-                                            endAngle={-270}
-                                            stroke="none"
-                                        >
-                                            {donutData.map((_, i) => (
-                                                <Cell key={i} fill={DONUT_COLORS[i % DONUT_COLORS.length]} />
-                                            ))}
-                                        </Pie>
-                                        <DonutCenter total={totalCapacity} />
-                                    </PieChart>
-                                </ResponsiveContainer>
+                        <>
+                            {/* Donut chart centered */}
+                            <div className="flex justify-center py-4">
+                                <div className="w-52 h-52">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                            <Pie
+                                                data={donutData}
+                                                dataKey="value"
+                                                innerRadius={60}
+                                                outerRadius={85}
+                                                paddingAngle={3}
+                                                startAngle={90}
+                                                endAngle={-270}
+                                                stroke="none"
+                                            >
+                                                {donutData.map((_, i) => (
+                                                    <Cell key={i} fill={DONUT_COLORS[i % DONUT_COLORS.length]} />
+                                                ))}
+                                            </Pie>
+                                            <DonutCenter total={totalCapacity} />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </div>
                             </div>
 
-                            <div className="space-y-3 flex-1">
+                            {/* Legend rows below the chart */}
+                            <div className="mt-auto space-y-0 border-t border-gray-100">
                                 {donutData.map((d, i) => (
-                                    <div key={d.name} className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
+                                    <div
+                                        key={d.name}
+                                        className="flex items-center justify-between py-3.5 border-b border-gray-50 last:border-0"
+                                    >
+                                        <div className="flex items-center gap-3">
                                             <span
-                                                className="w-3 h-3 rounded-full shrink-0"
+                                                className="w-3.5 h-8 rounded-sm shrink-0"
                                                 style={{ backgroundColor: DONUT_COLORS[i % DONUT_COLORS.length] }}
                                             />
                                             <div>
-                                                <p className="text-xs text-gray-500">{d.name}</p>
-                                                <p className="text-sm font-bold text-gray-900">
+                                                <p className="text-xs text-gray-400 leading-none mb-1">{d.name}</p>
+                                                <p className="text-lg font-bold text-gray-900 leading-none">
                                                     {d.value.toLocaleString()}
                                                 </p>
                                             </div>
                                         </div>
-                                        <span className="text-xs font-semibold text-gray-400">
+                                        <span className="text-sm font-semibold text-gray-500 bg-gray-100 rounded-lg px-3 py-1">
                                             {d.pct}%
                                         </span>
                                     </div>
                                 ))}
                             </div>
-                        </div>
+                        </>
                     )}
                 </div>
 
-                {/* Bookings Revenue - Bar Chart */}
-                <div className="col-span-7 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                    <div className="flex items-center justify-between mb-1">
-                        <h2 className="text-base font-bold text-gray-800">Bookings Overview</h2>
-                        <button className="flex items-center gap-1 text-xs text-gray-400 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition">
-                            Last 8 Months <ChevronDown size={14} />
-                        </button>
-                    </div>
-                    <div className="flex items-center gap-2 mb-4">
-                        <p className="text-2xl font-bold text-gray-900">
-                            {totalBookings.toLocaleString()}
-                        </p>
-                        <span className="text-xs text-gray-400">total bookings</span>
-                    </div>
-
-                    <ResponsiveContainer width="100%" height={200}>
-                        <BarChart data={monthlyData} barSize={20}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" vertical={false} />
-                            <XAxis
-                                dataKey="month"
-                                axisLine={false}
-                                tickLine={false}
-                                tick={{ fill: '#9CA3AF', fontSize: 12 }}
-                            />
-                            <YAxis
-                                axisLine={false}
-                                tickLine={false}
-                                tick={{ fill: '#9CA3AF', fontSize: 12 }}
-                            />
-                            <Tooltip content={<CustomBarTooltip />} cursor={{ fill: '#FFF7ED' }} />
-                            <Bar dataKey="bookings" name="Bookings" fill={ACCENT} radius={[4, 4, 0, 0]} />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
-            </div>
-
-            {/* Popular Categories */}
-            <div className="grid grid-cols-12 gap-6 mb-8">
-                <div className="col-span-5 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                    <div className="flex items-center justify-between mb-5">
-                        <h2 className="text-base font-bold text-gray-800">Popular Categories</h2>
-                        <button className="flex items-center gap-1 text-xs text-gray-400 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition">
-                            Popular <ChevronDown size={14} />
-                        </button>
-                    </div>
-
-                    {categoryStats.length === 0 && !loading ? (
-                        <div className="text-sm text-gray-400 text-center py-8">
-                            No category data yet
+                {/* Right column: Sales Revenue + Popular Events stacked */}
+                <div className="col-span-7 flex flex-col gap-6">
+                    {/* Sales Revenue - Bar Chart */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                        <div className="flex items-center justify-between mb-1">
+                            <h2 className="text-lg font-bold text-gray-900">Sales Revenue</h2>
+                            <button className="flex items-center gap-1 text-xs text-gray-400 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition">
+                                Last 8 Months <ChevronDown size={14} />
+                            </button>
                         </div>
-                    ) : (
-                        <div className="space-y-4">
-                            {categoryStats.map((cat) => {
-                                const pct = Math.round(
-                                    (cat.count / (stats.totalEvents || 1)) * 100,
-                                );
-                                return (
-                                    <div key={cat.name}>
-                                        <div className="flex items-center justify-between mb-1.5">
-                                            <span className="text-sm font-medium text-gray-700">
+                        <div className="mb-4">
+                            <p className="text-xs text-gray-400">Total Revenue</p>
+                            <p className="text-2xl font-bold text-gray-900">
+                                {formatVND(totalRevenue)}
+                            </p>
+                        </div>
+
+                        <ResponsiveContainer width="100%" height={180}>
+                            <BarChart data={monthlyData} barSize={22}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" vertical={false} />
+                                <XAxis
+                                    dataKey="month"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: '#9CA3AF', fontSize: 11 }}
+                                />
+                                <YAxis
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: '#9CA3AF', fontSize: 11 }}
+                                    tickFormatter={(v) => v >= 1_000_000 ? `${(v / 1_000_000).toFixed(0)}M` : v >= 1_000 ? `${(v / 1_000).toFixed(0)}K` : v}
+                                />
+                                <Tooltip content={<CustomBarTooltip />} cursor={{ fill: '#FFF7ED' }} />
+                                <Bar dataKey="revenue" name="Revenue" fill={ACCENT} radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+
+                    {/* Popular Events */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                        <div className="flex items-center justify-between mb-5">
+                            <h2 className="text-lg font-bold text-gray-900">Popular Events</h2>
+                            <button className="flex items-center gap-1 text-xs text-gray-400 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition">
+                                Popular <ChevronDown size={14} />
+                            </button>
+                        </div>
+
+                        {categoryStats.length === 0 && !loading ? (
+                            <div className="text-sm text-gray-400 text-center py-6">
+                                No category data yet
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {categoryStats.map((cat) => {
+                                    const pct = Math.round(
+                                        (cat.count / (stats.totalEvents || 1)) * 100,
+                                    );
+                                    const barWidth = Math.max(8, (cat.count / maxCategoryCount) * 100);
+                                    return (
+                                        <div key={cat.name} className="flex items-center gap-4">
+                                            <span className="text-sm font-medium text-gray-700 w-24 shrink-0">
                                                 {cat.name}
                                             </span>
-                                            <span className="text-xs text-gray-400">
-                                                {cat.count} Events
+                                            <span
+                                                className="text-xs font-bold text-white rounded-md px-2.5 py-1 shrink-0 min-w-11 text-center"
+                                                style={{ backgroundColor: getCategoryColor(cat.name) }}
+                                            >
+                                                {pct}%
                                             </span>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                            <div className="flex-1 h-2.5 bg-gray-100 rounded-full overflow-hidden">
                                                 <div
                                                     className="h-full rounded-full transition-all duration-500"
                                                     style={{
-                                                        width: `${(cat.count / maxCategoryCount) * 100}%`,
+                                                        width: `${barWidth}%`,
                                                         backgroundColor: getCategoryColor(cat.name),
                                                     }}
                                                 />
                                             </div>
-                                            <span className="text-xs font-semibold text-gray-500 w-10 text-right">
-                                                {pct}%
+                                            <span className="text-sm text-gray-500 shrink-0 w-24 text-right">
+                                                <span className="font-bold text-gray-700">
+                                                    {cat.count.toLocaleString()}
+                                                </span>
+                                                {' '}
+                                                <span className="text-xs text-gray-400">Events</span>
                                             </span>
                                         </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
-                </div>
-
-                {/* Quick Stats */}
-                <div className="col-span-7 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                    <h2 className="text-base font-bold text-gray-800 mb-5">Event Summary</h2>
-                    <div className="grid grid-cols-2 gap-4">
-                        {[
-                            {
-                                label: 'Total Events',
-                                value: stats.totalEvents,
-                                color: '#F97316',
-                                bg: '#FFF7ED',
-                            },
-                            {
-                                label: 'Active',
-                                value: stats.activeCount,
-                                color: '#10B981',
-                                bg: '#ECFDF5',
-                            },
-                            {
-                                label: 'Upcoming',
-                                value: stats.upcomingCount,
-                                color: '#3B82F6',
-                                bg: '#EFF6FF',
-                            },
-                            {
-                                label: 'Completed',
-                                value: stats.completedCount,
-                                color: '#6B7280',
-                                bg: '#F3F4F6',
-                            },
-                        ].map((item) => (
-                            <div
-                                key={item.label}
-                                className="rounded-xl p-4 flex items-center gap-3"
-                                style={{ backgroundColor: item.bg }}
-                            >
-                                <div
-                                    className="w-10 h-10 rounded-full flex items-center justify-center"
-                                    style={{ backgroundColor: `${item.color}20` }}
-                                >
-                                    <TrendingUp size={18} style={{ color: item.color }} />
-                                </div>
-                                <div>
-                                    <p className="text-xs text-gray-500">{item.label}</p>
-                                    <p className="text-xl font-bold text-gray-900">
-                                        {loading ? '—' : item.value}
-                                    </p>
-                                </div>
+                                    );
+                                })}
                             </div>
-                        ))}
+                        )}
                     </div>
                 </div>
             </div>
