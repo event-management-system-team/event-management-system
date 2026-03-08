@@ -3,6 +3,10 @@ package com.eventmanagement.backend.model;
 import com.eventmanagement.backend.constants.ResourceType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -13,9 +17,11 @@ import java.util.UUID;
 @Table(name = "event_resources")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
+@SQLDelete(sql = "UPDATE event_resources SET deleted_at = CURRENT_TIMESTAMP WHERE resource_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class EventResource {
 
     @Id
@@ -24,10 +30,10 @@ public class EventResource {
     private UUID resourceId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "event_id")
+    @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
-    @Column(name = "resource_name", length = 255)
+    @Column(name = "resource_name", nullable = false, length = 255)
     private String resourceName;
 
     @Column(name = "description", columnDefinition = "TEXT")
@@ -36,14 +42,15 @@ public class EventResource {
     @Column(name = "file_url", columnDefinition = "TEXT")
     private String fileUrl;
 
-    @Column(name = "file_type", length = 50)
+    @Column(name = "file_type", length = 100)
     private String fileType;
 
     @Column(name = "file_size")
     private Integer fileSize;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "resource_type", length = 50)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "resource_type", columnDefinition = "resource_type")
     @Builder.Default
     private ResourceType resourceType = ResourceType.DOCUMENT;
 

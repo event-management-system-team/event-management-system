@@ -1,5 +1,9 @@
 package com.eventmanagement.backend.model;
 
+import com.eventmanagement.backend.constants.RecruitmentStatus;
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -66,6 +70,7 @@ public class Recruitment {
     private LocalDateTime deadline;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(columnDefinition = "varchar(50)")
     @Builder.Default
     private RecruitmentStatus status = RecruitmentStatus.OPEN;

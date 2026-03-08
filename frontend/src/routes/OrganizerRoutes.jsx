@@ -11,6 +11,7 @@ import RecruitmentList from "../pages/organizer/RecruitmentList";
 import RecruitmentBuilder from "../pages/organizer/RecruitmentBuilder";
 import ApplicationList from "../pages/organizer/ApplicationList";
 import RecruitmentDetail from "../pages/organizer/RecruitmentDetail";
+import StaffManagement from "../pages/organizer/StaffManagement";
 
 
 const OrganizerRoutes = () => {
@@ -27,6 +28,7 @@ const OrganizerRoutes = () => {
                     <Route path="/recruitmentcreate/:eventId" element={<RecruitmentBuilder />} />
                     <Route path="/applications/:recruitmentId" element={<ApplicationList />} />
                     <Route path="/recruitments/:recruitmentId" element={<RecruitmentDetail />} />
+                    <Route path="/:id/staff" element={<StaffManagement />} />
                 </Route>
             </Route>
         </Routes>

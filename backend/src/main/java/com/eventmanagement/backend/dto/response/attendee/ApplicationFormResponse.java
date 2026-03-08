@@ -23,4 +23,5 @@ public class ApplicationFormResponse {
 
     private List<PositionResponse> recruitments;
 
+    private String status;
 }
