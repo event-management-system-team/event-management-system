@@ -3,6 +3,7 @@ package com.eventmanagement.backend.service;
 import com.eventmanagement.backend.constants.EventStatus;
 import com.eventmanagement.backend.dto.response.attendee.*;
 import com.eventmanagement.backend.model.Event;
+import com.eventmanagement.backend.model.TicketType;
 import com.eventmanagement.backend.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -102,11 +103,11 @@ public class EventService {
         List<TicketTypeResponse> ticketTypeResponses = new ArrayList<>();
         if (event.getTicketTypes() != null && !event.getTicketTypes().isEmpty()) {
             ticketTypeResponses = event.getTicketTypes().stream()
+                    .filter(TicketType::getIsActive)
                     .map(ticket -> TicketTypeResponse.builder()
                             .ticketTypeId(ticket.getTicketTypeId())
                             .ticketName(ticket.getTicketName())
                             .price(ticket.getPrice())
-                            .isActive(ticket.getIsActive())
                             .description(ticket.getDescription())
                             .quantity(ticket.getQuantity())
                             .reservedCount(ticket.getReservedCount())
