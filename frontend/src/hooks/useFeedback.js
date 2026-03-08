@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import api from "../services/api";
+import axiosInstance from "../config/axios"; 
 
 const fetchFeedbacks = async (eventId) => {
-  const response = await api.get(`/events/${eventId}/feedback`);
+  const response = await axiosInstance.get(`/events/${eventId}/feedback`);
   console.log("Fetched feedbacks:", response.data); 
   return response.data;
 };
@@ -13,6 +13,5 @@ export const useFeedbacks = (eventId) => {
     queryKey: ["feedbacks", eventId],
     queryFn: () => fetchFeedbacks(eventId),
     enabled: !!eventId, 
-  // Chỉ chạy query khi eventId tồn tại
   });
 };

@@ -7,6 +7,8 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,10 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.eventmanagement.backend.constants.FormType;
 import com.eventmanagement.backend.dto.request.CustomFormRequestDTO;
+import com.eventmanagement.backend.dto.request.SubmitFeedbackRequest;
 import com.eventmanagement.backend.dto.response.organizer.FeedbackDetailResponseDTO;
 import com.eventmanagement.backend.dto.response.organizer.FeedbackResponseDTO;
 import com.eventmanagement.backend.dto.response.organizer.RecruitmentDetailDTO;
 import com.eventmanagement.backend.model.CustomForm;
+import com.eventmanagement.backend.model.Feedback;
+import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.repository.CustomFormRepository;
 import com.eventmanagement.backend.repository.FeedbackRepository;
 import com.eventmanagement.backend.service.attendee.RecruitmentService;
@@ -114,4 +119,31 @@ public ResponseEntity<?> getEventForm(
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống: " + e.getMessage());
     }
 }
-}
+
+@PostMapping("feedbacks/events/{eventId}")
+@PreAuthorize("hasRole('ATTENDEE')")
+    public ResponseEntity<?> submitFeedback(
+            @PathVariable UUID eventId,
+            @RequestBody SubmitFeedbackRequest request) {
+        try {
+            // 2. FIX LỖI EMAIL: Lấy nguyên cái Object User ra từ SecurityContext
+            User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            
+            // Rút email chuẩn từ Object đó ra
+            String currentUserEmail = currentUser.getEmail();
+            // Truyền email này xuống Service thay vì truyền ID
+            Feedback savedFeedback = feedbackService.createFeedback(eventId, currentUserEmail, request);
+            
+            return ResponseEntity.ok(Map.of(
+                "message", "Cảm ơn bạn đã gửi đánh giá!",
+                "feedbackId", savedFeedback.getId()
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", "Lỗi server nội bộ: " + e.getMessage()));
+        }
+    }
+    }

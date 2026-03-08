@@ -43,7 +43,6 @@ public class ApplicationController {
         return ResponseEntity.ok(response);
     }
 
-        // 1. API lấy danh sách ứng viên theo chiến dịch
     @GetMapping("/recruitments/{recruitmentId}")
     public ResponseEntity<List<ApplicationResponseDTO>> getApplicationsByRecruitment(
             @PathVariable UUID recruitmentId) {
@@ -51,35 +50,35 @@ public class ApplicationController {
         return ResponseEntity.ok(applications);
     }
 
+    @GetMapping("/{applicationId}")
+    public ResponseEntity<ApplicationResponseDTO> getApplicationDetail(@PathVariable UUID applicationId) {
+        ApplicationResponseDTO detail = applicationServiceOrganizer.getApplicationDetail(applicationId);
+        return ResponseEntity.ok(detail);
+    }
+
     @PutMapping("/{applicationId}/status")
     public ResponseEntity<?> updateApplicationStatus(
             @PathVariable UUID applicationId, 
             @RequestBody UpdateApplicationStatusRequest request) {
         try {
-            // 1. Validate dữ liệu đầu vào
             if (request.getStatus() == null) {
-                // Trả về JSON để React dễ dàng hiển thị thông báo lỗi
                 return ResponseEntity.badRequest().body(Map.of(
                     "message", "Trạng thái (status) không được để trống!"
                 ));
             }
 
-            // 2. Gọi Service xử lý logic (Cập nhật đơn + Insert EventStaff nếu Approve)
             StaffApplication updatedApp = applicationServiceOrganizer.updateApplicationStatuss(applicationId, request.getStatus());
             
-            // 3. Trả về kết quả thành công dưới dạng JSON
             return ResponseEntity.ok(Map.of(
                 "message", "Cập nhật trạng thái ứng viên thành công!",
-                "status", updatedApp.getApplicationStatus() // Lưu ý: Đảm bảo tên getter này khớp với Entity của bạn (có thể là getStatus())
+                "status", updatedApp.getApplicationStatus() 
             ));
             
         } catch (RuntimeException e) {
-            // Bắt các lỗi logic từ Service (ví dụ: Không tìm thấy đơn)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
                 "message", e.getMessage()
             ));
         } catch (Exception e) {
-            // Bắt các lỗi hệ thống không lường trước
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                 "message", "Lỗi hệ thống: " + e.getMessage()

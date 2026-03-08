@@ -34,6 +34,18 @@ const ApplicationList = () => {
     }
   };
 
+  const handleViewDetail = async (applicationId) => {
+    try {
+      const response = await axiosInstance.get(`/applications/${applicationId}`);
+      if (response.status === 200) {
+        setSelectedCandidate(response.data);
+      }
+    } catch (error) {
+      console.error("Lỗi tải chi tiết ứng viên:", error);
+      message.error("Không thể tải chi tiết ứng viên!");
+    }
+  };
+
   const handleUpdateStatus = async (applicationId, newStatus) => {
     try {
       const response = await axiosInstance.put(`/applications/${applicationId}/status`, { status: newStatus });
@@ -128,7 +140,7 @@ const ApplicationList = () => {
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-center gap-3">
                         <button 
-                          onClick={() => setSelectedCandidate(app)}
+                          onClick={() => handleViewDetail(app.id)}
                           className="text-gray-400 hover:text-teal-500 transition-colors p-1"
                         >
                           <Eye size={18} />

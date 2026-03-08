@@ -1,6 +1,7 @@
 package com.eventmanagement.backend.service.organizer;
 
 import java.lang.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +10,9 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.eventmanagement.backend.dto.request.SubmitFeedbackRequest;
 import com.eventmanagement.backend.dto.response.organizer.FeedbackDetailResponseDTO;
 import com.eventmanagement.backend.dto.response.organizer.FeedbackResponseDTO;
 import com.eventmanagement.backend.model.CustomForm;
@@ -19,6 +22,7 @@ import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.repository.CustomFormRepository;
 import com.eventmanagement.backend.repository.EventRepository;
 import com.eventmanagement.backend.repository.FeedbackRepository;
+import com.eventmanagement.backend.repository.TicketTypeRepository;
 import com.eventmanagement.backend.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -31,6 +35,8 @@ public class FeedbackService {
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
     private final CustomFormRepository customFormRepository;
+    private final TicketTypeRepository ticketRepository;
+
 
  private  FeedbackResponseDTO feedbackResponseDTO;
     public List<FeedbackResponseDTO> getFeedbacksByEvent(UUID eventId) {
@@ -115,4 +121,38 @@ public class FeedbackService {
 
     return responseDTO;
 }
+
+    @Transactional
+    public Feedback createFeedback(UUID eventId, String email, SubmitFeedbackRequest request) {
+        
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Sự kiện không tồn tại!"));
+                
+        // TÌM USER TRONG DATABASE BẰNG EMAIL LẤY TỪ TOKEN
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại hoặc phiên đăng nhập không hợp lệ!"));
+
+        UUID userId = user.getUserId(); // Rút ra ID thật để dùng cho các hàm check bên dưới
+
+        // ==== CÁC BƯỚC VALIDATE GIỮ NGUYÊN ====
+        if (event.getStartDate().isAfter(LocalDateTime.now())) {
+            throw new RuntimeException("Sự kiện chưa diễn ra, không thể gửi đánh giá!");
+        }
+
+        // Kiểm tra xem đã đánh giá chưa (Dùng hàm vừa thêm ở Repository)
+        boolean alreadySubmitted = feedbackRepository.existsByEvent_EventIdAndUser_UserId(eventId, userId);
+        if (alreadySubmitted) {
+            throw new RuntimeException("Bạn đã gửi đánh giá cho sự kiện này rồi!");
+        }
+
+        // ==== LƯU VÀO DATABASE ====
+        Feedback feedback = new Feedback();
+        feedback.setEvent(event);
+        feedback.setUser(user);
+        feedback.setRating(request.getRating());
+        feedback.setComment(request.getComment());
+        feedback.setFeedbackData(request.getFeedbackData());
+        
+        return feedbackRepository.save(feedback);
+    }
 }

@@ -3,6 +3,7 @@ package com.eventmanagement.backend.service.attendee;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -121,12 +122,12 @@ public class RecruitmentService {
         }
 
         List<BenefitRecruitment> benefits = recruitment.getBenefits();
-        List<RecruitmentResponse.BenefitRecruitmentDto> benefitResponse = benefits.stream()
+        List<RecruitmentResponse.BenefitRecruitmentDto> benefitResponse = (benefits != null) ? benefits.stream()
                 .map(benefit -> RecruitmentResponse.BenefitRecruitmentDto.builder()
                         .icon(benefit.getIcon())
                         .title(benefit.getTitle())
                         .description(benefit.getDescription())
-                        .build()).toList();
+                        .build()).toList() : new ArrayList<>();
 
 
         return RecruitmentResponse.builder()
