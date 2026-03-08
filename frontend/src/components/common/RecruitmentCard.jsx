@@ -5,9 +5,9 @@ const RecruitmentCard = ({ positions = [], eventName, eventSlug, eventBannerUrl,
 
     const isNew = (new Date() - new Date(createdAt)) / (1000 * 60 * 60 * 24) <= 3;
 
-    const dateObj = new Date(deadline);
-    const month = dateObj.toLocaleString('en-US', { month: 'short' });
-    const day = dateObj.getDate();
+    const dateObj = deadline ? new Date(deadline) : null;
+    const month = dateObj ? dateObj.toLocaleString('en-US', { month: 'short' }) : null;
+    const day = dateObj ? dateObj.getDate() : null;
 
     return (
         <Link to={`/recruitments/${eventSlug}`} className="block">
@@ -87,10 +87,19 @@ const RecruitmentCard = ({ positions = [], eventName, eventSlug, eventBannerUrl,
                     </div>
 
                     <div className="shrink-0 border-l border-gray-100 pl-3 sm:pl-6 ml-1 flex flex-col items-center justify-center min-w-[50px] sm:min-w-[70px]">
-                        <div className="text-[12px] sm:text-[13px] font-black text-slate-400 uppercase tracking-widest mb-0.5 sm:mb-1 text-center">{month}</div>
-                        <div className="font-black text-2xl sm:text-3xl flex items-center justify-center leading-none">
-                            {day}
-                        </div>
+                        {dateObj ? (
+                            <>
+                                <div className="text-[12px] sm:text-[13px] font-black text-slate-400 uppercase tracking-widest mb-0.5 sm:mb-1 text-center">{month}</div>
+                                <div className="font-black text-2xl sm:text-3xl flex items-center justify-center leading-none text-slate-800">
+                                    {day}
+                                </div>
+                            </>
+                        ) : (
+                            <div className="flex flex-col items-center justify-center text-[#4ECDC4]">
+                                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest mb-0.5">OPEN</span>
+                                <span className="text-2xl sm:text-3xl font-black leading-none">∞</span>
+                            </div>
+                        )}
                     </div>
                 </div>
 
