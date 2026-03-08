@@ -24,24 +24,20 @@ public class StaffSchedule {
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
-    @Column(name = "schedule_name", length = 255)
+    @Column(name = "schedule_name", nullable = false, length = 255)
     private String scheduleName;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "start_time")
+    @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
 
-    @Column(name = "end_time")
+    @Column(name = "end_time", nullable = false)
     private LocalDateTime endTime;
 
     @Column(name = "location", length = 255)
     private String location;
-
-    @Column(name = "required_staff")
-    @Builder.Default
-    private Integer requiredStaff = 1;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

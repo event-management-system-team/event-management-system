@@ -10,20 +10,17 @@ import java.util.UUID;
 @Entity
 @Table(
         name = "event_staffs",
-        uniqueConstraints = {
-                @UniqueConstraint(
-                        name = "unique_event_user",
-                        columnNames = {"event_id", "user_id"}
-                )
-        }
+        uniqueConstraints = @UniqueConstraint(
+                name = "unique_event_user",
+                columnNames = {"event_id", "user_id"}
+        )
 )
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class EventStaff {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "event_staff_id", updatable = false, nullable = false)

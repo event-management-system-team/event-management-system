@@ -11,17 +11,15 @@ import java.util.UUID;
 @Entity
 @Table(
         name = "staff_assignments",
-        uniqueConstraints = {
-                @UniqueConstraint(
-                        name = "unique_staff_schedule",
-                        columnNames = {"schedule_id", "event_staff_id"}
-                )
-        }
+        uniqueConstraints = @UniqueConstraint(
+                name = "unique_staff_schedule",
+                columnNames = {"schedule_id", "event_staff_id"}
+        )
 )
-@Getter
 @Setter
-@NoArgsConstructor
+@Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class StaffAssignment {
 
@@ -31,24 +29,30 @@ public class StaffAssignment {
     private UUID assignmentId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "schedule_id", nullable = false)
+    @JoinColumn(
+            name = "schedule_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "fk_assignment_schedule")
+    )
     private StaffSchedule schedule;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "event_staff_id", nullable = false)
+    @JoinColumn(
+            name = "event_staff_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "fk_assignment_event_staff")
+    )
     private EventStaff eventStaff;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", length = 20)
+    @Column(name = "status", nullable = false)
     @Builder.Default
     private AssignmentStatus status = AssignmentStatus.ASSIGNED;
 
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 
+    @Column(name = "assigned_at", nullable = false, updatable = false)
     @CreationTimestamp
-    @Column(name = "assigned_at", updatable = false)
     private LocalDateTime assignedAt;
-
-
-}
+    }
