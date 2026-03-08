@@ -2,7 +2,7 @@ package com.eventmanagement.backend.constants;
 
 public enum OrderStatus {
     PENDING,
-    CONFIRMED,
+    PAID,
     CANCELLED,
     EXPIRED
 }

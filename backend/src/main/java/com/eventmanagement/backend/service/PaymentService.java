@@ -43,7 +43,7 @@ public class PaymentService {
                                 .orElseThrow(() -> new NotFoundException(
                                                 "Order không tồn tại: " + orderCode));
 
-                if (order.getStatus() == OrderStatus.CONFIRMED) {
+                if (order.getStatus() == OrderStatus.PAID) {
                         throw new RuntimeException("Order đã được thanh toán.");
                 }
 

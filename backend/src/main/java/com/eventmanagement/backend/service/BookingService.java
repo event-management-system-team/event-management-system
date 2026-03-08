@@ -241,7 +241,7 @@ public class BookingService {
          */
         private void confirmOrderInternal(Order order, List<Ticket> tickets) {
 
-                order.setStatus(OrderStatus.CONFIRMED);
+                order.setStatus(OrderStatus.PAID);
                 order.setPaidAt(LocalDateTime.now());
                 orderRepository.save(order);
 

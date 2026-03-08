@@ -17,42 +17,42 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v1/tickets")
+@RequestMapping("/api/tickets")
 @RequiredArgsConstructor
 public class TicketController {
 
-    private final TicketRepository ticketRepository;
+        private final TicketRepository ticketRepository;
 
-    @GetMapping("/my-tickets")
-    @PreAuthorize("hasAnyRole('ATTENDEE')")
-    public ResponseEntity<List<TicketResponse>> getMyTickets(
-            @AuthenticationPrincipal User user) {
+        @GetMapping("/my-tickets")
+        @PreAuthorize("hasAnyRole('ATTENDEE')")
+        public ResponseEntity<List<TicketResponse>> getMyTickets(
+                        @AuthenticationPrincipal User user) {
 
-        List<Ticket> tickets = ticketRepository
-                .findByUserUserId(user.getUserId());
+                List<Ticket> tickets = ticketRepository
+                                .findByUserUserId(user.getUserId());
 
-        List<TicketResponse> response = tickets.stream()
-                .map(TicketResponse::from)
-                .collect(Collectors.toList());
+                List<TicketResponse> response = tickets.stream()
+                                .map(TicketResponse::from)
+                                .collect(Collectors.toList());
 
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/my-tickets/{ticketId}")
-    @PreAuthorize("hasAnyRole('ATTENDEE')")
-    public ResponseEntity<TicketResponse> getTicketDetail(
-            @PathVariable UUID ticketId,
-            @AuthenticationPrincipal User user) {
-
-        Ticket ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new NotFoundException(
-                        "The ticket does not exist.: " + ticketId));
-
-        if (!ticket.getUser().getUserId().equals(user.getUserId())) {
-            throw new RuntimeException(
-                    "You are not authorized to view this ticket.");
+                return ResponseEntity.ok(response);
         }
 
-        return ResponseEntity.ok(TicketResponse.from(ticket));
-    }
+        @GetMapping("/my-tickets/{ticketId}")
+        @PreAuthorize("hasAnyRole('ATTENDEE')")
+        public ResponseEntity<TicketResponse> getTicketDetail(
+                        @PathVariable UUID ticketId,
+                        @AuthenticationPrincipal User user) {
+
+                Ticket ticket = ticketRepository.findById(ticketId)
+                                .orElseThrow(() -> new NotFoundException(
+                                                "The ticket does not exist.: " + ticketId));
+
+                if (!ticket.getUser().getUserId().equals(user.getUserId())) {
+                        throw new RuntimeException(
+                                        "You are not authorized to view this ticket.");
+                }
+
+                return ResponseEntity.ok(TicketResponse.from(ticket));
+        }
 }

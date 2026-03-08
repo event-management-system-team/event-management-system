@@ -51,7 +51,7 @@ public class PaymentController {
             boolean isValid = paymentService.verifyCallback(params);
             if (!isValid) {
                 return redirectTo(frontendUrl
-                        + "/payment/failed?orderCode=" + orderCode
+                        + "/attendee/payment/failed?orderCode=" + orderCode
                         + "&reason=invalid_signature");
             }
 
@@ -62,19 +62,19 @@ public class PaymentController {
                 bookingService.confirmOrder(orderCode);
 
                 return redirectTo(frontendUrl
-                        + "/payment/success?orderCode=" + orderCode);
+                        + "/attendee/payment/success?orderCode=" + orderCode);
 
             } else {
                 String responseCode = params.get("vnp_ResponseCode");
 
                 return redirectTo(frontendUrl
-                        + "/payment/failed?orderCode=" + orderCode
+                        + "/attendee/payment/failed?orderCode=" + orderCode
                         + "&code=" + responseCode);
             }
 
         } catch (Exception e) {
             return redirectTo(frontendUrl
-                    + "/payment/failed?orderCode=" + orderCode
+                    + "/attendee/payment/failed?orderCode=" + orderCode
                     + "&reason=server_error");
         }
     }

@@ -5,6 +5,8 @@ import ApplicationForm from "../pages/attendee/ApplicationForm";
 import MyApplication from "../pages/attendee/MyApplication";
 import MainLayout from "../components/layout/MainLayout";
 import CheckoutPage from "../pages/attendee/CheckoutPage";
+import PaymentSuccessPage from "../pages/attendee/PaymentSuccessPage";
+import PaymentFailedPage from "../pages/attendee/PaymentFailedPage";
 
 const AttendeeRoutes = () => {
   return (
@@ -17,6 +19,8 @@ const AttendeeRoutes = () => {
           />
           <Route path="applications/" element={<MyApplication />} />
           <Route path="checkout/" element={<CheckoutPage />} />
+          <Route path="payment/success" element={<PaymentSuccessPage />} />
+          <Route path="payment/failed" element={<PaymentFailedPage />} />
         </Route>
       </Route>
     </Routes>
