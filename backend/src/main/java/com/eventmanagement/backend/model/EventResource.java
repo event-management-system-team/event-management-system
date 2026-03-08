@@ -20,8 +20,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@SQLDelete(sql = "UPDATE event_resources SET deleted_at = CURRENT_TIMESTAMP WHERE resource_id = ?")
-@SQLRestriction("deleted_at IS NULL")
+//@SQLDelete(sql = "UPDATE event_resources SET deleted_at = CURRENT_TIMESTAMP WHERE resource_id = ?")
+//@SQLRestriction("deleted_at IS NULL")
 public class EventResource {
 
     @Id
