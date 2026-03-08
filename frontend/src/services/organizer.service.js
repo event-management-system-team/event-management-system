@@ -36,6 +36,11 @@ const organizerService = {
         return response.data
     },
 
+    deleteEvent: async (eventId) => {
+        const response = await axiosInstance.delete(`/organizer/events/${eventId}`)
+        return response.data
+    },
+
     updateEvent: async (eventId, eventData, coverFile) => {
         const formData = new FormData()
 

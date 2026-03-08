@@ -13,6 +13,7 @@ import {
     ChevronRight,
     MapPin,
     Pencil,
+    Trash2,
 } from 'lucide-react';
 import dayjs from 'dayjs';
 import organizerService from '../../services/organizer.service';
@@ -63,7 +64,8 @@ const MyEventsPage = () => {
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [showSearch, setShowSearch] = useState(false);
-
+    const [deleteTarget, setDeleteTarget] = useState(null);
+    const [deleting, setDeleting] = useState(false);
 
     const abortRef = useRef(null);
 
@@ -156,6 +158,22 @@ const MyEventsPage = () => {
 
     const handleNext = () => {
         if (currentPage < totalPages - 1) setCurrentPage((p) => p + 1);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!deleteTarget) return;
+        setDeleting(true);
+        try {
+            await organizerService.deleteEvent(deleteTarget.eventId);
+            setDeleteTarget(null);
+            fetchEvents(currentPage);
+            fetchStats();
+        } catch (err) {
+            const msg = err.response?.data?.message || 'Failed to delete event.';
+            setError(msg);
+        } finally {
+            setDeleting(false);
+        }
     };
 
     const statCards = [
@@ -387,18 +405,26 @@ const MyEventsPage = () => {
                                 </div>
 
                                 {/* Actions */}
-                                <div className="col-span-1 flex items-center justify-end gap-2">
+                                <div className="col-span-1 flex items-center justify-end gap-1">
                                     {(event.status === 'PENDING' || event.status === 'DRAFT') ? (
-                                        <button
-                                            onClick={() => navigate(`/organizer/edit-event/${event.eventId}`)}
-                                            className="flex items-center gap-1 text-sm text-amber-600 hover:text-amber-700 font-medium transition-colors"
-                                            title="Edit Event"
-                                        >
-                                            <Pencil size={14} />
-                                            
-                                        </button>
+                                        <>
+                                            <button
+                                                onClick={() => navigate(`/organizer/edit-event/${event.eventId}`)}
+                                                className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-amber-600 hover:text-amber-700 hover:bg-amber-50 font-medium rounded-lg cursor-pointer transition-colors"
+                                                title="Edit Event"
+                                            >
+                                                <Pencil size={15} />
+                                            </button>
+                                            <button
+                                                onClick={() => setDeleteTarget(event)}
+                                                className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-red-400 hover:text-red-600 hover:bg-red-50 font-medium rounded-lg cursor-pointer transition-colors"
+                                                title="Delete Event"
+                                            >
+                                                <Trash2 size={15} />
+                                            </button>
+                                        </>
                                     ) : (
-                                        <button className="text-sm text-[#7FA5A5] hover:text-[#5d8585] font-medium transition-colors">
+                                        <button className="text-sm text-[#7FA5A5] hover:text-[#5d8585] font-medium transition-colors cursor-pointer">
                                             Manage
                                         </button>
                                     )}
@@ -434,6 +460,42 @@ const MyEventsPage = () => {
                     </div>
                 )}
             </div>
+
+            {/* Delete Confirmation Modal */}
+            {deleteTarget && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                    <div className="bg-white rounded-2xl shadow-xl p-7 max-w-sm w-full mx-4">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center">
+                                <Trash2 size={20} className="text-red-500" />
+                            </div>
+                            <h3 className="text-lg font-bold text-gray-900">Delete Event</h3>
+                        </div>
+                        <p className="text-sm text-gray-500 mb-1">
+                            Are you sure you want to delete this event?
+                        </p>
+                        <p className="text-sm font-medium text-gray-800 mb-5 truncate">
+                            "{deleteTarget.eventName}"
+                        </p>
+                        <div className="flex items-center justify-end gap-3">
+                            <button
+                                onClick={() => setDeleteTarget(null)}
+                                disabled={deleting}
+                                className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleDeleteConfirm}
+                                disabled={deleting}
+                                className="px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg cursor-pointer transition-colors disabled:opacity-60"
+                            >
+                                {deleting ? 'Deleting...' : 'Delete'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
