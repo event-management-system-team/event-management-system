@@ -98,4 +98,6 @@ public interface StaffRepository extends JpaRepository<EventStaff, UUID> {
     List<EventStaff> findByEventEventIdAndEventStaffIdIn(UUID eventEventId, Collection<UUID> eventStaffIds);
 
     UUID event(Event event);
+
+    long countByEvent_EventId(UUID eventEventId);
 }

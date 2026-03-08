@@ -4,7 +4,6 @@ import com.eventmanagement.backend.constants.ResourceType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.CreationTimestamp;
@@ -20,7 +19,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@SQLDelete(sql = "UPDATE event_resources SET deleted_at = CURRENT_TIMESTAMP WHERE resource_id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class EventResource {
 

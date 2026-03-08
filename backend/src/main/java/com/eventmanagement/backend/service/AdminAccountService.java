@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class AdminService {
+public class AdminAccountService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final GenerateAvatarUrl generateAvatarUrl;

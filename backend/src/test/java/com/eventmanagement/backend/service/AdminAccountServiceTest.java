@@ -30,7 +30,7 @@ class AdminAccountServiceTest {
     private GenerateAvatarUrl generateAvatarUrl;
 
     @InjectMocks
-    private AdminService adminService;
+    private AdminAccountService adminAccountService;
 
     private CreateOrganizerRequest request;
 
@@ -60,7 +60,7 @@ class AdminAccountServiceTest {
         when(userRepository.save(any(User.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        UserResponse response = adminService.createOrganizer(request);
+        UserResponse response = adminAccountService.createOrganizer(request);
 
         assertNotNull(response);
 

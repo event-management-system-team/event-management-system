@@ -404,9 +404,8 @@ export function AccountManagement() {
                                 <SelectValue placeholder="Role" />
                             </SelectTrigger>
                             <SelectContent className='border border-gray-200'>
-                                <SelectItem value="all">All Users</SelectItem>
-                                <SelectItem value="ORGANIZER">Organizer</SelectItem>
-                                <SelectItem value="ATTENDEE">Attendee</SelectItem>
+                                <SelectItem value="all">All Accounts</SelectItem>
+                                <SelectItem value="ORGANIZER">Organizer Account</SelectItem>
                             </SelectContent>
                         </Select>
 
@@ -430,7 +429,7 @@ export function AccountManagement() {
                             <SelectContent className='border border-gray-200'>
                                 <SelectItem value="newest">Newest</SelectItem>
                                 <SelectItem value="oldest">Oldest</SelectItem>
-                                <SelectItem value="name">Name A-Z</SelectItem>
+                                <SelectItem value="name">Name A - Z</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
