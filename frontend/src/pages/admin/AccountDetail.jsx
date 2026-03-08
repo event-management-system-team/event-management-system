@@ -2,7 +2,6 @@ import {
     CheckCircle,
     Bell,
     ChevronRight,
-    Edit,
     Ban,
     Mail,
     ExternalLink
@@ -16,7 +15,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { Badge } from "../../components/domain/admin/Badge.jsx";
 import { useEffect, useState } from "react";
 import { adminService } from "../../services/admin.service.js";
-import { EditAccountModal } from "../../components/domain/admin/EditAccountModal.jsx";
 import { Alert } from "../../components/common/Alert.jsx";
 import { useAlert } from '../../hooks/useAlert.js';
 import { Popconfirm } from 'antd';
@@ -27,7 +25,6 @@ export function AccountDetail() {
     const [account, setAccount] = useState(null);
     const [error, setError] = useState(null);
     const [eventCount, setEventCount] = useState(0);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const { alert, showAlert, closeAlert } = useAlert();
 
     const fetchAccount = async () => {
@@ -81,7 +78,8 @@ export function AccountDetail() {
                 fetchAccount();
             }, 300);
         } catch (error) {
-            showAlert("error", "Operation failed", 4000);
+            console.error(error)
+            showAlert("error", "Operation failed");
         }
     }
 
@@ -218,13 +216,6 @@ export function AccountDetail() {
                             <>
                                 {account?.status === "ACTIVE" ? (
                                     <div className="flex gap-2">
-                                        <Button
-                                            className="gap-2 bg-[#7FA5A5] hover:bg-[#6D9393] text-white"
-                                            onClick={() => setIsEditModalOpen(true)}
-                                        >
-                                            <Edit className="h-4 w-4" />
-                                            Edit Profile
-                                        </Button>
                                         <Popconfirm
                                             title="Ban account"
                                             description="Are you sure to ban this account?"
@@ -395,21 +386,6 @@ export function AccountDetail() {
                     </Tabs>
                 </div>
             </main>
-
-            <EditAccountModal
-                isOpen={isEditModalOpen}
-                onClose={() => setIsEditModalOpen(false)}
-                accountData={{
-                    id: account?.userId,
-                    fullName: account?.fullName,
-                    email: account?.email,
-                    phone: account?.phone,
-                    role: account?.role
-                }}
-                onSuccess={(updatedAccount) => {
-                    setAccount(updatedAccount)
-                }}
-            />
 
             {/* Global Alert */}
             <div className="fixed top-6 right-6 z-[999] w-[360px]">

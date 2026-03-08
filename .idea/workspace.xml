@@ -62,7 +62,7 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;Spring Boot.BackendApplication.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feature/staff-list&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/admin-dashboard&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
@@ -165,7 +165,7 @@
       <workItem from="1772806593374" duration="3774000" />
       <workItem from="1772869835737" duration="13174000" />
       <workItem from="1772898102150" duration="2297000" />
-      <workItem from="1772935436010" duration="10230000" />
+      <workItem from="1772935436010" duration="11476000" />
     </task>
     <servers />
   </component>
