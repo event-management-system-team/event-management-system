@@ -34,6 +34,7 @@ const EventDetailPage = () => {
                 startDate={events?.startDate}
                 endDate={events?.endDate}
                 category={events?.category}
+                status={events?.status}
             />
 
             <div className="w-full bg-background-light">
@@ -56,6 +57,7 @@ const EventDetailPage = () => {
                                 minPrice={events?.minPrice}
                                 ticketTypes={events?.ticketTypes}
                                 totalCapacity={events?.totalCapacity}
+                                eventStatus={events?.status}
                             />
 
                             <OrganizerCard events={events} />
