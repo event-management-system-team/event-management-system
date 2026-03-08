@@ -12,6 +12,7 @@ const OrganizerRoutes = () => {
                 <Route element={<OrganizerLayout />}>
                     <Route path="/my-events" element={<MyEventsPage />} />
                     <Route path="/create-event" element={<CreateEventPage />} />
+                    <Route path="/edit-event/:eventId" element={<CreateEventPage />} />
                 </Route>
             </Route>
         </Routes>
