@@ -1,5 +1,6 @@
 package com.eventmanagement.backend.controller.admin;
 
+import com.eventmanagement.backend.dto.response.admin.AnalyticsSummaryResponse;
 import com.eventmanagement.backend.dto.response.admin.EventAnalyticsResponse;
 import com.eventmanagement.backend.service.EventAnalyticsService;
 import lombok.RequiredArgsConstructor;
@@ -19,5 +20,10 @@ public class EventAnalyticsController {
     @GetMapping("/events")
     public ResponseEntity<List<EventAnalyticsResponse>> getEventAnalytics() {
         return ResponseEntity.ok(eventAnalyticsService.getAnalyticsDashboard());
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<AnalyticsSummaryResponse> getSummary() {
+        return ResponseEntity.ok(eventAnalyticsService.getSummary());
     }
  }

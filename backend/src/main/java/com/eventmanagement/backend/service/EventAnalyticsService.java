@@ -1,123 +1,76 @@
 package com.eventmanagement.backend.service;
 
+import com.eventmanagement.backend.dto.response.admin.AnalyticsSummaryResponse;
 import com.eventmanagement.backend.dto.response.admin.EventAnalyticsResponse;
-import com.eventmanagement.backend.model.Event;
-import com.eventmanagement.backend.model.EventAnalytics;
 import com.eventmanagement.backend.repository.EventAnalyticsRepository;
-import com.eventmanagement.backend.repository.StaffRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class EventAnalyticsService {
-//    private final EventAnalyticsRepository eventAnalyticsRepository;
-//    private final StaffRepository staffRepository;
-//
-//    public EventAnalytics buildAnalytics(Event event) {
-//
-//        int registrations = event.getRegisteredCount();
-//        int checkins = event.getCheckedInCount();
-//
-//        double attendanceRate = registrations == 0
-//                ? 0
-//                : (double) checkins / registrations;
-//
-//        double registrationRate = event.getTotalCapacity() == null
-//                ? 0
-//                : (double) registrations / event.getTotalCapacity();
-//
-//        Map<String, Object> performance = Map.of(
-//                "is_free", event.getIsFree(),
-//                "capacity", event.getTotalCapacity(),
-//                "attendance_rate", attendanceRate,
-//                "registration_rate", registrationRate,
-//                "event_status", event.getStatus(),
-//                "start_date", event.getStartDate(),
-//                "end_date", event.getEndDate()
-//        );
-//
-//        Map<String, Object> demographic = Map.of(
-//                "category_id", event.getCategory().getCategoryId(),
-//                "staff_count", staffRepository.countByEvent_EventId(event.getEventId()),
-//                "organizer_id", event.getOrganizer().getUserId()
-//        );
-//
-//        EventAnalytics analytics = new EventAnalytics();
-//        analytics.setEvent(event);
-//        analytics.setTotalRegistrations(registrations);
-//        analytics.setTotalCheckins(checkins);
-//        analytics.setPerformanceMetrics(performance);
-//        analytics.setDemographicData(demographic);
-//
-//        return analytics;
-//    }
-
     private final EventAnalyticsRepository eventAnalyticsRepository;
-    private final ObjectMapper objectMapper;
 
     public List<EventAnalyticsResponse> getAnalyticsDashboard() {
 
-        List<EventAnalytics> analyticsList =
-                eventAnalyticsRepository.getAnalyticsDashboard();
+        List<Object[]> rows = eventAnalyticsRepository.getAnalyticsDashboard();
 
-        return analyticsList.stream().map(this::mapToResponse).toList();
+        return rows.stream().map(row -> {
+
+            EventAnalyticsResponse res = new EventAnalyticsResponse();
+
+            UUID eventId = (UUID) row[0];
+            String eventName = (String) row[1];
+            UUID categoryId = (UUID) row[2];
+            String categoryName = (String) row[3];
+            Timestamp startDate = (Timestamp) row[4];
+            Timestamp endDate = (Timestamp) row[5];
+            String status = (String) row[6];
+            Integer ticketsSold = (Integer) row[7];
+            BigDecimal revenue = (BigDecimal) row[8];
+            Integer checkins = (Integer) row[9];
+            Integer registrations = (Integer) row[10];
+
+            res.setEventId(eventId);
+            res.setEventName(eventName);
+            res.setCategoryId(categoryId);
+            res.setCategoryName(categoryName);
+
+            if (startDate != null)
+                res.setStartDate(startDate.toLocalDateTime());
+
+            if (endDate != null)
+                res.setEndDate(endDate.toLocalDateTime());
+
+            res.setStatus(status);
+            res.setTicketsSold(ticketsSold);
+            res.setRevenue(revenue);
+
+            if (registrations != null && registrations != 0) {
+                res.setAttendanceRate((double) checkins / registrations);
+            }
+
+            return res;
+
+        }).toList();
     }
 
-    private EventAnalyticsResponse mapToResponse(EventAnalytics analytics) {
+    public AnalyticsSummaryResponse getSummary() {
 
-        Map<String, Object> performance =
-                analytics.getPerformanceMetrics();
+        Object[] row = (Object[]) eventAnalyticsRepository.getAnalyticsSummary();
 
-        Map<String, Object> demographic =
-                analytics.getDemographicData();
+        AnalyticsSummaryResponse res = new AnalyticsSummaryResponse();
 
-        EventAnalyticsResponse res = new EventAnalyticsResponse();
-
-        res.setEventId(analytics.getEvent().getEventId());
-
-        Object eventName = performance.get("event_name");
-        if (eventName != null) {
-            res.setEventName(eventName.toString());
-        }
-
-        Object categoryId = demographic.get("category_id");
-
-        if (categoryId != null) {
-            res.setCategoryId(UUID.fromString(categoryId.toString()));
-        }
-
-        String startDate = (String) performance.get("start_date");
-        String endDate = (String) performance.get("end_date");
-
-        if (startDate != null) {
-            res.setStartDate(LocalDateTime.parse(startDate));
-        }
-
-        if (endDate != null) {
-            res.setEndDate(LocalDateTime.parse(endDate));
-        }
-
-        res.setTicketsSold(analytics.getTotalTicketsSold());
-        res.setRevenue(analytics.getTotalRevenue());
-
-        Object attendanceRate = performance.get("attendance_rate");
-
-        if (attendanceRate != null) {
-            res.setAttendanceRate(Double.valueOf(attendanceRate.toString()));
-        }
-
-        Object status = performance.get("event_status");
-
-        if (status != null) {
-            res.setStatus(status.toString());
-        }
+        res.setTotalTicketsSold(((Number) row[0]).longValue());
+        res.setTotalRevenue((BigDecimal) row[1]);
+        res.setAverageAttendanceRate(((Number) row[2]).doubleValue());
+        res.setTotalEvents(((Number) row[3]).intValue());
+        res.setActiveEvents(((Number) row[4]).intValue());
 
         return res;
     }

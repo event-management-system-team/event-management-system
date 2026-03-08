@@ -12,9 +12,43 @@ import java.util.UUID;
 public interface EventAnalyticsRepository extends JpaRepository<EventAnalytics, UUID> {
 
     @Query(value = """
-        SELECT *
+        SELECT
+        e.event_id,
+        e.event_name,
+        e.category_id,
+        c.category_name,
+        e.start_date,
+        e.end_date,
+        e.status,
+        ea.total_tickets_sold,
+        ea.total_revenue,
+        ea.total_checkins,
+        ea.total_registrations
         FROM event_analytics ea
-        ORDER BY calculated_at DESC
+        JOIN events e ON ea.event_id = e.event_id
+        LEFT JOIN event_categories c ON e.category_id = c.category_id
+        ORDER BY ea.calculated_at DESC;
         """, nativeQuery = true)
-    List<EventAnalytics> getAnalyticsDashboard();
+    List<Object[]> getAnalyticsDashboard();
+
+    @Query(value = """
+        SELECT 
+        SUM(ea.total_tickets_sold) AS totalTicketsSold,
+        SUM(ea.total_revenue) AS totalRevenue,
+        AVG(
+        CASE 
+            WHEN ea.total_registrations = 0 THEN 0
+            ELSE ea.total_checkins * 1.0 / ea.total_registrations
+        END
+        ) AS avgAttendanceRate,
+        COUNT(ea.event_id) AS totalEvents,
+        COUNT(DISTINCT CASE
+            WHEN e.status IN ('ONGOING','APPROVED')
+            THEN ea.event_id
+            END) AS activeEvents
+        FROM event_analytics ea
+        JOIN events e ON ea.event_id = e.event_id
+        WHERE e.status IN ('ONGOING','COMPLETED')
+        """, nativeQuery = true)
+    Object getAnalyticsSummary();
 }
