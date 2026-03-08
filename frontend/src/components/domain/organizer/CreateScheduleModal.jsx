@@ -268,7 +268,6 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
                 staffRoles: selectedRoles
             }
 
-            console.log("payload", data)
             const response = await organizerService.createSchedule(eventId, data)
             onAlert("success", "Created schedule successfully")
 
@@ -574,7 +573,7 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
                     </Button>
                     <Button
                         onClick={handleSubmit}
-                        disabled={!isFormValid}
+                        disabled={!isFormValid()}
                         className="px-6 bg-[#7FA5A5] hover:bg-[#6D9393] text-white disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Create Schedule

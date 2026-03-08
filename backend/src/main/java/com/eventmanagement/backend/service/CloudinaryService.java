@@ -259,13 +259,13 @@ public class CloudinaryService {
         }
 
         Set<String> allowedTypes = Set.of(
-                "resource/pdf",
+                "application/pdf",
 
-                "resource/msword",
-                "resource/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 
-                "resource/vnd.ms-excel",
-                "resource/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "application/vnd.ms-excel",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 
                 "image/jpeg",
                 "image/png"

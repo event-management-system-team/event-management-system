@@ -6,14 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="b61f3f50-8065-4f51-be19-f5261948bd35" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/organizer/EventResourceController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/organizer/EventResourceController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/request/CreateResourceRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/request/CreateResourceRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/EventResourceRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/EventResourceRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/model/EventResource.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/model/EventResource.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/CloudinaryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/CloudinaryService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/EventResourceService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/EventResourceService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/test/java/com/eventmanagement/backend/controller/organizer/EventResourceControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/com/eventmanagement/backend/controller/organizer/EventResourceControllerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/test/java/com/eventmanagement/backend/service/EventResourceServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/com/eventmanagement/backend/service/EventResourceServiceTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/domain/organizer/OrganizerSidebar.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/domain/organizer/CreateResourceModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/domain/organizer/CreateResourceModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/domain/organizer/CreateScheduleModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/domain/organizer/CreateScheduleModal.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/organizer/StaffManagement.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/organizer/StaffManagement.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -174,7 +170,7 @@
       <workItem from="1772806593374" duration="3774000" />
       <workItem from="1772869835737" duration="13174000" />
       <workItem from="1772898102150" duration="2297000" />
-      <workItem from="1772935436010" duration="5075000" />
+      <workItem from="1772935436010" duration="8349000" />
     </task>
     <servers />
   </component>

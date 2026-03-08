@@ -52,8 +52,9 @@ import 'temporal-polyfill/global'
 import '@schedule-x/theme-default/dist/index.css'
 import { CreateScheduleModal } from '../../components/domain/organizer/CreateScheduleModal.jsx';
 import { AddShiftModal } from '../../components/domain/organizer/AddShiftModal.jsx';
+import { CreateResourceModal } from '../../components/domain/organizer/CreateResourceModal.jsx';
 
-const resources = [
+const rawResources = [
     {
         id: "1",
         name: "Staff_Training_Manual_2026.pdf",
@@ -100,11 +101,13 @@ export default function StaffManagement() {
     const [totalItems, setTotalItems] = useState(0);
     const [staffs, setStaffs] = useState([]);
     const [assignments, setAssignments] = useState([]);
-    const [uploadedFiles, setUploadedFiles] = useState(resources)
+    const [uploadedFiles, setUploadedFiles] = useState(rawResources)
+    const [resources, setResources] = useState([])
     const fileInputRef = useRef(null)
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+    const [isResourceModalopen, setIsResourceModalOpen] = useState(false)
     const [isShiftModalOpen, setIsShiftModalOpen] = useState(false);
     const { alert, showAlert, closeAlert } = useAlert();
 
@@ -142,12 +145,30 @@ export default function StaffManagement() {
         }
     }
 
+    const fetchResources = async () => {
+        if (!id) return
+
+        try {
+            setLoading(true)
+            const response = await organizerService.getResources(id)
+            // const data = await response.json()
+
+            setResources(response.data)
+        } catch (error) {
+            setError("Cannot load resources");
+            console.error(error)
+        } finally {
+            setLoading(false);
+        }
+    }
+
     useEffect(() => {
         fetchStaffList()
     }, [id, currentPage])
 
     useEffect(() => {
         fetchAssignmentList()
+        fetchResources()
     }, [id]);
 
     const getTopRightAction = () => {
@@ -156,7 +177,7 @@ export default function StaffManagement() {
                 return (
                     <Button
                         className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5 py-5 h-12 w-40"
-                    // onClick={openModal}
+                        onClick={openResourceModal}
                     >
                         <Plus className="h-4 w-4" />
                         Upload Resource
@@ -335,6 +356,14 @@ export default function StaffManagement() {
 
     const closeShiftModal = () => {
         setIsShiftModalOpen(false);
+    };
+
+    const openResourceModal = () => {
+        setIsResourceModalOpen(true)
+    };
+
+    const closeResourceModal = () => {
+        setIsResourceModalOpen(false)
     };
 
     // const formatDate = (isoString) => {
@@ -528,7 +557,7 @@ export default function StaffManagement() {
                     {/* TAB 3: Resources */}
                     <TabsContent value="resources" className="space-y-4">
                         {/* Upload Dropzone */}
-                        <Card className="shadow-sm">
+                        {/* <Card className="shadow-sm">
                             <CardContent className="p-8">
                                 <div
                                     className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-[#7FA5A5] transition-colors cursor-pointer"
@@ -558,29 +587,29 @@ export default function StaffManagement() {
                                     />
                                 </div>
                             </CardContent>
-                        </Card>
+                        </Card> */}
 
                         {/* Recent Files */}
-                        <Card className="shadow-sm">
+                        <Card className="shadow-sm border-none">
                             <CardHeader>
                                 <CardTitle>Recent Files</CardTitle>
                                 <CardDescription>Manage and download event resources</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-3">
-                                    {uploadedFiles.map(file => (
+                                    {resources?.map(file => (
                                         <div
-                                            key={file.id}
+                                            key={file.resourceId}
                                             className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                                         >
                                             <div className="flex items-center gap-4 flex-1">
-                                                <div className="flex-shrink-0">{getFileIcon(file.type)}</div>
+                                                {/* <div className="flex-shrink-0">{getFileIcon(file.resourceType)}</div> */}
                                                 <div className="flex-1 min-w-0">
                                                     <p className="text-sm font-medium text-gray-900 truncate">
-                                                        {file.name}
+                                                        {file.resourceName}
                                                     </p>
                                                     <p className="text-xs text-gray-500">
-                                                        Uploaded {file.uploadDate} • {file.size}
+                                                        Uploaded {file.createdAt} • {file.fileSize}
                                                     </p>
                                                 </div>
                                             </div>
@@ -605,7 +634,7 @@ export default function StaffManagement() {
                                                     variant="ghost"
                                                     size="sm"
                                                     className="h-8 w-8 p-0"
-                                                    onClick={() => handleFileDelete(file.id)}
+                                                    onClick={() => handleFileDelete(file.resourceId)}
                                                 >
                                                     <Trash2 className="h-4 w-4 text-red-500" />
                                                 </Button>
@@ -635,6 +664,15 @@ export default function StaffManagement() {
                 isOpen={isScheduleModalOpen}
                 onClose={closeScheduleModal}
                 onCreated={handleScheduleCreated}
+                onAlert={showAlert}
+            />
+
+            {/* Create Resource Modal */}
+            <CreateResourceModal
+                eventId={id}
+                isOpen={isResourceModalopen}
+                onClose={closeResourceModal}
+                // onCreated={handleScheduleCreated}
                 onAlert={showAlert}
             />
 

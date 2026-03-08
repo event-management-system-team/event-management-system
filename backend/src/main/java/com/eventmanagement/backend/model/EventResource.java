@@ -42,7 +42,7 @@ public class EventResource {
     @Column(name = "file_url", columnDefinition = "TEXT")
     private String fileUrl;
 
-    @Column(name = "file_type", length = 50)
+    @Column(name = "file_type", length = 100)
     private String fileType;
 
     @Column(name = "file_size")

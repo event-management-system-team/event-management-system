@@ -77,7 +77,7 @@ const organizerService = {
     },
 
     getResources: (eventId) => {
-        return axiosInstance.post(`/events/${eventId}/resources`)
+        return axiosInstance.get(`/events/${eventId}/resources`)
     }
 
 };
