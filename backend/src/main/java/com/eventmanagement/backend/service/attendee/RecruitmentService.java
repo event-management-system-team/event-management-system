@@ -140,6 +140,8 @@ public class RecruitmentService {
                 .eventName(event.getEventName())
                 .eventBannerUrl(event.getBannerUrl())
                 .location(event.getLocation())
+                .startDate(event.getStartDate())
+                .endDate(event.getEndDate())
                 .description(recruitment.getDescription())
                 .deadline(recruitment.getDeadline())
                 .createdAt(recruitment.getCreatedAt())
