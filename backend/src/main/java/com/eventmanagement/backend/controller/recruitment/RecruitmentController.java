@@ -56,7 +56,6 @@ public class RecruitmentController {
     private final RecruitmentServiceOrganizer RecruitmentServiceOrganizer;
 
 
-
     @GetMapping("/recent")
     public ResponseEntity<List<RecruitmentResponse>> getRecentRecruitment() {
         List<RecruitmentResponse> recruitments = recruitmentService.getRecentRecruitments();
@@ -92,7 +91,7 @@ public class RecruitmentController {
             @RequestParam("recruitmentId") UUID recruitmentId,
             @RequestParam("userId") UUID userId,
             @RequestParam("answers") String answersJson,
-            @RequestParam("files") MultipartFile cv
+            @RequestParam(value = "files", required = false) MultipartFile cv
     ) {
         try {
             applicationFormService.submitApplication(recruitmentId, userId, answersJson, cv);
@@ -103,7 +102,7 @@ public class RecruitmentController {
         }
     }
 
-     @GetMapping("/dashboards")
+    @GetMapping("/dashboards")
     public ResponseEntity<RecruitmentDashBoardDTO> getDashboardData() {
         RecruitmentDashBoardDTO response = RecruitmentServiceOrganizer.getDashBoardData();
         return ResponseEntity.ok(response);
@@ -124,16 +123,17 @@ public class RecruitmentController {
 
     @PostMapping("/events/{eventId}/workspace")
     public ResponseEntity<?> saveRecruitmentWorkspace(
-            @PathVariable UUID eventId, 
+            @PathVariable UUID eventId,
             @RequestBody WorkspaceRequestDTO request) {
         try {
             recruitmentServiceOrganizer.saveWorkspace(eventId, request);
             return ResponseEntity.ok("Đã lưu toàn bộ Workspace thành công!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body("Lỗi khi lưu Workspace: " + e.getMessage());
+                    .body("Lỗi khi lưu Workspace: " + e.getMessage());
         }
     }
+
     @GetMapping("/events/{eventId}/workspace")
     public ResponseEntity<?> getRecruitmentWorkspace(@PathVariable UUID eventId) {
         try {
@@ -149,21 +149,21 @@ public class RecruitmentController {
                 posDto.put("vacancy", r.getVacancy());
                 safePositions.add(posDto);
             }
-            
+
             workspaceData.put("positions", safePositions);
-            
+
             return ResponseEntity.ok(workspaceData);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body("Lỗi khi tải Workspace: " + e.getMessage());
+                    .body("Lỗi khi tải Workspace: " + e.getMessage());
         }
     }
-    
+
 
     @GetMapping("/events/{eventId}/forms")
-public ResponseEntity<?> getForm(@PathVariable UUID eventId, @RequestParam("type") String typeStr) {
-   
-    FormType type = FormType.valueOf(typeStr.toUpperCase()); 
-    return ResponseEntity.ok(customFormService.getFormByType(eventId, type));
-}
+    public ResponseEntity<?> getForm(@PathVariable UUID eventId, @RequestParam("type") String typeStr) {
+
+        FormType type = FormType.valueOf(typeStr.toUpperCase());
+        return ResponseEntity.ok(customFormService.getFormByType(eventId, type));
+    }
 }

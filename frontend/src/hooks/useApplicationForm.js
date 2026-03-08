@@ -20,8 +20,8 @@ export const useApplicationForm = (recruitmentList, userProfile, eventSlug) => {
             formData.append('recruitmentId', selectedRole);
             formData.append('userId', userProfile.userId);
 
-            const cvFile = values.cv[0].originFileObj;
-            formData.append('files', cvFile);
+            const cvFile = values.cv?.[0]?.originFileObj;
+            if (cvFile) { formData.append('files', cvFile); }
 
             const { cv, ...answersOnlyText } = values;
             formData.append('answers', JSON.stringify(answersOnlyText));
