@@ -1,4 +1,4 @@
-import { Info, Lock, Minus, Plus, Ticket } from 'lucide-react'
+import { Info, Lock, Minus, Plus, Ticket, Clock } from 'lucide-react'
 import { useTicketCart } from '../../../hooks/useTicketCart'
 
 const SidebarTicket = ({ minPrice, ticketTypes, eventStatus }) => {
@@ -31,6 +31,13 @@ const SidebarTicket = ({ minPrice, ticketTypes, eventStatus }) => {
                     ticketTypes.map((ticket) => {
                         const count = ticketCounts[ticket.ticketTypeId] || 0;
                         const isSoldOut = (ticket.soldCount + ticket.reservedCount) === ticket.quantity;
+
+                        const formatTicketDate = (dateStr) => {
+                            if (!dateStr) return null;
+                            const d = new Date(dateStr);
+                            return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+                        };
+
                         return (
                             <div
                                 key={ticket.ticketTypeId}
@@ -44,6 +51,16 @@ const SidebarTicket = ({ minPrice, ticketTypes, eventStatus }) => {
                                         </p>
                                     ) : (
                                         <p className="text-[11px] text-red-500 font-bold uppercase tracking-widest mt-1">Sold Out</p>
+                                    )}
+                                    {(ticket.saleStart || ticket.saleEnd) && (
+                                        <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold tracking-tight mt-1">
+                                            <Clock size={10} className="shrink-0 text-slate-300" />
+                                            <span className="truncate" title="Sale Period">
+                                                {ticket.saleStart ? formatTicketDate(ticket.saleStart) : 'NOW'}
+                                                <span className="text-slate-300 font-normal mx-1">-</span>
+                                                {ticket.saleEnd ? formatTicketDate(ticket.saleEnd) : '∞'}
+                                            </span>
+                                        </div>
                                     )}
                                 </div>
 
