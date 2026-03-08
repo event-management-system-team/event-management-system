@@ -12,6 +12,7 @@ import {
     ChevronLeft,
     ChevronRight,
     MapPin,
+    Pencil,
 } from 'lucide-react';
 import dayjs from 'dayjs';
 import organizerService from '../../services/organizer.service';
@@ -386,10 +387,21 @@ const MyEventsPage = () => {
                                 </div>
 
                                 {/* Actions */}
-                                <div className="col-span-1 text-right">
-                                    <button className="text-sm text-[#7FA5A5] hover:text-[#5d8585] font-medium transition-colors">
-                                        Manage
-                                    </button>
+                                <div className="col-span-1 flex items-center justify-end gap-2">
+                                    {(event.status === 'PENDING' || event.status === 'DRAFT') ? (
+                                        <button
+                                            onClick={() => navigate(`/organizer/edit-event/${event.eventId}`)}
+                                            className="flex items-center gap-1 text-sm text-amber-600 hover:text-amber-700 font-medium transition-colors"
+                                            title="Edit Event"
+                                        >
+                                            <Pencil size={14} />
+                                            
+                                        </button>
+                                    ) : (
+                                        <button className="text-sm text-[#7FA5A5] hover:text-[#5d8585] font-medium transition-colors">
+                                            Manage
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         );
