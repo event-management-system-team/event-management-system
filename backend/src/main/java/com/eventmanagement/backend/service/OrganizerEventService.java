@@ -7,6 +7,7 @@ import com.eventmanagement.backend.dto.response.organizer.OrganizerEventResponse
 import com.eventmanagement.backend.dto.response.organizer.OrganizerEventStatsResponse;
 import com.eventmanagement.backend.exception.BadRequestException;
 import com.eventmanagement.backend.exception.NotFoundException;
+import com.eventmanagement.backend.exception.UnauthorizedException;
 import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.model.EventAgenda;
 import com.eventmanagement.backend.model.EventCategory;
@@ -223,10 +224,141 @@ public class OrganizerEventService {
                 .status(event.getStatus().name())
                 .isFree(event.getIsFree())
                 .totalCapacity(event.getTotalCapacity())
+                .categoryId(event.getCategory() != null ? event.getCategory().getCategoryId() : null)
                 .categoryName(event.getCategory() != null ? event.getCategory().getCategoryName() : null)
                 .tickets(ticketResponses)
                 .agendas(agendaResponses)
                 .build();
+    }
+
+    /**
+     * Lấy chi tiết event theo ID (dành cho organizer edit)
+     */
+    public CreateEventResponse getEventById(UUID eventId, User organizer) {
+        Event event = eventRepository.findWithDetailsById(eventId);
+        if (event == null) {
+            throw new NotFoundException("Event not found: " + eventId);
+        }
+        if (!event.getOrganizer().getUserId().equals(organizer.getUserId())) {
+            throw new UnauthorizedException("You are not the organizer of this event");
+        }
+        return mapToCreateEventResponse(event);
+    }
+
+    /**
+     * Cập nhật event (chỉ cho phép khi status là DRAFT hoặc PENDING)
+     */
+    @Transactional
+    public CreateEventResponse updateEvent(UUID eventId, User organizer, CreateEventRequest request, MultipartFile coverFile) {
+        Event event = eventRepository.findWithDetailsById(eventId);
+        if (event == null) {
+            throw new NotFoundException("Event not found: " + eventId);
+        }
+        if (!event.getOrganizer().getUserId().equals(organizer.getUserId())) {
+            throw new UnauthorizedException("You are not the organizer of this event");
+        }
+        if (event.getStatus() != EventStatus.DRAFT && event.getStatus() != EventStatus.PENDING) {
+            throw new BadRequestException("Only DRAFT or PENDING events can be edited");
+        }
+
+        EventCategory category = eventCategoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new NotFoundException("Category not found: " + request.getCategoryId()));
+
+        LocalDateTime startDateTime = parseDateTime(request.getStartDate(), request.getStartTime());
+        LocalDateTime endDateTime = parseDateTime(request.getEndDate(), request.getEndTime());
+
+        if (endDateTime.isBefore(startDateTime)) {
+            throw new BadRequestException("End date/time must be after start date/time");
+        }
+        if (!request.isDraft() && startDateTime.isBefore(LocalDateTime.now())) {
+            throw new BadRequestException("Start date/time must be in the future");
+        }
+
+        if (coverFile != null && !coverFile.isEmpty()) {
+            try {
+                String bannerUrl = cloudinaryService.uploadEventBanner(coverFile);
+                event.setBannerUrl(bannerUrl);
+            } catch (IOException e) {
+                throw new BadRequestException("Failed to upload cover image: " + e.getMessage());
+            }
+        }
+
+        EventStatus status = request.isDraft() ? EventStatus.DRAFT : EventStatus.PENDING;
+
+        int totalCapacity;
+        if (request.isFree()) {
+            totalCapacity = request.getTotalCapacity() != null ? request.getTotalCapacity() : 0;
+        } else {
+            totalCapacity = request.getTickets() != null
+                    ? request.getTickets().stream()
+                            .mapToInt(t -> t.getQuantity() != null ? t.getQuantity() : 0)
+                            .sum()
+                    : 0;
+        }
+
+        Map<String, Object> locationCoordinates = null;
+        if (request.getLocationCoordinates() != null && !request.getLocationCoordinates().isEmpty()) {
+            locationCoordinates = new HashMap<>(request.getLocationCoordinates());
+        }
+
+        event.setCategory(category);
+        event.setEventName(request.getEventName());
+        event.setDescription(request.getDescription());
+        event.setLocation(request.getLocation());
+        event.setLocationCoordinates(locationCoordinates);
+        event.setStartDate(startDateTime);
+        event.setEndDate(endDateTime);
+        event.setIsFree(request.isFree());
+        event.setTotalCapacity(totalCapacity);
+        event.setStatus(status);
+
+        event.getTicketTypes().clear();
+        if (request.isFree()) {
+            TicketType freeTicket = TicketType.builder()
+                    .event(event)
+                    .ticketName("Free Admission")
+                    .quantity(totalCapacity)
+                    .price(BigDecimal.ZERO)
+                    .isActive(true)
+                    .build();
+            event.getTicketTypes().add(freeTicket);
+        } else if (request.getTickets() != null) {
+            for (CreateEventRequest.TicketRequest ticketReq : request.getTickets()) {
+                BigDecimal price = ticketReq.getPrice() != null ? ticketReq.getPrice() : BigDecimal.ZERO;
+                TicketType ticketType = TicketType.builder()
+                        .event(event)
+                        .ticketName(ticketReq.getName())
+                        .quantity(ticketReq.getQuantity() != null ? ticketReq.getQuantity() : 0)
+                        .price(price)
+                        .isActive(true)
+                        .build();
+                event.getTicketTypes().add(ticketType);
+            }
+        }
+
+        event.getAgendas().clear();
+        if (request.getAgenda() != null && !request.getAgenda().isEmpty()) {
+            int order = 0;
+            for (CreateEventRequest.AgendaRequest agendaReq : request.getAgenda()) {
+                LocalDateTime agendaStart = parseDateTime(request.getStartDate(), agendaReq.getStartTime());
+                LocalDateTime agendaEnd = parseDateTime(request.getStartDate(), agendaReq.getEndTime());
+
+                EventAgenda agenda = EventAgenda.builder()
+                        .event(event)
+                        .title(agendaReq.getTitle())
+                        .description(agendaReq.getDescription())
+                        .startTime(agendaStart)
+                        .endTime(agendaEnd)
+                        .location(agendaReq.getLocation())
+                        .orderIndex(order++)
+                        .build();
+                event.getAgendas().add(agenda);
+            }
+        }
+
+        Event saved = eventRepository.save(event);
+        log.info("Event updated: id={}, name={}, status={}", saved.getEventId(), saved.getEventName(), saved.getStatus());
+        return mapToCreateEventResponse(saved);
     }
 
     /**
