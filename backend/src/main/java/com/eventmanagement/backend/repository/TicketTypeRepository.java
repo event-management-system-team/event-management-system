@@ -10,4 +10,6 @@ import java.util.UUID;
 @Repository
 public interface TicketTypeRepository extends JpaRepository<TicketType, UUID> {
     List<TicketType> findByEvent_EventIdAndIsActiveTrue(UUID eventId);
+
+    List<TicketType> findByEvent_EventSlugAndIsActiveTrue(String eventSlug);
 }
