@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import UrgencyTimer from "../../components/domain/checkout/UrgencyTimer";
 import TicketReview from "../../components/domain/checkout/TicketReview";
@@ -14,14 +14,22 @@ import {
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
 
-  const { selectedTickets, selectedEvent, reservation, loading } = useSelector(
-    (state) => state.booking,
-  );
+  const { reservation, loading } = useSelector((state) => state.booking);
+  const reduxTickets = useSelector((state) => state.booking.selectedTickets);
+  const reduxEvent = useSelector((state) => state.booking.selectedEvent);
   const { user } = useSelector((state) => state.auth);
-  const [timeLeft, setTimeLeft] = useState(0);
 
+  const selectedTickets =
+    reduxTickets?.length > 0
+      ? reduxTickets
+      : location.state?.tickets || [];
+
+  const selectedEvent = reduxEvent || location.state?.event || null;
+
+  const [timeLeft, setTimeLeft] = useState(0);
   const [form, setForm] = useState({
     fullName: user?.fullName || "",
     email: user?.email || "",
@@ -32,7 +40,6 @@ const CheckoutPage = () => {
     selectedTickets?.reduce((sum, t) => sum + t.price * t.quantity, 0) || 0;
 
   useEffect(() => {
-    // Free tickets have no reservation — only block paid tickets missing reservation
     if (!selectedTickets?.length || (!reservation && subTotal > 0)) {
       navigate(-1);
     }
@@ -59,13 +66,10 @@ const CheckoutPage = () => {
   }, [reservation]);
 
   const formatTime = (seconds) => {
-    const m = Math.floor(seconds / 60)
-      .toString()
-      .padStart(2, "0");
+    const m = Math.floor(seconds / 60).toString().padStart(2, "0");
     const s = (seconds % 60).toString().padStart(2, "0");
     return `${m}:${s}`;
   };
-
 
   const validate = () => {
     const errors = {};
@@ -83,22 +87,29 @@ const CheckoutPage = () => {
       return;
     }
 
+    if (!selectedTickets || selectedTickets.length === 0) {
+      navigate(-1);
+      return;
+    }
+
     const ticket = selectedTickets[0];
+
     try {
       const orderResult = await dispatch(
         createOrder({
-          ticketTypeId: ticket.ticketTypeId,   // null for free events
-          eventId: selectedEvent?.eventId,      // required for free events
+          ticketTypeId: ticket.ticketTypeId ?? null,
+          eventId: selectedEvent?.eventId,
           quantity: ticket.quantity,
           fullName: form.fullName,
           email: form.email,
         }),
       ).unwrap();
 
-      // Free ticket: already confirmed by backend — skip VNPay
+      console.log("orderResult:", JSON.stringify(orderResult));
+
       if (orderResult.free) {
         dispatch(clearBooking());
-        navigate(`/payment/success?orderCode=${orderResult.orderCode}`);
+        navigate(`/attendee/payment/success?orderCode=${orderResult.orderCode}`);
         return;
       }
 
@@ -109,7 +120,7 @@ const CheckoutPage = () => {
 
       window.location.href = paymentResult.paymentUrl;
     } catch (err) {
-      console.error(err);
+      console.error("Checkout error:", err);
     }
   };
 

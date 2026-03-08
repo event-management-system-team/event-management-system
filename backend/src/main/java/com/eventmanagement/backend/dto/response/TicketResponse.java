@@ -29,6 +29,10 @@ public class TicketResponse {
 
     private String eventLocation;
 
+    private String eventBannerUrl;
+
+    private String orderCode;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventStartDate;
 
@@ -36,6 +40,8 @@ public class TicketResponse {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
+
+    private String paymentMethod;
 
     public static TicketResponse from(Ticket ticket) {
         return TicketResponse.builder()
@@ -46,9 +52,16 @@ public class TicketResponse {
                 .price(ticket.getPrice())
                 .eventName(ticket.getEvent().getEventName())
                 .eventLocation(ticket.getEvent().getLocation())
+                .eventBannerUrl(ticket.getEvent().getBannerUrl())
+                .orderCode(ticket.getOrder().getOrderCode())
                 .eventStartDate(ticket.getEvent().getStartDate())
-                .ticketTypeName(ticket.getTicketType().getTicketName())
+                .ticketTypeName(ticket.getTicketType() != null
+                        ? ticket.getTicketType().getTicketName()
+                        : "Free Admission")
                 .createdAt(ticket.getCreatedAt())
+                .paymentMethod(ticket.getOrder() != null && ticket.getOrder().getPaymentMethod() != null
+                        ? ticket.getOrder().getPaymentMethod().name()
+                        : null)
                 .build();
     }
 }

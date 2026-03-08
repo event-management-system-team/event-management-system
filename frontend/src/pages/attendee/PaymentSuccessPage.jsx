@@ -29,8 +29,7 @@ const PaymentSuccessPage = () => {
     retryDelay: 2000,
   });
 
-  const orderTickets = tickets.filter((t) => t.orderCode === orderCode);
-  const displayTickets = orderTickets.length > 0 ? orderTickets : tickets;
+  const displayTickets = tickets.filter((t) => t.orderCode === orderCode);
 
   return (
     <div className="bg-[#E5E1DA] font-sans min-h-screen text-[#131516]">

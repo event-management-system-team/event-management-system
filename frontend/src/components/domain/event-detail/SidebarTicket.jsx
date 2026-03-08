@@ -27,6 +27,15 @@ const SidebarTicket = ({ minPrice, ticketTypes, event }) => {
     formatCurrency,
   } = useTicketCart(ticketTypes);
 
+  const eventState = {
+    eventId: event?.eventId,
+    eventName: event?.eventName,
+    eventSlug: event?.eventSlug,
+    location: event?.location,
+    startDate: event?.startDate,
+    bannerUrl: event?.bannerUrl,
+  };
+
   const handleBuyTickets = async () => {
     if (!isAuthenticated) {
       navigate("/login");
@@ -34,27 +43,17 @@ const SidebarTicket = ({ minPrice, ticketTypes, event }) => {
     }
 
     if (!ticketTypes || ticketTypes.length === 0) {
-      dispatch(
-        setSelectedTickets([
-          {
+      navigate("/attendee/checkout", {
+        state: {
+          tickets: [{
             ticketTypeId: null,
             ticketTypeName: "Free Admission",
             price: 0,
             quantity: freeTicketCount,
-          },
-        ]),
-      );
-      dispatch(
-        setSelectedEvent({
-          eventId: event?.eventId,
-          eventName: event?.eventName,
-          eventSlug: event?.eventSlug,
-          location: event?.location,
-          startDate: event?.startDate,
-          bannerUrl: event?.bannerUrl,
-        }),
-      );
-      navigate("/attendee/checkout");
+          }],
+          event: eventState,
+        },
+      });
       return;
     }
 
@@ -81,18 +80,12 @@ const SidebarTicket = ({ minPrice, ticketTypes, event }) => {
         ),
       );
 
-      dispatch(setSelectedTickets(selectedList));
-      dispatch(
-        setSelectedEvent({
-          eventId: event?.eventId,
-          eventName: event?.eventName,
-          eventSlug: event?.eventSlug,
-          location: event?.location,
-          startDate: event?.startDate,
-          bannerUrl: event?.bannerUrl,
-        }),
-      );
-      navigate("/attendee/checkout");
+      navigate("/attendee/checkout", {
+        state: {
+          tickets: selectedList,
+          event: eventState,
+        },
+      });
     } catch (error) {
       console.error(error);
     }
