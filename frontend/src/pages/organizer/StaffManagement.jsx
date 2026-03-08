@@ -1,40 +1,21 @@
 import {
-    Users,
-    CheckCircle,
     Plus,
-    Bell,
     ChevronRight,
-    Search,
-    UserCircle,
-    MoreVertical,
-    UserX,
     Eye,
     Download,
-    ChevronLeft,
-    Upload,
     Calendar1,
     FileText,
     ImageIcon,
-    Trash2
 } from 'lucide-react';
-import { Link, useParams } from 'react-router';
-import { useEffect, useRef, useState } from "react";
+import { useParams } from 'react-router';
+import { useEffect, useState } from "react";
 import { Button } from "../../components/domain/admin/Button.jsx";
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/domain/admin/Avatar.jsx";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/domain/admin/Card.jsx";
+import { Card, CardContent } from "../../components/domain/admin/Card.jsx";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/domain/admin/Tabs.jsx";
-import { Input } from "../../components/domain/admin/Input.jsx";
 import { Badge } from "../../components/domain/admin/Badge.jsx";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/domain/admin/Select.jsx";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger
-} from "../../components/domain/admin/Dropdown-Menu.jsx";
 import organizerService from "../../services/organizer.service.js";
 import { AccountsPagination } from "../../components/domain/admin/AccountsPagination.jsx";
-import { DatePicker, Space, Popconfirm, Calendar } from 'antd';
 import { Alert } from "../../components/common/Alert.jsx";
 import { useAlert } from '../../hooks/useAlert.js';
 import dayjs from "dayjs";
@@ -51,46 +32,8 @@ import { createEventsServicePlugin } from '@schedule-x/events-service'
 import 'temporal-polyfill/global'
 import '@schedule-x/theme-default/dist/index.css'
 import { CreateScheduleModal } from '../../components/domain/organizer/CreateScheduleModal.jsx';
-import { AddShiftModal } from '../../components/domain/organizer/AddShiftModal.jsx';
+// import { AddShiftModal } from '../../components/domain/organizer/AddShiftModal.jsx';
 import { CreateResourceModal } from '../../components/domain/organizer/CreateResourceModal.jsx';
-
-const rawResources = [
-    {
-        id: "1",
-        name: "Staff_Training_Manual_2026.pdf",
-        type: "pdf",
-        uploadDate: "Feb 10, 2026",
-        size: "2.4 MB"
-    },
-    {
-        id: "2",
-        name: "Event_Floor_Plan.jpg",
-        type: "image",
-        uploadDate: "Feb 8, 2026",
-        size: "1.8 MB"
-    },
-    {
-        id: "3",
-        name: "Staff_Schedule_Template.xlsx",
-        type: "excel",
-        uploadDate: "Feb 5, 2026",
-        size: "156 KB"
-    },
-    {
-        id: "4",
-        name: "Emergency_Procedures.docx",
-        type: "document",
-        uploadDate: "Feb 1, 2026",
-        size: "890 KB"
-    },
-    {
-        id: "5",
-        name: "Contact_List.pdf",
-        type: "pdf",
-        uploadDate: "Jan 28, 2026",
-        size: "512 KB"
-    }
-]
 
 export default function StaffManagement() {
 
@@ -101,14 +44,12 @@ export default function StaffManagement() {
     const [totalItems, setTotalItems] = useState(0);
     const [staffs, setStaffs] = useState([]);
     const [assignments, setAssignments] = useState([]);
-    const [uploadedFiles, setUploadedFiles] = useState(rawResources)
     const [resources, setResources] = useState([])
-    const fileInputRef = useRef(null)
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
     const [isResourceModalopen, setIsResourceModalOpen] = useState(false)
-    const [isShiftModalOpen, setIsShiftModalOpen] = useState(false);
+    // const [isShiftModalOpen, setIsShiftModalOpen] = useState(false);
     const { alert, showAlert, closeAlert } = useAlert();
 
     const fetchStaffList = async () => {
@@ -151,7 +92,6 @@ export default function StaffManagement() {
         try {
             setLoading(true)
             const response = await organizerService.getResources(id)
-            // const data = await response.json()
 
             setResources(response.data)
         } catch (error) {
@@ -207,117 +147,78 @@ export default function StaffManagement() {
         }
     }
 
-    const getFileIcon = type => {
+    const formatFileSize = (bytes) => {
+        return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+    }
+
+    const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+        });
+    };
+
+    const normalizeFileType = (mime) => {
+        if (!mime) return "document"
+
+        if (mime.startsWith("image/")) return "image"
+        if (mime.includes("pdf")) return "pdf"
+        if (mime.includes("excel") || mime.includes("spreadsheet")) return "excel"
+        if (mime.includes("word") || mime.includes("document")) return "document"
+
+        return "document"
+    }
+
+    const getFileIcon = (mimeType) => {
+        const type = normalizeFileType(mimeType)
+
         switch (type) {
             case "pdf":
                 return <FileText className="h-8 w-8 text-red-500" />
+
             case "image":
                 return <ImageIcon className="h-8 w-8 text-blue-500" />
+
             case "excel":
                 return <FileText className="h-8 w-8 text-green-500" />
+
             case "document":
                 return <FileText className="h-8 w-8 text-blue-600" />
+
             default:
                 return <FileText className="h-8 w-8 text-gray-500" />
         }
     }
 
-    // const handleFileUpload = event => {
-    //     const files = event.target.files
-    //     if (files) {
-    //         const newFiles = Array.from(files).map(file => {
-    //             const fileType = file.type.includes("pdf")
-    //                 ? "pdf"
-    //                 : file.type.includes("image")
-    //                     ? "image"
-    //                     : file.type.includes("sheet") || file.name.endsWith(".xlsx")
-    //                         ? "excel"
-    //                         : "document"
+    const handleFileDownload = (file) => {
+        if (!file?.fileUrl) return;
 
-    //             return {
-    //                 id: Date.now().toString() + Math.random(),
-    //                 name: file.name,
-    //                 type: fileType,
-    //                 uploadDate: new Date().toLocaleDateString("en-US", {
-    //                     month: "short",
-    //                     day: "numeric",
-    //                     year: "numeric"
-    //                 }),
-    //                 size:
-    //                     file.size > 1024 * 1024
-    //                         ? `${(file.size / (1024 * 1024)).toFixed(2)} MB`
-    //                         : `${(file.size / 1024).toFixed(0)} KB`
-    //             }
-    //         })
-    //         setUploadedFiles([...uploadedFiles, ...newFiles])
-    //         toast.success(`${newFiles.length} file(s) uploaded successfully`, {
-    //             description: "Your resources have been added"
-    //         })
+        const downloadUrl = file.fileUrl.replace(
+            "/upload/",
+            "/upload/fl_attachment/"
+        );
 
-    //         // Reset input
-    //         if (fileInputRef.current) {
-    //             fileInputRef.current.value = ""
-    //         }
-    //     }
-    // }
+        const link = document.createElement("a");
+        link.href = downloadUrl;
+        link.download = file.resourceName || "download";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 
-    const handleFileUpload = async (event) => {
+    const handleFilePreview = (file) => {
+        if (!file?.fileUrl) return;
 
-        const files = event.target.files
-
-        for (const file of files) {
-
-            const data = {
-                resourceName: file.name,
-                description: "",
-                resourceType: "DOCUMENT"
-            }
-
-            const res = await organizerService.createResource(id, data, file)
-
-            console.log(res.data)
-
+        if (file.fileType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+            const officeViewer = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(file.fileUrl)}`;
+            // const googleViewer = `https://docs.google.com/gview?url=${encodeURIComponent(file.fileUrl)}&embedded=true`
+            window.open(officeViewer, "_blank");
+            return;
         }
-    }
 
-    const handleFileDelete = fileId => {
-        const file = uploadedFiles.find(f => f.id === fileId)
-        setUploadedFiles(uploadedFiles.filter(f => f.id !== fileId))
-        toast.success("File deleted", {
-            description: `${file?.name} has been removed`
-        })
-    }
-
-    const handleFileDownload = file => {
-        // toast.info("Download started", {
-        //     description: `Downloading ${file.name}`
-        // })
-        // In a real application, this would trigger an actual download
-        console.log("Downloading file:", file.name)
-    }
-
-    const handleFilePreview = file => {
-        // toast.info("Opening preview", {
-        //     description: `Previewing ${file.name}`
-        // })
-        // In a real application, this would open a preview modal
-        console.log("Previewing file:", file.name)
-    }
-
-    const handleDragOver = e => {
-        e.preventDefault()
-    }
-
-    const handleDrop = e => {
-        e.preventDefault()
-        const files = e.dataTransfer.files
-        if (files && files.length > 0) {
-            const fakeEvent = {
-                target: { files }
-            }
-            handleFileUpload(fakeEvent)
-        }
-    }
+        window.open(file.fileUrl, "_blank");
+    };
 
     const pageSize = 10;
     const startItem = currentPage * pageSize + 1;
@@ -346,17 +247,17 @@ export default function StaffManagement() {
         setIsScheduleModalOpen(true)
     };
 
-    const openShiftModal = () => {
-        setIsShiftModalOpen(true)
-    };
-
     const closeScheduleModal = () => {
         setIsScheduleModalOpen(false);
     };
 
-    const closeShiftModal = () => {
-        setIsShiftModalOpen(false);
-    };
+    // const openShiftModal = () => {
+    //     setIsShiftModalOpen(true)
+    // };
+
+    // const closeShiftModal = () => {
+    //     setIsShiftModalOpen(false);
+    // };
 
     const openResourceModal = () => {
         setIsResourceModalOpen(true)
@@ -364,29 +265,6 @@ export default function StaffManagement() {
 
     const closeResourceModal = () => {
         setIsResourceModalOpen(false)
-    };
-
-    // const formatDate = (isoString) => {
-    //     const date = new Date(isoString);
-
-    //     return date.toLocaleDateString("en-US", {
-    //         month: "short",
-    //         day: "2-digit",
-    //         year: "numeric",
-    //     });
-    // };
-
-    const getStatusColor = (status) => {
-        switch (status) {
-            case "CONFIRMED":
-                return "bg-green-500";
-            case "ASSIGNED":
-                return "bg-yellow-500";
-            case "DECLINED":
-                return "bg-red-500";
-            default:
-                return "bg-gray-400";
-        }
     };
 
     const eventsService = useState(() => createEventsServicePlugin())[0]
@@ -426,6 +304,10 @@ export default function StaffManagement() {
 
     const handleScheduleCreated = async () => {
         await fetchAssignmentList()
+    }
+
+    const handleResourceCreated = async () => {
+        await fetchResources()
     }
 
     if (loading) return <div className="absolute top-0 left-0 w-full h-1 bg-blue-500 animate-pulse z-10" />
@@ -556,60 +438,23 @@ export default function StaffManagement() {
 
                     {/* TAB 3: Resources */}
                     <TabsContent value="resources" className="space-y-4">
-                        {/* Upload Dropzone */}
-                        {/* <Card className="shadow-sm">
-                            <CardContent className="p-8">
-                                <div
-                                    className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-[#7FA5A5] transition-colors cursor-pointer"
-                                    onDragOver={handleDragOver}
-                                    onDrop={handleDrop}
-                                >
-                                    <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-base font-medium text-gray-700 mb-2">
-                                        Drop new resources here
-                                    </p>
-                                    <p className="text-sm text-gray-500">
-                                        Support for PDF, DOCX, XLSX, JPG up to 10MB
-                                    </p>
-                                    <Button
-                                        className="mt-4 bg-[#7FA5A5] hover:bg-[#6D9393] text-white"
-                                        onClick={() => fileInputRef.current?.click()}
-                                    >
-                                        Click to Upload
-                                    </Button>
-                                    <input
-                                        type="file"
-                                        ref={fileInputRef}
-                                        className="hidden"
-                                        multiple
-                                        onChange={handleFileUpload}
-                                        accept=".pdf, .docx, .xlsx, .jpg"
-                                    />
-                                </div>
-                            </CardContent>
-                        </Card> */}
-
                         {/* Recent Files */}
                         <Card className="shadow-sm border-none">
-                            <CardHeader>
-                                <CardTitle>Recent Files</CardTitle>
-                                <CardDescription>Manage and download event resources</CardDescription>
-                            </CardHeader>
                             <CardContent>
-                                <div className="space-y-3">
+                                <div className="space-y-4">
                                     {resources?.map(file => (
                                         <div
                                             key={file.resourceId}
                                             className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                                         >
                                             <div className="flex items-center gap-4 flex-1">
-                                                {/* <div className="flex-shrink-0">{getFileIcon(file.resourceType)}</div> */}
+                                                <div className="flex-shrink-0">{getFileIcon(file.fileType)}</div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="text-sm font-medium text-gray-900 truncate">
                                                         {file.resourceName}
                                                     </p>
                                                     <p className="text-xs text-gray-500">
-                                                        Uploaded {file.createdAt} • {file.fileSize}
+                                                        Uploaded {formatDate(file.createdAt)} • {formatFileSize(file.fileSize)}
                                                     </p>
                                                 </div>
                                             </div>
@@ -629,14 +474,6 @@ export default function StaffManagement() {
                                                     onClick={() => handleFilePreview(file)}
                                                 >
                                                     <Eye className="h-4 w-4 text-gray-500" />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-8 w-8 p-0"
-                                                    onClick={() => handleFileDelete(file.resourceId)}
-                                                >
-                                                    <Trash2 className="h-4 w-4 text-red-500" />
                                                 </Button>
                                             </div>
                                         </div>
@@ -672,7 +509,7 @@ export default function StaffManagement() {
                 eventId={id}
                 isOpen={isResourceModalopen}
                 onClose={closeResourceModal}
-                // onCreated={handleScheduleCreated}
+                onCreated={handleResourceCreated}
                 onAlert={showAlert}
             />
 

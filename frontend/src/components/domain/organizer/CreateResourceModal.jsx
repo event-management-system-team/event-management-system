@@ -21,7 +21,7 @@ import { useState, useRef } from "react"
 import { cn } from "../admin/utils"
 import organizerService from "../../../services/organizer.service"
 
-export function CreateResourceModal({ eventId, isOpen, onClose, onAlert }) {
+export function CreateResourceModal({ eventId, isOpen, onClose, onAlert, onCreated }) {
 
     const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -198,7 +198,7 @@ export function CreateResourceModal({ eventId, isOpen, onClose, onAlert }) {
             })
             setUploadedFile(null)
 
-            // onCreated(res.data);
+            onCreated(res.data)
             onClose();
 
         } catch (err) {
