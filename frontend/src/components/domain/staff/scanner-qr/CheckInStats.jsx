@@ -84,38 +84,40 @@ const CheckInStats = ({ ticketStats }) => {
                     Ticket Type Breakdown
                 </Text>
 
-                {ticketStats?.map((stat) => {
-                    const ui = getTicketUI(stat.ticketName);
-                    const IconComp = ui.icon;
+                <div className="flex flex-col gap-4">
+                    {ticketStats?.map((stat) => {
+                        const ui = getTicketUI(stat.ticketName);
+                        const IconComp = ui.icon;
 
-                    return (
-                        <Flex key={stat.ticketTypeId} justify="space-between" align="center">
-                            <Flex align="center" gap="12px">
-                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center border ${ui.bg} ${ui.border}`}>
-                                    <IconComp size={16} className={ui.color} />
-                                </div>
+                        return (
+                            <Flex key={stat.ticketTypeId} justify="space-between" align="center" >
+                                <Flex align="center" gap="12px">
+                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center border ${ui.bg} ${ui.border}`}>
+                                        <IconComp size={16} className={ui.color} />
+                                    </div>
 
-                                <Flex vertical>
-                                    <Text strong style={{ color: '#2C3E50', fontSize: '14px', lineHeight: 1.2 }}>
-                                        {stat.ticketName}
-                                    </Text>
-                                    <Text type="secondary" style={{ fontSize: '10px', fontWeight: 500 }}>
-                                        Total: {stat.soldCount}
-                                    </Text>
+                                    <Flex vertical>
+                                        <Text strong style={{ color: '#2C3E50', fontSize: '14px', lineHeight: 1.2 }}>
+                                            {stat.ticketName}
+                                        </Text>
+                                        <Text type="secondary" style={{ fontSize: '10px', fontWeight: 500 }}>
+                                            Total: {stat.soldCount}
+                                        </Text>
+                                    </Flex>
                                 </Flex>
-                            </Flex>
 
-                            <div style={{ textAlign: 'right' }}>
-                                <Text strong style={{ color: '#2C3E50', fontSize: '14px', fontWeight: 900 }}>
-                                    {stat.checkInCount}
-                                </Text>
-                                <Text type="secondary" style={{ fontSize: '12px', fontWeight: 500, marginLeft: '4px' }}>
-                                    in
-                                </Text>
-                            </div>
-                        </Flex>
-                    );
-                })}
+                                <div style={{ textAlign: 'right' }}>
+                                    <Text strong style={{ color: '#2C3E50', fontSize: '14px', fontWeight: 900 }}>
+                                        {stat.checkInCount}
+                                    </Text>
+                                    <Text type="secondary" style={{ fontSize: '12px', fontWeight: 500, marginLeft: '4px' }}>
+                                        in
+                                    </Text>
+                                </div>
+                            </Flex>
+                        );
+                    })}
+                </div>
             </div>
         </div>
 
