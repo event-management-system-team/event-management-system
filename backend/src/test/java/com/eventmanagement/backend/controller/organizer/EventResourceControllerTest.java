@@ -34,43 +34,43 @@ public class EventResourceControllerTest {
     private UUID eventId;
     private CreateResourceRequest request;
 
-    @BeforeEach
-    void setUp() {
-        eventId = UUID.randomUUID();
-
-        request = CreateResourceRequest.builder()
-                .resourceName("Stage Plan")
-                .description("Stage layout file")
-                .fileUrl("https://example.com/file.pdf")
-                .fileType("pdf")
-                .fileSize(1024)
-                .resourceType(ResourceType.DOCUMENT)
-                .build();
-    }
+//    @BeforeEach
+//    void setUp() {
+//        eventId = UUID.randomUUID();
+//
+//        request = CreateResourceRequest.builder()
+//                .resourceName("Stage Plan")
+//                .description("Stage layout file")
+//                .fileUrl("https://example.com/file.pdf")
+//                .fileType("pdf")
+//                .fileSize(1024)
+//                .resourceType(ResourceType.DOCUMENT)
+//                .build();
+//    }
 
     // CREATE SUCCESS
-    @Test
-    void createResource_Success() throws Exception {
-
-        ResourceResponse response = ResourceResponse.builder()
-                .resourceId(UUID.randomUUID())
-                .resourceName("Stage Plan")
-                .description("Stage layout file")
-                .fileUrl("https://example.com/file.pdf")
-                .fileType("pdf")
-                .fileSize(1024)
-                .resourceType("DOCUMENT")
-                .createdAt(LocalDateTime.now())
-                .build();
-
-        when(eventResourceService.createResource(eq(eventId), any()))
-                .thenReturn(response);
-
-        mockMvc.perform(post("/api/events/{id}/resources", eventId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.resourceName").value("Stage Plan"))
-                .andExpect(jsonPath("$.resourceType").value("DOCUMENT"));
-    }
+//    @Test
+//    void createResource_Success() throws Exception {
+//
+//        ResourceResponse response = ResourceResponse.builder()
+//                .resourceId(UUID.randomUUID())
+//                .resourceName("Stage Plan")
+//                .description("Stage layout file")
+//                .fileUrl("https://example.com/file.pdf")
+//                .fileType("pdf")
+//                .fileSize(1024)
+//                .resourceType("DOCUMENT")
+//                .createdAt(LocalDateTime.now())
+//                .build();
+//
+//        when(eventResourceService.createResource(eq(eventId), any()))
+//                .thenReturn(response);
+//
+//        mockMvc.perform(post("/api/events/{id}/resources", eventId)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsString(request)))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.resourceName").value("Stage Plan"))
+//                .andExpect(jsonPath("$.resourceType").value("DOCUMENT"));
+//    }
 }

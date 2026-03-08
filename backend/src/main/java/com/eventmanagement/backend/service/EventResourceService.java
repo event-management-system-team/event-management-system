@@ -10,7 +10,10 @@ import com.eventmanagement.backend.repository.EventResourceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -19,19 +22,26 @@ public class EventResourceService {
 
     private final EventRepository eventRepository;
     private final EventResourceRepository eventResourceRepository;
+    private final CloudinaryService cloudinaryService;
 
     @Transactional
-    public ResourceResponse createResource(UUID eventId, CreateResourceRequest req) {
+    public ResourceResponse createResource(
+            UUID eventId,
+            CreateResourceRequest req,
+            MultipartFile file
+    ) throws IOException {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found"));
+
+        String fileUrl = cloudinaryService.uploadResource(file, eventId);
 
         EventResource resource = EventResource.builder()
                 .event(event)
                 .resourceName(req.getResourceName())
                 .description(req.getDescription())
-                .fileUrl(req.getFileUrl())
-                .fileType(req.getFileType())
-                .fileSize(req.getFileSize())
+                .fileUrl(fileUrl)
+                .fileType(file.getContentType())
+                .fileSize((int) file.getSize())
                 .resourceType(req.getResourceType())
                 .build();
         eventResourceRepository.save(resource);
@@ -46,5 +56,29 @@ public class EventResourceService {
                 .resourceType(resource.getResourceType().name())
                 .createdAt(resource.getCreatedAt())
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ResourceResponse> getResources(UUID eventId) {
+
+        if (!eventRepository.existsById(eventId)) {
+            throw new NotFoundException("Event not found");
+        }
+
+        return eventResourceRepository
+                .findByEvent_EventIdOrderByCreatedAtDesc(eventId)
+                .stream()
+                .map(resource -> ResourceResponse.builder()
+                        .resourceId(resource.getResourceId())
+                        .resourceName(resource.getResourceName())
+                        .description(resource.getDescription())
+                        .fileUrl(resource.getFileUrl())
+                        .fileType(resource.getFileType())
+                        .fileSize(resource.getFileSize())
+                        .resourceType(resource.getResourceType().name())
+                        .createdAt(resource.getCreatedAt())
+                        .build()
+                )
+                .toList();
     }
 }

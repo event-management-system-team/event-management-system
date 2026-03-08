@@ -19,7 +19,6 @@ import {
 } from 'lucide-react';
 import { Link, useParams } from 'react-router';
 import { useEffect, useRef, useState } from "react";
-import { OrganizerSidebar } from "../../components/domain/organizer/OrganizerSidebar.jsx";
 import { Button } from "../../components/domain/admin/Button.jsx";
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/domain/admin/Avatar.jsx";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/domain/admin/Card.jsx";
@@ -153,16 +152,15 @@ export default function StaffManagement() {
 
     const getTopRightAction = () => {
         switch (activeTab) {
-            case "staff":
+            case "resources":
                 return (
-                    <div className="flex gap-3">
-                        <Button
-                            className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5 py-5 h-12 w-32"
-                        >
-                            <Download className="h-4 w-4" />
-                            Export List
-                        </Button>
-                    </div>
+                    <Button
+                        className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5 py-5 h-12 w-40"
+                    // onClick={openModal}
+                    >
+                        <Plus className="h-4 w-4" />
+                        Upload Resource
+                    </Button>
                 )
             case "schedule":
                 return (
@@ -203,42 +201,61 @@ export default function StaffManagement() {
         }
     }
 
-    const handleFileUpload = event => {
+    // const handleFileUpload = event => {
+    //     const files = event.target.files
+    //     if (files) {
+    //         const newFiles = Array.from(files).map(file => {
+    //             const fileType = file.type.includes("pdf")
+    //                 ? "pdf"
+    //                 : file.type.includes("image")
+    //                     ? "image"
+    //                     : file.type.includes("sheet") || file.name.endsWith(".xlsx")
+    //                         ? "excel"
+    //                         : "document"
+
+    //             return {
+    //                 id: Date.now().toString() + Math.random(),
+    //                 name: file.name,
+    //                 type: fileType,
+    //                 uploadDate: new Date().toLocaleDateString("en-US", {
+    //                     month: "short",
+    //                     day: "numeric",
+    //                     year: "numeric"
+    //                 }),
+    //                 size:
+    //                     file.size > 1024 * 1024
+    //                         ? `${(file.size / (1024 * 1024)).toFixed(2)} MB`
+    //                         : `${(file.size / 1024).toFixed(0)} KB`
+    //             }
+    //         })
+    //         setUploadedFiles([...uploadedFiles, ...newFiles])
+    //         toast.success(`${newFiles.length} file(s) uploaded successfully`, {
+    //             description: "Your resources have been added"
+    //         })
+
+    //         // Reset input
+    //         if (fileInputRef.current) {
+    //             fileInputRef.current.value = ""
+    //         }
+    //     }
+    // }
+
+    const handleFileUpload = async (event) => {
+
         const files = event.target.files
-        if (files) {
-            const newFiles = Array.from(files).map(file => {
-                const fileType = file.type.includes("pdf")
-                    ? "pdf"
-                    : file.type.includes("image")
-                        ? "image"
-                        : file.type.includes("sheet") || file.name.endsWith(".xlsx")
-                            ? "excel"
-                            : "document"
 
-                return {
-                    id: Date.now().toString() + Math.random(),
-                    name: file.name,
-                    type: fileType,
-                    uploadDate: new Date().toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric"
-                    }),
-                    size:
-                        file.size > 1024 * 1024
-                            ? `${(file.size / (1024 * 1024)).toFixed(2)} MB`
-                            : `${(file.size / 1024).toFixed(0)} KB`
-                }
-            })
-            setUploadedFiles([...uploadedFiles, ...newFiles])
-            toast.success(`${newFiles.length} file(s) uploaded successfully`, {
-                description: "Your resources have been added"
-            })
+        for (const file of files) {
 
-            // Reset input
-            if (fileInputRef.current) {
-                fileInputRef.current.value = ""
+            const data = {
+                resourceName: file.name,
+                description: "",
+                resourceType: "DOCUMENT"
             }
+
+            const res = await organizerService.createResource(id, data, file)
+
+            console.log(res.data)
+
         }
     }
 
@@ -389,7 +406,6 @@ export default function StaffManagement() {
 
         <div className="flex h-screen bg-[#F1F0E8]">
             {/* Sidebar */}
-            <OrganizerSidebar />
 
             {/* Main Content */}
             <main className="flex-1 overflow-auto">

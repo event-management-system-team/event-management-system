@@ -50,6 +50,36 @@ const organizerService = {
         return axiosInstance.post(`/events/${eventId}/schedules`, data)
     },
 
+    createResource: (eventId, data, file) => {
+
+        const formData = new FormData()
+
+        formData.append(
+            "data",
+            JSON.stringify({
+                resourceName: data.resourceName,
+                description: data.description,
+                resourceType: data.resourceType
+            })
+        )
+
+        formData.append("file", file)
+
+        return axiosInstance.post(
+            `/events/${eventId}/resources`,
+            formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            }
+        )
+    },
+
+    getResources: (eventId) => {
+        return axiosInstance.post(`/events/${eventId}/resources`)
+    }
+
 };
 
 export default organizerService;

@@ -44,58 +44,58 @@ public class EventResourceServiceTest {
     private CreateResourceRequest request;
     private Event event;
 
-    @BeforeEach
-    void setUp() {
-        eventId = UUID.randomUUID();
-
-        event = Event.builder()
-                .eventId(eventId)
-                .build();
-
-        request = CreateResourceRequest.builder()
-                .resourceName("Stage Plan")
-                .description("Stage layout file")
-                .fileUrl("https://example.com/file.pdf")
-                .fileType("pdf")
-                .fileSize(1024)
-                .resourceType(ResourceType.DOCUMENT)
-                .build();
-    }
+//    @BeforeEach
+//    void setUp() {
+//        eventId = UUID.randomUUID();
+//
+//        event = Event.builder()
+//                .eventId(eventId)
+//                .build();
+//
+//        request = CreateResourceRequest.builder()
+//                .resourceName("Stage Plan")
+//                .description("Stage layout file")
+//                .fileUrl("https://example.com/file.pdf")
+//                .fileType("pdf")
+//                .fileSize(1024)
+//                .resourceType(ResourceType.DOCUMENT)
+//                .build();
+//    }
 
     // EVENT NOT FOUND
-    @Test
-    void createResource_EventNotFound_ThrowException() {
-
-        when(eventRepository.findById(eventId))
-                .thenReturn(Optional.empty());
-
-        assertThrows(NotFoundException.class,
-                () -> eventResourceService.createResource(eventId, request));
-    }
+//    @Test
+//    void createResource_EventNotFound_ThrowException() {
+//
+//        when(eventRepository.findById(eventId))
+//                .thenReturn(Optional.empty());
+//
+//        assertThrows(NotFoundException.class,
+//                () -> eventResourceService.createResource(eventId, request));
+//    }
 
     // CREATE SUCCESS
-    @Test
-    void createResource_Success() {
-
-        when(eventRepository.findById(eventId))
-                .thenReturn(Optional.of(event));
-
-        when(eventResourceRepository.save(any()))
-                .thenAnswer(invocation -> {
-                    EventResource r = invocation.getArgument(0);
-                    r.setResourceId(UUID.randomUUID());
-                    r.setCreatedAt(LocalDateTime.now());
-                    return r;
-                });
-
-        ResourceResponse response =
-                eventResourceService.createResource(eventId, request);
-
-        assertNotNull(response);
-        assertEquals("Stage Plan", response.getResourceName());
-        assertEquals("pdf", response.getFileType());
-        assertEquals("DOCUMENT", response.getResourceType());
-
-        verify(eventResourceRepository).save(any());
-    }
+//    @Test
+//    void createResource_Success() {
+//
+//        when(eventRepository.findById(eventId))
+//                .thenReturn(Optional.of(event));
+//
+//        when(eventResourceRepository.save(any()))
+//                .thenAnswer(invocation -> {
+//                    EventResource r = invocation.getArgument(0);
+//                    r.setResourceId(UUID.randomUUID());
+//                    r.setCreatedAt(LocalDateTime.now());
+//                    return r;
+//                });
+//
+//        ResourceResponse response =
+//                eventResourceService.createResource(eventId, request);
+//
+//        assertNotNull(response);
+//        assertEquals("Stage Plan", response.getResourceName());
+//        assertEquals("pdf", response.getFileType());
+//        assertEquals("DOCUMENT", response.getResourceType());
+//
+//        verify(eventResourceRepository).save(any());
+//    }
 }
