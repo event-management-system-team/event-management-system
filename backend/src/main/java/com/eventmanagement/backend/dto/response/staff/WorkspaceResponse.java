@@ -19,7 +19,6 @@ public class WorkspaceResponse {
     private EventInfo eventInfo;
     private String staffRole;
 
-
     private List<ScheduleResponse> schedules;
     private List<ResourceResponse> resources;
 
@@ -38,6 +37,8 @@ public class WorkspaceResponse {
         private String location;
         private String bannerUrl;
         private LocalDateTime startDate;
+        private LocalDateTime endDate;
+
     }
 
 }

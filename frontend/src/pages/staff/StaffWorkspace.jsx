@@ -3,26 +3,14 @@ import ProfileCard from '../../components/domain/staff/workspace/ProfileCard';
 import EventBannerCard from '../../components/domain/staff/workspace/EventBannerCard';
 import ScheduleWidget from '../../components/domain/staff/workspace/ScheduleWidget';
 import ResourcesWidget from '../../components/domain/staff/workspace/ResourcesWidget';
-import { useQuery } from '@tanstack/react-query'
-import staffService from '../../services/staff.service'
-import { useNavigate, useParams } from 'react-router';
-import LoadingState from '../../components/common/LoadingState'
-import EmptyState from '../../components/common/EmptyState'
+import { useNavigate, useParams, useOutletContext } from 'react-router';
 
 const StaffWorkspacePage = () => {
 
     const { eventSlug } = useParams()
     const navigate = useNavigate();
 
-    const { data, isLoading, isError } = useQuery({
-        queryKey: ['workspace', eventSlug],
-        queryFn: () => staffService.getWorkspace(eventSlug),
-        enabled: !!eventSlug
-    })
-
-    if (isLoading) return <LoadingState />
-    if (isError || !data) return <EmptyState className='h-[600px]' />
-
+    const { data } = useOutletContext();
 
     const schedules = data?.schedules?.slice(0, 2) || [];
     const resources = data?.resources?.slice(0, 2) || [];

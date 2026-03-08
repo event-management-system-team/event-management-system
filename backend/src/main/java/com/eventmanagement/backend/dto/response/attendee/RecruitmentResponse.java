@@ -17,6 +17,8 @@ public class RecruitmentResponse {
     private String eventName;
     private String eventBannerUrl;
     private String location;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private String description;
     private LocalDateTime deadline;
     private LocalDateTime createdAt;
@@ -26,7 +28,7 @@ public class RecruitmentResponse {
     private OrganizerResponse organizer;
     private List<BenefitRecruitmentDto> benefits;
 
-    
+
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
