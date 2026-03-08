@@ -61,6 +61,7 @@ const ScannerCamera = ({ onVerifyQR, onScanQR, isCheckingIn }) => {
                     onError={(error) => {
                         message.error("Camera Error: " + error?.message);
                     }}
+                    formats={['qr_code']}
                     constraints={{
                         facingMode: 'environment'
                     }}

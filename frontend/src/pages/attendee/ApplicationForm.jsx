@@ -7,14 +7,10 @@ import { useQuery } from '@tanstack/react-query'
 import recruitmentService from '../../services/recruitment.service'
 import LoadingState from '../../components/common/LoadingState'
 import EmptyState from '../../components/common/EmptyState'
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import profileService from '../../services/profile.service'
-
-
-
-
+import ClosedRecruitmentRedirect from '../../components/domain/attendee/application-form/ClosedRecruitmentRedirect';
 const ApplicationFormPage = () => {
-
     const { eventSlug } = useParams();
 
     const { data: recruitmentData, isLoading, isError } = useQuery({
@@ -42,6 +38,9 @@ const ApplicationFormPage = () => {
         return <EmptyState />;
     }
 
+    if (recruitmentData?.status === 'CLOSED') {
+        return <ClosedRecruitmentRedirect />;
+    }
     const { formSchema, eventName, deadline, location, recruitments } = recruitmentData;
     const normFile = (e) => {
         if (Array.isArray(e)) {

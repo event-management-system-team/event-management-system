@@ -69,6 +69,8 @@ const RecruitmentDetailPage = () => {
                                 totalAvailable={totalAvailable}
                                 totalVacancy={totalVacancy}
                                 deadlineDate={deadlineDate}
+                                startDate={recruitment.startDate}
+                                endDate={recruitment.endDate}
                                 location={recruitment.location} />
 
                             <OrganizerCard
