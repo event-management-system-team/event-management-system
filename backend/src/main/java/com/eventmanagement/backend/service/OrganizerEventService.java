@@ -232,6 +232,28 @@ public class OrganizerEventService {
     }
 
     /**
+     * Xóa event vĩnh viễn (hard delete, bypass @SQLDelete).
+     * Chỉ cho phép khi status là DRAFT hoặc PENDING.
+     */
+    @Transactional
+    public void deleteEvent(UUID eventId, User organizer) {
+        Event event = eventRepository.findWithDetailsById(eventId);
+        if (event == null) {
+            throw new NotFoundException("Event not found: " + eventId);
+        }
+        if (!event.getOrganizer().getUserId().equals(organizer.getUserId())) {
+            throw new UnauthorizedException("You are not the organizer of this event");
+        }
+        if (event.getStatus() != EventStatus.DRAFT && event.getStatus() != EventStatus.PENDING) {
+            throw new BadRequestException("Only DRAFT or PENDING events can be deleted");
+        }
+        eventRepository.hardDeleteAgendasByEventId(eventId);
+        eventRepository.hardDeleteTicketsByEventId(eventId);
+        eventRepository.hardDeleteById(eventId);
+        log.info("Event hard-deleted: id={}, name={}", eventId, event.getEventName());
+    }
+
+    /**
      * Lấy chi tiết event theo ID (dành cho organizer edit)
      */
     public CreateEventResponse getEventById(UUID eventId, User organizer) {

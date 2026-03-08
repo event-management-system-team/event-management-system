@@ -70,6 +70,13 @@ public class OrganizerEventController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("/{eventId}")
+    public ResponseEntity<Void> deleteEvent(@PathVariable UUID eventId) {
+        User organizer = getAuthenticatedUser();
+        organizerEventService.deleteEvent(eventId, organizer);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/stats")
     public ResponseEntity<OrganizerEventStatsResponse> getMyEventStats() {
 

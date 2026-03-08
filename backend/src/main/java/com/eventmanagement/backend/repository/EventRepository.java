@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -73,4 +74,16 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
         @EntityGraph(attributePaths = { "ticketTypes", "agendas", "category" })
         @Query("SELECT e FROM Event e WHERE e.eventId = :eventId")
         Event findWithDetailsById(@Param("eventId") UUID eventId);
+
+        @Modifying
+        @Query(value = "DELETE FROM event_agendas WHERE event_id = :eventId", nativeQuery = true)
+        void hardDeleteAgendasByEventId(@Param("eventId") UUID eventId);
+
+        @Modifying
+        @Query(value = "DELETE FROM ticket_types WHERE event_id = :eventId", nativeQuery = true)
+        void hardDeleteTicketsByEventId(@Param("eventId") UUID eventId);
+
+        @Modifying
+        @Query(value = "DELETE FROM events WHERE event_id = :eventId", nativeQuery = true)
+        void hardDeleteById(@Param("eventId") UUID eventId);
 }
