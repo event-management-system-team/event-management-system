@@ -69,4 +69,8 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
         @EntityGraph(attributePaths = "ticketTypes")
         @Query("SELECT e FROM Event e WHERE e.eventId IN :eventIds")
         List<Event> findWithTicketsByEventIdIn(@Param("eventIds") List<UUID> eventIds);
+
+        @EntityGraph(attributePaths = { "ticketTypes", "agendas", "category" })
+        @Query("SELECT e FROM Event e WHERE e.eventId = :eventId")
+        Event findWithDetailsById(@Param("eventId") UUID eventId);
 }
