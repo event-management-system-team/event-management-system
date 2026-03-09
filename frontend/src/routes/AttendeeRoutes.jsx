@@ -4,6 +4,7 @@ import ProtectedRoute from "../components/common/ProtectedRoute";
 import ApplicationForm from "../pages/attendee/ApplicationForm";
 import MyApplication from "../pages/attendee/MyApplication";
 import MyTickets from "../pages/attendee/MyTickets";
+import TicketDetail from "../pages/attendee/TicketDetail";
 import MainLayout from "../components/layout/MainLayout";
 import CheckoutPage from "../pages/attendee/CheckoutPage";
 import PaymentSuccessPage from "../pages/attendee/PaymentSuccessPage";
@@ -21,6 +22,7 @@ const AttendeeRoutes = () => {
           />
           <Route path="applications/" element={<MyApplication />} />
           <Route path="my-tickets/" element={<MyTickets />} />
+          <Route path="tickets/:orderCode" element={<TicketDetail />} />
           <Route path="checkout/" element={<CheckoutPage />} />
           <Route path="payment/success" element={<PaymentSuccessPage />} />
           <Route path="payment/failed" element={<PaymentFailedPage />} />

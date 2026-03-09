@@ -71,7 +71,7 @@ const TicketCard = ({
 
         <div className={`flex flex-col sm:flex-row gap-2 mt-2 ${['PENDING', 'CANCELLED', 'REJECTED'].includes(status?.toUpperCase()) ? 'invisible pointer-events-none' : ''}`}>
           <Link
-            to={`/tickets/${eventSlug}`}
+            to={`/attendee/tickets/${eventSlug}`}
             className="w-full sm:flex-1 bg-[#8aa8b2] hover:bg-[#7a97a1] text-white py-2 md:py-2.5 rounded-lg flex items-center justify-center gap-2 text-xs md:text-sm font-bold transition-colors"
             tabIndex={['PENDING', 'CANCELLED', 'REJECTED'].includes(status?.toUpperCase()) ? -1 : 0}
           >

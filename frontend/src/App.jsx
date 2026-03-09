@@ -4,7 +4,6 @@ import { autoRefreshToken } from "./store/slices/auth.slice";
 
 import AppRoutes from "./routes";
 import LoadingState from "./components/common/LoadingState";
-import MyTicketsPage from "./pages/attendee/MyTickets";
 
 function App() {
   const hasRefreshed = useRef(false);
@@ -23,5 +22,7 @@ function App() {
 
   return <AppRoutes />;
 }
+
+
 
 export default App;
