@@ -1,8 +1,6 @@
 package com.eventmanagement.backend.controller.admin;
 
-import com.eventmanagement.backend.dto.response.admin.AnalyticsSummaryResponse;
-import com.eventmanagement.backend.dto.response.admin.EventAnalyticsResponse;
-import com.eventmanagement.backend.dto.response.admin.MonthlyTicketSalesResponse;
+import com.eventmanagement.backend.dto.response.admin.*;
 import com.eventmanagement.backend.service.EventAnalyticsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,5 +29,15 @@ public class EventAnalyticsController {
     @GetMapping("/monthly-ticket-sales")
     public ResponseEntity<List<MonthlyTicketSalesResponse>> getMonthlyTicketSales() {
         return ResponseEntity.ok(eventAnalyticsService.getMonthlyTicketSales());
+    }
+
+    @GetMapping("/top-revenue-events")
+    public ResponseEntity<List<TopEventRevenueResponse>> getTopRevenueEvents() {
+        return ResponseEntity.ok(eventAnalyticsService.getTopRevenueEvents());
+    }
+
+    @GetMapping("/category-distribution")
+    public ResponseEntity<List<CategoryDistributionResponse>> getCategoryDistribution() {
+        return ResponseEntity.ok(eventAnalyticsService.getCategoryDistribution());
     }
  }

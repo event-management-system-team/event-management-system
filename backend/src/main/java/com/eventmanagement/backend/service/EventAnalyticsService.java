@@ -1,8 +1,6 @@
 package com.eventmanagement.backend.service;
 
-import com.eventmanagement.backend.dto.response.admin.AnalyticsSummaryResponse;
-import com.eventmanagement.backend.dto.response.admin.EventAnalyticsResponse;
-import com.eventmanagement.backend.dto.response.admin.MonthlyTicketSalesResponse;
+import com.eventmanagement.backend.dto.response.admin.*;
 import com.eventmanagement.backend.repository.EventAnalyticsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -82,21 +80,41 @@ public class EventAnalyticsService {
     }
 
     public List<MonthlyTicketSalesResponse> getMonthlyTicketSales() {
-
         List<Object[]> rows = eventAnalyticsRepository.getMonthlyTicketSales();
 
         return rows.stream().map(row -> {
-
             MonthlyTicketSalesResponse res = new MonthlyTicketSalesResponse();
 
             LocalDateTime month = ((Timestamp) row[0]).toLocalDateTime();
-
             res.setMonth(month.getMonth().toString().substring(0,3));
             res.setTicketsSold(((Number) row[1]).longValue());
             res.setRevenue((BigDecimal) row[2]);
-
             return res;
+        }).toList();
+    }
 
+    public List<TopEventRevenueResponse> getTopRevenueEvents() {
+        List<Object[]> rows = eventAnalyticsRepository.getTopRevenueEvents();
+
+        return rows.stream().map(row -> {
+            TopEventRevenueResponse res = new TopEventRevenueResponse();
+
+            res.setEventName((String) row[0]);
+            res.setRevenue((BigDecimal) row[1]);
+            return res;
+        }).toList();
+    }
+
+    public List<CategoryDistributionResponse> getCategoryDistribution() {
+        List<Object[]> rows = eventAnalyticsRepository.getCategoryDistribution();
+
+        return rows.stream().map(row -> {
+            CategoryDistributionResponse res = new CategoryDistributionResponse();
+
+            res.setCategoryName((String) row[0]);
+            res.setColorCode((String) row[1]);
+            res.setCount((Long) row[2]);
+            return res;
         }).toList();
     }
 }

@@ -67,4 +67,32 @@ public interface EventAnalyticsRepository extends JpaRepository<EventAnalytics, 
         ORDER BY month
         """, nativeQuery = true)
     List<Object[]> getMonthlyTicketSales();
+
+    @Query(value = """
+    SELECT 
+        e.event_name,
+        SUM(ea.total_revenue) AS revenue
+    FROM event_analytics ea
+    JOIN events e ON ea.event_id = e.event_id
+    GROUP BY e.event_id, e.event_name
+    ORDER BY revenue DESC
+    LIMIT 5
+    """, nativeQuery = true)
+    List<Object[]> getTopRevenueEvents();
+
+    @Query(value = """
+    SELECT
+        ec.category_name,
+        ec.color_code,
+        COUNT(e.event_id) AS event_count
+    FROM events e
+    JOIN event_categories ec
+    ON e.category_id = ec.category_id
+    GROUP BY
+        e.category_id,
+        ec.category_name,
+        ec.color_code
+    ORDER BY event_count DESC;
+    """, nativeQuery = true)
+    List<Object[]> getCategoryDistribution();
 }

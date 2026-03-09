@@ -69,105 +69,12 @@ import { Badge } from "../../components/domain/admin/Badge.jsx";
 import { adminService } from '../../services/admin.service.js';
 import dayjs from "dayjs";
 
-// Revenue per event (top 8)
-const revenueByEventData = [
-    { name: "Summer Music", revenue: 234000 },
-    { name: "Charity Gala", revenue: 125000 },
-    { name: "Tech Conf", revenue: 42350 },
-    { name: "Marketing", revenue: 32500 },
-    { name: "Food Fest", revenue: 16000 },
-    { name: "Workshop", revenue: 7800 }
-]
-
-// Event category distribution
-const categoryDistributionData = [
-    { name: "Technology", value: 324, color: "#3B82F6" },
-    { name: "Music", value: 198, color: "#8B5CF6" },
-    { name: "Education", value: 287, color: "#F59E0B" },
-    { name: "Business", value: 215, color: "#10B981" },
-    { name: "Food & Beverage", value: 142, color: "#F97316" },
-    { name: "Other", value: 118, color: "#6B7280" }
-]
-
-// Funnel data
-const funnelData = [
-    { stage: "Views", value: 125000, color: "#93C5FD" },
-    { stage: "Registrations", value: 45000, color: "#60A5FA" },
-    { stage: "Tickets", value: 18500, color: "#3B82F6" },
-    { stage: "Attendance", value: 16125, color: "#1E40AF" }
-]
-
-// Top performing events
-const topPerformingEvents = [
-    {
-        name: "Summer Music Festival",
-        metric: "$234,000",
-        badge: "Revenue",
-        avatarBg: "bg-blue-600",
-        avatar: "SM"
-    },
-    {
-        name: "Charity Gala Evening",
-        metric: "$125,000",
-        badge: "Revenue",
-        avatarBg: "bg-slate-600",
-        avatar: "CG"
-    },
-    {
-        name: "Tech Conference 2026",
-        metric: "96%",
-        badge: "Attendance",
-        avatarBg: "bg-slate-800",
-        avatar: "TC"
-    },
-    {
-        name: "Digital Marketing Summit",
-        metric: "94%",
-        badge: "Attendance",
-        avatarBg: "bg-green-700",
-        avatar: "DM"
-    },
-    {
-        name: "Summer Music Festival",
-        metric: "4,680",
-        badge: "Tickets",
-        avatarBg: "bg-blue-600",
-        avatar: "SM"
-    }
-]
-
-// Underperforming events
-const underperformingEvents = [
-    {
-        name: "Food & Wine Festival",
-        metric: "21%",
-        issue: "Low ticket sales",
-        avatarBg: "bg-orange-600",
-        avatar: "FW",
-        severity: "high"
-    },
-    {
-        name: "Workshop Series: Design",
-        metric: "65%",
-        issue: "Low attendance rate",
-        avatarBg: "bg-amber-700",
-        avatar: "WS",
-        severity: "medium"
-    },
-    {
-        name: "Indie Film Festival",
-        metric: "0%",
-        issue: "No sales yet",
-        avatarBg: "bg-rose-600",
-        avatar: "IF",
-        severity: "high"
-    }
-]
-
 export function EventAnalytics() {
     const [events, setEvents] = useState([])
     const [summary, setSummary] = useState()
     const [monthlySales, setMonthlySales] = useState([])
+    const [topRevenueEvents, setTopRevenueEvents] = useState([])
+    const [categoryDis, setCategoryDis] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(false)
 
@@ -178,15 +85,19 @@ export function EventAnalytics() {
         try {
             setLoading(true)
 
-            const [eventRes, summaryRes, salesRes] = await Promise.all([
+            const [eventRes, summaryRes, salesRes, topRevenueRes, categoryRes] = await Promise.all([
                 adminService.getEventAnalytics(),
                 adminService.getSummaryAnalytics(),
-                adminService.getMonthlyTicketSales()
+                adminService.getMonthlyTicketSales(),
+                adminService.getTopRevenueEvents(),
+                adminService.getCategoryDistribution()
             ])
 
             setEvents(eventRes.data)
             setSummary(summaryRes.data)
             setMonthlySales(salesRes.data)
+            setTopRevenueEvents(topRevenueRes.data)
+            setCategoryDis(categoryRes.data)
 
         } catch (error) {
             setError("Cannot load event analytics")
@@ -270,6 +181,17 @@ export function EventAnalytics() {
         revenue: item.revenue
     }))
 
+    const topRevenueEventsData = topRevenueEvents.map((item, index) => ({
+        event: item.eventName,
+        revenue: item.revenue
+    }))
+
+    const categoryDistributionData = categoryDis.map((item, index) => ({
+        name: item.categoryName,
+        color: item.colorCode,
+        events: item.count,
+    }))
+
     const globalMetrics = [
         {
             title: "TOTAL EVENTS",
@@ -294,7 +216,6 @@ export function EventAnalytics() {
         },
         {
             title: "TOTAL REVENUE",
-            // value: "$2.4M",
             value: formatVND(summary?.totalRevenue),
             icon: DollarSign,
             iconBg: "bg-emerald-100",
@@ -391,7 +312,7 @@ export function EventAnalytics() {
                 {/* Data Visualization Section */}
                 <div className="grid grid-cols-2 gap-5 px-8 pb-6">
 
-                    {/* Ticket Sales Over Time */}
+                    {/* Ticket Sales By Month */}
                     <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                         <CardHeader className="border-b border-gray-100">
                             <CardTitle className="text-xl font-semibold text-gray-700">Ticket Sales Trend</CardTitle>
@@ -429,8 +350,8 @@ export function EventAnalytics() {
                         </CardContent>
                     </Card>
 
-                    {/* Revenue by Month */}
-                    <Card className="bg-[#f7f7f7] shadow-sm  border border-gray-200">
+                    {/* Revenue By Month */}
+                    <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                         <CardHeader className="border-b border-gray-100">
                             <CardTitle className="text-xl font-semibold text-gray-700">Revenue Trend</CardTitle>
                             <CardDescription>
@@ -456,7 +377,40 @@ export function EventAnalytics() {
                                         }}
                                         formatter={value => `${formatVND(value)}`}
                                     />
-                                    <Bar dataKey="revenue" fill="#10B981" radius={[6, 6, 0, 0]} />
+                                    <Bar dataKey="revenue" fill="#10B981" radius={[6, 6, 0, 0]} barSize={80} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </CardContent>
+                    </Card>
+
+                    {/* Top Events By Revenue */}
+                    <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
+                        <CardHeader className="border-b border-gray-100">
+                            <CardTitle className="text-xl font-semibold text-gray-700">Revenue by Event</CardTitle>
+                            <CardDescription>
+                                Top performing events by revenue
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="pt-6">
+                            <ResponsiveContainer width="100%" height={240}>
+                                <BarChart data={topRevenueEventsData}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                                    <XAxis
+                                        dataKey="event"
+                                        tick={{ fontSize: 11 }}
+                                        stroke="#6B7280"
+                                    />
+                                    <YAxis tick={{ fontSize: 12 }} stroke="#6B7280" />
+                                    <Tooltip
+                                        contentStyle={{
+                                            backgroundColor: "#fff",
+                                            border: "1px solid #E5E7EB",
+                                            borderRadius: "6px",
+                                            fontSize: "12px"
+                                        }}
+                                        formatter={value => `${formatVND(value)}`}
+                                    />
+                                    <Bar dataKey="revenue" fill="#2e96ea" radius={[6, 6, 0, 0]} barSize={60} />
                                 </BarChart>
                             </ResponsiveContainer>
                         </CardContent>
@@ -465,7 +419,7 @@ export function EventAnalytics() {
                     {/* Event Category Distribution */}
                     <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                         <CardHeader className="border-b border-gray-100">
-                            <CardTitle className="text-lg">Event Distribution</CardTitle>
+                            <CardTitle className="text-xl font-semibold text-gray-700">Event Distribution</CardTitle>
                             <CardDescription>Events by category breakdown</CardDescription>
                         </CardHeader>
                         <CardContent className="pt-6">
@@ -478,7 +432,8 @@ export function EventAnalytics() {
                                         innerRadius={60}
                                         outerRadius={100}
                                         paddingAngle={2}
-                                        dataKey="value"
+                                        dataKey="events"
+                                        nameKey="name"
                                     >
                                         {categoryDistributionData.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={entry.color} />
@@ -502,156 +457,6 @@ export function EventAnalytics() {
                                     />
                                 </PieChart>
                             </ResponsiveContainer>
-                        </CardContent>
-                    </Card>
-
-                    {/* Conversion Funnel */}
-                    <Card className="bg-[#f7f7f7] shadow-sm  border border-gray-200">
-                        <CardHeader className="border-b border-gray-100">
-                            <CardTitle className="text-lg">Conversion Funnel</CardTitle>
-                            <CardDescription>
-                                User journey from views to attendance
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="pt-6">
-                            <div className="space-y-4">
-                                {funnelData.map((stage, index) => {
-                                    const percentage =
-                                        index === 0
-                                            ? 100
-                                            : ((stage.value / funnelData[0].value) * 100).toFixed(1)
-                                    return (
-                                        <div key={stage.stage}>
-                                            <div className="flex items-center justify-between mb-2">
-                                                <span
-                                                    className="text-sm font-medium text-gray-700">{stage.stage}</span>
-                                                <span className="text-sm font-semibold text-gray-900">{stage.value.toLocaleString()} ({percentage}%)</span>
-                                            </div>
-                                            <div
-                                                className="h-10 rounded-lg overflow-hidden"
-                                                style={{ backgroundColor: "#F3F4F6" }}
-                                            >
-                                                <div
-                                                    className="h-full flex items-center justify-center text-white text-xs font-medium rounded-lg transition-all"
-                                                    style={{
-                                                        width: `${percentage}%`,
-                                                        backgroundColor: stage.color,
-                                                        minWidth: percentage === "100" ? "100%" : "60px"
-                                                    }}
-                                                >
-                                                    {percentage}%
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )
-                                })}
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* Performance Highlights */}
-                <div className="grid grid-cols-2 gap-5 px-8 pb-6">
-                    {/* Top Performing Events */}
-                    <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
-                        <CardHeader className="border-b border-gray-100">
-                            <div className="flex items-center gap-2">
-                                <Award className="h-5 w-5 text-green-600" />
-                                <CardTitle className="text-lg">Top Performing Events</CardTitle>
-                            </div>
-                            <CardDescription>
-                                Best events by tickets, revenue, and attendance
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="pt-4">
-                            <div className="space-y-3">
-                                {topPerformingEvents.map((event, index) => (
-                                    <div
-                                        key={index}
-                                        className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div className="text-sm font-semibold text-gray-400 w-6">
-                                                {index + 1}
-                                            </div>
-                                            <Avatar className={`w-9 h-9 ${event.avatarBg}`}>
-                                                <AvatarFallback className="text-white text-xs">
-                                                    {event.avatar}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div>
-                                                <div className="text-sm font-medium text-gray-900">
-                                                    {event.name}
-                                                </div>
-                                                <Badge
-                                                    variant="outline"
-                                                    className="mt-1 text-xs bg-green-50 text-green-700 border-green-200"
-                                                >
-                                                    {event.badge}
-                                                </Badge>
-                                            </div>
-                                        </div>
-                                        <div className="text-lg font-semibold text-gray-900">
-                                            {event.metric}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Underperforming Events */}
-                    <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
-                        <CardHeader className="border-b border-gray-100">
-                            <div className="flex items-center gap-2">
-                                <AlertTriangle className="h-5 w-5 text-orange-600" />
-                                <CardTitle className="text-lg">
-                                    Events Needing Attention
-                                </CardTitle>
-                            </div>
-                            <CardDescription>
-                                Events with performance issues requiring action
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="pt-4">
-                            <div className="space-y-3">
-                                {underperformingEvents.map((event, index) => (
-                                    <div
-                                        key={index}
-                                        className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div
-                                                className={`w-2 h-2 rounded-full ${event.severity === "high"
-                                                    ? "bg-red-500"
-                                                    : "bg-orange-500"
-                                                    }`}
-                                            />
-                                            <Avatar className={`w-9 h-9 ${event.avatarBg}`}>
-                                                <AvatarFallback className="text-white text-xs">
-                                                    {event.avatar}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div>
-                                                <div className="text-sm font-medium text-gray-900">
-                                                    {event.name}
-                                                </div>
-                                                <div className="text-xs text-gray-500 mt-0.5">
-                                                    {event.issue}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div
-                                            className={`text-sm font-semibold ${event.severity === "high"
-                                                ? "text-red-600"
-                                                : "text-orange-600"
-                                                }`}
-                                        >
-                                            {event.metric}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
                         </CardContent>
                     </Card>
                 </div>
@@ -727,28 +532,6 @@ export function EventAnalytics() {
                 {/* Event Performance Table */}
                 <div className="px-8 pb-8">
                     <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
-                        <CardHeader className="border-b border-gray-100">
-                            <div className="flex items-center justify-between">
-                                <CardTitle className="text-lg">
-                                    Event Performance Overview
-                                </CardTitle>
-                                <div className="flex gap-2">
-                                    <Select defaultValue="10">
-                                        <SelectTrigger className="w-[120px] border border-gray-200">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent className='border border-gray-200'>
-                                            <SelectItem value="10">Show 10</SelectItem>
-                                            <SelectItem value="25">Show 25</SelectItem>
-                                            <SelectItem value="50">Show 50</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <Button variant="ghost" size="icon" className="h-9 w-9">
-                                        <ArrowUpDown className="h-4 w-4 text-gray-500" />
-                                    </Button>
-                                </div>
-                            </div>
-                        </CardHeader>
                         <CardContent className="p-0">
                             {/* Table Header */}
                             <div
@@ -786,7 +569,6 @@ export function EventAnalytics() {
                                                     {event.eventName}
                                                 </div>
                                                 <div className="flex items-center gap-1.5 mt-0.5">
-                                                    {/* <CategoryIcon className="h-3 w-3 text-gray-400" /> */}
                                                     <span className="text-xs text-gray-500">
                                                         {event.categoryName}
                                                     </span>
@@ -863,29 +645,6 @@ export function EventAnalytics() {
                                     </div>
                                 )
                             })}
-
-                            {/* Footer with Pagination */}
-                            {/* <div className="px-6 py-4 flex items-center justify-between text-sm text-gray-600">
-                                <div>Showing 1–6 of {eventPerformanceData.length} events</div>
-                                <div className="flex gap-2">
-                                    <Button variant="outline" size="sm">
-                                        Previous
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="bg-[#7FA5A5] text-white border-[#7FA5A5] hover:bg-[#6D9393]"
-                                    >
-                                        1
-                                    </Button>
-                                    <Button variant="outline" size="sm">
-                                        2
-                                    </Button>
-                                    <Button variant="outline" size="sm">
-                                        Next
-                                    </Button>
-                                </div>
-                            </div> */}
                         </CardContent>
                     </Card>
                 </div>
@@ -948,7 +707,7 @@ export function EventAnalytics() {
                                 </div>
 
                                 {/* Sales Timeline */}
-                                <Card>
+                                {/* <Card>
                                     <CardHeader>
                                         <CardTitle className="text-base">
                                             Ticket Sales Timeline
@@ -970,7 +729,7 @@ export function EventAnalytics() {
                                             </LineChart>
                                         </ResponsiveContainer>
                                     </CardContent>
-                                </Card>
+                                </Card> */}
 
                                 {/* Peak Booking Times */}
                                 <Card>

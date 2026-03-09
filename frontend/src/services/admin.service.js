@@ -81,15 +81,23 @@ export const adminService = {
     },
 
     getEventAnalytics: () => {
-        return axiosInstance.get(`/analytics/events`)
+        return axiosInstance.get('/analytics/events')
     },
 
     getSummaryAnalytics: () => {
-        return axiosInstance.get(`/analytics/summary`)
+        return axiosInstance.get('/analytics/summary')
     },
 
     getMonthlyTicketSales: () => {
-        return axiosInstance.get(`/analytics/monthly-ticket-sales`)
+        return axiosInstance.get('/analytics/monthly-ticket-sales')
+    },
+
+    getTopRevenueEvents: () => {
+        return axiosInstance.get('/analytics/top-revenue-events')
+    },
+
+    getCategoryDistribution: () => {
+        return axiosInstance.get('/analytics/category-distribution')
     },
 
 };
