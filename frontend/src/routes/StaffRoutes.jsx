@@ -14,10 +14,10 @@ const StaffRoutes = () => {
             <Route element={<StaffLayout />}>
                 <Route element={<ProtectedRoute allowedRoles={["ATTENDEE"]} />}>
                     <Route element={<AccessStaff />} >
-                        <Route path="/" element={<StaffWorkspacePage />} />
-                        <Route path="/my-schedule" element={<MySchedulePage />} />
-                        <Route path="/resource" element={<ResourcesPage />} />
-                        <Route path="/scan-qr" element={<ScanQRPage />} />
+                        <Route index element={<StaffWorkspacePage />} />
+                        <Route path="my-schedule" element={<MySchedulePage />} />
+                        <Route path="resource" element={<ResourcesPage />} />
+                        <Route path="scan-qr" element={<ScanQRPage />} />
                     </Route>
                 </Route>
             </Route>

@@ -19,16 +19,16 @@ const OrganizerRoutes = () => {
         <Routes>
             <Route element={<ProtectedRoute allowedRoles={["ORGANIZER"]} />}>
                 <Route element={<OrganizerLayout />}>
-                    <Route path="/my-events" element={<MyEventsPage />} />
-                    {/* <Route path="/create-event" element={<CreateEventPage />} /> */}
-                    <Route path="/feedback/feedbacklist/:eventId" element={<FeedbackList />} />
-                    <Route path="/feedback/createform/:eventId" element={<FeedbackBuilder />} />
-                    <Route path="/feedback/:feedbackId" element={<FeedbackDetail />} />
-                    <Route path="/recruitmentlist/:eventId" element={<RecruitmentList />} />
-                    <Route path="/recruitmentcreate/:eventId" element={<RecruitmentBuilder />} />
-                    <Route path="/applications/:recruitmentId" element={<ApplicationList />} />
-                    <Route path="/recruitments/:recruitmentId" element={<RecruitmentDetail />} />
-                    <Route path="/:id/staff" element={<StaffManagement />} />
+                    <Route path="my-events" element={<MyEventsPage />} />
+                    {/* <Route path="create-event" element={<CreateEventPage />} /> */}
+                    <Route path="feedback/feedbacklist/:eventId" element={<FeedbackList />} />
+                    <Route path="feedback/createform/:eventId" element={<FeedbackBuilder />} />
+                    <Route path="feedback/:feedbackId" element={<FeedbackDetail />} />
+                    <Route path="recruitmentlist/:eventId" element={<RecruitmentList />} />
+                    <Route path="recruitmentcreate/:eventId" element={<RecruitmentBuilder />} />
+                    <Route path="applications/:recruitmentId" element={<ApplicationList />} />
+                    <Route path="recruitments/:recruitmentId" element={<RecruitmentDetail />} />
+                    <Route path=":id/staff" element={<StaffManagement />} />
                 </Route>
             </Route>
         </Routes>

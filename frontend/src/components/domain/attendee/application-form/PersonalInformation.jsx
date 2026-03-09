@@ -24,7 +24,7 @@ const PersonalInformation = ({ userProfile }) => {
                 </div>
             </div>
             <p className="text-xs text-[#6a777c] mt-3 ml-2">
-                Need to update your info? <a href="/me" className="text-[#89A8B2] hover:underline font-bold transition-colors">Edit Profile</a>
+                Need to update your info? <a href="/attendee/me" className="text-[#89A8B2] hover:underline font-bold transition-colors">Edit Profile</a>
             </p>
         </section>
     )
