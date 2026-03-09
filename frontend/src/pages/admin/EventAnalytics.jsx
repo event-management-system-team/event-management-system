@@ -67,6 +67,7 @@ import {
 } from "../../components/domain/admin/Dialog.jsx";
 import { Badge } from "../../components/domain/admin/Badge.jsx";
 import { adminService } from '../../services/admin.service.js';
+import dayjs from "dayjs";
 
 // Mock data for global analytics
 // const globalMetrics = [
@@ -429,6 +430,52 @@ export function EventAnalytics() {
             iconColor: "text-orange-600"
         }
     ]
+
+    const ticketProgress = (total, sold) => {
+        if (!total || total <= 0) return 0
+        const progress = (sold / total) * 100
+
+        return Math.min(100, Math.round(progress))
+    }
+
+    const formatVND = (amount) => {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(amount)
+    }
+
+    const getStatusVariant = (status) => {
+        switch (status) {
+            case "APPROVED":
+                return "default";
+            case "ONGOING":
+                return "default";
+            case "PENDING":
+                return "secondary";
+            case "REJECTED":
+                return "destructive";
+            default:
+                return "secondary";
+        }
+    }
+
+    const getStatusClasses = (status) => {
+        switch (status) {
+            case "APPROVED":
+                return "bg-blue-100 text-blue-600 hover:bg-blue-100";
+            case "ONGOING":
+                return "bg-green-100 text-green-700 hover:bg-green-100";
+            case "PENDING":
+                return "bg-orange-100 text-orange-700 hover:bg-orange-100";
+            case "REJECTED":
+                return "bg-red-100 text-red-700 hover:bg-red-100";
+            case "COMPLETED":
+                return "bg-gray-200 text-700 hover:bg-gray-200";
+            default:
+                return "bg-gray-100 text-gray-700";
+        }
+    };
 
     const handleViewDetails = event => {
         setSelectedEvent(event)
@@ -888,60 +935,68 @@ export function EventAnalytics() {
                             </div>
 
                             {/* Event Rows */}
-                            {eventPerformanceData.map(event => {
-                                const CategoryIcon = event.categoryIcon
+                            {events?.map(event => {
+                                // const CategoryIcon = event.categoryIcon
+                                const progress = ticketProgress(event.totalCapacity, event.ticketsSold);
                                 return (
                                     <div
-                                        key={event.id}
+                                        key={event.eventId}
                                         className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-gray-50"
                                     >
                                         <div className="col-span-3 flex items-center gap-3">
-                                            <Avatar className={`w-10 h-10 ${event.thumbnailBg}`}>
-                                                <AvatarFallback className="text-white text-xs">
-                                                    {event.thumbnail}
-                                                </AvatarFallback>
+                                            <Avatar className='w-10 h-10'>
+                                                {event?.bannerUrl ? (
+                                                    <AvatarImage src={event.bannerUrl} alt={event.eventName} />
+                                                ) : (
+                                                    <AvatarFallback className="bg-gray-300" />
+                                                )}
                                             </Avatar>
                                             <div>
                                                 <div className="font-medium text-sm text-gray-900">
-                                                    {event.name}
+                                                    {event.eventName}
                                                 </div>
                                                 <div className="flex items-center gap-1.5 mt-0.5">
-                                                    <CategoryIcon className="h-3 w-3 text-gray-400" />
+                                                    {/* <CategoryIcon className="h-3 w-3 text-gray-400" /> */}
                                                     <span className="text-xs text-gray-500">
-                                                        {event.category}
+                                                        {event.categoryName}
                                                     </span>
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="col-span-2">
-                                            <div className="text-sm text-gray-900">{event.date}</div>
-                                            <div className="text-xs text-gray-500">{event.time}</div>
+                                            <div className="text-sm text-gray-900">
+                                                {dayjs(event.startDate).format("MMM DD, YYYY")}
+                                            </div>
+                                            <div className="text-xs text-gray-500">
+                                                {dayjs(event.startDate).format("hh:mm A")} -{" "}
+                                                {dayjs(event.endDate).format("hh:mm A")}
+                                            </div>
                                         </div>
                                         <div className="col-span-2">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <div
                                                     className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                                                     <div
-                                                        className={`h-full rounded-full ${event.progress >= 80
+                                                        className={`h-full rounded-full ${progress >= 80
                                                             ? "bg-green-500"
-                                                            : event.progress >= 50
+                                                            : progress >= 50
                                                                 ? "bg-blue-500"
                                                                 : "bg-orange-500"
                                                             }`}
-                                                        style={{ width: `${event.progress}%` }}
+                                                        style={{ width: `${progress}%` }}
                                                     />
                                                 </div>
                                                 <span className="text-xs text-gray-600 min-w-[35px]">
-                                                    {event.progress}%
+                                                    {progress}%
                                                 </span>
                                             </div>
                                             <div className="text-xs text-gray-600">
                                                 {event.ticketsSold.toLocaleString()} /{" "}
-                                                {event.capacity.toLocaleString()}
+                                                {event.totalCapacity.toLocaleString()}
                                             </div>
                                         </div>
                                         <div className="col-span-1 text-sm font-semibold text-gray-900">
-                                            {event.revenue}
+                                            {formatVND(event.revenue)}
                                         </div>
                                         <div className="col-span-1">
                                             <div
@@ -956,18 +1011,14 @@ export function EventAnalytics() {
                                             </div>
                                         </div>
                                         <div className="col-span-2">
-                                            <Badge
-                                                variant={event.statusVariant}
-                                                className={
-                                                    event.statusVariant === "default"
-                                                        ? "bg-green-100 text-green-700 hover:bg-green-100"
-                                                        : event.statusVariant === "secondary"
-                                                            ? "bg-orange-100 text-orange-700 hover:bg-orange-100"
-                                                            : ""
-                                                }
-                                            >
-                                                ● {event.status}
-                                            </Badge>
+                                            <div className="col-span-2">
+                                                <Badge
+                                                    variant={getStatusVariant(event.status)}
+                                                    className={getStatusClasses(event.status)}
+                                                >
+                                                    ● {event.status}
+                                                </Badge>
+                                            </div>
                                         </div>
                                         <div className="col-span-1 flex justify-end">
                                             <Button

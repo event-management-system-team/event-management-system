@@ -6,25 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="b61f3f50-8065-4f51-be19-f5261948bd35" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/admin/AdminAccountController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/admin/AdminAccountController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/admin/AdminEventController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/admin/AdminEventController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/admin/EventAgendaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/admin/EventAgendaController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/admin/TicketTypeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/admin/TicketTypeController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/EventAgendaRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/EventAgendaRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/TicketTypeRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/TicketTypeRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/AdminEventService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/AdminEventService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/EventAgendaService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/EventAgendaService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/TicketTypeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/TicketTypeService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/test/java/com/eventmanagement/backend/controller/admin/EventControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/com/eventmanagement/backend/controller/admin/EventControllerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/test/java/com/eventmanagement/backend/service/AdminEventServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/com/eventmanagement/backend/service/AdminEventServiceTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/admin/EventAnalyticsResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/admin/EventAnalyticsResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/EventAnalyticsRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/EventAnalyticsRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/EventAnalyticsService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/EventAnalyticsService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/admin/EventAnalytics.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/admin/EventAnalytics.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/admin/EventDetail.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/admin/EventDetail.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/admin/EventManagement.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/admin/EventManagement.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/routes/AdminRoutes.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/routes/AdminRoutes.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/services/admin.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/admin.service.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -185,7 +171,7 @@
       <workItem from="1772869835737" duration="13174000" />
       <workItem from="1772898102150" duration="2297000" />
       <workItem from="1772935436010" duration="21335000" />
-      <workItem from="1773016859046" duration="4740000" />
+      <workItem from="1773016859046" duration="6928000" />
     </task>
     <servers />
   </component>

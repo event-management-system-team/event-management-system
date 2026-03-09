@@ -30,11 +30,12 @@ public class EventAnalyticsService {
             String categoryName = (String) row[3];
             Timestamp startDate = (Timestamp) row[4];
             Timestamp endDate = (Timestamp) row[5];
-            String status = (String) row[6];
-            Integer ticketsSold = (Integer) row[7];
-            BigDecimal revenue = (BigDecimal) row[8];
-            Integer checkins = (Integer) row[9];
-            Integer registrations = (Integer) row[10];
+            Integer totalCapacity = (Integer) row[6];
+            String status = (String) row[7];
+            Integer ticketsSold = (Integer) row[8];
+            BigDecimal revenue = (BigDecimal) row[9];
+            Integer checkins = (Integer) row[10];
+            Integer registrations = (Integer) row[11];
 
             res.setEventId(eventId);
             res.setEventName(eventName);
@@ -47,6 +48,7 @@ public class EventAnalyticsService {
             if (endDate != null)
                 res.setEndDate(endDate.toLocalDateTime());
 
+            res.setTotalCapacity(totalCapacity);
             res.setStatus(status);
             res.setTicketsSold(ticketsSold);
             res.setRevenue(revenue);

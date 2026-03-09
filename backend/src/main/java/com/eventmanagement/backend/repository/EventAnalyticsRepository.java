@@ -19,6 +19,7 @@ public interface EventAnalyticsRepository extends JpaRepository<EventAnalytics, 
         c.category_name,
         e.start_date,
         e.end_date,
+        e.total_capacity,
         e.status,
         ea.total_tickets_sold,
         ea.total_revenue,
@@ -27,6 +28,7 @@ public interface EventAnalyticsRepository extends JpaRepository<EventAnalytics, 
         FROM event_analytics ea
         JOIN events e ON ea.event_id = e.event_id
         LEFT JOIN event_categories c ON e.category_id = c.category_id
+        WHERE e.status IN ('ONGOING','APPROVED', 'COMPLETED')
         ORDER BY ea.calculated_at DESC;
         """, nativeQuery = true)
     List<Object[]> getAnalyticsDashboard();

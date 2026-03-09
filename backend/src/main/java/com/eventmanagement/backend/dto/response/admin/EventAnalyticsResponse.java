@@ -21,6 +21,7 @@ public class EventAnalyticsResponse {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
 
+    private Integer totalCapacity;
     private Integer ticketsSold;
     private BigDecimal revenue;
 
