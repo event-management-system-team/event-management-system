@@ -59,6 +59,14 @@ public class OrganizerEventController {
         return ResponseEntity.ok(stats);
     }
 
+    @GetMapping("/{eventId}")
+    public ResponseEntity<OrganizerEventResponse> getEventDetail(
+            @PathVariable UUID eventId) {
+        
+        OrganizerEventResponse event = organizerEventService.getEventDetail(eventId);
+        return ResponseEntity.ok(event);
+    }
+
     // get authenticated user
     private User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

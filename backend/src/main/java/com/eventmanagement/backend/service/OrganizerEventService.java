@@ -253,6 +253,19 @@ public class OrganizerEventService {
     }
 
     /**
+     * Lấy chi tiết một event của organizer
+     */
+    public OrganizerEventResponse getEventDetail(UUID eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Event not found: " + eventId));
+        
+        Event eventWithTickets = eventRepository.findWithTicketsByEventId(eventId)
+                .orElse(event);
+        
+        return mapToOrganizerResponse(eventWithTickets);
+    }
+
+    /**
      * Lấy thống kê event của organizer (total, active, upcoming, completed)
      *
      */
