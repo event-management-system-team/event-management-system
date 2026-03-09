@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client/dist/sockjs';
-import { message } from 'antd';
+
 
 export const useCheckInWebSocket = (eventSlug) => {
     const queryClient = useQueryClient();

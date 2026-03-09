@@ -32,5 +32,5 @@ public interface FeedbackRepository extends JpaRepository<Feedback, UUID> {
         WHERE f.event_id = CAST(:eventId AS UUID)
     """, nativeQuery = true)
     List<FeedbackResponseDTO> findFeedbacksByEventId(@Param("eventId") UUID eventId);
-
+    boolean existsByEvent_EventIdAndUser_UserId(UUID eventId, UUID userId);
 }

@@ -3,6 +3,7 @@ package com.eventmanagement.backend.service.attendee;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -14,7 +15,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 
 import com.eventmanagement.backend.constants.EventStatus;
 import com.eventmanagement.backend.constants.RecruitmentStatus;
@@ -126,12 +126,12 @@ public class RecruitmentService {
         }
 
         List<BenefitRecruitment> benefits = recruitment.getBenefits();
-        List<RecruitmentResponse.BenefitRecruitmentDto> benefitResponse = benefits.stream()
+        List<RecruitmentResponse.BenefitRecruitmentDto> benefitResponse = (benefits != null) ? benefits.stream()
                 .map(benefit -> RecruitmentResponse.BenefitRecruitmentDto.builder()
                         .icon(benefit.getIcon())
                         .title(benefit.getTitle())
                         .description(benefit.getDescription())
-                        .build()).toList();
+                        .build()).toList() : new ArrayList<>();
 
 
         return RecruitmentResponse.builder()
