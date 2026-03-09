@@ -30,7 +30,7 @@ const TicketCard = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col h-full">
+    <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 duration-300 flex flex-col h-full">
       <div className="relative aspect-[16/9] w-full overflow-hidden shrink-0">
         <img
           className="w-full h-full object-cover"
@@ -69,14 +69,11 @@ const TicketCard = ({
           {ticketCount} Tickets
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-2 mt-2">
-          <button className="w-full sm:flex-1 bg-[#8aa8b2] hover:bg-[#7a97a1] text-white py-2 md:py-2.5 rounded-lg flex items-center justify-center gap-2 text-xs md:text-sm font-bold transition-colors">
-            <QrCode size={16} className="md:w-[18px] md:h-[18px]" />
-            View QR
-          </button>
+        <div className={`flex flex-col sm:flex-row gap-2 mt-2 ${['PENDING', 'CANCELLED', 'REJECTED'].includes(status?.toUpperCase()) ? 'invisible pointer-events-none' : ''}`}>
           <Link
             to={`/tickets/${eventSlug}`}
-            className="w-full sm:flex-1 border border-gray-200 hover:bg-gray-50 text-gray-700 py-2 md:py-2.5 rounded-lg flex items-center justify-center text-xs md:text-sm font-bold transition-colors text-center"
+            className="w-full sm:flex-1 bg-[#8aa8b2] hover:bg-[#7a97a1] text-white py-2 md:py-2.5 rounded-lg flex items-center justify-center gap-2 text-xs md:text-sm font-bold transition-colors"
+            tabIndex={['PENDING', 'CANCELLED', 'REJECTED'].includes(status?.toUpperCase()) ? -1 : 0}
           >
             Details
           </Link>

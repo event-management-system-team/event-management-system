@@ -70,7 +70,6 @@ const MyApplicationPage = () => {
         ))}
       </div>
 
-      {/* Application List */}
       <ApplicationList
         isLoading={isLoading}
         filteredApps={filteredApps}
