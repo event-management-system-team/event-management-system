@@ -52,6 +52,7 @@ public class BookingService {
         private final TicketRepository ticketRepository;
         private final UserRepository userRepository;
         private final GenerateCode generateCode;
+        private final EmailService emailService;
 
         @Value("${booking.reservation-ttl-seconds}")
         private long reservationTtl;
@@ -241,6 +242,8 @@ public class BookingService {
                                 throw new RuntimeException("Failed to update ticket counts.");
                         redisTemplate.delete(buildReservationKey(ticketTypeId, order.getUser().getUserId()));
                 }
+                emailService.sendTicketEmail(order.getUser(), order, tickets);
+                log.info("[Booking] Ticket email queued for order: {}", order.getOrderCode());
         }
 
         @Scheduled(fixedRate = 60_000)

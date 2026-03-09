@@ -2,6 +2,7 @@ import React from 'react';
 import { IoCalendarClearOutline } from "react-icons/io5";
 import { MdOutlineLocationOn } from "react-icons/md";
 import { MdOutlineConfirmationNumber } from "react-icons/md";
+import { QRCodeSVG } from 'qrcode.react';
 
 const TicketCard = ({ event }) => {
   return (
@@ -31,8 +32,12 @@ const TicketCard = ({ event }) => {
 
       {/* QR Code Section */}
       <div className="flex-1 p-8 md:p-10 flex flex-col items-center justify-center bg-gray-50">
-        <div className="bg-white p-4 rounded-lg shadow-md mb-4">
-          <div className="w-32 h-32 bg-center bg-no-repeat bg-contain" style={{backgroundImage: `url(${event.qrCode})`}}></div>
+        <div className="bg-white p-4 rounded-lg shadow-md mb-4 flex items-center justify-center">
+          {event.qrCode ? (
+            <QRCodeSVG value={event.qrCode} size={128} />
+          ) : (
+            <div className="w-32 h-32 bg-gray-200 animate-pulse rounded"></div>
+          )}
         </div>
         <p className="text-[#6a787c] text-xs font-semibold uppercase tracking-widest mb-1">Ticket ID</p>
         <p className="text-[#131516] font-bold text-lg">{event.ticketId}</p>
