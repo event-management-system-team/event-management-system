@@ -32,7 +32,7 @@ const PaymentSuccessPage = () => {
   const displayTickets = tickets.filter((t) => t.orderCode === orderCode);
 
   return (
-    <div className="bg-[#E5E1DA] font-sans min-h-screen text-[#131516]">
+    <div className="bg-[#F1F0E8] font-sans min-h-screen text-[#131516]">
       <main className="max-w-[1000px] mx-auto px-4 py-12 flex flex-col items-center">
         <SuccessHero />
 
@@ -75,7 +75,9 @@ const PaymentSuccessPage = () => {
           paymentMethod={displayTickets[0]?.paymentMethod || "VNPay"}
         />
 
-        <SuccessActions onGoMyTickets={() => navigate("/my-tickets")} />
+        <SuccessActions
+          onGoMyTickets={() => navigate("/attendee/my-tickets")}
+        />
       </main>
     </div>
   );

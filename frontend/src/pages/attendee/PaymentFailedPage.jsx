@@ -32,12 +32,12 @@ const PaymentFailedPage = () => {
       : "Giao dịch không thể được xử lý tại thời điểm này");
 
   return (
-    <div className="bg-[#F8F6F6] font-sans min-h-screen text-[#131516]">
+    <div className="bg-[#F1F0E8] font-sans min-h-screen text-[#131516]">
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-12 max-w-[800px] mx-auto w-full">
         <FailedHero errorMessage={errorMessage} />
         <FailedReasons />
         <FailedActions
-          onTryAgain={() => navigate(-2)}
+          onTryAgain={() => navigate("/events")}
           onContactSupport={() =>
             (window.location.href = "mailto:support@eventhub.vn")
           }
