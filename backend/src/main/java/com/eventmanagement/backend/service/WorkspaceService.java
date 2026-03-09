@@ -1,16 +1,19 @@
 package com.eventmanagement.backend.service;
 
+import com.eventmanagement.backend.constants.TicketStatus;
+import com.eventmanagement.backend.constants.EventStatus;
 import com.eventmanagement.backend.dto.response.staff.ResourceResponse;
 import com.eventmanagement.backend.dto.response.staff.ScheduleResponse;
+import com.eventmanagement.backend.dto.response.staff.TicketTypeStaffResponse;
 import com.eventmanagement.backend.dto.response.staff.WorkspaceResponse;
+import com.eventmanagement.backend.exception.ForbiddenException;
 import com.eventmanagement.backend.model.*;
-import com.eventmanagement.backend.repository.EventResourceRepository;
-import com.eventmanagement.backend.repository.EventStaffRepository;
-import com.eventmanagement.backend.repository.StaffAssignmentRepository;
+import com.eventmanagement.backend.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
@@ -23,15 +26,25 @@ public class WorkspaceService {
     private final EventStaffRepository eventStaffRepo;
     private final StaffAssignmentRepository assignmentRepo;
     private final EventResourceRepository resourceRepo;
+    private final TicketTypeRepository ticketTypeRepo;
+    private final TicketRepository ticketRepo;
 
     @Transactional(readOnly = true)
     public WorkspaceResponse getWorkspaceData(String eventSlug, UUID userId) {
 
         EventStaff eventStaff = eventStaffRepo.findWorkspaceAccess(eventSlug, userId)
-                .orElseThrow(() -> new RuntimeException("You are not an event staff member"));
+                .orElseThrow(() -> new ForbiddenException("You are not an event staff member"));
 
         User user = eventStaff.getUser();
         Event event = eventStaff.getEvent();
+
+        if (event.getStatus() == EventStatus.COMPLETED && event.getEndDate() != null) {
+            LocalDateTime cutoffTime = event.getEndDate().plusDays(5);
+
+            if (LocalDateTime.now().isAfter(cutoffTime)) {
+                throw new ForbiddenException("The event ended over 5 days ago. The staff workspace is locked for data security purposes.");
+            }
+        }
 
         List<StaffAssignment> assignments = assignmentRepo.findAssignmentsByStaffId(eventStaff.getEventStaffId());
 
@@ -40,6 +53,25 @@ public class WorkspaceService {
         return mapToResponse(assignments, resources, eventStaff, user, event);
 
     }
+
+    public List<TicketTypeStaffResponse> getTicketType(String eventSlug) {
+        List<TicketType> ticketTypes = ticketTypeRepo.findByEvent_EventSlugAndIsActiveTrue(eventSlug);
+
+
+        List<TicketTypeStaffResponse> responses = ticketTypes.stream().map(
+                (ticketType) -> {
+                    long checkedInTickets = ticketRepo.countByTicketType_TicketTypeIdAndStatus(ticketType.getTicketTypeId(), TicketStatus.CHECKED_IN);
+                    return TicketTypeStaffResponse.builder()
+                            .ticketTypeId(ticketType.getTicketTypeId())
+                            .ticketName(ticketType.getTicketName())
+                            .soldCount(ticketType.getSoldCount())
+                            .checkInCount(checkedInTickets)
+                            .build();
+
+                }).collect(Collectors.toList());
+        return responses;
+    }
+
 
     private WorkspaceResponse mapToResponse(List<StaffAssignment> assignments, List<EventResource> resources,
                                             EventStaff eventStaff, User user, Event event) {
@@ -64,6 +96,7 @@ public class WorkspaceService {
                         .resourceName(r.getResourceName())
                         .fileUrl(r.getFileUrl())
                         .fileType(r.getFileType())
+                        .resourceType(r.getResourceType())
                         .build()
         ).collect(Collectors.toList());
 
@@ -77,6 +110,7 @@ public class WorkspaceService {
                 .eventName(event.getEventName())
                 .location(event.getLocation())
                 .startDate(event.getStartDate())
+                .endDate(event.getEndDate())
                 .bannerUrl(event.getBannerUrl())
                 .build();
 

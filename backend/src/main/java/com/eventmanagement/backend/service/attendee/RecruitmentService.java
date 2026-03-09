@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 
 import com.eventmanagement.backend.constants.EventStatus;
 import com.eventmanagement.backend.constants.RecruitmentStatus;
@@ -32,18 +32,20 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RecruitmentService {
     private final RecruitmentRepository recruitmentRepository;
-    private final RestClient.Builder builder;
+
+    List<RecruitmentStatus> statusesRecruitment = Arrays.asList(RecruitmentStatus.OPEN, RecruitmentStatus.CLOSED);
 
     public List<RecruitmentResponse> getRecentRecruitments() {
 
-        Pageable topFour = PageRequest.of(0, 4);
-        List<String> topEvent = recruitmentRepository.findRecentEventWithOpenRecruitments(topFour);
+        Pageable topThree = PageRequest.of(0, 3);
+        List<String> topEvent = recruitmentRepository.findRecentEventWithOpenRecruitments(statusesRecruitment, topThree);
 
         if (topEvent.isEmpty()) {
             return List.of();
         }
 
-        List<Recruitment> recruitments = recruitmentRepository.findRecruitmentsByEventSlugs(topEvent);
+
+        List<Recruitment> recruitments = recruitmentRepository.findRecruitmentsByEventSlugs(topEvent, statusesRecruitment);
 
         Map<Event, List<Recruitment>> groupedByEvent = recruitments.stream()
                 .collect(Collectors.groupingBy((recruitment) -> recruitment.getEvent()));
@@ -65,12 +67,14 @@ public class RecruitmentService {
         }
 
 
-        Page<String> eventSlugs = recruitmentRepository.searchEventSlug(EventStatus.APPROVED, kw, loc, dl, pageable);
+        List<EventStatus> statuses = Arrays.asList(EventStatus.APPROVED, EventStatus.ONGOING);
+
+        Page<String> eventSlugs = recruitmentRepository.searchEventSlug(statuses, kw, loc, dl, pageable);
 
         if (eventSlugs.isEmpty()) {
             return Page.empty(pageable);
         }
-        List<Recruitment> recruitments = recruitmentRepository.searchRecruitments(RecruitmentStatus.OPEN, eventSlugs.getContent());
+        List<Recruitment> recruitments = recruitmentRepository.searchRecruitments(statusesRecruitment, eventSlugs.getContent());
 
         List<RecruitmentResponse> groupByEvent = groupRecruitmentByEvent(recruitments);
 
@@ -136,6 +140,8 @@ public class RecruitmentService {
                 .eventName(event.getEventName())
                 .eventBannerUrl(event.getBannerUrl())
                 .location(event.getLocation())
+                .startDate(event.getStartDate())
+                .endDate(event.getEndDate())
                 .description(recruitment.getDescription())
                 .deadline(recruitment.getDeadline())
                 .createdAt(recruitment.getCreatedAt())
@@ -146,5 +152,5 @@ public class RecruitmentService {
                 .build();
     }
 
-    
+
 }

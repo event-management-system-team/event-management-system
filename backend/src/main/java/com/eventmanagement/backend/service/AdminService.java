@@ -32,7 +32,6 @@ public class AdminService {
     private final GenerateAvatarUrl generateAvatarUrl;
     private final EventRepository eventRepository;
 
-    // get account list (+pagination)
     public Page<UserResponse> getAllAccounts(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<User> userPage = userRepository.findAll(pageable);
@@ -46,12 +45,6 @@ public class AdminService {
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
-
-//    public List<UserResponse> searchAccounts(String keyword) {
-//        List<User> users = userRepository.searchUsers(keyword);
-//
-//        return users.stream().map(this::mapToResponse).collect(Collectors.toList());
-//    }
 
     public Page<UserResponse> searchAccounts(String keyword, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());

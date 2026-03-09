@@ -36,7 +36,7 @@ const SubmitFeedback = () => {
           }
         } catch (e) {
           setEventInfo({ name: 'Sự kiện của bạn', date: 'Đang diễn ra', cover: eventInfo.cover });
-          e.message && message.warning("Không lấy được thông tin sự kiện, sẽ hiển thị thông tin mặc định.");
+          e.message ;
         }
 
         const formRes = await axiosInstance.get(`/events/${eventId}/forms?type=FEEDBACK`);

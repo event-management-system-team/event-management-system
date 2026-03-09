@@ -48,7 +48,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/events/**").permitAll()
                         .requestMatchers("/api/categories/**").permitAll()
                         .requestMatchers("/api/recruitments/**").permitAll()
-                            .requestMatchers("/api/profile/{userId}").permitAll()
+                        .requestMatchers("/api/profile/{userId}").permitAll()
+                        .requestMatchers("/ws-checkin/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

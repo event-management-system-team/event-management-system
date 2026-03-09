@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.spi.ToolProvider;
 
 @Entity
 @Table(name = "staff_applications")
@@ -23,7 +24,7 @@ public class StaffApplication {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "application_id")
+    @Column(name = "application_id", updatable = false, nullable = false)
     private UUID applicationId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -40,15 +41,15 @@ public class StaffApplication {
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "status")
+    @Column(name = "status", columnDefinition = "application_status")
     @Builder.Default
-    private ApplicationStatus applicationStatus = ApplicationStatus.PENDING;
+    private ApplicationStatus applicationStatus  = ApplicationStatus.PENDING;
 
     @Column(name = "applied_at")
     @Builder.Default
     private LocalDateTime appliedAt = LocalDateTime.now();
 
-    @Column(name = "reviewed_at")
+    @Column(name = "reviewed_at", updatable = false)
     private LocalDateTime reviewedAt;
 
     @Column(name = "created_at", updatable = false)
@@ -60,6 +61,11 @@ public class StaffApplication {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
 }

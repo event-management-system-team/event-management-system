@@ -1,34 +1,112 @@
-import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import staffService from '../../services/staff.service';
+import { useParams, useOutletContext, useSearchParams } from 'react-router-dom';
+import { message } from 'antd';
+import ScannerCamera from '../../components/domain/staff/scanner-qr/ScannerCamera';
+import SearchTicket from '../../components/domain/staff/scanner-qr/SearchTicket';
+import EventInfo from '../../components/domain/staff/scanner-qr/EventInfo';
+import CheckInStats from '../../components/domain/staff/scanner-qr/CheckInStats';
+import { useQuery, keepPreviousData, useQueryClient, useMutation } from '@tanstack/react-query';
+import staffService from '../../services/staff.service'
+import LoadingState from '../../components/common/LoadingState';
+import EmptyState from '../../components/common/EmptyState';
+import { useCheckInWebSocket } from '../../hooks/useCheckInWebSocket';
 
 const ScanQRPage = () => {
-    const navigate = useNavigate();
+
+    const { data } = useOutletContext();
     const { eventSlug } = useParams();
 
-    const { data } = useQuery({
-        queryKey: ['workspace', eventSlug],
-        queryFn: () => staffService.getWorkspace(eventSlug),
+    const [searchParams, setSearchParams] = useSearchParams();
+    const queryClient = useQueryClient();
+
+    const searchKeyword = searchParams.get('keyword') || '';
+
+    useCheckInWebSocket(eventSlug);
+
+    const { data: tickets, isLoading: isTicketsLoading, isError: isTicketsError } = useQuery({
+        queryKey: ['event', 'tickets', eventSlug, searchKeyword],
+        queryFn: () => staffService.searchEventTickets(eventSlug, searchKeyword),
+        placeholderData: keepPreviousData
+    })
+
+    const { data: ticketStats } = useQuery({
+        queryKey: ['event', 'tickets', eventSlug, 'total-check-in'],
+        queryFn: () => staffService.getCurrentCheckIn(eventSlug),
         enabled: !!eventSlug
+    })
+
+
+    const checkInMutation = useMutation({
+        mutationFn: (request) => staffService.checkInAttendee(eventSlug, request),
+        onSuccess: (response) => {
+            message.success(`Check-in successful for: ${response.customerName}`);
+
+            queryClient.invalidateQueries({ queryKey: ['event', 'tickets', eventSlug] });
+        },
+        onError: (error) => {
+            message.error(error.response?.data?.message || 'Check-in failed!')
+        }
     });
 
-    useEffect(() => {
-        if (data) {
-            const role = data.staffRole?.toLowerCase() || '';
-            const isCheckInStaff = role.includes('check-in') || role.includes('check in');
+    const handleSearch = (keyword) => {
+        const params = new URLSearchParams();
+        if (keyword.trim()) params.append('keyword', keyword.trim());
+        setSearchParams(params);
+    }
 
-            if (!isCheckInStaff) {
 
-                alert('You not allow access QR Scan');
+    const handleSearchCheckIn = (ticketId) => {
+        checkInMutation.mutate({ ticketId });
+    }
 
-                navigate(`/staff/${eventSlug}`, { replace: true });
-            }
+    const handleScanCheckIn = (ticketCode) => {
+        checkInMutation.mutate({ ticketCode });
+    }
+
+    const handleVerifyTicket = async (ticketCode) => {
+        const data = await staffService.searchEventTickets(eventSlug, ticketCode);
+        const ticket = data.find(t => t.ticketCode === ticketCode) || data[0];
+        if (!ticket) {
+            throw new Error("Invalid or non-existent ticket code!");
         }
-    }, [data, navigate, eventSlug]);
+        if (ticket.status === 'CHECKED_IN') {
+            throw new Error("This ticket has already been checked in!");
+        }
+        return ticket;
+    };
+
+    if (isTicketsLoading) return <LoadingState />
+    if (!tickets || isTicketsError) return <EmptyState className='h-[600px]' />
+
+
 
     return (
-        <div>QR Scan</div>
+        <div className="flex-1 flex flex-col lg:flex-row gap-6 h-full w-full overflow-y-auto lg:overflow-hidden bg-[#E5E1DA] p-4 md:p-6 lg:p-8 font-sans">
+
+
+            <div className="flex-1 flex flex-col gap-6 min-w-0 transition-all duration-300 order-2 lg:order-1">
+                <ScannerCamera
+                    onVerifyQR={handleVerifyTicket}
+                    onScanQR={handleScanCheckIn}
+                    isCheckingIn={checkInMutation.isPending}
+
+                />
+                <SearchTicket
+                    tickets={tickets}
+                    handleSearch={handleSearch}
+                    searchKeyword={searchKeyword}
+                    onCheckIn={handleSearchCheckIn}
+                    isCheckingIn={checkInMutation.isPending}
+                />
+            </div>
+
+            <aside className="w-full lg:w-80 flex flex-col shrink-0 h-fit lg:h-full gap-6 order-1 lg:order-2">
+                <EventInfo
+                    eventInfo={data?.eventInfo} />
+                <CheckInStats
+                    ticketStats={ticketStats} />
+            </aside>
+
+        </div>
     );
 };
 

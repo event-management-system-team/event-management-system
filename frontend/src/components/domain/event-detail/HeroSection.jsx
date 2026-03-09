@@ -1,7 +1,7 @@
 import { CalendarDays, Clock, MapPin, Tag } from 'lucide-react'
 import DynamicBreadcrumb from '../../common/DynamicBreadcrumb';
 
-const HeroSection = ({ bannerUrl, location, eventName, startDate, endDate, category }) => {
+const HeroSection = ({ bannerUrl, location, eventName, startDate, endDate, category, status }) => {
 
     // 1. Hàm chỉ lấy Ngày 
     const formatDate = (dateString) => {
@@ -31,11 +31,23 @@ const HeroSection = ({ bannerUrl, location, eventName, startDate, endDate, categ
                     <DynamicBreadcrumb baseColor='!text-slate-300' activeColor='text-white' />
 
                     <div className="mb-10">
-                        <div className="inline-flex items-center gap-2 bg-primary text-white px-4 py-1.5 rounded-full text-xs font-bold mb-4 uppercase tracking-wider"
-                            style={{ backgroundColor: `${category.colorCode}` }}
-                        >
-                            <Tag className="w-4 h-4" />
-                            {category.categoryName || 'Event'}
+                        <div className="flex flex-wrap items-center gap-3 mb-4">
+                            <div className="inline-flex items-center gap-2 bg-primary text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-md"
+                                style={{ backgroundColor: `${category.colorCode}` }}
+                            >
+                                <Tag className="w-4 h-4" />
+                                {category.categoryName || 'Event'}
+                            </div>
+
+                            {status === 'ONGOING' && (
+                                <div className="inline-flex items-center gap-2.5 bg-red-600 text-white px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-[0_0_15px_rgba(239,68,68,0.5)]">
+                                    <span className="relative flex h-2.5 w-2.5">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-100"></span>
+                                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+                                    </span>
+                                    HAPPENING NOW
+                                </div>
+                            )}
                         </div>
 
                         <h1 className="text-white text-4xl lg:text-6xl font-extrabold my-6 max-w-3xl text-balance">
@@ -43,30 +55,30 @@ const HeroSection = ({ bannerUrl, location, eventName, startDate, endDate, categ
                         </h1>
 
 
-                        <div className="flex flex-wrap gap-x-8 gap-y-4 text-white/90 font-medium">
-
-                            {/* Location*/}
-                            <div className="flex items-center gap-2">
-                                <MapPin className="w-5 h-5 text-primary" />
-                                <span>{location}</span>
+                        <div className="flex flex-col gap-4 text-white/90 font-medium">
+                            <div className="flex items-start gap-2 w-full">
+                                <MapPin className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                                <span className="leading-relaxed">{location}</span>
                             </div>
 
-                            {/* Date */}
-                            <div className="flex items-center gap-2">
-                                <CalendarDays className="w-5 h-5 text-primary" />
-                                <span>
-                                    {isSameDay
-                                        ? formatDate(startDate)
-                                        : `${formatDate(startDate)} - ${formatDate(endDate)}`}
-                                </span>
-                            </div>
+                            <div className="flex flex-wrap gap-x-8 gap-y-4">
 
-                            {/* Time */}
-                            <div className="flex items-center gap-2">
-                                <Clock className="w-5 h-5 text-primary" />
-                                <span>
-                                    {formatTime(startDate)} - {formatTime(endDate)}
-                                </span>
+                                <div className="flex items-center gap-2">
+                                    <CalendarDays className="w-5 h-5 text-primary shrink-0" />
+                                    <span>
+                                        {isSameDay
+                                            ? formatDate(startDate)
+                                            : `${formatDate(startDate)} - ${formatDate(endDate)}`}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <Clock className="w-5 h-5 text-primary shrink-0" />
+                                    <span>
+                                        {formatTime(startDate)} - {formatTime(endDate)}
+                                    </span>
+                                </div>
+
                             </div>
 
                         </div>

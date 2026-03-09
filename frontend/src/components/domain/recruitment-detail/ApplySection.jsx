@@ -1,8 +1,8 @@
 import { Progress } from 'antd'
-import { ArrowRight, Calendar, MapPin } from 'lucide-react'
+import { ArrowRight, Calendar, MapPin, Clock } from 'lucide-react'
 import { useNavigate } from 'react-router';
 
-const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage, formattedDeadline, totalAvailable, totalVacancy, deadlineDate }) => {
+const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage, formattedDeadline, totalAvailable, totalVacancy, deadlineDate, startDate, endDate }) => {
 
     const navigate = useNavigate();
     return (
@@ -31,6 +31,24 @@ const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage,
                         )}
                     </div>
                 </div>
+
+                <div className="flex items-start gap-4">
+                    <Clock size={18} className="text-primary mt-0.5" />
+                    <div>
+                        <p className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold mb-1">Event Duration</p>
+                        <p className="text-[14px] font-bold text-slate-600 leading-relaxed">
+                            {(() => {
+                                const startStr = startDate ? new Date(startDate).toLocaleDateString('en-GB') : 'TBA';
+                                const endStr = endDate ? new Date(endDate).toLocaleDateString('en-GB') : 'TBA';
+
+                                if (startStr === 'TBA' && endStr === 'TBA') return 'TBA';
+                                if (startStr === endStr) return startStr;
+                                return `${startStr} - ${endStr}`;
+                            })()}
+                        </p>
+                    </div>
+                </div>
+
                 <div className="flex items-start gap-4">
                     <MapPin size={18} className="text-primary mt-0.5" />
                     <div>
@@ -59,16 +77,16 @@ const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage,
 
 
             <button
-                disabled={totalAvailable <= 0}
+                disabled={totalAvailable <= 0 || status === 'CLOSED'}
                 className="w-full py-4 text-[15px] font-extrabold rounded-xl transition-all duration-300 flex items-center justify-center gap-3 group uppercase
                bg-primary text-white shadow-lg shadow-primary/30 
                hover:bg-primary/90 hover:shadow-primary/50 hover:-translate-y-1
                disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:bg-slate-200"
                 onClick={() => navigate(`/attendee/recruitments/${eventSlug}/apply-staff`)}
             >
-                {totalAvailable <= 0 ? 'Fully Booked' : 'Apply Now'}
+                {status === 'CLOSED' ? 'CLOSED' : (totalAvailable <= 0 ? 'Fully Booked' : 'Apply Now')}
 
-                {!(totalAvailable <= 0) && (
+                {!(totalAvailable <= 0 || status === 'CLOSED') && (
                     <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1.5" />
                 )}
             </button>
