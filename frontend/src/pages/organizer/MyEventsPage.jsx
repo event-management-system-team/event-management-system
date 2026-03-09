@@ -385,12 +385,15 @@ const MyEventsPage = () => {
                                     </div>
                                 </div>
 
-                                {/* Actions */}
-                                <div className="col-span-1 text-right">
-                                    <button className="text-sm text-[#7FA5A5] hover:text-[#5d8585] font-medium transition-colors">
-                                        Manage
-                                    </button>
-                                </div>
+                                                {/* Actions */}
+                                                <div className="col-span-1 text-right">
+                                                    <button 
+                                                        onClick={() => navigate(`/organizer/events/${event.eventId}`)}
+                                                        className="px-3 py-1.5 text-sm text-[#7FA5A5] hover:text-white hover:bg-[#2d3a4f] font-medium rounded-lg border border-transparent hover:border-[#2d3a4f] transition-all duration-200"
+                                                    >
+                                                        Manage
+                                                    </button>
+                                                </div>
                             </div>
                         );
                     })}
