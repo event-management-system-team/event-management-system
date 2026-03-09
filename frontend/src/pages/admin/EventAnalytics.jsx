@@ -352,7 +352,7 @@ export function EventAnalytics() {
                 <div className="grid grid-cols-2 gap-5 px-8 pb-6">
 
                     {/* Ticket Sales By Month */}
-                    <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200" id="ticketsSold" ref={chartRef}>
+                    <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200" id="ticketsSold">
                         <CardHeader className="border-b border-gray-100">
                             <CardTitle className="text-xl font-semibold text-gray-700">Ticket Sales Trend</CardTitle>
                             <CardDescription>

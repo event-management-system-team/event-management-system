@@ -9,7 +9,7 @@ import {
     Eye,
     X,
 } from 'lucide-react';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/domain/admin/Avatar.jsx";
 import { Button } from "../../components/domain/admin/Button.jsx";
 import { Input } from "../../components/domain/admin/Input.jsx";
@@ -28,13 +28,16 @@ import LoadingState from '../../components/common/LoadingState.jsx';
 
 export function EventManagement() {
 
+    const [searchParams] = useSearchParams()
+    const statusParam = searchParams.get("status")
+
     const [events, setEvents] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [originalEvents, setOriginalEvents] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [status, setStatus] = useState("all");
+    const [status, setStatus] = useState(statusParam ? statusParam.toUpperCase() : "all");
     const [category, setCategory] = useState("all");
     const [priceType, setPriceType] = useState("all");
     const [date, setDate] = useState(null);

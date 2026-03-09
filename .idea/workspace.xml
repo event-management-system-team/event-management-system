@@ -8,9 +8,8 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/admin/AccountManagement.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/admin/AccountManagement.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/admin/AdminDashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/admin/AdminDashboard.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/admin/EventAnalytics.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/admin/EventAnalytics.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/admin/EventDetail.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/admin/EventDetail.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/admin/EventManagement.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/admin/EventManagement.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -172,7 +171,7 @@
       <workItem from="1772869835737" duration="13174000" />
       <workItem from="1772898102150" duration="2297000" />
       <workItem from="1772935436010" duration="21335000" />
-      <workItem from="1773016859046" duration="23336000" />
+      <workItem from="1773016859046" duration="24324000" />
     </task>
     <servers />
   </component>

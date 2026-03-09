@@ -10,7 +10,7 @@ import {
     UserX,
     Eye
 } from 'lucide-react';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { AdminSidebar } from "../../components/domain/admin/AdminSidebar.jsx";
 import { CreateOrganizerModal } from "../../components/domain/admin/CreateOrganizerModal.jsx";
 import { useEffect, useMemo, useState } from "react";
@@ -37,13 +37,17 @@ import LoadingState from '../../components/common/LoadingState.jsx';
 
 export function AccountManagement() {
 
+    const [searchParams] = useSearchParams()
+    const roleParam = searchParams.get("role")
+    const statusParam = searchParams.get("status")
+
     const [accounts, setAccounts] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [originalAccounts, setOriginalAccounts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [status, setStatus] = useState("all");
-    const [role, setRole] = useState("all");
+    const [status, setStatus] = useState(statusParam ? statusParam.toUpperCase() : "all");
+    const [role, setRole] = useState(roleParam ? roleParam.toUpperCase() : "all");
     const [date, setDate] = useState(null);
     const [sortOption, setSortOption] = useState("newest");
     const [searchTerm, setSearchTerm] = useState("");
