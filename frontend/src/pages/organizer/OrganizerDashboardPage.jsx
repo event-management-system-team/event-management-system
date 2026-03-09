@@ -432,7 +432,7 @@ const OrganizerDashboardPage = () => {
                                 <div
                                     key={event.eventId}
                                     className="group rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-                                    onClick={() => navigate('/organizer/my-events')}
+                                    onClick={() => navigate(`/organizer/events/${event.eventId}`)}
                                 >
                                     <div className="relative h-40 bg-gray-200 overflow-hidden">
                                         {event.bannerUrl ? (

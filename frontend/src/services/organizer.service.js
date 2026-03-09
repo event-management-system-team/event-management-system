@@ -30,6 +30,23 @@ const organizerService = {
         })
         return response.data
     },
+
+    getEventDetail: async (eventId) => {
+        const response = await axiosInstance.get(`/organizer/events/${eventId}`)
+        return response.data
+    },
+
+    getEventAttendees: async (eventId, page = 0, size = 10) => {
+        const response = await axiosInstance.get(`/organizer/events/${eventId}/attendees`, {
+            params: { page, size }
+        })
+        return response.data
+    },
+
+    getEventTicketStats: async (eventId) => {
+        const response = await axiosInstance.get(`/organizer/events/${eventId}/ticket-stats`)
+        return response.data
+    },
 }
 
 export default organizerService
