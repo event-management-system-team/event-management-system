@@ -3,7 +3,6 @@ package com.eventmanagement.backend.service;
 import com.eventmanagement.backend.constants.EventStatus;
 import com.eventmanagement.backend.dto.response.admin.EventResponse;
 import com.eventmanagement.backend.exception.BadRequestException;
-import com.eventmanagement.backend.exception.NotFoundException;
 import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,18 +36,17 @@ public class AdminEventService {
                 .collect(Collectors.toList());
     }
 
-    public EventResponse getEventById(UUID id) {
-        Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Event does not exist"));
+    public EventResponse getEventBySlug(String slug) {
+        Event event = eventRepository.findEventByEventSlug(slug);
+//                .orElseThrow(() -> new RuntimeException("Event does not exist"));
         EventResponse response = mapToResponse(event);
 
         return response;
     }
 
     @Transactional
-    public void approveEvent(UUID id) {
-        Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Event not found"));
+    public void approveEvent(String slug) {
+        Event event = eventRepository.findEventByEventSlug(slug);
 
         if (event.getStatus() != EventStatus.PENDING) {
             throw new BadRequestException("Only PENDING event can be approved");
@@ -63,9 +60,8 @@ public class AdminEventService {
     }
 
     @Transactional
-    public void rejectEvent(UUID id, String reason) {
-        Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Event not found"));
+    public void rejectEvent(String slug, String reason) {
+        Event event = eventRepository.findEventByEventSlug(slug);
 
         if (event.getStatus() != EventStatus.PENDING) {
             throw new BadRequestException("Only PENDING event can be rejected");

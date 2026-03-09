@@ -19,7 +19,7 @@ const AdminRoutes = () => {
           element={<AccountDetail />}
         />
         <Route path="/events" element={<EventManagement />} />
-        <Route path="/events/event-detail/:id" element={<EventDetail />} />
+        <Route path="/events/event-detail/:slug" element={<EventDetail />} />
         <Route path="/analytics" element={<EventAnalytics />} />
       </Route>
     </Routes>

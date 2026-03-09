@@ -493,7 +493,7 @@ export function EventManagement() {
                             {paginatedEvents.map(event => {
                                 // const CategoryIcon = event.categoryIcon
                                 const progress = ticketProgress(event?.totalCapacity, event?.registeredCount);
-                                const detailUrl = `/admin/events/event-detail/${event.eventId}`;
+                                const detailUrl = `/admin/events/event-detail/${event.eventSlug}`;
 
                                 return (
                                     <div

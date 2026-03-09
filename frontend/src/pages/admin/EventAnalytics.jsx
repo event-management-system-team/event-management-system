@@ -51,7 +51,7 @@ import {
     Legend,
     ResponsiveContainer
 } from 'recharts';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AdminSidebar } from "../../components/domain/admin/AdminSidebar.jsx";
 import { Button } from "../../components/domain/admin/Button.jsx";
 import { Avatar, AvatarFallback } from "../../components/domain/admin/Avatar.jsx";
@@ -66,64 +66,65 @@ import {
     DialogTitle
 } from "../../components/domain/admin/Dialog.jsx";
 import { Badge } from "../../components/domain/admin/Badge.jsx";
+import { adminService } from '../../services/admin.service.js';
 
 // Mock data for global analytics
-const globalMetrics = [
-    {
-        title: "TOTAL EVENTS",
-        value: "1,284",
-        change: "+15.3%",
-        trending: "up",
-        icon: Calendar,
-        iconBg: "bg-blue-100",
-        iconColor: "text-blue-600"
-    },
-    {
-        title: "ACTIVE EVENTS",
-        value: "342",
-        change: "+22.1%",
-        trending: "up",
-        icon: Zap,
-        iconBg: "bg-green-100",
-        iconColor: "text-green-600"
-    },
-    {
-        title: "TOTAL TICKETS SOLD",
-        value: "89,547",
-        change: "+18.7%",
-        trending: "up",
-        icon: Target,
-        iconBg: "bg-purple-100",
-        iconColor: "text-purple-600"
-    },
-    {
-        title: "TOTAL REVENUE",
-        value: "$2.4M",
-        change: "+24.3%",
-        trending: "up",
-        icon: DollarSign,
-        iconBg: "bg-emerald-100",
-        iconColor: "text-emerald-600"
-    },
-    {
-        title: "AVG ATTENDANCE RATE",
-        value: "87.2%",
-        change: "+3.5%",
-        trending: "up",
-        icon: Users,
-        iconBg: "bg-orange-100",
-        iconColor: "text-orange-600"
-    },
-    {
-        title: "CONVERSION RATE",
-        value: "12.4%",
-        change: "-2.1%",
-        trending: "down",
-        icon: Percent,
-        iconBg: "bg-red-100",
-        iconColor: "text-red-600"
-    }
-]
+// const globalMetrics = [
+//     {
+//         title: "TOTAL EVENTS",
+//         value: "1,284",
+//         change: "+15.3%",
+//         trending: "up",
+//         icon: Calendar,
+//         iconBg: "bg-blue-100",
+//         iconColor: "text-blue-600"
+//     },
+//     {
+//         title: "ACTIVE EVENTS",
+//         value: "342",
+//         change: "+22.1%",
+//         trending: "up",
+//         icon: Zap,
+//         iconBg: "bg-green-100",
+//         iconColor: "text-green-600"
+//     },
+//     {
+//         title: "TOTAL TICKETS SOLD",
+//         value: "89,547",
+//         change: "+18.7%",
+//         trending: "up",
+//         icon: Target,
+//         iconBg: "bg-purple-100",
+//         iconColor: "text-purple-600"
+//     },
+//     {
+//         title: "TOTAL REVENUE",
+//         value: "$2.4M",
+//         change: "+24.3%",
+//         trending: "up",
+//         icon: DollarSign,
+//         iconBg: "bg-emerald-100",
+//         iconColor: "text-emerald-600"
+//     },
+//     {
+//         title: "AVG ATTENDANCE RATE",
+//         value: "87.2%",
+//         change: "+3.5%",
+//         trending: "up",
+//         icon: Users,
+//         iconBg: "bg-orange-100",
+//         iconColor: "text-orange-600"
+//     },
+//     {
+//         title: "CONVERSION RATE",
+//         value: "12.4%",
+//         change: "-2.1%",
+//         trending: "down",
+//         icon: Percent,
+//         iconBg: "bg-red-100",
+//         iconColor: "text-red-600"
+//     }
+// ]
 
 // Mock event performance data
 const eventPerformanceData = [
@@ -345,8 +346,89 @@ const underperformingEvents = [
 ]
 
 export function EventAnalytics() {
+    const [events, setEvents] = useState([])
+    const [summary, setSummary] = useState()
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(false)
+
     const [selectedEvent, setSelectedEvent] = useState(null)
     const [isDetailOpen, setIsDetailOpen] = useState(false)
+
+    const fetchEventAnalytics = async () => {
+        try {
+            setLoading(true);
+            const response = await adminService.getEventAnalytics()
+
+            setEvents(response.data)
+            // setEvents(response.data.content);
+            // setCurrentPage(response.data.number)
+        } catch (error) {
+            setError("Cannot load event analytics");
+            console.error(error)
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const fetchEventSummary = async () => {
+        try {
+            setLoading(true);
+            const response = await adminService.getSummaryAnalytics()
+
+            setSummary(response.data)
+            // setEvents(response.data.content);
+            // setCurrentPage(response.data.number)
+        } catch (error) {
+            setError("Cannot load summary analytics");
+            console.error(error)
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        fetchEventAnalytics()
+        fetchEventSummary()
+    }, [])
+
+    const globalMetrics = [
+        {
+            title: "TOTAL EVENTS",
+            value: summary?.totalEvents,
+            icon: Calendar,
+            iconBg: "bg-blue-100",
+            iconColor: "text-blue-600"
+        },
+        {
+            title: "ACTIVE EVENTS",
+            value: summary?.activeEvents,
+            icon: Zap,
+            iconBg: "bg-green-100",
+            iconColor: "text-green-600"
+        },
+        {
+            title: "TOTAL TICKETS SOLD",
+            value: summary?.totalTicketsSold,
+            icon: Target,
+            iconBg: "bg-purple-100",
+            iconColor: "text-purple-600"
+        },
+        {
+            title: "TOTAL REVENUE",
+            // value: "$2.4M",
+            value: summary?.totalRevenue,
+            icon: DollarSign,
+            iconBg: "bg-emerald-100",
+            iconColor: "text-emerald-600"
+        },
+        {
+            title: "AVG ATTENDANCE RATE",
+            value: summary?.averageAttendanceRate,
+            icon: Users,
+            iconBg: "bg-orange-100",
+            iconColor: "text-orange-600"
+        }
+    ]
 
     const handleViewDetails = event => {
         setSelectedEvent(event)
@@ -406,11 +488,10 @@ export function EventAnalytics() {
                 </header>
 
                 {/* Global Analytics Overview */}
-                <div className="grid grid-cols-6 gap-4 p-8 pb-6">
+                <div className="grid grid-cols-5 gap-4 p-8 pb-6">
                     {globalMetrics.map((metric, index) => {
                         const Icon = metric.icon
-                        const TrendIcon =
-                            metric.trending === "up" ? TrendingUp : TrendingDown
+
                         return (
                             <Card key={index} className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                                 <CardContent className="p-5">
@@ -419,15 +500,6 @@ export function EventAnalytics() {
                                             className={`w-9 h-9 ${metric.iconBg} rounded-lg flex items-center justify-center`}
                                         >
                                             <Icon className={`h-4 w-4 ${metric.iconColor}`} />
-                                        </div>
-                                        <div
-                                            className={`flex items-center gap-0.5 text-xs ${metric.trending === "up"
-                                                ? "text-green-600"
-                                                : "text-red-600"
-                                                }`}
-                                        >
-                                            <TrendIcon className="h-3 w-3" />
-                                            <span>{metric.change}</span>
                                         </div>
                                     </div>
                                     <div className="text-xs text-gray-500 mb-1 tracking-wide">
@@ -440,74 +512,6 @@ export function EventAnalytics() {
                             </Card>
                         )
                     })}
-                </div>
-
-                {/* Filters & Search */}
-                <div className="px-8 pb-6">
-                    <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
-                        <CardContent className="p-5">
-                            <div className="flex items-center gap-3">
-                                {/* Search Input */}
-                                <div className="relative flex-1">
-                                    <Search
-                                        className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                    <Input
-                                        type="text"
-                                        placeholder="Search by event name or organizer..."
-                                        className="pl-9 pr-4 py-2 w-full border-gray-300"
-                                    />
-                                </div>
-
-                                {/* Date Range */}
-                                <Select defaultValue="30days">
-                                    <SelectTrigger className="w-[160px] border border-gray-200">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent className='border border-gray-200'>
-                                        <SelectItem value="7days">Last 7 days</SelectItem>
-                                        <SelectItem value="30days">Last 30 days</SelectItem>
-                                        <SelectItem value="90days">Last 90 days</SelectItem>
-                                        <SelectItem value="custom">Custom range</SelectItem>
-                                    </SelectContent>
-                                </Select>
-
-                                {/* Category Filter */}
-                                <Select defaultValue="all">
-                                    <SelectTrigger className="w-[150px] border border-gray-200">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent className='border border-gray-200'>
-                                        <SelectItem value="all">All Categories</SelectItem>
-                                        <SelectItem value="technology">Technology</SelectItem>
-                                        <SelectItem value="music">Music</SelectItem>
-                                        <SelectItem value="education">Education</SelectItem>
-                                        <SelectItem value="business">Business</SelectItem>
-                                    </SelectContent>
-                                </Select>
-
-                                {/* Status Filter */}
-                                <Select defaultValue="all">
-                                    <SelectTrigger className="w-[140px] border border-gray-200">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent className='border border-gray-200'>
-                                        <SelectItem value="all">All Status</SelectItem>
-                                        <SelectItem value="upcoming">Upcoming</SelectItem>
-                                        <SelectItem value="ongoing">Ongoing</SelectItem>
-                                        <SelectItem value="completed">Completed</SelectItem>
-                                    </SelectContent>
-                                </Select>
-
-                                {/* Apply Button */}
-                                <Button className="bg-[#7FA5A5] hover:bg-[#6D9393] text-white">
-                                    Apply Filters
-                                </Button>
-
-                                {/* Reset Button */}
-                                <Button variant="outline">Reset</Button>
-                            </div>
-                        </CardContent>
-                    </Card>
                 </div>
 
                 {/* Data Visualization Section */}
@@ -772,6 +776,74 @@ export function EventAnalytics() {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Filters & Search */}
+                <div className="px-8 pb-6">
+                    <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
+                        <CardContent className="p-5">
+                            <div className="flex items-center gap-3">
+                                {/* Search Input */}
+                                <div className="relative flex-1">
+                                    <Search
+                                        className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                    <Input
+                                        type="text"
+                                        placeholder="Search by event name or organizer..."
+                                        className="pl-9 pr-4 py-2 w-full border-gray-300"
+                                    />
+                                </div>
+
+                                {/* Date Range */}
+                                <Select defaultValue="30days">
+                                    <SelectTrigger className="w-[160px] border border-gray-200">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className='border border-gray-200'>
+                                        <SelectItem value="7days">Last 7 days</SelectItem>
+                                        <SelectItem value="30days">Last 30 days</SelectItem>
+                                        <SelectItem value="90days">Last 90 days</SelectItem>
+                                        <SelectItem value="custom">Custom range</SelectItem>
+                                    </SelectContent>
+                                </Select>
+
+                                {/* Category Filter */}
+                                <Select defaultValue="all">
+                                    <SelectTrigger className="w-[150px] border border-gray-200">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className='border border-gray-200'>
+                                        <SelectItem value="all">All Categories</SelectItem>
+                                        <SelectItem value="technology">Technology</SelectItem>
+                                        <SelectItem value="music">Music</SelectItem>
+                                        <SelectItem value="education">Education</SelectItem>
+                                        <SelectItem value="business">Business</SelectItem>
+                                    </SelectContent>
+                                </Select>
+
+                                {/* Status Filter */}
+                                <Select defaultValue="all">
+                                    <SelectTrigger className="w-[140px] border border-gray-200">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className='border border-gray-200'>
+                                        <SelectItem value="all">All Status</SelectItem>
+                                        <SelectItem value="upcoming">Upcoming</SelectItem>
+                                        <SelectItem value="ongoing">Ongoing</SelectItem>
+                                        <SelectItem value="completed">Completed</SelectItem>
+                                    </SelectContent>
+                                </Select>
+
+                                {/* Apply Button */}
+                                <Button className="bg-[#7FA5A5] hover:bg-[#6D9393] text-white">
+                                    Apply Filters
+                                </Button>
+
+                                {/* Reset Button */}
+                                <Button variant="outline">Reset</Button>
                             </div>
                         </CardContent>
                     </Card>

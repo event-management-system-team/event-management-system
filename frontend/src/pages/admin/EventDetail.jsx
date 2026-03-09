@@ -1,24 +1,12 @@
 import {
     Calendar,
-    Users,
-    Settings,
-    BarChart3,
     Bell,
-    LogOut,
-    LayoutDashboard,
     UserCircle,
-    CalendarCog,
     ChevronRight,
-    Search,
     MapPin,
     Clock,
-    DollarSign,
-    Ticket,
     CheckCircle,
-    X,
-    FileText,
-    Activity,
-    History
+    X
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
@@ -38,7 +26,7 @@ import { Popconfirm } from 'antd';
 import dayjs from "dayjs";
 
 export function EventDetail() {
-    const { id } = useParams();
+    const { slug } = useParams();
     const [loading, setLoading] = useState(true);
     const [event, setEvent] = useState(null);
     const [ticketTypes, setTicketTypes] = useState([]);
@@ -46,45 +34,24 @@ export function EventDetail() {
     const [error, setError] = useState(null);
     const { alert, showAlert, closeAlert } = useAlert();
 
-    const fetchEvent = async () => {
-        if (!id) return
+    const fetchData = async () => {
+        if (!slug) return
 
         try {
             setLoading(true)
-            const response = await adminService.getEventDetail(id)
-            setEvent(response.data)
+
+            const [eventRes, ticketRes, agendaRes] = await Promise.all([
+                adminService.getEventDetail(slug),
+                adminService.getTicketTypes(slug),
+                adminService.getEventAgenda(slug)
+            ])
+
+            setEvent(eventRes.data)
+            setTicketTypes(ticketRes.data)
+            setAgenda(agendaRes.data)
+
         } catch (error) {
-            setError("Cannot load event detail");
-            console.error(error)
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    const fetchTicketTypes = async () => {
-        if (!id) return
-
-        try {
-            setLoading(true)
-            const response = await adminService.getTicketTypes(id)
-            setTicketTypes(response.data)
-        } catch (error) {
-            setError("Cannot load event ticket types");
-            console.error(error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    const fetchEventAgenda = async () => {
-        if (!id) return
-
-        try {
-            setLoading(true)
-            const response = await adminService.getEventAgenda(id)
-            setAgenda(response.data)
-        } catch (error) {
-            setError("Cannot load event ticket types");
+            setError("Cannot load event detail")
             console.error(error)
         } finally {
             setLoading(false)
@@ -92,12 +59,8 @@ export function EventDetail() {
     }
 
     useEffect(() => {
-        if (id) {
-            fetchEvent()
-            fetchTicketTypes()
-            fetchEventAgenda()
-        }
-    }, [id]);
+        fetchData()
+    }, [slug])
 
     const SALE_STATUS_CONFIG = {
         NOT_STARTED: {
@@ -153,13 +116,13 @@ export function EventDetail() {
     }
 
     const handleApproveEvent = async () => {
-        if (!id) return
+        if (!slug) return
 
         try {
             setLoading(true)
-            await adminService.approveEvent(id)
+            await adminService.approveEvent(slug)
             showAlert("success", 'Approve event successfully', 2500)
-            await fetchEvent()
+            await fetchData()
         } catch (error) {
             showAlert("error", "Operation failed", 4000)
             console.error(error)
@@ -187,7 +150,7 @@ export function EventDetail() {
     }
 
     const handleRejectEvent = async () => {
-        if (!id) return
+        if (!slug) return
 
         const rejectionReason = buildRejectReason()
 
@@ -198,9 +161,9 @@ export function EventDetail() {
 
         try {
             setLoading(true)
-            await adminService.rejectEvent(id, rejectionReason)
+            await adminService.rejectEvent(slug, rejectionReason)
             showAlert("success", 'Reject event successfully', 2500)
-            await fetchEvent()
+            await fetchData()
         } catch (error) {
             showAlert("error", "Operation failed", 4000)
             console.error(error)
