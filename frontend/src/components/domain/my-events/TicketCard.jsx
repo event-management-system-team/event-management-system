@@ -14,6 +14,21 @@ const TicketCard = ({
   const month = dateObj.toLocaleString("en-US", { month: "short" });
   const day = dateObj.getDate();
 
+  const getStatusStyle = (status) => {
+    switch (status?.toUpperCase()) {
+      case "PENDING":
+        return "bg-[#FF6B35]/10 text-[#FF6B35] border-[#FF6B35]/20";
+      case "APPROVED":
+      case "CONFIRMED":
+        return "bg-[#4ECDC4]/10 text-[#4ECDC4] border-[#4ECDC4]/20";
+      case "REJECTED":
+      case "CANCELLED":
+        return "bg-red-500/10 text-red-500 border-red-500/20";
+      default:
+        return "bg-gray-500/10 text-gray-500 border-gray-500/20";
+    }
+  };
+
   return (
     <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col h-full">
       <div className="relative aspect-[16/9] w-full overflow-hidden shrink-0">
@@ -32,7 +47,7 @@ const TicketCard = ({
         </div>
 
         {status && (
-          <div className="absolute top-3 right-3 md:top-4 md:right-4 bg-[#ccfbf1] text-[#0d9488] px-2 py-1 rounded text-[9px] md:text-[10px] font-bold uppercase truncate max-w-[100px] md:max-w-none">
+          <div className={`absolute top-3 right-3 md:top-4 md:right-4 px-2 py-1 rounded text-[9px] md:text-[10px] font-bold uppercase truncate max-w-[100px] md:max-w-none border ${getStatusStyle(status)}`}>
             {status}
           </div>
         )}
