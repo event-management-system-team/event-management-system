@@ -51,7 +51,7 @@ import {
     Legend,
     ResponsiveContainer
 } from 'recharts';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AdminSidebar } from "../../components/domain/admin/AdminSidebar.jsx";
 import { Button } from "../../components/domain/admin/Button.jsx";
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/domain/admin/Avatar.jsx";
@@ -68,6 +68,7 @@ import {
 import { Badge } from "../../components/domain/admin/Badge.jsx";
 import { adminService } from '../../services/admin.service.js';
 import dayjs from "dayjs";
+import { DatePicker, Space } from 'antd';
 
 export function EventAnalytics() {
     const [events, setEvents] = useState([])
@@ -77,6 +78,12 @@ export function EventAnalytics() {
     const [categoryDis, setCategoryDis] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(false)
+    const [status, setStatus] = useState("all")
+    const [category, setCategory] = useState("all")
+    const [date, setDate] = useState(null)
+    const [sortOption, setSortOption] = useState("newest")
+    const [categories, setCategories] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("")
 
     const [selectedEvent, setSelectedEvent] = useState(null)
     const [isDetailOpen, setIsDetailOpen] = useState(false)
@@ -85,12 +92,13 @@ export function EventAnalytics() {
         try {
             setLoading(true)
 
-            const [eventRes, summaryRes, salesRes, topRevenueRes, categoryRes] = await Promise.all([
+            const [eventRes, summaryRes, salesRes, topRevenueRes, categoryRes, categoriesListRes] = await Promise.all([
                 adminService.getEventAnalytics(),
                 adminService.getSummaryAnalytics(),
                 adminService.getMonthlyTicketSales(),
                 adminService.getTopRevenueEvents(),
-                adminService.getCategoryDistribution()
+                adminService.getCategoryDistribution(),
+                adminService.getAllCategories()
             ])
 
             setEvents(eventRes.data)
@@ -98,6 +106,7 @@ export function EventAnalytics() {
             setMonthlySales(salesRes.data)
             setTopRevenueEvents(topRevenueRes.data)
             setCategoryDis(categoryRes.data)
+            setCategories(categoriesListRes.data)
 
         } catch (error) {
             setError("Cannot load event analytics")
@@ -110,6 +119,55 @@ export function EventAnalytics() {
     useEffect(() => {
         fetchData()
     }, [])
+
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value)
+    }
+
+    const processedEvents = useMemo(() => {
+        let list = [...events];
+
+        if (searchTerm.trim()) {
+            const lower = searchTerm.toLowerCase();
+            list = list.filter(e =>
+                e.eventName?.toLowerCase().includes(lower)
+            )
+        }
+
+        // filter by status
+        list = list.filter(e => status === "all" || e.status === status);
+
+        // filter by category
+        list = list.filter(e => category === "all" || e.categoryId === category);
+
+        // filter by date 
+        list = list.filter(e => {
+            if (!date) return true;
+
+            const selected = dayjs(date);
+            const start = dayjs(e.startDate);
+            const end = dayjs(e.endDate);
+
+            return (
+                selected.isSame(start, "day") ||
+                selected.isSame(end, "day")
+            );
+        });
+
+        // sort by option
+        list.sort((a, b) => {
+            switch (sortOption) {
+                case "newest":
+                    return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+                case "oldest":
+                    return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
+                default:
+                    return 0;
+            }
+        });
+
+        return list;
+    }, [events, searchTerm, status, category, date, sortOption]);
 
     const ticketProgress = (total, sold) => {
         if (!total || total <= 0) return 0
@@ -383,39 +441,6 @@ export function EventAnalytics() {
                         </CardContent>
                     </Card>
 
-                    {/* Top Events By Revenue */}
-                    <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
-                        <CardHeader className="border-b border-gray-100">
-                            <CardTitle className="text-xl font-semibold text-gray-700">Revenue by Event</CardTitle>
-                            <CardDescription>
-                                Top performing events by revenue
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="pt-6">
-                            <ResponsiveContainer width="100%" height={240}>
-                                <BarChart data={topRevenueEventsData}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                                    <XAxis
-                                        dataKey="event"
-                                        tick={{ fontSize: 11 }}
-                                        stroke="#6B7280"
-                                    />
-                                    <YAxis tick={{ fontSize: 12 }} stroke="#6B7280" />
-                                    <Tooltip
-                                        contentStyle={{
-                                            backgroundColor: "#fff",
-                                            border: "1px solid #E5E7EB",
-                                            borderRadius: "6px",
-                                            fontSize: "12px"
-                                        }}
-                                        formatter={value => `${formatVND(value)}`}
-                                    />
-                                    <Bar dataKey="revenue" fill="#2e96ea" radius={[6, 6, 0, 0]} barSize={60} />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </CardContent>
-                    </Card>
-
                     {/* Event Category Distribution */}
                     <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                         <CardHeader className="border-b border-gray-100">
@@ -459,71 +484,129 @@ export function EventAnalytics() {
                             </ResponsiveContainer>
                         </CardContent>
                     </Card>
+
+                    {/* Top Events By Revenue */}
+                    <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
+                        <CardHeader className="border-b border-gray-100">
+                            <CardTitle className="text-xl font-semibold text-gray-700">Revenue by Event</CardTitle>
+                            <CardDescription>
+                                Top performing events by revenue
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="pt-6">
+                            <ResponsiveContainer width="100%" height={240}>
+                                <BarChart data={topRevenueEventsData}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                                    <XAxis
+                                        dataKey="event"
+                                        tick={{ fontSize: 11 }}
+                                        stroke="#6B7280"
+                                    />
+                                    <YAxis tick={{ fontSize: 12 }} stroke="#6B7280" />
+                                    <Tooltip
+                                        contentStyle={{
+                                            backgroundColor: "#fff",
+                                            border: "1px solid #E5E7EB",
+                                            borderRadius: "6px",
+                                            fontSize: "12px"
+                                        }}
+                                        formatter={value => `${formatVND(value)}`}
+                                    />
+                                    <Bar dataKey="revenue" fill="#2e96ea" radius={[6, 6, 0, 0]} barSize={60} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </CardContent>
+                    </Card>
                 </div>
 
                 {/* Filters & Search */}
                 <div className="px-8 pb-6">
                     <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                         <CardContent className="p-5">
-                            <div className="flex items-center gap-3">
+                            <div className="grid grid-cols-8 gap-4 items-end">
+
                                 {/* Search Input */}
-                                <div className="relative flex-1">
+                                <div className="relative flex-4 col-span-4">
                                     <Search
                                         className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                                     <Input
                                         type="text"
-                                        placeholder="Search by event name or organizer..."
+                                        placeholder="Search by event name..."
+                                        value={searchTerm}
+                                        onChange={handleSearchChange}
                                         className="pl-9 pr-4 py-2 w-full border-gray-300"
                                     />
                                 </div>
 
-                                {/* Date Range */}
-                                <Select defaultValue="30days">
-                                    <SelectTrigger className="w-[160px] border border-gray-200">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent className='border border-gray-200'>
-                                        <SelectItem value="7days">Last 7 days</SelectItem>
-                                        <SelectItem value="30days">Last 30 days</SelectItem>
-                                        <SelectItem value="90days">Last 90 days</SelectItem>
-                                        <SelectItem value="custom">Custom range</SelectItem>
-                                    </SelectContent>
-                                </Select>
-
                                 {/* Category Filter */}
-                                <Select defaultValue="all">
-                                    <SelectTrigger className="w-[150px] border border-gray-200">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent className='border border-gray-200'>
-                                        <SelectItem value="all">All Categories</SelectItem>
-                                        <SelectItem value="technology">Technology</SelectItem>
-                                        <SelectItem value="music">Music</SelectItem>
-                                        <SelectItem value="education">Education</SelectItem>
-                                        <SelectItem value="business">Business</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <div className="col-span-1">
+                                    <Select
+                                        value={category}
+                                        onValueChange={(value) => setCategory(value)}
+                                    >
+                                        <SelectTrigger className='border border-gray-200 cursor-pointer bg-[#f7f7f7] hover:bg-[#B3C8CF]'>
+                                            <SelectValue placeholder="Category" />
+                                        </SelectTrigger>
+                                        <SelectContent className='border border-gray-200'>
+                                            <SelectItem value="all">All Category</SelectItem>
+                                            {categories?.map(c => (
+                                                <SelectItem
+                                                    key={c.categoryId}
+                                                    value={c.categoryId}
+                                                >
+                                                    {c.categoryName}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
 
                                 {/* Status Filter */}
-                                <Select defaultValue="all">
-                                    <SelectTrigger className="w-[140px] border border-gray-200">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent className='border border-gray-200'>
-                                        <SelectItem value="all">All Status</SelectItem>
-                                        <SelectItem value="upcoming">Upcoming</SelectItem>
-                                        <SelectItem value="ongoing">Ongoing</SelectItem>
-                                        <SelectItem value="completed">Completed</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <div className="col-span-1">
+                                    <Select
+                                        value={status}
+                                        onValueChange={(value) => setStatus(value)}
+                                    >
+                                        <SelectTrigger className='border border-gray-200 cursor-pointer bg-[#f7f7f7] hover:bg-[#B3C8CF]'>
+                                            <SelectValue placeholder="Status" />
+                                        </SelectTrigger>
+                                        <SelectContent className='border border-gray-200'>
+                                            <SelectItem value="all">All Status</SelectItem>
+                                            <SelectItem value="PENDING">Pending</SelectItem>
+                                            <SelectItem value="APPROVED">Approved</SelectItem>
+                                            <SelectItem value="COMPLETED">Completed</SelectItem>
+                                            <SelectItem value="REJECTED">Rejected</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
 
-                                {/* Apply Button */}
-                                <Button className="bg-[#7FA5A5] hover:bg-[#6D9393] text-white">
-                                    Apply Filters
-                                </Button>
+                                {/* Date Range */}
+                                <div className="col-span-1">
+                                    <Space vertical className=''>
+                                        <DatePicker
+                                            size="large"
+                                            style={{ height: 36, backgroundColor: '#f7f7f7' }}
+                                            onChange={(date) => setDate(date)}
+                                        />
+                                    </Space>
+                                </div>
 
-                                {/* Reset Button */}
-                                <Button variant="outline">Reset</Button>
+                                {/* Sort Dropdown */}
+                                <div className="col-span-1">
+                                    <Select
+                                        value={sortOption}
+                                        onValueChange={(value) => setSortOption(value)}
+                                    >
+                                        <SelectTrigger
+                                            className="w-[140px] border border-gray-200 cursor-pointer bg-[#f7f7f7] hover:bg-[#B3C8CF]">
+                                            <SelectValue placeholder="Sort by" />
+                                        </SelectTrigger>
+                                        <SelectContent className='border border-gray-200'>
+                                            <SelectItem value="newest">Newest</SelectItem>
+                                            <SelectItem value="oldest">Oldest</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
@@ -546,7 +629,7 @@ export function EventAnalytics() {
                             </div>
 
                             {/* Event Rows */}
-                            {events?.map(event => {
+                            {processedEvents?.map(event => {
                                 // const CategoryIcon = event.categoryIcon
                                 const progress = ticketProgress(event.totalCapacity, event.ticketsSold)
                                 const canShowAttendance = ["ONGOING", "COMPLETED"].includes(event.status)

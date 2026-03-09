@@ -83,24 +83,8 @@ export function AccountManagement() {
     }, [currentPage]);
 
     const handleSearchChange = (e) => {
-        const value = e.target.value;
-        setSearchTerm(value);
-
-        if (!value.trim()) {
-            setAccounts(originalAccounts);
-            return;
-        }
-
-        const lower = value.toLowerCase();
-
-        const filtered = originalAccounts.filter(acc =>
-            acc.fullName?.toLowerCase().includes(lower) ||
-            acc.email?.toLowerCase().includes(lower) ||
-            acc.phone?.includes(value)
-        );
-
-        setAccounts(filtered);
-    };
+        setSearchTerm(e.target.value)
+    }
 
     const handleToggleBan = async (account) => {
         if (!account) return;
@@ -568,7 +552,7 @@ export function AccountManagement() {
                                     {isSearching ? (
                                         <>Showing {processedAccounts.length} search results</>
                                     ) : (
-                                        <>Showing {totalItems === 0 ? 0 : startItem}–{Math.min((currentPage + 1) * pageSize, totalItems)} of {totalItems} results</>
+                                        <>Showing {totalItems === 0 ? 0 : startItem}–{Math.min((currentPage + 1) * pageSize, totalItems)} of {totalItems} accounts</>
                                     )}
                                 </div>
 

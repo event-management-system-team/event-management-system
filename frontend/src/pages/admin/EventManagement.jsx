@@ -90,23 +90,8 @@ export function EventManagement() {
     }, [currentPage]);
 
     const handleSearchChange = (e) => {
-        const value = e.target.value
-        setSearchTerm(value)
-
-        if (!value.trim()) {
-            setEvents(originalEvents);
-            return;
-        }
-
-        const lower = value.toLowerCase();
-        const filtered = originalEvents.filter(e =>
-            e.eventName?.toLowerCase().includes(lower) ||
-            e.location?.toLowerCase().includes(lower) ||
-            e.organizer?.fullName?.toLowerCase().includes(value)
-        );
-
-        setEvents(filtered);
-    };
+        setSearchTerm(e.target.value)
+    }
 
     const processedEvents = useMemo(() => {
         let list = [...originalEvents];
@@ -384,6 +369,7 @@ export function EventManagement() {
                                             <SelectItem value="all">All Status</SelectItem>
                                             <SelectItem value="PENDING">Pending</SelectItem>
                                             <SelectItem value="APPROVED">Approved</SelectItem>
+                                            <SelectItem value="ONGOING">Ongoing</SelectItem>
                                             <SelectItem value="COMPLETED">Completed</SelectItem>
                                             <SelectItem value="REJECTED">Rejected</SelectItem>
                                         </SelectContent>
@@ -598,7 +584,7 @@ export function EventManagement() {
                                     {isSearching ? (
                                         <>Showing {processedEvents.length} search results</>
                                     ) : (
-                                        <>Showing {totalItems === 0 ? 0 : startItem}–{Math.min((currentPage + 1) * pageSize, totalItems)} of {totalItems} results</>
+                                        <>Showing {totalItems === 0 ? 0 : startItem}–{Math.min((currentPage + 1) * pageSize, totalItems)} of {totalItems} events</>
                                     )}
                                 </div>
 

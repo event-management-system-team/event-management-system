@@ -51,7 +51,7 @@ public interface EventAnalyticsRepository extends JpaRepository<EventAnalytics, 
             END) AS activeEvents
         FROM event_analytics ea
         JOIN events e ON ea.event_id = e.event_id
-        WHERE e.status IN ('ONGOING','COMPLETED')
+        WHERE e.status IN ('APPROVED','ONGOING','COMPLETED')
         """, nativeQuery = true)
     Object getAnalyticsSummary();
 
