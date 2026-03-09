@@ -33,6 +33,7 @@ import dayjs from "dayjs";
 import { Alert } from "../../components/common/Alert.jsx";
 import { useAlert } from '../../hooks/useAlert.js';
 import { Popconfirm } from 'antd';
+import LoadingState from '../../components/common/LoadingState.jsx';
 
 export function AccountManagement() {
 
@@ -265,7 +266,7 @@ export function AccountManagement() {
 
     const metrics = summaryMetrics(originalAccounts);
 
-    if (loading) return <div className="absolute top-0 left-0 w-full h-1 bg-blue-500 animate-pulse z-10" />
+    if (loading) return <LoadingState />
     if (error) return <div>Something went wrong: {error}</div>;
 
     return (

@@ -24,6 +24,7 @@ import { DatePicker, Space } from 'antd';
 import dayjs from "dayjs";
 import { AccountsPagination } from '../../components/domain/admin/AccountsPagination.jsx';
 import { Alert } from '../../components/common/Alert.jsx';
+import LoadingState from '../../components/common/LoadingState.jsx';
 
 export function EventManagement() {
 
@@ -254,7 +255,7 @@ export function EventManagement() {
 
     const metrics = summaryMetrics(originalEvents);
 
-    if (loading) return <div className="absolute top-0 left-0 w-full h-1 bg-blue-500 animate-pulse z-10" />
+    if (loading) return <LoadingState />
     if (error) return <div>Something went wrong: {error}</div>;
 
     return (

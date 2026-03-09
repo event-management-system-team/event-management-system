@@ -1,41 +1,15 @@
 import {
     Calendar,
     Users,
-    TrendingUp,
-    CheckCircle,
-    Plus,
-    Settings,
-    BarChart3,
-    UserPlus,
     Bell,
     Zap,
-    CalendarCheck,
-    Home,
     ChevronRight,
-    Filter,
     Search,
-    HelpCircle,
-    ArrowUpDown,
-    LogOut,
-    LayoutDashboard,
-    UserCircle,
-    CalendarCog,
-    TrendingDown,
-    Eye,
     DollarSign,
-    Percent,
     Target,
     Download,
-    FileText,
-    Music,
-    Briefcase,
-    Utensils,
-    GraduationCap,
-    AlertTriangle,
-    Award,
-    X
+    FileText
 } from 'lucide-react';
-import { Link } from 'react-router';
 import {
     LineChart,
     Line,
@@ -51,7 +25,7 @@ import {
     Legend,
     ResponsiveContainer
 } from 'recharts';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { AdminSidebar } from "../../components/domain/admin/AdminSidebar.jsx";
 import { Button } from "../../components/domain/admin/Button.jsx";
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/domain/admin/Avatar.jsx";
@@ -69,6 +43,9 @@ import { Badge } from "../../components/domain/admin/Badge.jsx";
 import { adminService } from '../../services/admin.service.js';
 import dayjs from "dayjs";
 import { DatePicker, Space } from 'antd';
+import LoadingState from '../../components/common/LoadingState.jsx';
+import html2pdf from 'html2pdf.js';
+import html2canvas from "html2canvas";
 
 export function EventAnalytics() {
     const [events, setEvents] = useState([])
@@ -167,7 +144,7 @@ export function EventAnalytics() {
         });
 
         return list;
-    }, [events, searchTerm, status, category, date, sortOption]);
+    }, [events, searchTerm, status, category, date, sortOption])
 
     const ticketProgress = (total, sold) => {
         if (!total || total <= 0) return 0
@@ -228,10 +205,10 @@ export function EventAnalytics() {
         }
     };
 
-    const handleViewDetails = event => {
-        setSelectedEvent(event)
-        setIsDetailOpen(true)
-    }
+    // const handleViewDetails = event => {
+    //     setSelectedEvent(event)
+    //     setIsDetailOpen(true)
+    // }
 
     const monthlySalesData = monthlySales.map((item, index) => ({
         month: formatMonth(item.month),
@@ -288,6 +265,10 @@ export function EventAnalytics() {
         }
     ]
 
+    if (loading) {
+        return <LoadingState />
+    }
+
     return (
         <div className="flex h-screen bg-[#F1F0E8]">
             {/* Sidebar */}
@@ -328,10 +309,10 @@ export function EventAnalytics() {
                             </p>
                         </div>
                         <div className="flex gap-2">
-                            <Button variant="outline" className="gap-2">
+                            {/* <Button variant="outline" className="gap-2" onClick={handleExportPDF}>
                                 <Download className="h-4 w-4" />
-                                Export CSV
-                            </Button>
+                                Export PDF
+                            </Button> */}
                             <Button variant="outline" className="gap-2">
                                 <FileText className="h-4 w-4" />
                                 Generate Report
@@ -371,7 +352,7 @@ export function EventAnalytics() {
                 <div className="grid grid-cols-2 gap-5 px-8 pb-6">
 
                     {/* Ticket Sales By Month */}
-                    <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
+                    <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200" id="ticketsSold" ref={chartRef}>
                         <CardHeader className="border-b border-gray-100">
                             <CardTitle className="text-xl font-semibold text-gray-700">Ticket Sales Trend</CardTitle>
                             <CardDescription>
@@ -379,7 +360,7 @@ export function EventAnalytics() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="pt-6">
-                            <ResponsiveContainer width="100%" height={240}>
+                            <ResponsiveContainer width='100%' height={240}>
                                 <LineChart data={monthlySalesData}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                                     <XAxis
@@ -618,26 +599,26 @@ export function EventAnalytics() {
                         <CardContent className="p-0">
                             {/* Table Header */}
                             <div
-                                className="grid grid-cols-11 gap-4 px-6 py-3 border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wide items-center">
+                                className="grid grid-cols-10 gap-4 px-6 py-3 border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wide items-center">
                                 <div className="col-span-3">Event</div>
                                 <div className="col-span-2">Date & Time</div>
                                 <div className="col-span-2">Tickets Sold</div>
                                 <div className="col-span-1">Revenue</div>
                                 <div className="col-span-1">Attendance</div>
                                 <div className="col-span-1">Status</div>
-                                <div className="col-span-1 text-right">Actions</div>
+                                {/* <div className="col-span-1 text-right">Actions</div> */}
                             </div>
 
                             {/* Event Rows */}
                             {processedEvents?.map(event => {
                                 // const CategoryIcon = event.categoryIcon
                                 const progress = ticketProgress(event.totalCapacity, event.ticketsSold)
-                                const canShowAttendance = ["ONGOING", "COMPLETED"].includes(event.status)
+                                const containData = ["ONGOING", "COMPLETED"].includes(event.status)
                                 const attendanceRate = event.attendanceRate * 100
                                 return (
                                     <div
                                         key={event.eventId}
-                                        className="grid grid-cols-11 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-[#eef3f5]"
+                                        className="grid grid-cols-10 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-[#eef3f5]"
                                     >
                                         <div className="col-span-3 flex items-center gap-3">
                                             <Avatar className='w-10 h-10'>
@@ -690,12 +671,13 @@ export function EventAnalytics() {
                                                 {event.totalCapacity.toLocaleString()}
                                             </div>
                                         </div>
-                                        <div className="col-span-1 text-sm font-semibold text-gray-600">
-                                            {formatVND(event.revenue)}
+                                        <div className={`col-span-1 text-sm text-center ${!containData ? 'text-gray-400' : 'font-semibold text-gray-600'}`}>
+                                            {/* {formatVND(event.revenue)} */}
+                                            {containData ? `${formatVND(event.revenue)}` : '-'}
                                         </div>
                                         <div className="col-span-1">
                                             <div
-                                                className={`text-sm font-medium justify-center text-center ${!canShowAttendance
+                                                className={`text-sm font-medium text-center ${!containData
                                                     ? "text-gray-400"
                                                     : attendanceRate >= 80
                                                         ? "text-green-600"
@@ -704,7 +686,7 @@ export function EventAnalytics() {
                                                             : "text-orange-600"
                                                     }`}
                                             >
-                                                {canShowAttendance ? `${formatNumber(attendanceRate)} %` : '-'}
+                                                {containData ? `${formatNumber(attendanceRate)} %` : '-'}
                                             </div>
                                         </div>
                                         <div className="col-span-1">
@@ -715,7 +697,7 @@ export function EventAnalytics() {
                                                 ● {event.status}
                                             </Badge>
                                         </div>
-                                        <div className="col-span-1 flex justify-end">
+                                        {/* <div className="col-span-1 flex justify-end">
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
@@ -724,7 +706,7 @@ export function EventAnalytics() {
                                             >
                                                 View Details
                                             </Button>
-                                        </div>
+                                        </div> */}
                                     </div>
                                 )
                             })}

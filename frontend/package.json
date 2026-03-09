@@ -41,6 +41,8 @@
     "dayjs": "^1.11.19",
     "dotenv": "^17.2.3",
     "framer-motion": "^12.34.0",
+    "html2canvas": "^1.4.1",
+    "html2pdf.js": "^0.14.0",
     "lucide-react": "^0.563.0",
     "motion": "^12.31.0",
     "qrcode.react": "^4.2.0",
