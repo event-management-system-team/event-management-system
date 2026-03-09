@@ -39,6 +39,7 @@ public class Ticket {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    // nullable = true — vé free không có ticketType
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ticket_type_id", nullable = true)
     private TicketType ticketType;
@@ -46,7 +47,7 @@ public class Ticket {
     @Column(name = "ticket_code", unique = true, nullable = false, length = 100)
     private String ticketCode;
 
-    @Column(name = "qr_code_url", columnDefinition = "text")
+    @Column(name = "qr_code_url", columnDefinition = "TEXT")
     private String qrCodeUrl;
 
     @Enumerated(EnumType.STRING)
@@ -54,6 +55,10 @@ public class Ticket {
     @Column(name = "status", nullable = false, columnDefinition = "ticket_status")
     @Builder.Default
     private TicketStatus status = TicketStatus.PENDING;
+
+    // Quan hệ với CheckIn — từ develop branch
+    @OneToOne(mappedBy = "ticket", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private CheckIn checkIn;
 
     @Column(name = "price", precision = 15, scale = 2)
     private BigDecimal price;

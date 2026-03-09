@@ -1,8 +1,9 @@
 package com.eventmanagement.backend.model;
 
+import com.eventmanagement.backend.constants.OrderStatus;
+import com.eventmanagement.backend.constants.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.*;
-import com.eventmanagement.backend.constants.PaymentMethod;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
@@ -11,8 +12,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import com.eventmanagement.backend.constants.OrderStatus;
 
 @Entity
 @Table(name = "orders")
@@ -35,8 +34,8 @@ public class Order {
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
-    @Column(name = "order_code", unique = true, length = 50)
-    private String orderCode;
+    @Column(name = "order_code", unique = true, nullable = false, length = 50)
+    private String orderCode; // Dùng để hiển thị cho user (vd: ORD-12345)
 
     @Column(name = "total_amount", precision = 15, scale = 2)
     @Builder.Default

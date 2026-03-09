@@ -18,6 +18,8 @@ public class StaffApplicationResponse {
     private UUID applicationId;
     private UUID recruitmentId;
     private String positionName;
+    private UUID eventId;
+    private String eventSlug;
     private String eventName;
     private String location;
     private String bannerUrl;

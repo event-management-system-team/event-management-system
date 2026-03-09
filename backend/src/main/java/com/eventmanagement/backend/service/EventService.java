@@ -3,6 +3,7 @@ package com.eventmanagement.backend.service;
 import com.eventmanagement.backend.constants.EventStatus;
 import com.eventmanagement.backend.dto.response.attendee.*;
 import com.eventmanagement.backend.model.Event;
+import com.eventmanagement.backend.model.TicketType;
 import com.eventmanagement.backend.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,8 +24,11 @@ import java.util.stream.Collectors;
 public class EventService {
     private final EventRepository eventRepository;
 
+    private final List<EventStatus> statuses = Arrays.asList(EventStatus.APPROVED, EventStatus.ONGOING);
+
+
     public List<EventResponse> getTopNewEvents() {
-        List<Event> events = eventRepository.findTop6ByStatusOrderByRegisteredCountDesc(EventStatus.APPROVED);
+        List<Event> events = eventRepository.findTop6ByStatusInOrderByRegisteredCountDesc(statuses);
 
         return events.stream().map((event) -> mapToResponse(event)).collect(Collectors.toList());
     }
@@ -31,7 +36,7 @@ public class EventService {
     public List<EventResponse> getHotEvents() {
 
         Pageable topSix = PageRequest.of(0, 6);
-        List<Event> events = eventRepository.findHotEventsSellingFast(EventStatus.APPROVED, topSix);
+        List<Event> events = eventRepository.findHotEventsSellingFast(statuses, topSix);
         return events.stream().map((event) -> mapToResponse(event)).collect(Collectors.toList());
     }
 
@@ -53,7 +58,7 @@ public class EventService {
             endOfDay = date.atTime(23, 59, 59); // Tương đương 23:59:59
         }
 
-        Page<Event> events = eventRepository.searchEvents(EventStatus.APPROVED, kw, loc, cat, startOfDay, endOfDay, price, isFree,
+        Page<Event> events = eventRepository.searchEvents(statuses, kw, loc, cat, startOfDay, endOfDay, price, isFree,
                 pageable);
         return events.map(event -> mapToResponse(event));
     }
@@ -98,11 +103,11 @@ public class EventService {
         List<TicketTypeResponse> ticketTypeResponses = new ArrayList<>();
         if (event.getTicketTypes() != null && !event.getTicketTypes().isEmpty()) {
             ticketTypeResponses = event.getTicketTypes().stream()
+                    .filter(TicketType::getIsActive)
                     .map(ticket -> TicketTypeResponse.builder()
                             .ticketTypeId(ticket.getTicketTypeId())
                             .ticketName(ticket.getTicketName())
                             .price(ticket.getPrice())
-                            .isActive(ticket.getIsActive())
                             .description(ticket.getDescription())
                             .quantity(ticket.getQuantity())
                             .reservedCount(ticket.getReservedCount())

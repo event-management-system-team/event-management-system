@@ -21,7 +21,6 @@ public class TicketTypeResponse {
     private Integer quantity;
     private Integer soldCount;
     private Integer reservedCount;
-    private Boolean isActive;
     private String description;
     private LocalDateTime saleStart;
     private LocalDateTime saleEnd;

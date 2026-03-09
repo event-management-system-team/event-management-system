@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -145,7 +146,6 @@ public class CloudinaryService {
         }
     }
 
-
     public String uploadCV(MultipartFile file) throws IOException {
         log.info("Starting document upload to Cloudinary: {}", file.getOriginalFilename());
 
@@ -209,4 +209,73 @@ public class CloudinaryService {
             throw new IOException("Only PDF and Word documents (DOC/DOCX) are allowed");
         }
     }
+
+    public String uploadResource(MultipartFile file, UUID eventId) throws IOException {
+        log.info("Starting resource upload to Cloudinary: {}", file.getOriginalFilename());
+
+        validateResourceFile(file);
+
+        String originalFilename = file.getOriginalFilename();
+        String extension = "";
+
+        if (originalFilename != null && originalFilename.contains(".")) {
+            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        }
+
+        String publicId = folder + "/events/" + eventId + "/resources/" + UUID.randomUUID().toString() + extension;
+
+        try {
+            Map uploadResult = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap(
+                            "public_id", publicId,
+                            "resource_type", "auto"
+                    ));
+
+            String url = (String) uploadResult.get("secure_url");
+            log.info("Resource uploaded successfully: {}", url);
+
+            return url;
+
+        } catch (Exception e) {
+            log.error("Failed to upload resource to Cloudinary: {}", e.getMessage());
+            throw new IOException("Failed to upload resource: " + e.getMessage());
+        }
+    }
+
+    private void validateResourceFile(MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
+            throw new IOException("File is empty");
+        }
+
+        long maxSize = 10 * 1024 * 1024;
+        if (file.getSize() > maxSize) {
+            throw new IOException("File size exceeds 10MB limit");
+        }
+
+        String contentType = file.getContentType();
+        if (contentType == null) {
+            throw new IOException("Invalid file type");
+        }
+
+        Set<String> allowedTypes = Set.of(
+                "application/pdf",
+
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+
+                "application/vnd.ms-excel",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+
+                "image/jpeg",
+                "image/png"
+        );
+
+        if (!allowedTypes.contains(file.getContentType())) {
+            throw new IOException(
+                    "Only PDF, DOC, DOCX, XLS, XLSX, JPG, PNG files are allowed"
+            );
+        }
+    }
+
 }

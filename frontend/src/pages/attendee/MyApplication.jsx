@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import ApplicationList from "../../components/domain/my-application/ApplicationList";
+import ApplicationList from "../../components/domain/attendee/my-application/ApplicationList";
 import applicationService from "../../services/application.service";
 
 const MyApplicationPage = () => {
@@ -54,12 +54,12 @@ const MyApplicationPage = () => {
         </p>
       </div>
 
-      <div className="bg-white p-1 rounded-full flex gap-2 mb-10 w-fit border border-gray-200 shadow-sm overflow-x-auto">
+      <div className="bg-white p-1 rounded-full flex gap-1 sm:gap-2 mb-10 w-full md:w-fit border border-gray-200 shadow-sm overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {["All", "Pending", "Approved", "Rejected"].map((tab) => (
           <button
             key={tab}
             onClick={() => setFilter(tab)}
-            className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${
+            className={`px-4 sm:px-6 py-2 rounded-full text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${
               filter === tab
                 ? "bg-[#8aa8b2] text-white shadow-md shadow-[#8aa8b2]/20"
                 : "text-gray-600 hover:bg-gray-100"
