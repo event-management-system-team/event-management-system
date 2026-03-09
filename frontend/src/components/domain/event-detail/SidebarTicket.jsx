@@ -36,6 +36,8 @@ const SidebarTicket = ({ minPrice, ticketTypes, event }) => {
     bannerUrl: event?.bannerUrl,
   };
 
+  const isEventEnded = event?.endDate ? new Date(event.endDate) < new Date() : false;
+
   const handleBuyTickets = async () => {
     if (!isAuthenticated) {
       navigate("/login");
@@ -125,32 +127,43 @@ const SidebarTicket = ({ minPrice, ticketTypes, event }) => {
             const isSoldOut =
               (ticket.soldCount ?? 0) + (ticket.reservedCount ?? 0) >=
               ticket.quantity;
+              
+            const saleStart = ticket.saleStart ? new Date(ticket.saleStart) : null;
+            const saleEnd = ticket.saleEnd ? new Date(ticket.saleEnd) : null;
+            const now = new Date();
+            
+            const isBeforeSale = saleStart && now < saleStart;
+            const isAfterSale = saleEnd && now > saleEnd;
+            const isSaleClosed = isBeforeSale || isAfterSale;
+            
+            const isDisabled = isSoldOut || isSaleClosed || isEventEnded;
+
             return (
               <div
                 key={ticket.ticketTypeId}
-                className={`flex items-center justify-between p-4 rounded-2xl ${isSoldOut ? "bg-slate-50 opacity-50" : "bg-slate-50"}`}
+                className={`flex items-center justify-between p-4 rounded-2xl ${isDisabled ? "bg-slate-50 opacity-50" : "bg-slate-50"}`}
               >
                 <div>
-                  <p className={`font-bold ${isSoldOut ? "line-through" : ""}`}>
+                  <p className={`font-bold ${isDisabled ? "line-through" : ""}`}>
                     {ticket.ticketName}
                   </p>
-                  {!isSoldOut ? (
+                  {!isDisabled ? (
                     <p className="text-sm text-primary font-bold">
                       {formatCurrency(ticket.price)}
                     </p>
                   ) : (
                     <p className="text-[11px] text-red-500 font-bold uppercase tracking-widest mt-1">
-                      Sold Out
+                      {isEventEnded ? "Event Ended" : isSoldOut ? "Sold Out" : isBeforeSale ? "Not Started" : "Sale Ended"}
                     </p>
                   )}
                 </div>
 
                 <div
-                  className={`flex items-center gap-3 ${isSoldOut ? "cursor-not-allowed" : ""}`}
+                  className={`flex items-center gap-3 ${isDisabled ? "cursor-not-allowed" : ""}`}
                 >
                   <button
                     onClick={() => handleRemoveTicket(ticket.ticketTypeId)}
-                    disabled={isSoldOut || count <= 0}
+                    disabled={isDisabled || count <= 0}
                     className="size-8 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:hover:bg-transparent"
                   >
                     <Minus className="w-4 h-4" />
@@ -158,10 +171,10 @@ const SidebarTicket = ({ minPrice, ticketTypes, event }) => {
                   {count}
                   <button
                     onClick={() => handleAddTicket(ticket.ticketTypeId)}
-                    disabled={isSoldOut || totalSelectedTickets >= maxTickets}
+                    disabled={isDisabled || totalSelectedTickets >= maxTickets}
                     className={`size-8 rounded-full border flex items-center justify-center transition-colors disabled:opacity-50
                                                 ${
-                                                  !isSoldOut
+                                                  !isDisabled
                                                     ? "border-primary text-primary bg-primary/10"
                                                     : "border-slate-200 hover:bg-slate-100"
                                                 }`}
@@ -189,19 +202,19 @@ const SidebarTicket = ({ minPrice, ticketTypes, event }) => {
             <div className="flex items-center gap-3">
               <button
                 onClick={handleRemoveFreeTicket}
-                disabled={freeTicketCount <= 1}
+                disabled={freeTicketCount <= 1 || isEventEnded}
                 className="size-8 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:hover:bg-transparent"
               >
                 <Minus className="w-4 h-4" />
               </button>
 
-              <span className="text-sm font-bold w-4 text-center text-green-800">
-                {freeTicketCount}
+              <span className={`text-sm font-bold w-4 text-center ${isEventEnded ? 'text-slate-400' : 'text-green-800'}`}>
+                {isEventEnded ? '-' : freeTicketCount}
               </span>
 
               <button
                 onClick={handleAddFreeTicket}
-                disabled={freeTicketCount >= maxTickets}
+                disabled={freeTicketCount >= maxTickets || isEventEnded}
                 className="size-8 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:hover:bg-transparent"
               >
                 <Plus className="w-4 h-4" />
@@ -219,7 +232,7 @@ const SidebarTicket = ({ minPrice, ticketTypes, event }) => {
 
         <button
           onClick={handleBuyTickets}
-          disabled={loading || (ticketTypes?.length > 0 && !hasSelectedTickets)}
+          disabled={loading || isEventEnded || (ticketTypes?.length > 0 && !hasSelectedTickets)}
           className="w-full bg-primary hover:bg-primary/90 text-white font-extrabold py-4 rounded-xl transition-all uppercase tracking-wider shadow-lg shadow-primary/20 disabled:opacity-70 disabled:shadow-none disabled:cursor-not-allowed relative overflow-hidden"
         >
           {loading ? (
@@ -233,6 +246,8 @@ const SidebarTicket = ({ minPrice, ticketTypes, event }) => {
                 Securing your seats...
               </span>
             </span>
+          ) : isEventEnded ? (
+            "Event Ended"
           ) : !ticketTypes || ticketTypes.length === 0 ? (
             "Register Now"
           ) : subTotal > 0 ? (

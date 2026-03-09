@@ -47,6 +47,10 @@ public class PaymentService {
                         throw new RuntimeException("Order đã được thanh toán.");
                 }
 
+                if (order.getEvent().getEndDate().isBefore(LocalDateTime.now())) {
+                        throw new RuntimeException("Sự kiện đã kết thúc, không thể tiếp tục thanh toán.");
+                }
+
                 long amount = order.getTotalAmount()
                                 .multiply(BigDecimal.valueOf(100))
                                 .longValue();

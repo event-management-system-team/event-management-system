@@ -64,8 +64,21 @@ public class BookingService {
                         if (!lock.tryLock(3, 5, TimeUnit.SECONDS))
                                 throw new RuntimeException("System is busy, please try again later.");
 
-                        ticketTypeRepository.findById(request.getTicketTypeId())
+                        TicketType ticketType = ticketTypeRepository.findById(request.getTicketTypeId())
                                         .orElseThrow(() -> new NotFoundException("Ticket type not found"));
+
+                        if (ticketType.getEvent().getEndDate().isBefore(LocalDateTime.now())) {
+                                throw new RuntimeException("Sự kiện đã kết thúc, không thể đặt vé.");
+                        }
+
+                        if (ticketType.getSaleStart() != null
+                                        && ticketType.getSaleStart().isAfter(LocalDateTime.now())) {
+                                throw new RuntimeException("Vé chưa được mở bán.");
+                        }
+
+                        if (ticketType.getSaleEnd() != null && ticketType.getSaleEnd().isBefore(LocalDateTime.now())) {
+                                throw new RuntimeException("Đã hết thời gian bán vé.");
+                        }
 
                         int updated = ticketTypeRepository.reserveTickets(request.getTicketTypeId(),
                                         request.getQuantity());
@@ -102,6 +115,10 @@ public class BookingService {
                         com.eventmanagement.backend.model.Event event = eventRepository
                                         .findById(request.getEventId())
                                         .orElseThrow(() -> new NotFoundException("Event not found"));
+
+                        if (event.getEndDate().isBefore(LocalDateTime.now())) {
+                                throw new RuntimeException("Sự kiện đã kết thúc, không thể tạo đơn hàng.");
+                        }
 
                         Order order = Order.builder()
                                         .user(user).event(event)
