@@ -54,7 +54,7 @@ import {
 import { useEffect, useState } from 'react';
 import { AdminSidebar } from "../../components/domain/admin/AdminSidebar.jsx";
 import { Button } from "../../components/domain/admin/Button.jsx";
-import { Avatar, AvatarFallback } from "../../components/domain/admin/Avatar.jsx";
+import { Avatar, AvatarFallback, AvatarImage } from "../../components/domain/admin/Avatar.jsx";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/domain/admin/Card.jsx";
 import { Input } from "../../components/domain/admin/Input.jsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/domain/admin/Select.jsx";
@@ -68,188 +68,6 @@ import {
 import { Badge } from "../../components/domain/admin/Badge.jsx";
 import { adminService } from '../../services/admin.service.js';
 import dayjs from "dayjs";
-
-// Mock data for global analytics
-// const globalMetrics = [
-//     {
-//         title: "TOTAL EVENTS",
-//         value: "1,284",
-//         change: "+15.3%",
-//         trending: "up",
-//         icon: Calendar,
-//         iconBg: "bg-blue-100",
-//         iconColor: "text-blue-600"
-//     },
-//     {
-//         title: "ACTIVE EVENTS",
-//         value: "342",
-//         change: "+22.1%",
-//         trending: "up",
-//         icon: Zap,
-//         iconBg: "bg-green-100",
-//         iconColor: "text-green-600"
-//     },
-//     {
-//         title: "TOTAL TICKETS SOLD",
-//         value: "89,547",
-//         change: "+18.7%",
-//         trending: "up",
-//         icon: Target,
-//         iconBg: "bg-purple-100",
-//         iconColor: "text-purple-600"
-//     },
-//     {
-//         title: "TOTAL REVENUE",
-//         value: "$2.4M",
-//         change: "+24.3%",
-//         trending: "up",
-//         icon: DollarSign,
-//         iconBg: "bg-emerald-100",
-//         iconColor: "text-emerald-600"
-//     },
-//     {
-//         title: "AVG ATTENDANCE RATE",
-//         value: "87.2%",
-//         change: "+3.5%",
-//         trending: "up",
-//         icon: Users,
-//         iconBg: "bg-orange-100",
-//         iconColor: "text-orange-600"
-//     },
-//     {
-//         title: "CONVERSION RATE",
-//         value: "12.4%",
-//         change: "-2.1%",
-//         trending: "down",
-//         icon: Percent,
-//         iconBg: "bg-red-100",
-//         iconColor: "text-red-600"
-//     }
-// ]
-
-// Mock event performance data
-const eventPerformanceData = [
-    {
-        id: 1,
-        name: "Tech Conference 2026",
-        category: "Technology",
-        categoryIcon: Briefcase,
-        thumbnail: "TC",
-        thumbnailBg: "bg-slate-800",
-        date: "Mar 15, 2026",
-        time: "09:00 AM",
-        ticketsSold: 847,
-        capacity: 1000,
-        progress: 85,
-        revenue: "$42,350",
-        revenueValue: 42350,
-        attendanceRate: 92,
-        status: "Upcoming",
-        statusVariant: "secondary"
-    },
-    {
-        id: 2,
-        name: "Summer Music Festival",
-        category: "Music",
-        categoryIcon: Music,
-        thumbnail: "SM",
-        thumbnailBg: "bg-blue-600",
-        date: "Jun 20, 2026",
-        time: "02:00 PM",
-        ticketsSold: 4680,
-        capacity: 5000,
-        progress: 94,
-        revenue: "$234,000",
-        revenueValue: 234000,
-        attendanceRate: 88,
-        status: "Upcoming",
-        statusVariant: "secondary"
-    },
-    {
-        id: 3,
-        name: "Workshop Series: Design",
-        category: "Education",
-        categoryIcon: GraduationCap,
-        thumbnail: "WS",
-        thumbnailBg: "bg-amber-700",
-        date: "Feb 28, 2026",
-        time: "10:00 AM",
-        ticketsSold: 156,
-        capacity: 200,
-        progress: 78,
-        revenue: "$7,800",
-        revenueValue: 7800,
-        attendanceRate: 65,
-        status: "Ongoing",
-        statusVariant: "default"
-    },
-    {
-        id: 4,
-        name: "Charity Gala Evening",
-        category: "Charity",
-        categoryIcon: Users,
-        thumbnail: "CG",
-        thumbnailBg: "bg-slate-600",
-        date: "Apr 5, 2026",
-        time: "06:00 PM",
-        ticketsSold: 500,
-        capacity: 500,
-        progress: 100,
-        revenue: "$125,000",
-        revenueValue: 125000,
-        attendanceRate: 96,
-        status: "Upcoming",
-        statusVariant: "secondary"
-    },
-    {
-        id: 5,
-        name: "Digital Marketing Summit",
-        category: "Business",
-        categoryIcon: Briefcase,
-        thumbnail: "DM",
-        thumbnailBg: "bg-green-700",
-        date: "Jan 22, 2026",
-        time: "08:30 AM",
-        ticketsSold: 650,
-        capacity: 650,
-        progress: 100,
-        revenue: "$32,500",
-        revenueValue: 32500,
-        attendanceRate: 94,
-        status: "Completed",
-        statusVariant: "outline"
-    },
-    {
-        id: 6,
-        name: "Food & Wine Festival",
-        category: "Food & Beverage",
-        categoryIcon: Utensils,
-        thumbnail: "FW",
-        thumbnailBg: "bg-orange-600",
-        date: "Aug 12, 2026",
-        time: "12:00 PM",
-        ticketsSold: 320,
-        capacity: 1500,
-        progress: 21,
-        revenue: "$16,000",
-        revenueValue: 16000,
-        attendanceRate: 45,
-        status: "Upcoming",
-        statusVariant: "secondary"
-    }
-]
-
-// Chart data - Ticket sales over time
-const ticketSalesData = [
-    { month: "Jan", sales: 4200 },
-    { month: "Feb", sales: 5800 },
-    { month: "Mar", sales: 7200 },
-    { month: "Apr", sales: 6500 },
-    { month: "May", sales: 8900 },
-    { month: "Jun", sales: 10200 },
-    { month: "Jul", sales: 9800 },
-    { month: "Aug", sales: 11500 }
-]
 
 // Revenue per event (top 8)
 const revenueByEventData = [
@@ -349,87 +167,38 @@ const underperformingEvents = [
 export function EventAnalytics() {
     const [events, setEvents] = useState([])
     const [summary, setSummary] = useState()
+    const [monthlySales, setMonthlySales] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(false)
 
     const [selectedEvent, setSelectedEvent] = useState(null)
     const [isDetailOpen, setIsDetailOpen] = useState(false)
 
-    const fetchEventAnalytics = async () => {
+    const fetchData = async () => {
         try {
-            setLoading(true);
-            const response = await adminService.getEventAnalytics()
+            setLoading(true)
 
-            setEvents(response.data)
-            // setEvents(response.data.content);
-            // setCurrentPage(response.data.number)
+            const [eventRes, summaryRes, salesRes] = await Promise.all([
+                adminService.getEventAnalytics(),
+                adminService.getSummaryAnalytics(),
+                adminService.getMonthlyTicketSales()
+            ])
+
+            setEvents(eventRes.data)
+            setSummary(summaryRes.data)
+            setMonthlySales(salesRes.data)
+
         } catch (error) {
-            setError("Cannot load event analytics");
+            setError("Cannot load event analytics")
             console.error(error)
         } finally {
-            setLoading(false);
-        }
-    }
-
-    const fetchEventSummary = async () => {
-        try {
-            setLoading(true);
-            const response = await adminService.getSummaryAnalytics()
-
-            setSummary(response.data)
-            // setEvents(response.data.content);
-            // setCurrentPage(response.data.number)
-        } catch (error) {
-            setError("Cannot load summary analytics");
-            console.error(error)
-        } finally {
-            setLoading(false);
+            setLoading(false)
         }
     }
 
     useEffect(() => {
-        fetchEventAnalytics()
-        fetchEventSummary()
+        fetchData()
     }, [])
-
-    const globalMetrics = [
-        {
-            title: "TOTAL EVENTS",
-            value: summary?.totalEvents,
-            icon: Calendar,
-            iconBg: "bg-blue-100",
-            iconColor: "text-blue-600"
-        },
-        {
-            title: "ACTIVE EVENTS",
-            value: summary?.activeEvents,
-            icon: Zap,
-            iconBg: "bg-green-100",
-            iconColor: "text-green-600"
-        },
-        {
-            title: "TOTAL TICKETS SOLD",
-            value: summary?.totalTicketsSold,
-            icon: Target,
-            iconBg: "bg-purple-100",
-            iconColor: "text-purple-600"
-        },
-        {
-            title: "TOTAL REVENUE",
-            // value: "$2.4M",
-            value: summary?.totalRevenue,
-            icon: DollarSign,
-            iconBg: "bg-emerald-100",
-            iconColor: "text-emerald-600"
-        },
-        {
-            title: "AVG ATTENDANCE RATE",
-            value: summary?.averageAttendanceRate,
-            icon: Users,
-            iconBg: "bg-orange-100",
-            iconColor: "text-orange-600"
-        }
-    ]
 
     const ticketProgress = (total, sold) => {
         if (!total || total <= 0) return 0
@@ -443,6 +212,19 @@ export function EventAnalytics() {
             style: 'currency',
             currency: 'VND'
         }).format(amount)
+    }
+
+    const formatTotalNumber = (num) => {
+        return Number(num).toLocaleString('en-US')
+    }
+
+    const formatNumber = (num) => {
+        return Number(num).toFixed(2)
+    }
+
+    const formatMonth = (month) => {
+        if (!month) return ""
+        return month.toLowerCase().charAt(0).toUpperCase() + month.slice(1).toLowerCase()
     }
 
     const getStatusVariant = (status) => {
@@ -481,6 +263,51 @@ export function EventAnalytics() {
         setSelectedEvent(event)
         setIsDetailOpen(true)
     }
+
+    const monthlySalesData = monthlySales.map((item, index) => ({
+        month: formatMonth(item.month),
+        sales: item.ticketsSold,
+        revenue: item.revenue
+    }))
+
+    const globalMetrics = [
+        {
+            title: "TOTAL EVENTS",
+            value: formatTotalNumber(summary?.totalEvents),
+            icon: Calendar,
+            iconBg: "bg-blue-100",
+            iconColor: "text-blue-600"
+        },
+        {
+            title: "ACTIVE EVENTS",
+            value: formatTotalNumber(summary?.activeEvents),
+            icon: Zap,
+            iconBg: "bg-green-100",
+            iconColor: "text-green-600"
+        },
+        {
+            title: "TOTAL TICKETS SOLD",
+            value: formatTotalNumber(summary?.totalTicketsSold),
+            icon: Target,
+            iconBg: "bg-purple-100",
+            iconColor: "text-purple-600"
+        },
+        {
+            title: "TOTAL REVENUE",
+            // value: "$2.4M",
+            value: formatVND(summary?.totalRevenue),
+            icon: DollarSign,
+            iconBg: "bg-emerald-100",
+            iconColor: "text-emerald-600"
+        },
+        {
+            title: "AVG ATTENDANCE RATE",
+            value: `${formatNumber(summary?.averageAttendanceRate)} %`,
+            icon: Users,
+            iconBg: "bg-orange-100",
+            iconColor: "text-orange-600"
+        }
+    ]
 
     return (
         <div className="flex h-screen bg-[#F1F0E8]">
@@ -563,17 +390,18 @@ export function EventAnalytics() {
 
                 {/* Data Visualization Section */}
                 <div className="grid grid-cols-2 gap-5 px-8 pb-6">
+
                     {/* Ticket Sales Over Time */}
                     <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                         <CardHeader className="border-b border-gray-100">
-                            <CardTitle className="text-lg">Ticket Sales Trend</CardTitle>
+                            <CardTitle className="text-xl font-semibold text-gray-700">Ticket Sales Trend</CardTitle>
                             <CardDescription>
                                 Monthly ticket sales performance
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="pt-6">
                             <ResponsiveContainer width="100%" height={240}>
-                                <LineChart data={ticketSalesData}>
+                                <LineChart data={monthlySalesData}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                                     <XAxis
                                         dataKey="month"
@@ -601,20 +429,20 @@ export function EventAnalytics() {
                         </CardContent>
                     </Card>
 
-                    {/* Revenue by Event */}
+                    {/* Revenue by Month */}
                     <Card className="bg-[#f7f7f7] shadow-sm  border border-gray-200">
                         <CardHeader className="border-b border-gray-100">
-                            <CardTitle className="text-lg">Revenue by Event</CardTitle>
+                            <CardTitle className="text-xl font-semibold text-gray-700">Revenue Trend</CardTitle>
                             <CardDescription>
-                                Top performing events by revenue
+                                Monthly revenue
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="pt-6">
                             <ResponsiveContainer width="100%" height={240}>
-                                <BarChart data={revenueByEventData}>
+                                <BarChart data={monthlySalesData}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                                     <XAxis
-                                        dataKey="name"
+                                        dataKey="month"
                                         tick={{ fontSize: 11 }}
                                         stroke="#6B7280"
                                     />
@@ -626,7 +454,7 @@ export function EventAnalytics() {
                                             borderRadius: "6px",
                                             fontSize: "12px"
                                         }}
-                                        formatter={value => `$${value.toLocaleString()}`}
+                                        formatter={value => `${formatVND(value)}`}
                                     />
                                     <Bar dataKey="revenue" fill="#10B981" radius={[6, 6, 0, 0]} />
                                 </BarChart>
@@ -924,28 +752,30 @@ export function EventAnalytics() {
                         <CardContent className="p-0">
                             {/* Table Header */}
                             <div
-                                className="grid grid-cols-12 gap-4 px-6 py-3 border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wide items-center">
+                                className="grid grid-cols-11 gap-4 px-6 py-3 border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wide items-center">
                                 <div className="col-span-3">Event</div>
                                 <div className="col-span-2">Date & Time</div>
                                 <div className="col-span-2">Tickets Sold</div>
                                 <div className="col-span-1">Revenue</div>
                                 <div className="col-span-1">Attendance</div>
-                                <div className="col-span-2">Status</div>
+                                <div className="col-span-1">Status</div>
                                 <div className="col-span-1 text-right">Actions</div>
                             </div>
 
                             {/* Event Rows */}
                             {events?.map(event => {
                                 // const CategoryIcon = event.categoryIcon
-                                const progress = ticketProgress(event.totalCapacity, event.ticketsSold);
+                                const progress = ticketProgress(event.totalCapacity, event.ticketsSold)
+                                const canShowAttendance = ["ONGOING", "COMPLETED"].includes(event.status)
+                                const attendanceRate = event.attendanceRate * 100
                                 return (
                                     <div
                                         key={event.eventId}
-                                        className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-gray-50"
+                                        className="grid grid-cols-11 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-[#eef3f5]"
                                     >
                                         <div className="col-span-3 flex items-center gap-3">
                                             <Avatar className='w-10 h-10'>
-                                                {event?.bannerUrl ? (
+                                                {event.bannerUrl ? (
                                                     <AvatarImage src={event.bannerUrl} alt={event.eventName} />
                                                 ) : (
                                                     <AvatarFallback className="bg-gray-300" />
@@ -995,30 +825,30 @@ export function EventAnalytics() {
                                                 {event.totalCapacity.toLocaleString()}
                                             </div>
                                         </div>
-                                        <div className="col-span-1 text-sm font-semibold text-gray-900">
+                                        <div className="col-span-1 text-sm font-semibold text-gray-600">
                                             {formatVND(event.revenue)}
                                         </div>
                                         <div className="col-span-1">
                                             <div
-                                                className={`text-sm font-medium ${event.attendanceRate >= 80
-                                                    ? "text-green-600"
-                                                    : event.attendanceRate >= 60
-                                                        ? "text-blue-600"
-                                                        : "text-orange-600"
+                                                className={`text-sm font-medium justify-center text-center ${!canShowAttendance
+                                                    ? "text-gray-400"
+                                                    : attendanceRate >= 80
+                                                        ? "text-green-600"
+                                                        : attendanceRate >= 60
+                                                            ? "text-blue-600"
+                                                            : "text-orange-600"
                                                     }`}
                                             >
-                                                {event.attendanceRate}%
+                                                {canShowAttendance ? `${formatNumber(attendanceRate)} %` : '-'}
                                             </div>
                                         </div>
-                                        <div className="col-span-2">
-                                            <div className="col-span-2">
-                                                <Badge
-                                                    variant={getStatusVariant(event.status)}
-                                                    className={getStatusClasses(event.status)}
-                                                >
-                                                    ● {event.status}
-                                                </Badge>
-                                            </div>
+                                        <div className="col-span-1">
+                                            <Badge
+                                                variant={getStatusVariant(event.status)}
+                                                className={getStatusClasses(event.status)}
+                                            >
+                                                ● {event.status}
+                                            </Badge>
                                         </div>
                                         <div className="col-span-1 flex justify-end">
                                             <Button
@@ -1035,7 +865,7 @@ export function EventAnalytics() {
                             })}
 
                             {/* Footer with Pagination */}
-                            <div className="px-6 py-4 flex items-center justify-between text-sm text-gray-600">
+                            {/* <div className="px-6 py-4 flex items-center justify-between text-sm text-gray-600">
                                 <div>Showing 1–6 of {eventPerformanceData.length} events</div>
                                 <div className="flex gap-2">
                                     <Button variant="outline" size="sm">
@@ -1055,14 +885,14 @@ export function EventAnalytics() {
                                         Next
                                     </Button>
                                 </div>
-                            </div>
+                            </div> */}
                         </CardContent>
                     </Card>
                 </div>
 
                 {/* Event Detail Modal */}
                 <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-                    <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+                    <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto bg-white">
                         <DialogHeader>
                             <DialogTitle className="text-xl">
                                 Event Performance Details
@@ -1237,7 +1067,7 @@ export function EventAnalytics() {
                         )}
                     </DialogContent>
                 </Dialog>
-            </main>
-        </div>
+            </main >
+        </div >
     )
 }

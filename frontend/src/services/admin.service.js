@@ -86,6 +86,10 @@ export const adminService = {
 
     getSummaryAnalytics: () => {
         return axiosInstance.get(`/analytics/summary`)
-    }
+    },
+
+    getMonthlyTicketSales: () => {
+        return axiosInstance.get(`/analytics/monthly-ticket-sales`)
+    },
 
 };

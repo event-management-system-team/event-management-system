@@ -17,6 +17,7 @@ public interface EventAnalyticsRepository extends JpaRepository<EventAnalytics, 
         e.event_name,
         e.category_id,
         c.category_name,
+        e.banner_url,
         e.start_date,
         e.end_date,
         e.total_capacity,
@@ -53,4 +54,17 @@ public interface EventAnalyticsRepository extends JpaRepository<EventAnalytics, 
         WHERE e.status IN ('ONGOING','COMPLETED')
         """, nativeQuery = true)
     Object getAnalyticsSummary();
+
+    @Query(value = """
+        SELECT 
+        DATE_TRUNC('month', e.start_date) AS month,
+        SUM(ea.total_tickets_sold) AS tickets_sold,
+        SUM(ea.total_revenue) AS revenue
+        FROM event_analytics ea
+        JOIN events e ON ea.event_id = e.event_id
+        WHERE e.status IN ('ONGOING','COMPLETED')
+        GROUP BY DATE_TRUNC('month', e.start_date)
+        ORDER BY month
+        """, nativeQuery = true)
+    List<Object[]> getMonthlyTicketSales();
 }

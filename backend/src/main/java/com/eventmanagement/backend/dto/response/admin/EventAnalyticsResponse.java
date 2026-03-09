@@ -17,6 +17,7 @@ public class EventAnalyticsResponse {
     private String eventName;
     private UUID categoryId;
     private String categoryName;
+    private String bannerUrl;
 
     private LocalDateTime startDate;
     private LocalDateTime endDate;

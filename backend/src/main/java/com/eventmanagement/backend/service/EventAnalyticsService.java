@@ -2,12 +2,14 @@ package com.eventmanagement.backend.service;
 
 import com.eventmanagement.backend.dto.response.admin.AnalyticsSummaryResponse;
 import com.eventmanagement.backend.dto.response.admin.EventAnalyticsResponse;
+import com.eventmanagement.backend.dto.response.admin.MonthlyTicketSalesResponse;
 import com.eventmanagement.backend.repository.EventAnalyticsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,19 +30,21 @@ public class EventAnalyticsService {
             String eventName = (String) row[1];
             UUID categoryId = (UUID) row[2];
             String categoryName = (String) row[3];
-            Timestamp startDate = (Timestamp) row[4];
-            Timestamp endDate = (Timestamp) row[5];
-            Integer totalCapacity = (Integer) row[6];
-            String status = (String) row[7];
-            Integer ticketsSold = (Integer) row[8];
-            BigDecimal revenue = (BigDecimal) row[9];
-            Integer checkins = (Integer) row[10];
-            Integer registrations = (Integer) row[11];
+            String bannerUrl = (String) row[4];
+            Timestamp startDate = (Timestamp) row[5];
+            Timestamp endDate = (Timestamp) row[6];
+            Integer totalCapacity = (Integer) row[7];
+            String status = (String) row[8];
+            Integer ticketsSold = (Integer) row[9];
+            BigDecimal revenue = (BigDecimal) row[10];
+            Integer checkins = (Integer) row[11];
+            Integer registrations = (Integer) row[12];
 
             res.setEventId(eventId);
             res.setEventName(eventName);
             res.setCategoryId(categoryId);
             res.setCategoryName(categoryName);
+            res.setBannerUrl(bannerUrl);
 
             if (startDate != null)
                 res.setStartDate(startDate.toLocalDateTime());
@@ -75,5 +79,24 @@ public class EventAnalyticsService {
         res.setActiveEvents(((Number) row[4]).intValue());
 
         return res;
+    }
+
+    public List<MonthlyTicketSalesResponse> getMonthlyTicketSales() {
+
+        List<Object[]> rows = eventAnalyticsRepository.getMonthlyTicketSales();
+
+        return rows.stream().map(row -> {
+
+            MonthlyTicketSalesResponse res = new MonthlyTicketSalesResponse();
+
+            LocalDateTime month = ((Timestamp) row[0]).toLocalDateTime();
+
+            res.setMonth(month.getMonth().toString().substring(0,3));
+            res.setTicketsSold(((Number) row[1]).longValue());
+            res.setRevenue((BigDecimal) row[2]);
+
+            return res;
+
+        }).toList();
     }
 }
