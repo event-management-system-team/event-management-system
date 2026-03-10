@@ -95,4 +95,34 @@ public interface EventAnalyticsRepository extends JpaRepository<EventAnalytics, 
     ORDER BY event_count DESC;
     """, nativeQuery = true)
     List<Object[]> getCategoryDistribution();
+
+    @Query(value = """
+SELECT
+    COUNT(e.event_id) AS total_events,
+
+    COUNT(CASE 
+        WHEN e.status IN ('APPROVED','ONGOING') 
+        THEN 1 
+    END) AS active_events,
+
+    COUNT(CASE 
+        WHEN e.status = 'PENDING' 
+        THEN 1 
+    END) AS pending_events,
+
+    (
+        SELECT COUNT(*)
+        FROM users
+        WHERE role = 'ORGANIZER'
+    ) AS organizer_accounts,
+
+    (
+        SELECT COUNT(*)
+        FROM users
+        WHERE status = 'BANNED'
+    ) AS banned_accounts
+
+FROM events e
+""", nativeQuery = true)
+    Object getDashboardSummary();
 }

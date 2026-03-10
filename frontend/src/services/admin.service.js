@@ -80,6 +80,7 @@ export const adminService = {
         return axiosInstance.patch(`/events/${slug}/reject`, { reason })
     },
 
+    // EVENT-ANALYTICS
     getEventAnalytics: () => {
         return axiosInstance.get('/analytics/events')
     },
@@ -99,5 +100,11 @@ export const adminService = {
     getCategoryDistribution: () => {
         return axiosInstance.get('/analytics/category-distribution')
     },
+
+    // ADMIN-DASHBOARD
+    getDashboardSummary: () => {
+        return axiosInstance.get('/analytics/dashboard-summary')
+    },
+
 
 };

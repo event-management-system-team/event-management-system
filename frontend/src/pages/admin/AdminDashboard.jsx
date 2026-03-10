@@ -31,50 +31,9 @@ import { Avatar, AvatarFallback } from "../../components/domain/admin/Avatar.jsx
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/domain/admin/Card.jsx";
 import { Badge } from "../../components/domain/admin/Badge.jsx";
 import { AdminSidebar } from "../../components/domain/admin/AdminSidebar.jsx";
-
-// Top summary metrics with trends
-const summaryMetrics = [
-    {
-        title: "TOTAL EVENTS",
-        value: "1,284",
-        icon: Calendar,
-        iconBg: "bg-blue-100",
-        iconColor: "text-blue-600",
-        link: "/admin/events"
-    },
-    {
-        title: "ACTIVE EVENTS",
-        value: "342",
-        icon: Zap,
-        iconBg: "bg-green-100",
-        iconColor: "text-green-600"
-    },
-    {
-        title: "PENDING REVIEWS",
-        value: "89",
-        icon: AlertCircle,
-        iconBg: "bg-orange-100",
-        iconColor: "text-orange-600",
-        link: "/admin/events?status=pending",
-        highlight: true
-    },
-    {
-        title: "ORGANIZER ACCOUNTS",
-        value: "456",
-        icon: Users,
-        iconBg: "bg-purple-100",
-        iconColor: "text-purple-600",
-        link: "/admin/accounts?role=ORGANIZER"
-    },
-    {
-        title: "SUSPENDED ACCOUNTS",
-        value: "12",
-        icon: UserX,
-        iconBg: "bg-red-100",
-        iconColor: "text-red-600",
-        link: "/admin/accounts?status=BANNED"
-    }
-]
+import { useEffect, useState } from 'react';
+import { adminService } from '../../services/admin.service.js';
+import LoadingState from '../../components/common/LoadingState.jsx';
 
 // Pending events awaiting review
 const pendingEvents = [
@@ -234,6 +193,78 @@ const systemInsights = [
 
 export function AdminDashboard() {
     const navigate = useNavigate();
+    const [summary, setSummary] = useState()
+
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(false)
+
+    const fetchData = async () => {
+        try {
+            setLoading(true)
+
+            const [summaryRes] = await Promise.all([
+                adminService.getDashboardSummary()
+            ])
+
+            setSummary(summaryRes.data)
+
+        } catch (error) {
+            setError("Cannot load dashboard data")
+            console.error(error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        fetchData()
+    }, [])
+
+    const summaryMetrics = [
+        {
+            title: "TOTAL EVENTS",
+            value: summary?.totalEvents,
+            icon: Calendar,
+            iconBg: "bg-blue-100",
+            iconColor: "text-blue-600",
+            link: "/admin/events"
+        },
+        {
+            title: "ACTIVE EVENTS",
+            value: summary?.activeEvents,
+            icon: Zap,
+            iconBg: "bg-green-100",
+            iconColor: "text-green-600"
+        },
+        {
+            title: "PENDING REVIEWS",
+            value: summary?.pendingEvents,
+            icon: AlertCircle,
+            iconBg: "bg-orange-100",
+            iconColor: "text-orange-600",
+            link: "/admin/events?status=pending",
+            highlight: true
+        },
+        {
+            title: "ORGANIZER ACCOUNTS",
+            value: summary?.organizerAccounts,
+            icon: Users,
+            iconBg: "bg-purple-100",
+            iconColor: "text-purple-600",
+            link: "/admin/accounts?role=ORGANIZER"
+        },
+        {
+            title: "SUSPENDED ACCOUNTS",
+            value: summary?.bannedAccounts,
+            icon: UserX,
+            iconBg: "bg-red-100",
+            iconColor: "text-red-600",
+            link: "/admin/accounts?status=BANNED"
+        }
+    ]
+
+    if (loading) return <LoadingState />
+
 
     return (
         <div className="flex h-screen bg-[#F1F0E8]">
