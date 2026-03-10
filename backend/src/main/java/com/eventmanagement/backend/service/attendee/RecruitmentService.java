@@ -1,0 +1,156 @@
+package com.eventmanagement.backend.service.attendee;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import com.eventmanagement.backend.constants.EventStatus;
+import com.eventmanagement.backend.constants.RecruitmentStatus;
+import com.eventmanagement.backend.dto.response.attendee.OrganizerResponse;
+import com.eventmanagement.backend.dto.response.attendee.PositionResponse;
+import com.eventmanagement.backend.dto.response.attendee.RecruitmentResponse;
+import com.eventmanagement.backend.model.BenefitRecruitment;
+import com.eventmanagement.backend.model.Event;
+import com.eventmanagement.backend.model.Recruitment;
+import com.eventmanagement.backend.repository.RecruitmentRepository;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class RecruitmentService {
+    private final RecruitmentRepository recruitmentRepository;
+
+    List<RecruitmentStatus> statusesRecruitment = Arrays.asList(RecruitmentStatus.OPEN, RecruitmentStatus.CLOSED);
+
+    public List<RecruitmentResponse> getRecentRecruitments() {
+
+        Pageable topThree = PageRequest.of(0, 3);
+        List<String> topEvent = recruitmentRepository.findRecentEventWithOpenRecruitments(statusesRecruitment, topThree);
+
+        if (topEvent.isEmpty()) {
+            return List.of();
+        }
+
+
+        List<Recruitment> recruitments = recruitmentRepository.findRecruitmentsByEventSlugs(topEvent, statusesRecruitment);
+
+        Map<Event, List<Recruitment>> groupedByEvent = recruitments.stream()
+                .collect(Collectors.groupingBy((recruitment) -> recruitment.getEvent()));
+
+        return groupRecruitmentByEvent(recruitments);
+    }
+
+    public Page<RecruitmentResponse> searchRecruitments(String keyword, String location,
+                                                        LocalDate deadline,
+                                                        int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        String kw = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
+        String loc = (location != null && !location.trim().isEmpty()) ? location.trim() : null;
+
+        LocalDateTime dl = null;
+        if (deadline != null) {
+            dl = deadline.atTime(LocalTime.MAX);
+        }
+
+
+        List<EventStatus> statuses = Arrays.asList(EventStatus.APPROVED, EventStatus.ONGOING);
+
+        Page<String> eventSlugs = recruitmentRepository.searchEventSlug(statuses, kw, loc, dl, pageable);
+
+        if (eventSlugs.isEmpty()) {
+            return Page.empty(pageable);
+        }
+        List<Recruitment> recruitments = recruitmentRepository.searchRecruitments(statusesRecruitment, eventSlugs.getContent());
+
+        List<RecruitmentResponse> groupByEvent = groupRecruitmentByEvent(recruitments);
+
+        return new PageImpl<>(groupByEvent, pageable, eventSlugs.getTotalElements());
+    }
+
+    public RecruitmentResponse getRecruitmentByEventSlug(String eventSlug) {
+        List<Recruitment> recruitments = recruitmentRepository.findByEvent_EventSlug(eventSlug);
+
+        if (recruitments.isEmpty()) return null;
+
+        Event event = recruitments.get(0).getEvent();
+
+        return mapToResponse(event, recruitments);
+    }
+
+    private List<RecruitmentResponse> groupRecruitmentByEvent(List<Recruitment> recruitments) {
+        Map<Event, List<Recruitment>> groupedByEvent = recruitments.stream()
+                .collect(Collectors.groupingBy(Recruitment::getEvent));
+
+        List<RecruitmentResponse> responseList = groupedByEvent.entrySet().stream()
+                .map(entry -> mapToResponse(entry.getKey(), entry.getValue()))
+                .sorted(Comparator.comparing(RecruitmentResponse::getCreatedAt).reversed())
+                .collect(Collectors.toList());
+        return responseList;
+    }
+
+    private RecruitmentResponse mapToResponse(Event event, List<Recruitment> recruitments) {
+
+        Recruitment recruitment = recruitments.get(0);
+        List<PositionResponse> positionResponse = recruitments.stream()
+                .map((position) -> PositionResponse.builder()
+                        .recruitmentId(position.getRecruitmentId())
+                        .positionName(position.getPositionName())
+                        .vacancy(position.getVacancy())
+                        .availableSlots(position.getVacancy() - position.getApprovedCount())
+                        .requirements(position.getRequirements())
+                        .build()
+                ).toList();
+
+        OrganizerResponse organizerResponses = null;
+        if (event.getOrganizer() != null) {
+            organizerResponses = OrganizerResponse.builder()
+                    .userId(event.getOrganizer().getUserId())
+                    .fullName(event.getOrganizer().getFullName())
+                    .avatarUrl(event.getOrganizer().getAvatarUrl())
+                    .email(event.getOrganizer().getEmail())
+                    .build();
+        }
+
+        List<BenefitRecruitment> benefits = recruitment.getBenefits();
+        List<RecruitmentResponse.BenefitRecruitmentDto> benefitResponse = (benefits != null) ? benefits.stream()
+                .map(benefit -> RecruitmentResponse.BenefitRecruitmentDto.builder()
+                        .icon(benefit.getIcon())
+                        .title(benefit.getTitle())
+                        .description(benefit.getDescription())
+                        .build()).toList() : new ArrayList<>();
+
+
+        return RecruitmentResponse.builder()
+                .eventId(event.getEventId())
+                .eventSlug(event.getEventSlug())
+                .eventName(event.getEventName())
+                .eventBannerUrl(event.getBannerUrl())
+                .location(event.getLocation())
+                .startDate(event.getStartDate())
+                .endDate(event.getEndDate())
+                .description(recruitment.getDescription())
+                .deadline(recruitment.getDeadline())
+                .createdAt(recruitment.getCreatedAt())
+                .status(recruitment.getStatus())
+                .positions(positionResponse)
+                .organizer(organizerResponses)
+                .benefits(benefitResponse)
+                .build();
+    }
+
+
+}

@@ -1,4 +1,4 @@
-import FilterDate from "../events/FilterDate";
+import FilterDate from "../../domain/events/FilterDate";
 import FilterLocation from "./FilterLocation";
 
 const SidebarFilter = ({ deadline, setDeadline, location, setLocation, handleApply, handleReset }) => {

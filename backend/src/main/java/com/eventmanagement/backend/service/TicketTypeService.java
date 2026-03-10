@@ -17,7 +17,6 @@ public class TicketTypeService {
 
     public List<TicketTypeResponse> getTicketTypes(UUID eventId) {
         List<TicketType> ticketTypes = repository.findByEvent_EventIdAndIsActiveTrue(eventId);
-
         LocalDateTime now = LocalDateTime.now();
 
         return ticketTypes.stream().map(ticket -> {

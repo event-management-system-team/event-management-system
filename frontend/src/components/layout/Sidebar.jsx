@@ -14,9 +14,7 @@ import {
   LogOut
 } from 'lucide-react';
 
-// ==========================================
-// COMPONENT PHỤ: Nút bấm trên Menu
-// ==========================================
+
 const NavItem = ({ to, icon, label, isActive }) => {
   return (
     <Link
@@ -33,9 +31,6 @@ const NavItem = ({ to, icon, label, isActive }) => {
   );
 };
 
-// ==========================================
-// COMPONENT CHÍNH: Sidebar
-// ==========================================
 const Sidebar = () => {
   const location = useLocation();
   const { eventId } = useParams();
@@ -50,15 +45,14 @@ const Sidebar = () => {
     navigate('/login');
   };
 
-  // Hàm kiểm tra trang đang đứng để bật trạng thái Active
+
   const isDashboardActive = location.pathname.includes('/dashboard');
   const isMyEventsActive = location.pathname.includes('/my-events');
-  // Hỗ trợ cả 2 link '/staff' hoặc '/recruitment'
+
   const isStaffActive = location.pathname.includes('/staff') || location.pathname.includes('/recruitment');
   const isAppActive = location.pathname.includes('/applications');
   const isFeedbackActive = location.pathname.includes('/feedback');
 
-  // Xử lý link Feedback an toàn: Nếu đang ở trong 1 sự kiện có ID thì dùng ID đó, nếu không thì truyền tạm ID = 1
   const feedbackLink = eventId ? `/organizer/feedback/feedbacklist/${eventId}` : `/organizer/feedbacklist/1`;
 
   return (
