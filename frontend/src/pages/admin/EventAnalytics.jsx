@@ -46,6 +46,8 @@ import { DatePicker, Space } from 'antd';
 import LoadingState from '../../components/common/LoadingState.jsx';
 import html2pdf from 'html2pdf.js';
 import html2canvas from "html2canvas";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 export function EventAnalytics() {
     const [events, setEvents] = useState([])
@@ -61,6 +63,7 @@ export function EventAnalytics() {
     const [sortOption, setSortOption] = useState("newest")
     const [categories, setCategories] = useState([]);
     const [searchTerm, setSearchTerm] = useState("")
+    const [sheetData, setSheetData] = useState(null)
 
     const [selectedEvent, setSelectedEvent] = useState(null)
     const [isDetailOpen, setIsDetailOpen] = useState(false)
@@ -96,6 +99,55 @@ export function EventAnalytics() {
     useEffect(() => {
         fetchData()
     }, [])
+
+    const getData = () => {
+        return events
+    }
+
+    useEffect(() => {
+        setSheetData(getData())
+    }, [])
+
+    const formatExcelData = (events) => {
+        return events
+            .filter(event => event.status === "COMPLETED")
+            .map((event, index) => {
+                const attendanceRate = event.attendanceRate * 100
+
+                return {
+                    "No.": index + 1,
+                    "Event Name": event.eventName,
+                    "Category": event.categoryName,
+                    "Start Date": dayjs(event.startDate).format("YYYY-MM-DD"),
+                    "Start Time": dayjs(event.startDate).format("HH:mm"),
+                    "End Time": dayjs(event.endDate).format("HH:mm"),
+                    "Tickets Sold": event.ticketsSold,
+                    "Total Capacity": event.totalCapacity,
+                    "Total Revenue": event.revenue,
+                    "Attendance Rate (%)": attendanceRate
+                }
+            })
+    }
+
+    const handleExportExcel = () => {
+        const excelData = formatExcelData(events)
+
+        const worksheet = XLSX.utils.json_to_sheet(excelData)
+
+        const workbook = XLSX.utils.book_new()
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Events Report")
+
+        const excelBuffer = XLSX.write(workbook, {
+            bookType: "xlsx",
+            type: "array"
+        })
+
+        const fileData = new Blob([excelBuffer], {
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        })
+
+        saveAs(fileData, "events-report.xlsx")
+    }
 
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value)
@@ -310,12 +362,12 @@ export function EventAnalytics() {
                         </div>
                         <div className="flex gap-2">
                             {/* <Button variant="outline" className="gap-2" onClick={handleExportPDF}>
-                                <Download className="h-4 w-4" />
+                                <FileText className="h-4 w-4" />
                                 Export PDF
                             </Button> */}
-                            <Button variant="outline" className="gap-2">
-                                <FileText className="h-4 w-4" />
-                                Generate Report
+                            <Button variant="outline" className="gap-2" onClick={handleExportExcel}>
+                                <Download className="h-4 w-4" />
+                                Export Excel Report
                             </Button>
                         </div>
                     </div>

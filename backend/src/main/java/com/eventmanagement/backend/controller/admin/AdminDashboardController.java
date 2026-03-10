@@ -2,7 +2,6 @@ package com.eventmanagement.backend.controller.admin;
 
 import com.eventmanagement.backend.dto.response.admin.DashboardSummaryResponse;
 import com.eventmanagement.backend.dto.response.admin.TopPendingEventsResponse;
-import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.service.AdminDashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

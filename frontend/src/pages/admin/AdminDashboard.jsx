@@ -345,7 +345,7 @@ export function AdminDashboard() {
                                         <CardDescription>Events awaiting review and approval</CardDescription>
                                     </div>
                                     <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100">
-                                        {pendingEvents.length} pending
+                                        {summary?.pendingEvents} pending
                                     </Badge>
                                 </div>
                             </CardHeader>
@@ -357,7 +357,7 @@ export function AdminDashboard() {
                                         return (
                                             <Link
                                                 key={event.eventSlug}
-                                                to={`events/event-detail/${event.eventSlug}`}
+                                                to={detailUrl}
                                                 className="block hover:bg-[#eef3f5] transition-colors"
                                             >
                                                 <div className="p-4 px-8 flex items-center justify-between">
@@ -376,13 +376,6 @@ export function AdminDashboard() {
                                                                 {dayjs(event.createdAt).format("MMM DD, YYYY")}
                                                             </span>
                                                         </div>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 ml-4">
-                                                        <Link to={detailUrl}>
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                                <Eye className="h-4 w-4 text-gray-500" />
-                                                            </Button>
-                                                        </Link>
                                                     </div>
                                                 </div>
                                             </Link>

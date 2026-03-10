@@ -40,6 +40,7 @@
     "date-holidays": "^3.26.8",
     "dayjs": "^1.11.19",
     "dotenv": "^17.2.3",
+    "file-saver": "^2.0.5",
     "framer-motion": "^12.34.0",
     "html2canvas": "^1.4.1",
     "html2pdf.js": "^0.14.0",
@@ -58,6 +59,7 @@
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",
     "temporal-polyfill": "^0.3.0",
+    "xlsx": "^0.18.5",
     "zod": "^4.3.6"
   },
   "devDependencies": {

@@ -5,21 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b61f3f50-8065-4f51-be19-f5261948bd35" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/04a1354e-22dc-4cde-ad8e-b590d548616c.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/04a1354e-22dc-4cde-ad8e-b590d548616c/storage_v2/_src_/database/ems.y4gBAA.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/04a1354e-22dc-4cde-ad8e-b590d548616c/storage_v2/_src_/database/ems.y4gBAA/schema/information_schema.FNRwLQ.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/04a1354e-22dc-4cde-ad8e-b590d548616c/storage_v2/_src_/database/ems.y4gBAA/schema/pg_catalog.0S1ZNQ.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/04a1354e-22dc-4cde-ad8e-b590d548616c/storage_v2/_src_/database/ems.y4gBAA/schema/public.abK9xQ.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/admin/AdminDashboardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/admin/AdminDashboardController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/attendee/RecruitmentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/attendee/RecruitmentService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/admin/AdminDashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/admin/AdminDashboard.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/admin/EventAnalytics.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/admin/EventAnalytics.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -181,7 +173,9 @@
       <workItem from="1772898102150" duration="2297000" />
       <workItem from="1772935436010" duration="21335000" />
       <workItem from="1773016859046" duration="26212000" />
-      <workItem from="1773116498768" duration="5412000" />
+      <workItem from="1773116498768" duration="9104000" />
+      <workItem from="1773143665565" duration="64000" />
+      <workItem from="1773144402149" duration="774000" />
     </task>
     <servers />
   </component>

@@ -126,7 +126,9 @@ public class RecruitmentService {
         }
 
         List<BenefitRecruitment> benefits = recruitment.getBenefits();
-        List<RecruitmentResponse.BenefitRecruitmentDto> benefitResponse = benefits.stream()
+        List<RecruitmentResponse.BenefitRecruitmentDto> benefitResponse =
+                benefits == null ? List.of() :
+                benefits.stream()
                 .map(benefit -> RecruitmentResponse.BenefitRecruitmentDto.builder()
                         .icon(benefit.getIcon())
                         .title(benefit.getTitle())
