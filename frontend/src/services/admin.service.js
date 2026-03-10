@@ -106,5 +106,8 @@ export const adminService = {
         return axiosInstance.get('/analytics/dashboard-summary')
     },
 
+    getTopPendingEvents: () => {
+        return axiosInstance.get(`/analytics/pending-events`)
+    }
 
 };

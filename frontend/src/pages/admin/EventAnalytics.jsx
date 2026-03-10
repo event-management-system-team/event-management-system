@@ -603,9 +603,9 @@ export function EventAnalytics() {
                                 <div className="col-span-3">Event</div>
                                 <div className="col-span-2">Date & Time</div>
                                 <div className="col-span-2">Tickets Sold</div>
-                                <div className="col-span-1">Revenue</div>
-                                <div className="col-span-1">Attendance</div>
-                                <div className="col-span-1">Status</div>
+                                <div className="col-span-1 text-center">Revenue</div>
+                                <div className="col-span-1 text-center">Attendance</div>
+                                <div className="col-span-1 text-center">Status</div>
                                 {/* <div className="col-span-1 text-right">Actions</div> */}
                             </div>
 
