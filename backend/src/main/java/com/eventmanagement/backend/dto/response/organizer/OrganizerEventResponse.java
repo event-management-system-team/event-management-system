@@ -26,6 +26,7 @@ public class OrganizerEventResponse {
 
     private Integer totalCapacity;
     private Integer registeredCount;
+    private Integer checkedInCount;
 
     // Tổng sold và tổng quantity từ tất cả ticket types
     private Integer totalSold;
@@ -34,4 +35,6 @@ public class OrganizerEventResponse {
     private BigDecimal totalRevenue;
 
     private String categoryName;
+    
+    private Boolean isFree;
 }

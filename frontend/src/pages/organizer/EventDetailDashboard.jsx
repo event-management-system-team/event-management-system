@@ -158,9 +158,10 @@ const EventDetailDashboard = () => {
 
             try {
                 const attendeesData = await organizerService.getEventAttendees(eventId, 0, 10);
+                console.log('Attendees API response:', attendeesData);
                 setAttendees(attendeesData.content || []);
             } catch (err) {
-                console.log('Attendees API not available yet, showing placeholder');
+                console.error('Attendees API error:', err.response?.status, err.response?.data || err.message);
                 setAttendees([]);
             }
         } catch (err) {
@@ -185,10 +186,12 @@ const EventDetailDashboard = () => {
         fetchEventDetail();
     }, [fetchEventDetail]);
 
+    const isFreeEvent = event?.isFree === true || (event?.totalRevenue === 0 && event?.isFree !== false);
+    
     const donutData = useMemo(() => {
-        if (event?.isFree) {
+        if (isFreeEvent) {
             return [
-                { name: 'Free', value: ticketStats.sold, pct: 100 },
+                { name: 'Free', value: ticketStats.sold || ticketStats.registeredCount || 0, pct: 100 },
             ];
         }
         const { general, vip, early } = ticketStats;
@@ -197,7 +200,7 @@ const EventDetailDashboard = () => {
             { name: 'VIP', value: vip, pct: ticketStats.sold > 0 ? Math.round((vip / ticketStats.sold) * 100) : 25 },
             { name: 'Early', value: early, pct: ticketStats.sold > 0 ? Math.round((early / ticketStats.sold) * 100) : 10 },
         ].filter(d => d.value > 0);
-    }, [ticketStats, event?.isFree]);
+    }, [ticketStats, isFreeEvent]);
 
     const capacityPercent = ticketStats.total > 0
         ? Math.round((ticketStats.checkedIn / ticketStats.total) * 100)
@@ -290,15 +293,27 @@ const EventDetailDashboard = () => {
 
             {/* Stat Cards Row */}
             <div className="grid grid-cols-4 gap-4 mb-6">
-                <StatCard
-                    icon={DollarSign}
-                    label="Total Revenue"
-                    value={formatVND(revenue)}
-                    subText={event?.isFree ? "Free Event" : "From ticket sales"}
-                    iconBg="bg-green-50"
-                    iconColor="text-green-600"
-                    loading={loading}
-                />
+                {isFreeEvent ? (
+                    <StatCard
+                        icon={Ticket}
+                        label="Event Type"
+                        value="Free Event"
+                        subText="No ticket fees"
+                        iconBg="bg-green-50"
+                        iconColor="text-green-600"
+                        loading={loading}
+                    />
+                ) : (
+                    <StatCard
+                        icon={DollarSign}
+                        label="Total Revenue"
+                        value={formatVND(revenue)}
+                        subText="From ticket sales"
+                        iconBg="bg-green-50"
+                        iconColor="text-green-600"
+                        loading={loading}
+                    />
+                )}
                 <StatCard
                     icon={Ticket}
                     label="Tickets Sold"
@@ -391,7 +406,7 @@ const EventDetailDashboard = () => {
                                             dataKey="value"
                                             innerRadius={55}
                                             outerRadius={75}
-                                            paddingAngle={event?.isFree ? 0 : 2}
+                                            paddingAngle={isFreeEvent ? 0 : 2}
                                             startAngle={90}
                                             endAngle={-270}
                                             stroke="none"
@@ -399,11 +414,11 @@ const EventDetailDashboard = () => {
                                             {donutData.map((_, i) => (
                                                 <Cell 
                                                     key={i} 
-                                                    fill={event?.isFree ? FREE_EVENT_COLOR : DONUT_COLORS[i % DONUT_COLORS.length]} 
+                                                    fill={isFreeEvent ? FREE_EVENT_COLOR : DONUT_COLORS[i % DONUT_COLORS.length]} 
                                                 />
                                             ))}
                                         </Pie>
-                                        <DonutCenter sold={ticketStats.sold} total={ticketStats.total} />
+                                        <DonutCenter sold={ticketStats.sold || ticketStats.registeredCount} total={ticketStats.total} />
                                     </PieChart>
                                 </ResponsiveContainer>
                             </div>
@@ -414,7 +429,7 @@ const EventDetailDashboard = () => {
                                     <div key={d.name} className="flex items-center gap-1.5">
                                         <span
                                             className="w-2.5 h-2.5 rounded-full"
-                                            style={{ backgroundColor: event?.isFree ? FREE_EVENT_COLOR : DONUT_COLORS[i % DONUT_COLORS.length] }}
+                                            style={{ backgroundColor: isFreeEvent ? FREE_EVENT_COLOR : DONUT_COLORS[i % DONUT_COLORS.length] }}
                                         />
                                         <span className="text-xs text-gray-500">
                                             {d.name} ({d.pct}%)

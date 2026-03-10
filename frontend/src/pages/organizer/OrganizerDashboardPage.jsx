@@ -25,8 +25,8 @@ import {
 } from 'recharts';
 import organizerService from '../../services/organizer.service';
 
-const ACCENT = '#F97316';
-const ACCENT_LIGHT = '#FFF7ED';
+const ACCENT = '#2d3a4f';
+const ACCENT_LIGHT = '#f0fdf4';
 
 const CATEGORY_COLORS = {
     Music: '#F97316',
@@ -42,7 +42,7 @@ const CATEGORY_COLORS = {
 const getCategoryColor = (name) =>
     CATEGORY_COLORS[name] || '#F97316';
 
-const DONUT_COLORS = ['#1E293B', '#F97316', '#FDBA74'];
+const DONUT_COLORS = ['#1E293B', '#F97316', '#94A3B8'];
 
 const formatVND = (value) =>
     new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(value);
@@ -336,7 +336,7 @@ const OrganizerDashboardPage = () => {
                                     tick={{ fill: '#9CA3AF', fontSize: 11 }}
                                     tickFormatter={(v) => v >= 1_000_000 ? `${(v / 1_000_000).toFixed(0)}M` : v >= 1_000 ? `${(v / 1_000).toFixed(0)}K` : v}
                                 />
-                                <Tooltip content={<CustomBarTooltip />} cursor={{ fill: '#FFF7ED' }} />
+                                <Tooltip content={<CustomBarTooltip />} cursor={{ fill: '#f0fdf4' }} />
                                 <Bar dataKey="revenue" name="Revenue" fill={ACCENT} radius={[4, 4, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
@@ -413,7 +413,7 @@ const OrganizerDashboardPage = () => {
 
                 {loading ? (
                     <div className="py-16 text-center">
-                        <div className="inline-block w-8 h-8 border-3 border-gray-200 border-t-orange-500 rounded-full animate-spin" />
+                        <div className="inline-block w-8 h-8 border-3 border-gray-200 border-t-[#2d3a4f] rounded-full animate-spin" />
                         <p className="text-sm text-gray-400 mt-3">Loading events...</p>
                     </div>
                 ) : events.length === 0 ? (
@@ -442,8 +442,8 @@ const OrganizerDashboardPage = () => {
                                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                             />
                                         ) : (
-                                            <div className="w-full h-full bg-linear-to-br from-orange-100 to-orange-200 flex items-center justify-center">
-                                                <Calendar size={32} className="text-orange-400" />
+                                            <div className="w-full h-full bg-linear-to-br from-slate-100 to-slate-200 flex items-center justify-center">
+                                                <Calendar size={32} className="text-slate-400" />
                                             </div>
                                         )}
                                         {event.categoryName && (
