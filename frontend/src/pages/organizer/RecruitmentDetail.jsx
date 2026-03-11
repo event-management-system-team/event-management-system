@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
-  ArrowLeft, Calendar, Users, Briefcase, FileText, Gift, Edit
+  ArrowLeft, Calendar, Users, Briefcase, FileText, Gift, Edit,CheckCircle
 } from 'lucide-react';
 import Sidebar from '../../components/layout/Sidebar';
 import axiosInstance from '../../config/axios';
@@ -32,13 +32,7 @@ const RecruitmentDetail = () => {
   if (isLoading) return <div className="flex h-screen items-center justify-center font-bold text-gray-500 bg-[#f8f7f2]">Loading Data...</div>;
   if (!detailData) return <div className="flex h-screen items-center justify-center font-bold text-red-500 bg-[#f8f7f2]">Recruitment post not found!</div>;
 
-  // Xử lý parse chuỗi JSON của Benefits (nếu có)
-  let parsedBenefits = {};
-  try {
-    if (detailData.benefits) parsedBenefits = JSON.parse(detailData.benefits);
-  } catch (e) {
-    console.error("Lỗi parse benefits JSON", e);
-  }
+
 
   return (
     <div className="flex h-screen bg-[#ecebe4] font-sans overflow-hidden">
@@ -103,10 +97,10 @@ const RecruitmentDetail = () => {
               </div>
             </div>
           </div>
-
-          {/* Hàng 2: Description & Benefits */}
+          {/* Hàng 2: Description & Requirements */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             
+            {/* Description Section */}
             <div className="p-8 border-b border-gray-100">
               <div className="flex items-center gap-2 mb-4">
                 <FileText size={20} className="text-[#8c9db3]" />
@@ -117,33 +111,26 @@ const RecruitmentDetail = () => {
               </p>
             </div>
 
+            {/* Requirements Section */}
             <div className="p-8 bg-gray-50/50">
               <div className="flex items-center gap-2 mb-4">
-                <Gift size={20} className="text-teal-500" />
-                <h3 className="text-lg font-extrabold text-gray-900">Benefits & Allowances</h3>
+                {/* Đổi icon thành CheckCircle cho hợp với Requirement */}
+                <CheckCircle size={20} className="text-teal-500" />
+                <h3 className="text-lg font-extrabold text-gray-900">Requirements</h3>
               </div>
               
-              {Object.keys(parsedBenefits).length > 0 ? (
-                <ul className="space-y-3">
-                  {Object.entries(parsedBenefits).map(([key, value], idx) => (
-                    <li key={idx} className="flex items-start gap-3">
-                      <div className="w-1.5 h-1.5 rounded-full bg-teal-400 mt-2 shrink-0"></div>
-                      <p className="text-sm text-gray-700 font-medium">
-                        <strong className="capitalize">{key.replace(/_/g, ' ')}:</strong> {value}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-gray-500 italic">No specific benefits listed.</p>
-              )}
+              {/* Render trực tiếp chuỗi text, dùng whitespace-pre-line để giữ nguyên dấu xuống dòng */}
+              <p className="text-gray-600 font-medium leading-relaxed whitespace-pre-line">
+                {detailData.requirements || 'No specific requirements listed.'}
+              </p>
             </div>
+
+          </div>
 
           </div>
 
         </div>
       </div>
-    </div>
   );
 };
 

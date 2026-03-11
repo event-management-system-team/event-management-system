@@ -15,6 +15,7 @@ public class RecruitmentDetailDTO {
     private String description;
     private String benefits; // Dữ liệu JSON lưu dạng String
     private Integer vacancy;
+    private String requirements; // Dữ liệu JSON lưu dạng String
     private LocalDateTime deadline;
     private String status;
 }

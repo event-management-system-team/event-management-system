@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus,Clock } from 'lucide-react';
 import { Link,useParams } from 'react-router-dom';
 import Sidebar from '../../components/layout/Sidebar'; 
 import axiosInstance from '../../config/axios';
@@ -14,7 +14,7 @@ const RecruitmentList = () => {
       
       setIsLoading(true);
       try {
-        const response = await axiosInstance.get(`recruitments/dashboards`);
+        const response = await axiosInstance.get(`recruitments/dashboards/${eventId}`);
         if (response.status === 200 && response.data) {
           console.log("🚀 Lấy dữ liệu Tuyển dụng thành công:", response.data);
           setDashboardData(response.data);
@@ -26,10 +26,13 @@ const RecruitmentList = () => {
         setIsLoading(false);
       }
     };
-    fetchDashboard();
-  }, []);
+    if (eventId) {
+        fetchDashboard();
+    }
+  }, [eventId]);
 
   
+
   const getStatusUI = (status) => {
     switch (status?.toUpperCase()) {
       case 'RECRUITING':
@@ -43,6 +46,14 @@ const RecruitmentList = () => {
     }
   };
 
+  const formatDeadline = (dateString) => {
+    if (!dateString) return "No deadline";
+    const d = new Date(dateString);
+    const time = d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    const date = d.toLocaleDateString('vi-VN');
+    return `${time} - ${date}`;
+  };
+
   if (isLoading) {
     return <div className="flex min-h-screen bg-[#ecebe4] items-center justify-center font-bold text-gray-500 animate-pulse">Đang tải danh sách tuyển dụng...</div>;
   }
@@ -51,7 +62,7 @@ const RecruitmentList = () => {
     return <div className="flex min-h-screen bg-[#ecebe4] items-center justify-center font-bold text-red-500">Lỗi không thể tải dữ liệu!</div>;
   }
 
-  // Map lại mảng Stats để nhét mã màu Tailwind vào
+
   const statsList = [
     { title: "ACTIVE ROLES", value: dashboardData?.stats.activeRoles, color: "border-[#60a5fa]" },
     { title: "TOTAL APPLICANTS", value: dashboardData?.stats.totalApplications, color: "border-[#34d399]" },
@@ -125,9 +136,19 @@ const RecruitmentList = () => {
                   </div>
 
                   {/* Cột 2: Trạng thái */}
-                  <div className="w-1/4 flex items-center gap-2">
-                    <span className={`w-2.5 h-2.5 rounded-full ${ui.color}`}></span>
-                    <span className="text-sm font-bold text-gray-600">{ui.text}</span>
+                  <div className="w-1/4 flex flex-col justify-center gap-2">
+                  <div className="flex items-center gap-2">
+                  <span className={`w-2.5 h-2.5 rounded-full ${ui.color}`}></span>
+                  <span className="text-sm font-bold text-gray-600">{ui.text}</span>
+                  </div>
+                    
+                  {/* Hiển thị Deadline nếu có */}
+                  {job.deadline && (
+                   <div className="flex items-center gap-1.5 text-[13px] font-medium text-gray-400">
+                      <Clock size={14} className="text-gray-400" />
+                      <span>Deadline: <span className="text-gray-500">{formatDeadline(job.deadline)}</span></span>
+                    </div>
+                  )}
                   </div>
 
                   {/* Cột 3: Nút bấm */}

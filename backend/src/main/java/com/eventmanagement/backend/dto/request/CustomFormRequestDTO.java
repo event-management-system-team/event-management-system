@@ -1,5 +1,6 @@
 package com.eventmanagement.backend.dto.request;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -13,4 +14,5 @@ public class CustomFormRequestDTO {
     private Boolean isActive;
     private FormType formType; 
     private List<Map<String, Object>> formSchema; 
+    private LocalDateTime deadline;
 }

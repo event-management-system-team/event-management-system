@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   ArrowLeft, Type, AlignLeft, UploadCloud, CheckSquare, 
-  FileText, Trash2, X, PlusCircle, Lock
+  FileText, Trash2, X, PlusCircle, Lock, Calendar, Clock
 } from 'lucide-react';
 import Sidebar from '../../components/layout/Sidebar';
 import { useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../config/axios';
 import { Button } from 'antd';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const RecruitmentFormBuilder = () => {
   const { eventId } = useParams();
@@ -17,6 +19,8 @@ const RecruitmentFormBuilder = () => {
   const [formSchema, setFormSchema] = useState([]);
   const [activeId, setActiveId] = useState(null);
   const [isLocked, setIsLocked] = useState(false);
+  const [deadlineDate, setDeadlineDate] = useState(null);
+  const [deadlineTime, setDeadlineTime] = useState('23:59');
 
   const dragItem = useRef(null);
   const dragOverItem = useRef(null);
@@ -25,15 +29,14 @@ const RecruitmentFormBuilder = () => {
   useEffect(() => {
     const fetchExistingForm = async () => {
       try {
-        // Dùng lại API form như Feedback, chỉ đổi tham số type
         const response = await axiosInstance.get(`/events/${eventId}/forms?type=RECRUITMENT`);
         
         if (response.status === 200 && response.data) {
           const dbData = response.data;
           
-          if(dbData.message === "Chưa có form") return; // Chưa có thì dùng data mặc định
+          if(dbData.message === "Chưa có form") return; 
 
-          setIsLocked(dbData.isActive || dbData.is_active === "true");
+          setIsLocked(dbData.active === true || dbData.isActive === true || dbData.is_active === "true");
           setFormName(dbData.formName || dbData.form_name || "Staff Application Form");
           
           let schemaFromDB = dbData.formSchema || dbData.form_schema || [];
@@ -51,6 +54,15 @@ const RecruitmentFormBuilder = () => {
           if (schemaFromDB.length > 0) {
             setFormSchema(schemaFromDB);
             setActiveId(schemaFromDB[0].field_id);
+          }
+
+          // Load deadline if exists
+          if (dbData.deadline) {
+            const deadlineDateTime = new Date(dbData.deadline);
+            setDeadlineDate(deadlineDateTime);
+            const hours = String(deadlineDateTime.getHours()).padStart(2, '0');
+            const minutes = String(deadlineDateTime.getMinutes()).padStart(2, '0');
+            setDeadlineTime(`${hours}:${minutes}`);
           }
         }
       } catch (error) {
@@ -100,18 +112,25 @@ const RecruitmentFormBuilder = () => {
     setActiveId(newSchema.length > 0 ? newSchema[0].field_id : null);
   };
 
-  // 3. LƯU DỮ LIỆU XUỐNG DATABASE
+
   const handleSaveAction = async (isActive) => {
     try {
-      // Cấu trúc payload chuẩn xác 100% để gửi cho CustomFormController
+      let formattedDeadline = null;
+      if (deadlineDate && deadlineTime) {
+        const year = deadlineDate.getFullYear();
+        const month = String(deadlineDate.getMonth() + 1).padStart(2, '0');
+        const day = String(deadlineDate.getDate()).padStart(2, '0');
+        formattedDeadline = `${year}-${month}-${day}T${deadlineTime}:00`;
+      }
       const payload = { 
         formName: formName,
-        formType: "RECRUITMENT", // Quan trọng: Đánh dấu đây là form tuyển dụng
+        formType: "RECRUITMENT", 
         formSchema: [
           { type: 'Form_description', content: formDesc },
           ...formSchema
         ],
-        isActive: isActive
+        isActive: isActive,
+        deadline: formattedDeadline
       };
 
       const response = await axiosInstance.post(`/events/${eventId}/forms`, payload);
@@ -149,9 +168,17 @@ const RecruitmentFormBuilder = () => {
           </div>
           <div className="flex items-center gap-4">
             {isLocked ? (
+              <>
               <div className="px-5 py-2 bg-teal-50 text-teal-700 border border-teal-200 rounded-lg text-sm font-bold flex items-center gap-2 cursor-not-allowed">
                 <Lock size={16} /> Form Published
               </div>
+              <button 
+                  onClick={() => handleSaveAction(true)} 
+                  className="px-5 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-bold shadow-md transition-all"
+                >
+                  Update Deadline
+                </button> 
+                </>
             ) : (
               <>
                 <button onClick={() => handleSaveAction(false)} className="text-sm font-bold text-gray-600 hover:text-gray-900 transition-colors">
@@ -165,7 +192,7 @@ const RecruitmentFormBuilder = () => {
           </div>
         </header>
 
-        {/* --- KHU VỰC 3 CỘT LÀM VIỆC --- */}
+
         <div className="flex-1 flex overflow-hidden">
           
           {/* CỘT 1: TOOLBOX CÂU HỎI */}
@@ -216,6 +243,50 @@ const RecruitmentFormBuilder = () => {
                       );
                     })
                   )}
+
+                  {/* DEADLINE SECTION */}
+                  <div className="mt-8 pt-8 border-t-2 border-gray-100">
+                    <div className="flex items-center gap-2 mb-6">
+                      <Clock size={20} className="text-[#2dd4bf]" />
+                      <h3 className="text-lg font-bold text-gray-900">Application Deadline</h3>
+                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-2">Select Date</label>
+                        <div className="relative">
+                          <DatePicker
+                            selected={deadlineDate}
+                            onChange={(date) => setDeadlineDate(date)}
+                            minDate={new Date()}
+                            dateFormat="dd/MM/yyyy"
+                            placeholderText="Choose a date..."
+                            className="w-full border-2 border-gray-200 rounded-xl p-3 text-sm font-medium text-gray-800 outline-none focus:border-[#2dd4bf] shadow-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                          />
+                          <Calendar size={18} className="absolute right-4 top-3.5 text-gray-400 pointer-events-none" />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-2">Select Time</label>
+                        <input
+                          type="time"
+                          value={deadlineTime}
+                          onChange={(e) => setDeadlineTime(e.target.value)}
+                          className="w-full border-2 border-gray-200 rounded-xl p-3 text-sm font-medium text-gray-800 outline-none focus:border-[#2dd4bf] shadow-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        />
+                      </div>
+
+                      {deadlineDate && (
+                        <div className="bg-[#f0fdfa] border border-[#2dd4bf]/20 rounded-xl p-4">
+                          <p className="text-sm text-gray-700">
+                            <span className="font-bold text-[#2dd4bf]">Application will close:</span>
+                            <br/>
+                            <span className="font-bold text-gray-900">{deadlineDate.toLocaleDateString('vi-VN')} at {deadlineTime}</span>
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
