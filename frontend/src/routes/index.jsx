@@ -6,6 +6,9 @@ import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
 import AttendeeRoutes from "./AttendeeRoutes";
+import OrganizerRoutes from "./OrganizerRoutes";
+import StaffRoutes from "./StaffRoutes";
+import ScrollToTop from '../hooks/useScrollToTop'
 import StaffRoutes from "./StaffRoutes";
 import ScrollToTop from '../hooks/useScrollToTop'
 
@@ -24,12 +27,23 @@ const AppRoutes = () => {
 
         {/* Organizer Routes */}
         <Route path="/organizer/*" element={<OrganizerRoutes />} />
+        {/* Admin Routes */}
+        <Route path="/admin/*" element={<AdminRoutes />} />
+
+        {/* Organizer Routes */}
+        <Route path="/organizer/*" element={<OrganizerRoutes />} />
 
         {/* Public/Protected Routes */}
         <Route path="/*" element={<PublicRoutes />} />
         <Route path="/attendee/*" element={<AttendeeRoutes />} />
         <Route path="/staff/:eventSlug/*" element={<StaffRoutes />} />
+        {/* Public/Protected Routes */}
+        <Route path="/*" element={<PublicRoutes />} />
+        <Route path="/attendee/*" element={<AttendeeRoutes />} />
+        <Route path="/staff/:eventSlug/*" element={<StaffRoutes />} />
 
+      </Routes>
+    </ScrollToTop>
       </Routes>
     </ScrollToTop>
   );
