@@ -3,6 +3,7 @@ package com.eventmanagement.backend.controller.admin;
 import com.eventmanagement.backend.dto.request.CreateOrganizerRequest;
 import com.eventmanagement.backend.dto.request.UserUpdateRequest;
 import com.eventmanagement.backend.dto.response.UserResponse;
+import com.eventmanagement.backend.dto.response.admin.AccountSummaryResponse;
 import com.eventmanagement.backend.repository.EventRepository;
 import com.eventmanagement.backend.repository.UserRepository;
 import com.eventmanagement.backend.service.AdminAccountService;
@@ -38,13 +39,9 @@ public class AdminAccountController {
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/search")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<UserResponse>> search(
-            @RequestParam("q") String q,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(adminAccountService.searchAccounts(q, page, size));
+    @GetMapping("/summary")
+    public ResponseEntity<AccountSummaryResponse> getAccountSummary() {
+        return ResponseEntity.ok(adminAccountService.getAccountSummary());
     }
 
     @GetMapping("/{id}")

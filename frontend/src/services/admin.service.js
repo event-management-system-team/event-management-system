@@ -13,6 +13,10 @@ export const adminService = {
         });
     },
 
+    getAccountSummary: () => {
+        return axiosInstance.get('/accounts/summary')
+    },
+
     searchAccounts: (keyword) => {
         return axiosInstance.get(`/accounts/search`, {
             params: { q: keyword }
@@ -54,6 +58,10 @@ export const adminService = {
         return axiosInstance.get(`/events`, {
             params: { page, size }
         });
+    },
+
+    getEventSummary: () => {
+        return axiosInstance.get('/events/summary')
     },
 
     getAllCategories: () => {

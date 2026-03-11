@@ -5,6 +5,7 @@ import com.eventmanagement.backend.constants.Status;
 import com.eventmanagement.backend.dto.request.CreateOrganizerRequest;
 import com.eventmanagement.backend.dto.request.UserUpdateRequest;
 import com.eventmanagement.backend.dto.response.UserResponse;
+import com.eventmanagement.backend.dto.response.admin.AccountSummaryResponse;
 import com.eventmanagement.backend.exception.BadRequestException;
 import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.repository.EventRepository;
@@ -46,14 +47,6 @@ public class AdminAccountService {
                 .collect(Collectors.toList());
     }
 
-    public Page<UserResponse> searchAccounts(String keyword, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-
-        Page<User> userPage = userRepository.searchUsers(keyword, pageable);
-
-        return userPage.map(this::mapToResponse);
-    }
-
     public UserResponse getAccountById(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User does not exist"));
@@ -65,6 +58,20 @@ public class AdminAccountService {
         }
 
         return response;
+    }
+
+    public AccountSummaryResponse getAccountSummary() {
+        long totalAccounts = userRepository.count();
+
+        long activeAccounts = userRepository.countByStatus(Status.ACTIVE);
+
+        long bannedAccounts = userRepository.countByStatus(Status.BANNED);
+
+        return AccountSummaryResponse.builder()
+                .totalAccounts(totalAccounts)
+                .activeAccounts(activeAccounts)
+                .bannedAccounts(bannedAccounts)
+                .build();
     }
 
     @Transactional

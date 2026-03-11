@@ -2,6 +2,7 @@ package com.eventmanagement.backend.controller.admin;
 
 import com.eventmanagement.backend.dto.request.RejectEventRequest;
 import com.eventmanagement.backend.dto.response.admin.EventResponse;
+import com.eventmanagement.backend.dto.response.admin.EventSummaryResponse;
 import com.eventmanagement.backend.dto.response.attendee.EventCategoryResponse;
 import com.eventmanagement.backend.service.AdminEventService;
 import com.eventmanagement.backend.service.EventCategoryService;
@@ -33,6 +34,11 @@ public class AdminEventController {
     public ResponseEntity<List<EventResponse>> getAll() {
         List<EventResponse> events = eventService.getAllEventsPlain();
         return ResponseEntity.ok(events);
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<EventSummaryResponse> getEventSummary() {
+        return ResponseEntity.ok(eventService.getEventSummary());
     }
 
     @GetMapping("/categories")

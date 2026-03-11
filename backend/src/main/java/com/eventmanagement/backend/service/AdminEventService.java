@@ -2,6 +2,7 @@ package com.eventmanagement.backend.service;
 
 import com.eventmanagement.backend.constants.EventStatus;
 import com.eventmanagement.backend.dto.response.admin.EventResponse;
+import com.eventmanagement.backend.dto.response.admin.EventSummaryResponse;
 import com.eventmanagement.backend.exception.BadRequestException;
 import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.repository.EventRepository;
@@ -36,9 +37,22 @@ public class AdminEventService {
                 .collect(Collectors.toList());
     }
 
+    public EventSummaryResponse getEventSummary() {
+        long totalEvents = eventRepository.count();
+        long activeEvents = eventRepository.countByStatusIn(List.of(EventStatus.APPROVED, EventStatus.ONGOING));
+        long pendingEvents = eventRepository.countByStatus(EventStatus.PENDING);
+        long completedEvents = eventRepository.countByStatus(EventStatus.COMPLETED);
+
+        return EventSummaryResponse.builder()
+                .totalEvents(totalEvents)
+                .activeEvents(activeEvents)
+                .pendingEvents(pendingEvents)
+                .completedEvents(completedEvents)
+                .build();
+    }
+
     public EventResponse getEventBySlug(String slug) {
         Event event = eventRepository.findEventByEventSlug(slug);
-//                .orElseThrow(() -> new RuntimeException("Event does not exist"));
         EventResponse response = mapToResponse(event);
 
         return response;
