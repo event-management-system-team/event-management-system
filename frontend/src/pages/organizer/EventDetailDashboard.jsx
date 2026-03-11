@@ -71,8 +71,15 @@ const AttendeeRow = ({ attendee, index }) => {
         'registered': { bg: 'bg-blue-50', text: 'text-blue-700', dot: 'bg-blue-500' },
         'cancelled': { bg: 'bg-red-50', text: 'text-red-600', dot: 'bg-red-500' },
     };
-    const status = attendee.status || 'registered';
+    const rawStatus = (attendee.status || 'registered').toLowerCase().replace('_', '-');
+    const status = rawStatus === 'checked_in' || rawStatus === 'checked-in' || rawStatus === 'checkedin' ? 'checked-in' : rawStatus;
     const colors = statusColors[status] || statusColors.registered;
+
+    const statusLabel = {
+        'checked-in': 'Checked In',
+        'registered': 'Registered',
+        'cancelled': 'Cancelled',
+    };
 
     return (
         <div className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors px-1 rounded-lg">
@@ -90,7 +97,7 @@ const AttendeeRow = ({ attendee, index }) => {
             <div className="flex items-center gap-3">
                 <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${colors.bg} ${colors.text}`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${colors.dot}`} />
-                    {status === 'checked-in' ? 'Checked In' : status === 'cancelled' ? 'Cancelled' : 'Registered'}
+                    {statusLabel[status] || status}
                 </span>
                 <ChevronRight size={16} className="text-gray-300" />
             </div>
@@ -187,7 +194,7 @@ const EventDetailDashboard = () => {
     }, [fetchEventDetail]);
 
     const isFreeEvent = event?.isFree === true || (event?.totalRevenue === 0 && event?.isFree !== false);
-    
+
     const donutData = useMemo(() => {
         if (isFreeEvent) {
             return [
@@ -259,14 +266,13 @@ const EventDetailDashboard = () => {
                             {loading ? 'Loading...' : event?.eventName || 'Event Not Found'}
                         </h1>
                         {event?.status && (
-                            <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                                event.status === 'APPROVED' ? 'bg-green-50 text-green-700' :
-                                event.status === 'ONGOING' ? 'bg-blue-50 text-blue-700' :
-                                event.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700' :
-                                event.status === 'COMPLETED' ? 'bg-gray-100 text-gray-600' :
-                                event.status === 'DRAFT' ? 'bg-orange-50 text-orange-600' :
-                                'bg-gray-100 text-gray-600'
-                            }`}>
+                            <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${event.status === 'APPROVED' ? 'bg-green-50 text-green-700' :
+                                    event.status === 'ONGOING' ? 'bg-blue-50 text-blue-700' :
+                                        event.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700' :
+                                            event.status === 'COMPLETED' ? 'bg-gray-100 text-gray-600' :
+                                                event.status === 'DRAFT' ? 'bg-orange-50 text-orange-600' :
+                                                    'bg-gray-100 text-gray-600'
+                                }`}>
                                 {event.status}
                             </span>
                         )}
@@ -412,9 +418,9 @@ const EventDetailDashboard = () => {
                                             stroke="none"
                                         >
                                             {donutData.map((_, i) => (
-                                                <Cell 
-                                                    key={i} 
-                                                    fill={isFreeEvent ? FREE_EVENT_COLOR : DONUT_COLORS[i % DONUT_COLORS.length]} 
+                                                <Cell
+                                                    key={i}
+                                                    fill={isFreeEvent ? FREE_EVENT_COLOR : DONUT_COLORS[i % DONUT_COLORS.length]}
                                                 />
                                             ))}
                                         </Pie>
