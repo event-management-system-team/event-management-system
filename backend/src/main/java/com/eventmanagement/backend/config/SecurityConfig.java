@@ -48,6 +48,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/events/**").permitAll()
                         .requestMatchers("/api/categories/**").permitAll()
                         .requestMatchers("/api/recruitments/**").permitAll()
+                        .requestMatchers("/api/payments/vnpay/callback").permitAll()
+                        // .requestMatchers("/api/applications/**").permitAll()
                         .requestMatchers("/api/profile/{userId}").permitAll()
                         .requestMatchers("/ws-checkin/**").permitAll()
                         .anyRequest().authenticated())
@@ -74,9 +76,9 @@ public class SecurityConfig {
     public Jackson2ObjectMapperBuilderCustomizer jacksonCustomizer() {
         return builder -> builder.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
-    
+
     @Bean
-public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-    return config.getAuthenticationManager();
-}
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
 }
