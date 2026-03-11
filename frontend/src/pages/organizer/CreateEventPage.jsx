@@ -474,12 +474,19 @@ const Step2Tickets = ({ form, onChange, errors = {} }) => {
                                         <div className="relative">
                                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">₫</span>
                                             <input
-                                                type="number"
+                                                type="text"
+                                                inputMode="numeric"
                                                 placeholder="0"
-                                                min="0"
-                                                step="1000"
-                                                value={ticket.price}
-                                                onChange={(e) => handleTicketChange(idx, 'price', e.target.value)}
+                                                value={
+                                                    ticket.price === '' || ticket.price === undefined
+                                                        ? ''
+                                                        : Number(ticket.price).toLocaleString('vi-VN')
+                                                }
+                                                onChange={(e) => {
+                                                    // Xoá dấu chấm, lấy số thuần
+                                                    const raw = e.target.value.replace(/\./g, '').replace(/[^0-9]/g, '');
+                                                    handleTicketChange(idx, 'price', raw);
+                                                }}
                                                 className={`w-full pl-7 pr-3 py-2 text-sm border rounded-lg bg-white focus:outline-none focus:ring-2 transition ${errors[`ticket_${idx}_price`] ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
                                             />
                                         </div>

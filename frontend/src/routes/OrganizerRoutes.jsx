@@ -14,23 +14,29 @@ import ApplicationList from "../pages/organizer/ApplicationList";
 import RecruitmentDetail from "../pages/organizer/RecruitmentDetail";
 import StaffManagement from "../pages/organizer/StaffManagement";
 
-
 const OrganizerRoutes = () => {
     return (
         <Routes>
             <Route element={<ProtectedRoute allowedRoles={["ORGANIZER"]} />}>
                 <Route element={<OrganizerLayout />}>
+
+                    {/* Events */}
                     <Route path="my-events" element={<MyEventsPage />} />
                     <Route path="create-event" element={<CreateEventPage />} />
                     <Route path="edit-event/:eventId" element={<CreateEventPage />} />
-                    {/* <Route path="create-event" element={<CreateEventPage />} /> */}
+
+                    {/* Feedback */}
                     <Route path="feedback/feedbacklist/:eventId" element={<FeedbackList />} />
                     <Route path="feedback/createform/:eventId" element={<FeedbackBuilder />} />
                     <Route path="feedback/:feedbackId" element={<FeedbackDetail />} />
+
+                    {/* Recruitment */}
                     <Route path="recruitmentlist/:eventId" element={<RecruitmentList />} />
                     <Route path="recruitmentcreate/:eventId" element={<RecruitmentBuilder />} />
                     <Route path="applications/:recruitmentId" element={<ApplicationList />} />
                     <Route path="recruitments/:recruitmentId" element={<RecruitmentDetail />} />
+
+                    {/* Staff */}
                     <Route path=":id/staff" element={<StaffManagement />} />
                 </Route>
             </Route>
