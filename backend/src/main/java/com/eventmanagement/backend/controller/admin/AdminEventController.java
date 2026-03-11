@@ -2,8 +2,8 @@ package com.eventmanagement.backend.controller.admin;
 
 import com.eventmanagement.backend.dto.request.RejectEventRequest;
 import com.eventmanagement.backend.dto.response.admin.EventResponse;
+import com.eventmanagement.backend.dto.response.admin.EventSummaryResponse;
 import com.eventmanagement.backend.dto.response.attendee.EventCategoryResponse;
-import com.eventmanagement.backend.repository.EventRepository;
 import com.eventmanagement.backend.service.AdminEventService;
 import com.eventmanagement.backend.service.EventCategoryService;
 import jakarta.validation.Valid;
@@ -14,14 +14,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/admin/events")
+@RequestMapping("/api/events")
 @RequiredArgsConstructor
 public class AdminEventController {
     private final AdminEventService eventService;
-    private final EventRepository eventRepository;
     private final EventCategoryService eventCategoryService;
 
     @GetMapping
@@ -38,6 +36,11 @@ public class AdminEventController {
         return ResponseEntity.ok(events);
     }
 
+    @GetMapping("/summary")
+    public ResponseEntity<EventSummaryResponse> getEventSummary() {
+        return ResponseEntity.ok(eventService.getEventSummary());
+    }
+
     @GetMapping("/categories")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<EventCategoryResponse>> getAllCategories() {
@@ -45,23 +48,23 @@ public class AdminEventController {
         return ResponseEntity.ok(categoryResponses);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/detail/{slug}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<EventResponse> getDetail(@PathVariable UUID id) {
-        return ResponseEntity.ok(eventService.getEventById(id));
+    public ResponseEntity<EventResponse> getDetail(@PathVariable String slug) {
+        return ResponseEntity.ok(eventService.getEventBySlug(slug));
     }
 
-    @PatchMapping("/{id}/approve")
+    @PatchMapping("/{slug}/approve")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> approveEvent(@PathVariable UUID id) {
-        eventService.approveEvent(id);
+    public ResponseEntity<Void> approveEvent(@PathVariable String slug) {
+        eventService.approveEvent(slug);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}/reject")
+    @PatchMapping("/{slug}/reject")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> rejectEvent(@PathVariable UUID id, @RequestBody @Valid RejectEventRequest request) {
-        eventService.rejectEvent(id, request.getReason());
+    public ResponseEntity<Void> rejectEvent(@PathVariable String slug, @RequestBody @Valid RejectEventRequest request) {
+        eventService.rejectEvent(slug, request.getReason());
         return ResponseEntity.noContent().build();
     }
 }

@@ -8,15 +8,15 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class TicketTypeService {
     private final TicketTypeRepository repository;
 
-    public List<TicketTypeResponse> getTicketTypes(UUID eventId) {
-        List<TicketType> ticketTypes = repository.findByEvent_EventIdAndIsActiveTrue(eventId);
+    public List<TicketTypeResponse> getTicketTypes(String slug) {
+        List<TicketType> ticketTypes = repository.findByEvent_EventSlugAndIsActiveTrue(slug);
+
         LocalDateTime now = LocalDateTime.now();
 
         return ticketTypes.stream().map(ticket -> {

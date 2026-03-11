@@ -4,7 +4,7 @@ import com.eventmanagement.backend.dto.request.CreateOrganizerRequest;
 import com.eventmanagement.backend.dto.response.UserResponse;
 import com.eventmanagement.backend.repository.EventRepository;
 import com.eventmanagement.backend.repository.UserRepository;
-import com.eventmanagement.backend.service.AdminService;
+import com.eventmanagement.backend.service.AdminAccountService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ class AccountControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    AdminService adminService;
+    AdminAccountService adminAccountService;
 
     @Mock
     UserRepository userRepository;
@@ -66,7 +66,7 @@ class AccountControllerTest {
                 .phone("0912345678")
                 .build();
 
-        when(adminService.createOrganizer(any(CreateOrganizerRequest.class)))
+        when(adminAccountService.createOrganizer(any(CreateOrganizerRequest.class)))
                 .thenReturn(response);
 
         mockMvc.perform(post("/api/admin/accounts/organizer")
