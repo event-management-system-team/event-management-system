@@ -80,6 +80,9 @@ const organizerService = {
     getStaffRoleList: (eventId) => {
         return axiosInstance.get(`/events/${eventId}/role`)
     },
+    getStaffRoleList: (eventId) => {
+        return axiosInstance.get(`/events/${eventId}/role`)
+    },
 
     getRoleStats: (eventId) => {
         return axiosInstance.get(`/events/${eventId}/role-stats`)
@@ -88,25 +91,52 @@ const organizerService = {
     getStaffByRole: (eventId) => {
         return axiosInstance.get(`/events/${eventId}/staff`)
     },
+    getStaffByRole: (eventId) => {
+        return axiosInstance.get(`/events/${eventId}/staff`)
+    },
 
+    createSchedule: (eventId, data) => {
+        return axiosInstance.post(`/events/${eventId}/schedules`, data)
+    },
     createSchedule: (eventId, data) => {
         return axiosInstance.post(`/events/${eventId}/schedules`, data)
     },
 
     createResource: (eventId, data, file) => {
         const formData = new FormData()
+        createResource: (eventId, data, file) => {
+            const formData = new FormData()
 
-        formData.append(
-            "data",
-            JSON.stringify({
-                resourceName: data.resourceName,
-                description: data.description,
-                resourceType: data.resourceType
-            })
-        )
+            formData.append(
+                "data",
+                JSON.stringify({
+                    resourceName: data.resourceName,
+                    description: data.description,
+                    resourceType: data.resourceType
+                })
+            )
+            formData.append(
+                "data",
+                JSON.stringify({
+                    resourceName: data.resourceName,
+                    description: data.description,
+                    resourceType: data.resourceType
+                })
+            )
 
-        formData.append("file", file)
+            formData.append("file", file)
+            formData.append("file", file)
 
+            return axiosInstance.post(
+                `/events/${eventId}/resources`,
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data"
+                    }
+                }
+            )
+        },
         return axiosInstance.post(
             `/events/${eventId}/resources`,
             formData,
@@ -121,6 +151,10 @@ const organizerService = {
     getResources: (eventId) => {
         return axiosInstance.get(`/events/${eventId}/resources`)
     }
+}
+getResources: (eventId) => {
+    return axiosInstance.get(`/events/${eventId}/resources`)
+}
 }
 
 export default organizerService
