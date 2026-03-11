@@ -21,11 +21,8 @@ const NavItem = ({ to, icon, label, isActive }) => {
       to={to}
       className={`flex items-center gap-3 px-4 py-3 mb-1 rounded-xl font-medium transition-all duration-200
         ${isActive
-          ? 'bg-[#3b4758] text-white shadow-lg pointer-events-none' // Trạng thái Active: Nền xám xanh, chữ trắng, khóa click
-          : 'text-gray-400 hover:bg-gray-800 hover:text-white'      // Trạng thái Bình thường
-        ${isActive 
-          ? 'bg-[#3b4758] text-white shadow-lg pointer-events-none' 
-          : 'text-gray-400 hover:bg-gray-800 hover:text-white'      
+          ? 'bg-[#3b4758] text-white shadow-lg pointer-events-none'
+          : 'text-gray-400 hover:bg-gray-800 hover:text-white'
         }`}
     >
       <span className={isActive ? 'text-gray-100' : 'text-gray-400'}>{icon}</span>
@@ -54,8 +51,6 @@ const Sidebar = () => {
   const isMyEventsActive = location.pathname.includes('/my-events');
 
   const isStaffActive = location.pathname.includes('/staff') || location.pathname.includes('/recruitment');
- 
-  const isStaffActive = location.pathname.includes('/staff') || location.pathname.includes('/recruitment'); 
   const isAppActive = location.pathname.includes('/applications');
   const isFeedbackActive = location.pathname.includes('/feedback');
 

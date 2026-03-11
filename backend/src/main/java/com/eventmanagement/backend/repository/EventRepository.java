@@ -37,10 +37,8 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
             "AND (CAST(:startOfDay AS timestamp) IS NULL OR CAST(:endOfDay AS timestamp) IS NULL OR " +
             "(e.startDate <= :endOfDay AND e.endDate >= :startOfDay)) " +
             "AND (:price IS NULL OR EXISTS (SELECT t FROM e.ticketTypes t WHERE t.price <= :price))" +
-            "AND (:isFree IS NULL OR e.isFree = :isFree) ")
-    Page<Event> searchEvents(@Param("statuses") List<EventStatus> statuses,
-                        "AND (:isFree IS NULL OR e.isFree = :isFree) " +
-                        "ORDER BY e.createdAt ASC")
+            "AND (:isFree IS NULL OR e.isFree = :isFree) " +
+            "ORDER BY e.createdAt ASC")
         Page<Event> searchEvents(@Param("statuses") List<EventStatus> statuses,
                              @Param("keyword") String keyword,
                              @Param("location") String location,
@@ -71,18 +69,6 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
     @EntityGraph(attributePaths = "ticketTypes")
     @Query("SELECT e FROM Event e WHERE e.eventId IN :eventIds")
     List<Event> findWithTicketsByEventIdIn(@Param("eventIds") List<UUID> eventIds);
-
-        // APPROVED -> ONGOING
-        @Modifying
-        @Transactional
-        @Query("UPDATE Event e SET e.status = 'ONGOING' WHERE e.status = 'APPROVED' AND e.startDate <= CURRENT_TIMESTAMP")
-        int updateStatusToOngoing();
-
-        // ONGOING -> COMPLETED
-        @Modifying
-        @Transactional
-        @Query("UPDATE Event e SET e.status = 'COMPLETED' WHERE e.status = 'ONGOING' AND e.endDate <= CURRENT_TIMESTAMP")
-        int updateStatusToCompleted();
 
         @EntityGraph(attributePaths = { "ticketTypes", "agendas", "category" })
         @Query("SELECT e FROM Event e WHERE e.eventId = :eventId")
