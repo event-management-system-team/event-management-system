@@ -3,8 +3,8 @@ package com.eventmanagement.backend.service;
 import com.eventmanagement.backend.constants.Role;
 import com.eventmanagement.backend.constants.Status;
 import com.eventmanagement.backend.dto.request.CreateOrganizerRequest;
-import com.eventmanagement.backend.dto.request.UserUpdateRequest;
 import com.eventmanagement.backend.dto.response.UserResponse;
+import com.eventmanagement.backend.dto.response.admin.AccountSummaryResponse;
 import com.eventmanagement.backend.exception.BadRequestException;
 import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.repository.EventRepository;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class AdminService {
+public class AdminAccountService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final GenerateAvatarUrl generateAvatarUrl;
@@ -46,14 +46,6 @@ public class AdminService {
                 .collect(Collectors.toList());
     }
 
-    public Page<UserResponse> searchAccounts(String keyword, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-
-        Page<User> userPage = userRepository.searchUsers(keyword, pageable);
-
-        return userPage.map(this::mapToResponse);
-    }
-
     public UserResponse getAccountById(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User does not exist"));
@@ -67,16 +59,18 @@ public class AdminService {
         return response;
     }
 
-    @Transactional
-    public UserResponse updateProfile(UUID id, UserUpdateRequest request) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User does not exist"));
+    public AccountSummaryResponse getAccountSummary() {
+        long totalAccounts = userRepository.count();
 
-        if (request.getFullName() != null) user.setFullName(request.getFullName());
-        if (request.getEmail() != null) user.setEmail(request.getEmail());
-        if (request.getPhone() != null) user.setPhone(request.getPhone());
+        long activeAccounts = userRepository.countByStatus(Status.ACTIVE);
 
-        return mapToResponse(userRepository.save(user));
+        long bannedAccounts = userRepository.countByStatus(Status.BANNED);
+
+        return AccountSummaryResponse.builder()
+                .totalAccounts(totalAccounts)
+                .activeAccounts(activeAccounts)
+                .bannedAccounts(bannedAccounts)
+                .build();
     }
 
     @Transactional

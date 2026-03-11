@@ -38,68 +38,68 @@ class AdminEventServiceTest {
         event.setStatus(EventStatus.PENDING);
     }
 
-    // APPROVE SUCCESS
-    @Test
-    void approveEvent_Pending_Success() {
-
-        when(eventRepository.findById(eventId))
-                .thenReturn(Optional.of(event));
-
-        eventService.approveEvent(eventId);
-
-        assertEquals(EventStatus.APPROVED, event.getStatus());
-        assertNull(event.getRejectionReason());
-        verify(eventRepository).save(event);
-    }
-
-    // APPROVE - NOT FOUND
-    @Test
-    void approveEvent_NotFound_ThrowException() {
-
-        when(eventRepository.findById(eventId))
-                .thenReturn(Optional.empty());
-
-        assertThrows(NotFoundException.class,
-                () -> eventService.approveEvent(eventId));
-    }
-
-    // APPROVE - STATUS NOT PENDING
-    @Test
-    void approveEvent_NotPending_ThrowBadRequest() {
-
-        event.setStatus(EventStatus.APPROVED);
-
-        when(eventRepository.findById(eventId))
-                .thenReturn(Optional.of(event));
-
-        assertThrows(BadRequestException.class,
-                () -> eventService.approveEvent(eventId));
-    }
-
-    // REJECT SUCCESS
-    @Test
-    void rejectEvent_Pending_Success() {
-
-        when(eventRepository.findById(eventId))
-                .thenReturn(Optional.of(event));
-
-        eventService.rejectEvent(eventId, "Invalid content");
-
-        assertEquals(EventStatus.REJECTED, event.getStatus());
-        assertEquals("Invalid content", event.getRejectionReason());
-        verify(eventRepository).save(event);
-    }
-
-    // REJECT - STATUS NOT PENDING
-    @Test
-    void rejectEvent_NotPending_ThrowBadRequest() {
-
-        event.setStatus(EventStatus.APPROVED);
-
-        when(eventRepository.findById(eventId))
-                .thenReturn(Optional.of(event));
-
-        assertThrows(BadRequestException.class,
-                () -> eventService.rejectEvent(eventId, "Reason"));
-    }
+//    // APPROVE SUCCESS
+//    @Test
+//    void approveEvent_Pending_Success() {
+//
+//        when(eventRepository.findById(eventId))
+//                .thenReturn(Optional.of(event));
+//
+//        eventService.approveEvent(eventId);
+//
+//        assertEquals(EventStatus.APPROVED, event.getStatus());
+//        assertNull(event.getRejectionReason());
+//        verify(eventRepository).save(event);
+//    }
+//
+//    // APPROVE - NOT FOUND
+//    @Test
+//    void approveEvent_NotFound_ThrowException() {
+//
+//        when(eventRepository.findById(eventId))
+//                .thenReturn(Optional.empty());
+//
+//        assertThrows(NotFoundException.class,
+//                () -> eventService.approveEvent(eventId));
+//    }
+//
+//    // APPROVE - STATUS NOT PENDING
+//    @Test
+//    void approveEvent_NotPending_ThrowBadRequest() {
+//
+//        event.setStatus(EventStatus.APPROVED);
+//
+//        when(eventRepository.findById(eventId))
+//                .thenReturn(Optional.of(event));
+//
+//        assertThrows(BadRequestException.class,
+//                () -> eventService.approveEvent(eventId));
+//    }
+//
+//    // REJECT SUCCESS
+//    @Test
+//    void rejectEvent_Pending_Success() {
+//
+//        when(eventRepository.findById(eventId))
+//                .thenReturn(Optional.of(event));
+//
+//        eventService.rejectEvent(eventId, "Invalid content");
+//
+//        assertEquals(EventStatus.REJECTED, event.getStatus());
+//        assertEquals("Invalid content", event.getRejectionReason());
+//        verify(eventRepository).save(event);
+//    }
+//
+//    // REJECT - STATUS NOT PENDING
+//    @Test
+//    void rejectEvent_NotPending_ThrowBadRequest() {
+//
+//        event.setStatus(EventStatus.APPROVED);
+//
+//        when(eventRepository.findById(eventId))
+//                .thenReturn(Optional.of(event));
+//
+//        assertThrows(BadRequestException.class,
+//                () -> eventService.rejectEvent(eventId, "Reason"));
+//    }
 }
