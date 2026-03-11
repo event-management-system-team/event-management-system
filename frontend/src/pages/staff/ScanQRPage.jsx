@@ -1,5 +1,4 @@
 import { useParams, useOutletContext, useSearchParams } from 'react-router-dom';
-import { Ticket, Star, Mic } from 'lucide-react';
 import { message } from 'antd';
 import ScannerCamera from '../../components/domain/staff/scanner-qr/ScannerCamera';
 import SearchTicket from '../../components/domain/staff/scanner-qr/SearchTicket';
@@ -9,13 +8,7 @@ import { useQuery, keepPreviousData, useQueryClient, useMutation } from '@tansta
 import staffService from '../../services/staff.service'
 import LoadingState from '../../components/common/LoadingState';
 import EmptyState from '../../components/common/EmptyState';
-
-
-const ticketStats = [
-    { type: 'General Admission', icon: Ticket, total: 800, checkedIn: 320, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
-    { type: 'VIP Access', icon: Star, total: 300, checkedIn: 85, color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-100' },
-    { type: 'Press / Media', icon: Mic, total: 100, checkedIn: 45, color: 'text-orange-600', bg: 'bg-orange-50', border: 'border-orange-100' },
-];
+import { useCheckInWebSocket } from '../../hooks/useCheckInWebSocket';
 
 const ScanQRPage = () => {
 
@@ -27,12 +20,20 @@ const ScanQRPage = () => {
 
     const searchKeyword = searchParams.get('keyword') || '';
 
+    useCheckInWebSocket(eventSlug);
 
     const { data: tickets, isLoading: isTicketsLoading, isError: isTicketsError } = useQuery({
         queryKey: ['event', 'tickets', eventSlug, searchKeyword],
         queryFn: () => staffService.searchEventTickets(eventSlug, searchKeyword),
         placeholderData: keepPreviousData
     })
+
+    const { data: ticketStats } = useQuery({
+        queryKey: ['event', 'tickets', eventSlug, 'total-check-in'],
+        queryFn: () => staffService.getCurrentCheckIn(eventSlug),
+        enabled: !!eventSlug
+    })
+
 
     const checkInMutation = useMutation({
         mutationFn: (request) => staffService.checkInAttendee(eventSlug, request),
@@ -101,7 +102,8 @@ const ScanQRPage = () => {
             <aside className="w-full lg:w-80 flex flex-col shrink-0 h-fit lg:h-full gap-6 order-1 lg:order-2">
                 <EventInfo
                     eventInfo={data?.eventInfo} />
-                <CheckInStats ticketStats={ticketStats} />
+                <CheckInStats
+                    ticketStats={ticketStats} />
             </aside>
 
         </div>

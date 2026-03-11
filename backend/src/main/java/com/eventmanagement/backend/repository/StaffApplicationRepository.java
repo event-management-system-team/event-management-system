@@ -1,6 +1,7 @@
 package com.eventmanagement.backend.repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,7 +18,9 @@ public interface StaffApplicationRepository extends JpaRepository<StaffApplicati
     List<StaffApplication> findAllByUser_UserIdOrderByAppliedAtDesc(UUID userId);
 
     int countByRecruitment_RecruitmentIdAndApplicationStatus(UUID recruitmentId, ApplicationStatus status); // so luong ho so theo trang thai
-    int countByRecruitment_RecruitmentId(UUID recruitmentId); // so luong ho so
+    int countByRecruitment_RecruitmentId(UUID recruitmentId); 
     List<StaffApplication> findByRecruitment_RecruitmentId(UUID recruitmentId);
+    Optional<StaffApplication> findByApplicationId(UUID applicationId);
+
     
 }

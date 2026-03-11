@@ -45,10 +45,15 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/accounts/**").permitAll()
                         .requestMatchers("/api/events/**").permitAll()
+                        .requestMatchers("/api/analytics/**").permitAll()
                         .requestMatchers("/api/categories/**").permitAll()
                         .requestMatchers("/api/recruitments/**").permitAll()
-                            .requestMatchers("/api/profile/{userId}").permitAll()
+                        .requestMatchers("/api/payments/vnpay/callback").permitAll()
+                        // .requestMatchers("/api/applications/**").permitAll()
+                        .requestMatchers("/api/profile/{userId}").permitAll()
+                        .requestMatchers("/ws-checkin/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -73,9 +78,9 @@ public class SecurityConfig {
     public Jackson2ObjectMapperBuilderCustomizer jacksonCustomizer() {
         return builder -> builder.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
-    
+
     @Bean
-public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-    return config.getAuthenticationManager();
-}
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
 }

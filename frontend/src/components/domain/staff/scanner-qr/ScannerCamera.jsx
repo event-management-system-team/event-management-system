@@ -68,7 +68,8 @@ const ScannerCamera = ({ onVerifyQR, onScanQR, isCheckingIn }) => {
                     components={{
                         audio: true,
                         torch: true,
-                        finder: true
+                        finder: true,
+                        onOff: true
                     }}
                     styles={{
                         video: { objectFit: 'cover' }

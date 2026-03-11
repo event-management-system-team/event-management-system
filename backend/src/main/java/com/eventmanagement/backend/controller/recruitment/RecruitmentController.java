@@ -46,19 +46,17 @@ import lombok.RequiredArgsConstructor;
 @CrossOrigin(origins = "*")
 public class RecruitmentController {
 
-    private final RecruitmentServiceOrganizer recruitmentServiceOrganizer;
-
     private final RecruitmentService recruitmentService;
     private final ApplicationFormService applicationFormService;
     private final CloudinaryService cloudinaryService;
     private final CustomFormService customFormService;
     private final RecruitmentRepository recruitmentRepository;
-    private final RecruitmentServiceOrganizer RecruitmentServiceOrganizer;
+    private final RecruitmentServiceOrganizer recruitmentServiceOrganizer;
 
 
     @GetMapping("/recent")
     public ResponseEntity<List<RecruitmentResponse>> getRecentRecruitment() {
-        List<RecruitmentResponse> recruitments = recruitmentService.getRecentRecruitments();
+        List<RecruitmentResponse> recruitments = (List<RecruitmentResponse>) recruitmentService.getRecentRecruitments();
         return ResponseEntity.ok(recruitments);
     }
 
@@ -102,9 +100,9 @@ public class RecruitmentController {
         }
     }
 
-    @GetMapping("/dashboards")
-    public ResponseEntity<RecruitmentDashBoardDTO> getDashboardData() {
-        RecruitmentDashBoardDTO response = RecruitmentServiceOrganizer.getDashBoardData();
+    @GetMapping("/dashboards/{eventId}")
+    public ResponseEntity<RecruitmentDashBoardDTO> getDashboardData(@PathVariable UUID eventId) {
+        RecruitmentDashBoardDTO response = recruitmentServiceOrganizer.getDashBoardData(eventId);
         return ResponseEntity.ok(response);
     }
 

@@ -1,0 +1,282 @@
+package com.eventmanagement.backend.service;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.eventmanagement.backend.constants.OrderStatus;
+import com.eventmanagement.backend.constants.PaymentMethod;
+import com.eventmanagement.backend.constants.TicketStatus;
+import com.eventmanagement.backend.dto.request.CreateOrderRequest;
+import com.eventmanagement.backend.dto.request.ReservationRequest;
+import com.eventmanagement.backend.dto.response.OrderResponse;
+import com.eventmanagement.backend.dto.response.ReservationResponse;
+import com.eventmanagement.backend.exception.NotFoundException;
+import com.eventmanagement.backend.model.Order;
+import com.eventmanagement.backend.model.Ticket;
+import com.eventmanagement.backend.model.TicketType;
+import com.eventmanagement.backend.model.User;
+import com.eventmanagement.backend.repository.EventRepository;
+import com.eventmanagement.backend.repository.OrderRepository;
+import com.eventmanagement.backend.repository.TicketRepository;
+import com.eventmanagement.backend.repository.TicketTypeRepository;
+import com.eventmanagement.backend.repository.UserRepository;
+import com.eventmanagement.backend.util.GenerateCode;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class BookingService {
+
+        private final RedisTemplate<String, Object> redisTemplate;
+        private final RedissonClient redissonClient;
+        private final TicketTypeRepository ticketTypeRepository;
+        private final EventRepository eventRepository;
+        private final OrderRepository orderRepository;
+        private final TicketRepository ticketRepository;
+        private final UserRepository userRepository;
+        private final GenerateCode generateCode;
+        private final EmailService emailService;
+
+        @Value("${booking.reservation-ttl-seconds}")
+        private long reservationTtl;
+
+        @Transactional
+        public ReservationResponse reserveTickets(ReservationRequest request, UUID userId) {
+                String lockKey = "lock:booking:" + request.getTicketTypeId();
+                RLock lock = redissonClient.getLock(lockKey);
+                try {
+                        if (!lock.tryLock(3, 5, TimeUnit.SECONDS))
+                                throw new RuntimeException("System is busy, please try again later.");
+
+                        TicketType ticketType = ticketTypeRepository.findById(request.getTicketTypeId())
+                                        .orElseThrow(() -> new NotFoundException("Ticket type not found"));
+
+                        if (ticketType.getEvent().getEndDate().isBefore(LocalDateTime.now())) {
+                                throw new RuntimeException("Sự kiện đã kết thúc, không thể đặt vé.");
+                        }
+
+                        if (ticketType.getSaleStart() != null
+                                        && ticketType.getSaleStart().isAfter(LocalDateTime.now())) {
+                                throw new RuntimeException("Vé chưa được mở bán.");
+                        }
+
+                        if (ticketType.getSaleEnd() != null && ticketType.getSaleEnd().isBefore(LocalDateTime.now())) {
+                                throw new RuntimeException("Đã hết thời gian bán vé.");
+                        }
+
+                        int updated = ticketTypeRepository.reserveTickets(request.getTicketTypeId(),
+                                        request.getQuantity());
+                        if (updated == 0)
+                                throw new RuntimeException("Ticket is not enough for reservation");
+
+                        String reservationKey = buildReservationKey(request.getTicketTypeId(), userId);
+                        redisTemplate.opsForValue().set(reservationKey, request.getQuantity(), reservationTtl,
+                                        TimeUnit.SECONDS);
+
+                        return ReservationResponse.builder()
+                                        .ticketTypeId(request.getTicketTypeId())
+                                        .quantity(request.getQuantity())
+                                        .expiresAt(LocalDateTime.now().plusSeconds(reservationTtl))
+                                        .build();
+                } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        throw new RuntimeException("System error during reservation", e);
+                } finally {
+                        if (lock.isHeldByCurrentThread())
+                                lock.unlock();
+                }
+        }
+
+        @Transactional
+        public OrderResponse createOrder(CreateOrderRequest request, UUID userId) {
+                User user = userRepository.findById(userId)
+                                .orElseThrow(() -> new NotFoundException("User not found"));
+
+                if (request.getTicketTypeId() == null) {
+                        if (request.getEventId() == null)
+                                throw new RuntimeException("eventId is required for free events.");
+
+                        com.eventmanagement.backend.model.Event event = eventRepository
+                                        .findById(request.getEventId())
+                                        .orElseThrow(() -> new NotFoundException("Event not found"));
+
+                        if (event.getEndDate().isBefore(LocalDateTime.now())) {
+                                throw new RuntimeException("Sự kiện đã kết thúc, không thể tạo đơn hàng.");
+                        }
+
+                        Order order = Order.builder()
+                                        .user(user).event(event)
+                                        .orderCode(generateCode.generateOrderCode())
+                                        .status(OrderStatus.PENDING)
+                                        .paymentMethod(PaymentMethod.FREE)
+                                        .totalAmount(BigDecimal.ZERO)
+                                        .build();
+                        orderRepository.save(order);
+
+                        Map<String, Object> attendeeInfo = new HashMap<>();
+                        attendeeInfo.put("name", request.getFullName());
+                        attendeeInfo.put("email", request.getEmail());
+
+                        List<Ticket> tickets = new ArrayList<>();
+                        for (int i = 0; i < request.getQuantity(); i++) {
+                                tickets.add(Ticket.builder()
+                                                .order(order).event(event).user(user)
+                                                .ticketCode(generateCode.generateTicketCode())
+                                                .status(TicketStatus.PENDING)
+                                                .price(BigDecimal.ZERO)
+                                                .attendeeInfo(attendeeInfo)
+                                                .build());
+                        }
+                        ticketRepository.saveAll(tickets);
+                        confirmOrderInternal(order, tickets);
+
+                        log.info("[Booking] Free order confirmed: {}", order.getOrderCode());
+                        return OrderResponse.from(order);
+                }
+
+                String reservationKey = buildReservationKey(request.getTicketTypeId(), userId);
+                Object cached = redisTemplate.opsForValue().get(reservationKey);
+                if (cached == null)
+                        throw new RuntimeException("Reservation has expired. Please select tickets again.");
+
+                int reservedQty = ((Number) cached).intValue();
+                if (reservedQty < request.getQuantity())
+                        throw new RuntimeException("Ticket quantity is invalid. Please select tickets again.");
+
+                TicketType ticketType = ticketTypeRepository.findById(request.getTicketTypeId())
+                                .orElseThrow(() -> new NotFoundException("Ticket type not found"));
+
+                BigDecimal total = ticketType.getPrice().multiply(BigDecimal.valueOf(request.getQuantity()));
+
+                Order order = Order.builder()
+                                .user(user).event(ticketType.getEvent())
+                                .orderCode(generateCode.generateOrderCode())
+                                .status(OrderStatus.PENDING)
+                                .totalAmount(total)
+                                .expiresAt(LocalDateTime.now().plusSeconds(reservationTtl))
+                                .build();
+
+                if (total.compareTo(BigDecimal.ZERO) == 0) {
+                        order.setPaymentMethod(PaymentMethod.FREE);
+                }
+
+                orderRepository.save(order);
+
+                Map<String, Object> attendeeInfo = new HashMap<>();
+                attendeeInfo.put("name", user.getFullName());
+                attendeeInfo.put("email", user.getEmail());
+
+                List<Ticket> tickets = new ArrayList<>();
+                for (int i = 0; i < request.getQuantity(); i++) {
+                        tickets.add(Ticket.builder()
+                                        .order(order).event(ticketType.getEvent()).user(user)
+                                        .ticketType(ticketType)
+                                        .ticketCode(generateCode.generateTicketCode())
+                                        .status(TicketStatus.PENDING)
+                                        .price(ticketType.getPrice())
+                                        .attendeeInfo(attendeeInfo)
+                                        .build());
+                }
+                ticketRepository.saveAll(tickets);
+
+                if (total.compareTo(BigDecimal.ZERO) == 0) {
+                        confirmOrderInternal(order, tickets);
+                } else {
+                        redisTemplate.delete(reservationKey);
+                }
+
+                return OrderResponse.from(order);
+        }
+
+        @Transactional
+        public void confirmOrder(String orderCode) {
+                Order order = orderRepository.findByOrderCode(orderCode)
+                                .orElseThrow(() -> new NotFoundException("Order not found: " + orderCode));
+
+                if (order.getStatus() == OrderStatus.PAID) {
+                        log.info("[Booking] Order {} already paid, skip", orderCode);
+                        return;
+                }
+                if (order.getStatus() == OrderStatus.CANCELLED)
+                        throw new RuntimeException("Order đã bị hủy: " + orderCode);
+
+                List<Ticket> tickets = ticketRepository.findByOrderOrderId(order.getOrderId());
+                if (tickets.isEmpty())
+                        throw new RuntimeException("Tickets not found for order: " + orderCode);
+
+                confirmOrderInternal(order, tickets);
+        }
+
+        private void confirmOrderInternal(Order order, List<Ticket> tickets) {
+                order.setStatus(OrderStatus.PAID);
+                order.setPaidAt(LocalDateTime.now());
+                orderRepository.save(order);
+
+                tickets.forEach(t -> {
+                        t.setStatus(TicketStatus.CONFIRMED);
+                        t.setQrCodeUrl(buildQrCode(t.getTicketCode()));
+                });
+                ticketRepository.saveAll(tickets);
+
+                if (!tickets.isEmpty() && tickets.get(0).getTicketType() != null) {
+                        UUID ticketTypeId = tickets.get(0).getTicketType().getTicketTypeId();
+                        int updated = ticketTypeRepository.confirmTickets(ticketTypeId, tickets.size());
+                        if (updated == 0)
+                                throw new RuntimeException("Failed to update ticket counts.");
+                        redisTemplate.delete(buildReservationKey(ticketTypeId, order.getUser().getUserId()));
+                }
+                emailService.sendTicketEmail(order.getUser(), order, tickets);
+                log.info("[Booking] Ticket email queued for order: {}", order.getOrderCode());
+        }
+
+        @Scheduled(fixedRate = 60_000)
+        @Transactional
+        public void cancelExpiredOrders() {
+                List<Order> expiredOrders = orderRepository
+                                .findExpiredPendingOrders(LocalDateTime.now(), OrderStatus.PENDING);
+                if (expiredOrders.isEmpty())
+                        return;
+
+                expiredOrders.forEach(order -> {
+                        order.setStatus(OrderStatus.CANCELLED);
+                        order.setCancelledAt(LocalDateTime.now());
+                        orderRepository.save(order);
+
+                        List<Ticket> tickets = ticketRepository.findByOrderOrderId(order.getOrderId());
+                        tickets.forEach(t -> t.setStatus(TicketStatus.CANCELLED));
+                        ticketRepository.saveAll(tickets);
+
+                        if (!tickets.isEmpty() && tickets.get(0).getTicketType() != null) {
+                                UUID ticketTypeId = tickets.get(0).getTicketType().getTicketTypeId();
+                                ticketTypeRepository.releaseReservedTickets(ticketTypeId, tickets.size());
+                        }
+                });
+
+                log.info("[Scheduler] Cancelled {} expired orders at {}", expiredOrders.size(), LocalDateTime.now());
+        }
+
+        private String buildReservationKey(UUID ticketTypeId, UUID userId) {
+                return "reservation:" + ticketTypeId + ":" + userId;
+        }
+
+        private String buildQrCode(String ticketCode) {
+                return "/check-in/" + ticketCode;
+        }
+}

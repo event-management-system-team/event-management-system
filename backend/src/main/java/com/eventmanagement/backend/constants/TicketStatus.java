@@ -1,7 +1,5 @@
 package com.eventmanagement.backend.constants;
 
 public enum TicketStatus {
-    PENDING,
-    PAID,
-    CHECKED_IN
+    PENDING, CONFIRMED, CANCELLED, CHECKED_IN, PAID
 }

@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,6 +15,8 @@ import org.springframework.stereotype.Repository;
 import com.eventmanagement.backend.constants.EventStatus;
 import com.eventmanagement.backend.constants.RecruitmentStatus;
 import com.eventmanagement.backend.model.Recruitment;
+
+import jakarta.transaction.Transactional;
 
 @Repository
 public interface RecruitmentRepository extends JpaRepository<Recruitment, UUID> {
@@ -69,4 +70,6 @@ public interface RecruitmentRepository extends JpaRepository<Recruitment, UUID> 
     @Query("UPDATE Recruitment r SET r.status = 'CLOSED' WHERE r.status = 'OPEN' " +
             "AND r.deadline <= CURRENT_TIMESTAMP")
     int updateStatusToClosed();
+
+    List<Recruitment> findByStatusAndDeadlineBefore(RecruitmentStatus status, LocalDateTime deadline);
 }

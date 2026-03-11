@@ -2,6 +2,7 @@ package com.eventmanagement.backend.controller.staff;
 
 import com.eventmanagement.backend.dto.request.CheckInRequest;
 import com.eventmanagement.backend.dto.response.staff.CheckInResponse;
+import com.eventmanagement.backend.dto.response.staff.TicketTypeStaffResponse;
 import com.eventmanagement.backend.dto.response.staff.WorkspaceResponse;
 import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.service.CheckInService;
@@ -26,13 +27,13 @@ public class WorkspaceController {
 
     @GetMapping("/{eventSlug}")
     public ResponseEntity<?> getWorkspaceData(@PathVariable("eventSlug") String eventSlug,
-                                                              @AuthenticationPrincipal User currentUser) {
+                                              @AuthenticationPrincipal User currentUser) {
         try {
             UUID userId = currentUser.getUserId();
             WorkspaceResponse response = workspaceService.getWorkspaceData(eventSlug, userId);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error",e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
 
     }
@@ -60,10 +61,18 @@ public class WorkspaceController {
     }
 
     @GetMapping("/{eventSlug}/ticket-list")
-    public ResponseEntity<List<CheckInResponse>> searchEventTickets( @PathVariable("eventSlug") String eventSlug,
-                                                                     @RequestParam(required = false) String keyword,
-                                                                     @AuthenticationPrincipal User currentUser) {
-        List<CheckInResponse> response = checkInService.searchEventTickets(eventSlug,keyword);
+    public ResponseEntity<List<CheckInResponse>> searchEventTickets(@PathVariable("eventSlug") String eventSlug,
+                                                                    @RequestParam(required = false) String keyword,
+                                                                    @AuthenticationPrincipal User currentUser) {
+        List<CheckInResponse> response = checkInService.searchEventTickets(eventSlug, keyword);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{eventSlug}/ticket-type-list")
+    public ResponseEntity<List<TicketTypeStaffResponse>> getTicketTypeAndCheckInCurrent(
+            @PathVariable("eventSlug") String eventSlug,
+            @AuthenticationPrincipal User currentUser) {
+        List<TicketTypeStaffResponse> responses = workspaceService.getTicketType(eventSlug);
+        return ResponseEntity.ok(responses);
     }
 }
