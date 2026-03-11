@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Users, Search, Download, ChevronLeft, ChevronRight } from 'lucide-react';
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
 import organizerService from '../../services/organizer.service';
 
 const PAGE_SIZE = 10;
@@ -75,6 +77,130 @@ const EventAttendeesPage = () => {
         fetchAttendees(currentPage);
     }, [fetchAttendees, currentPage]);
 
+    /* ── Export Excel (client-side via ExcelJS) ── */
+    const [exporting, setExporting] = useState(false);
+
+    const handleExport = async () => {
+        setExporting(true);
+        try {
+            // Fetch toàn bộ attendees
+            const data = await organizerService.getEventAttendees(eventId, 0, 10000);
+            const allAttendees = data.content || [];
+
+            const wb = new ExcelJS.Workbook();
+            wb.creator = 'EventHub';
+            wb.created = new Date();
+
+            const ws = wb.addWorksheet('Attendees', {
+                pageSetup: { paperSize: 9, orientation: 'landscape' },
+            });
+
+            // ── Màu sắc theme ──
+            const PRIMARY   = '2D3A4F'; // dark navy
+            const PRIMARY_L = 'E8EDF3'; // light navy tint
+            const SUCCESS   = '16A34A'; // green for checked-in
+            const INFO      = '1D4ED8'; // blue for registered
+            const DANGER    = 'DC2626'; // red for cancelled
+
+            // ── Row 1: Title ──
+            ws.mergeCells('A1:E1');
+            const titleCell = ws.getCell('A1');
+            titleCell.value = `Attendee List — ${event?.eventName || 'Event'}`;
+            titleCell.font = { name: 'Calibri', size: 16, bold: true, color: { argb: PRIMARY } };
+            titleCell.alignment = { vertical: 'middle', horizontal: 'left' };
+            ws.getRow(1).height = 32;
+
+            // ── Row 2: Sub-info ──
+            ws.mergeCells('A2:E2');
+            const subCell = ws.getCell('A2');
+            subCell.value = `Exported: ${new Date().toLocaleString('vi-VN')}   |   Total: ${allAttendees.length} attendees`;
+            subCell.font = { name: 'Calibri', size: 10, color: { argb: '6B7280' }, italic: true };
+            subCell.alignment = { vertical: 'middle', horizontal: 'left' };
+            ws.getRow(2).height = 20;
+
+            // ── Row 3: blank spacer ──
+            ws.getRow(3).height = 8;
+
+            // ── Row 4: Header ──
+            const HEADER_DEF = [
+                { key: 'no',     header: 'No.',         width: 7  },
+                { key: 'name',   header: 'Full Name',   width: 28 },
+                { key: 'email',  header: 'Email',       width: 34 },
+                { key: 'ticket', header: 'Ticket Type', width: 18 },
+                { key: 'status', header: 'Status',      width: 16 },
+            ];
+
+            ws.columns = HEADER_DEF.map(c => ({ key: c.key, width: c.width }));
+
+            const headerRow = ws.getRow(4);
+            HEADER_DEF.forEach((col, i) => {
+                const cell = headerRow.getCell(i + 1);
+                cell.value = col.header;
+                cell.font = { name: 'Calibri', size: 11, bold: true, color: { argb: 'FFFFFF' } };
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: PRIMARY } };
+                cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                cell.border = {
+                    top:    { style: 'thin', color: { argb: '475569' } },
+                    bottom: { style: 'thin', color: { argb: '475569' } },
+                    left:   { style: 'thin', color: { argb: '475569' } },
+                    right:  { style: 'thin', color: { argb: '475569' } },
+                };
+            });
+            headerRow.height = 26;
+            headerRow.commit();
+
+            // ── Rows 5+: Data ──
+            allAttendees.forEach((a, idx) => {
+                const s = normalizeStatus(a.status);
+                const statusLabel = statusConfig[s]?.label || s;
+                const statusColor = s === 'checked-in' ? SUCCESS : s === 'cancelled' ? DANGER : INFO;
+                const rowBg = idx % 2 === 0 ? 'FFFFFF' : PRIMARY_L;
+
+                const row = ws.addRow({
+                    no:     idx + 1,
+                    name:   a.fullName  || '',
+                    email:  a.email     || '',
+                    ticket: a.ticketType || 'General',
+                    status: statusLabel,
+                });
+
+                row.height = 22;
+                row.eachCell({ includeEmpty: true }, (cell, colNum) => {
+                    cell.font = {
+                        name: 'Calibri',
+                        size: 10,
+                        color: colNum === 5 ? { argb: statusColor } : { argb: '111827' },
+                        bold: colNum === 5,
+                    };
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: rowBg } };
+                    cell.alignment = {
+                        vertical: 'middle',
+                        horizontal: colNum === 1 ? 'center' : colNum === 5 ? 'center' : 'left',
+                    };
+                    cell.border = {
+                        top:    { style: 'hair', color: { argb: 'E5E7EB' } },
+                        bottom: { style: 'hair', color: { argb: 'E5E7EB' } },
+                        left:   { style: 'hair', color: { argb: 'E5E7EB' } },
+                        right:  { style: 'hair', color: { argb: 'E5E7EB' } },
+                    };
+                });
+                row.commit();
+            });
+
+            // ── Download ──
+            const buffer = await wb.xlsx.writeBuffer();
+            const blob = new Blob([buffer], {
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            });
+            const fileName = `attendees-${(event?.eventName || eventId).replace(/[^a-zA-Z0-9]/g, '_')}.xlsx`;
+            saveAs(blob, fileName);
+        } catch (err) {
+            console.error('Export failed:', err);
+        } finally {
+            setExporting(false);
+        }
+    };
+
     /* ── Derived values ── */
     const filtered = search.trim()
         ? attendees.filter(a =>
@@ -107,9 +233,13 @@ const EventAttendeesPage = () => {
                 </div>
 
                 {/* Export button */}
-                <button className="flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors">
-                    <Download size={16} />
-                    Export List
+                <button
+                    onClick={handleExport}
+                    disabled={exporting || loading || totalElements === 0}
+                    className="flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-100 hover:border-gray-400 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer"
+                >
+                    <Download size={16} className={exporting ? 'animate-bounce' : ''} />
+                    {exporting ? 'Exporting…' : 'Export List'}
                 </button>
             </div>
 
