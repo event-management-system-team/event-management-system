@@ -20,9 +20,9 @@ const OrganizerRoutes = () => {
         <Routes>
             <Route element={<ProtectedRoute allowedRoles={["ORGANIZER"]} />}>
                 <Route element={<OrganizerLayout />}>
-                    <Route path="/my-events" element={<MyEventsPage />} />
-                    <Route path="/create-event" element={<CreateEventPage />} />
-                    <Route path="/edit-event/:eventId" element={<CreateEventPage />} />
+                    <Route path="my-events" element={<MyEventsPage />} />
+                    <Route path="create-event" element={<CreateEventPage />} />
+                    <Route path="edit-event/:eventId" element={<CreateEventPage />} />
                     {/* <Route path="create-event" element={<CreateEventPage />} /> */}
                     <Route path="feedback/feedbacklist/:eventId" element={<FeedbackList />} />
                     <Route path="feedback/createform/:eventId" element={<FeedbackBuilder />} />

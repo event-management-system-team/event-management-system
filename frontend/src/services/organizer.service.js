@@ -123,4 +123,4 @@ const organizerService = {
     }
 }
 
-export default organizerService;
+export default organizerService
