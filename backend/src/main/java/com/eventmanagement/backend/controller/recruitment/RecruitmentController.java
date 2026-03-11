@@ -100,9 +100,9 @@ public class RecruitmentController {
         }
     }
 
-    @GetMapping("/dashboards")
-    public ResponseEntity<RecruitmentDashBoardDTO> getDashboardData() {
-        RecruitmentDashBoardDTO response = recruitmentServiceOrganizer.getDashBoardData();
+    @GetMapping("/dashboards/{eventId}")
+    public ResponseEntity<RecruitmentDashBoardDTO> getDashboardData(@PathVariable UUID eventId) {
+        RecruitmentDashBoardDTO response = recruitmentServiceOrganizer.getDashBoardData(eventId);
         return ResponseEntity.ok(response);
     }
 

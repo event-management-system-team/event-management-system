@@ -1,9 +1,8 @@
 
 import React from 'react';
 import { Link, useLocation, useParams, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { logoutUser } from '../../store/slices/auth.slice';
-import useProfile from '../../hooks/useProfile';
 import {
   LayoutDashboard,
   CalendarDays,
@@ -35,8 +34,6 @@ const Sidebar = () => {
   const location = useLocation();
   const { eventId } = useParams();
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
-  const { profile } = useProfile();
   const navigate = useNavigate();
 
   //navavigate ve trang login
@@ -44,7 +41,6 @@ const Sidebar = () => {
     await dispatch(logoutUser());
     navigate('/login');
   };
-
 
 
   const isDashboardActive = location.pathname.includes('/dashboard');
@@ -70,19 +66,16 @@ const Sidebar = () => {
         </div>
       </div>
 
+      {/* 2. User Profile (FPT Software) */}
       <div className="mx-4 mb-6 p-3 bg-[#2d3a4f] rounded-xl flex items-center gap-3 border border-gray-700 shadow-sm">
         <img
-          src={profile?.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.fullName || user?.fullName || 'User')}&background=random`}
+          src="https://ui-avatars.com/api/?name=FPT+Software&background=random"
           alt="User"
           className="w-10 h-10 rounded-full object-cover border border-gray-500"
         />
         <div className="overflow-hidden">
-          <h3 className="text-white text-sm font-bold truncate">
-            {profile?.fullName || user?.fullName || 'Loading...'}
-          </h3>
-          <p className="text-[11px] text-gray-400 truncate">
-            {profile?.role || user?.role || 'Organizer'}
-          </p>
+          <h3 className="text-white text-sm font-bold truncate">FPT Software</h3>
+          <p className="text-[11px] text-gray-400 truncate">Senior Organizer</p>
         </div>
       </div>
 

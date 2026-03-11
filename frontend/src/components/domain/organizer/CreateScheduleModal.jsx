@@ -43,6 +43,8 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
         fetchRoleList()
     }, [])
 
+    const [selectedRoles, setSelectedRoles] = useState([])
+
     const [formData, setFormData] = useState({
         scheduleName: "",
         description: "",
@@ -51,7 +53,6 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
         endTime: ""
     })
 
-    const [selectedRoles, setSelectedRoles] = useState([])
     const [errors, setErrors] = useState({
         scheduleName: "",
         description: "",
@@ -243,6 +244,7 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
         !!formData.location &&
         !!formData.startTime &&
         !!formData.endTime &&
+        selectedRoles.length > 0 &&
         !errors.scheduleName &&
         !errors.description &&
         !errors.location &&
@@ -573,7 +575,7 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
                     </Button>
                     <Button
                         onClick={handleSubmit}
-                        disabled={!isFormValid()}
+                        disabled={!isFormValid || isSubmitting}
                         className="px-6 bg-[#7FA5A5] hover:bg-[#6D9393] text-white disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Create Schedule

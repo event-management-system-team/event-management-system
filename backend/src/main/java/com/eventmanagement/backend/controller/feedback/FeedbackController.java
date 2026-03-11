@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.eventmanagement.backend.constants.FormType;
 import com.eventmanagement.backend.dto.request.CustomFormRequestDTO;
@@ -68,6 +69,11 @@ public class FeedbackController {
     @GetMapping("/events/{eventId}/feedback")
     public ResponseEntity<Map<String, Object>> getEventFeedbacks(@PathVariable UUID eventId) {
         List<FeedbackResponseDTO> feedbacks = feedbackRepository.findFeedbacksByEventId(eventId);
+        
+        if (feedbacks == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy sự kiện");
+        }
+        
         Map<String, Object> response = new HashMap<>();
         response.put("feedbacks", feedbacks);
         return ResponseEntity.ok(response);

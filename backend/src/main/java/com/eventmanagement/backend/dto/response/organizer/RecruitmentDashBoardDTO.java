@@ -1,5 +1,6 @@
 package com.eventmanagement.backend.dto.response.organizer;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,6 +43,7 @@ public class RecruitmentDashBoardDTO {
         private int total; // tong so luong can tuyen
         private String status; // recruiting/ closed
         private boolean isNew; // co moi khong
+        private LocalDateTime deadline; // han nop don
 
     }
 
