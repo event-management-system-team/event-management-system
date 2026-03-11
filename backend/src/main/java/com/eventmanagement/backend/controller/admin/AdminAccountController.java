@@ -1,7 +1,6 @@
 package com.eventmanagement.backend.controller.admin;
 
 import com.eventmanagement.backend.dto.request.CreateOrganizerRequest;
-import com.eventmanagement.backend.dto.request.UserUpdateRequest;
 import com.eventmanagement.backend.dto.response.UserResponse;
 import com.eventmanagement.backend.dto.response.admin.AccountSummaryResponse;
 import com.eventmanagement.backend.repository.EventRepository;
@@ -54,12 +53,6 @@ public class AdminAccountController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Long> getEventCount(@PathVariable UUID id) {
         return ResponseEntity.ok(eventRepository.countByOrganizer_UserId(id));
-    }
-
-    @PutMapping("/{id}/profile")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserResponse> updateProfile(@PathVariable UUID id, @RequestBody UserUpdateRequest request) {
-        return ResponseEntity.ok(adminAccountService.updateProfile(id, request));
     }
 
     @PatchMapping("/{id}/toggle-ban")
