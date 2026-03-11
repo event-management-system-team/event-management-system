@@ -1,31 +1,6 @@
-import {
-    Calendar,
-    Users,
-    TrendingUp,
-    CheckCircle,
-    Settings,
-    BarChart3,
-    Bell,
-    Zap,
-    CalendarCheck,
-    ChevronRight,
-    Search,
-    LogOut,
-    LayoutDashboard,
-    UserCircle,
-    CalendarCog,
-    Eye,
-    AlertCircle,
-    TrendingDown,
-    Clock,
-    UserX,
-    ArrowRight,
-    Activity,
-    FileText
-} from 'lucide-react';
+import { Bell, UserCircle, Clock, ArrowRight, } from 'lucide-react';
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../../components/domain/admin/Button.jsx";
-import { Input } from "../../components/domain/admin/Input.jsx";
 import { Avatar, AvatarFallback } from "../../components/domain/admin/Avatar.jsx";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/domain/admin/Card.jsx";
 import { Badge } from "../../components/domain/admin/Badge.jsx";
@@ -34,162 +9,7 @@ import { useEffect, useState } from 'react';
 import { adminService } from '../../services/admin.service.js';
 import LoadingState from '../../components/common/LoadingState.jsx';
 import dayjs from "dayjs";
-
-// Pending events awaiting review
-const pendingEvents = [
-    {
-        id: 3,
-        name: "Workshop Series: Design Thinking",
-        organizer: "Emma Williams",
-        organization: "Workshop Co.",
-        submittedDate: "Feb 10, 2026",
-        status: "Pending"
-    },
-    {
-        id: 7,
-        name: "Indie Film Festival",
-        organizer: "Amanda Garcia",
-        organization: "Arts & Culture Foundation",
-        submittedDate: "Feb 11, 2026",
-        status: "Pending"
-    },
-    {
-        id: 12,
-        name: "Startup Pitch Competition",
-        organizer: "Robert Kim",
-        organization: "Venture Nexus",
-        submittedDate: "Feb 12, 2026",
-        status: "Pending"
-    },
-    {
-        id: 15,
-        name: "Green Energy Symposium",
-        organizer: "Lisa Anderson",
-        organization: "EcoFuture Institute",
-        submittedDate: "Feb 12, 2026",
-        status: "Pending"
-    },
-    {
-        id: 18,
-        name: "Jazz Night Under the Stars",
-        organizer: "Marcus Brown",
-        organization: "Blue Note Productions",
-        submittedDate: "Feb 13, 2026",
-        status: "Pending"
-    }
-]
-
-// Pending organizer accounts
-const pendingAccounts = [
-    {
-        id: 8,
-        name: "Jennifer Martinez",
-        company: "Eventify Solutions",
-        submittedDate: "Feb 11, 2026",
-        status: "Verification Pending"
-    },
-    {
-        id: 9,
-        name: "Daniel Thompson",
-        company: "Summit Events Co.",
-        submittedDate: "Feb 12, 2026",
-        status: "Documents Review"
-    },
-    {
-        id: 10,
-        name: "Rachel Green",
-        company: "GreenSpace Events",
-        submittedDate: "Feb 12, 2026",
-        status: "Verification Pending"
-    },
-    {
-        id: 11,
-        name: "Kevin Patel",
-        company: "Metro Conference Group",
-        submittedDate: "Feb 13, 2026",
-        status: "Documents Review"
-    }
-]
-
-// Recent system activity
-const recentActivity = [
-    {
-        id: 1,
-        action: "Event Approved",
-        entity: "Global Tech Summit 2026",
-        timestamp: "2 hours ago",
-        type: "approved",
-        icon: CheckCircle
-    },
-    {
-        id: 2,
-        action: "Account Suspended",
-        entity: "Skyline Events Inc.",
-        timestamp: "4 hours ago",
-        type: "suspended",
-        icon: UserX
-    },
-    {
-        id: 3,
-        action: "Event Rejected",
-        entity: "Music Festival Downtown",
-        timestamp: "6 hours ago",
-        type: "rejected",
-        icon: AlertCircle
-    },
-    {
-        id: 4,
-        action: "Account Verified",
-        entity: "Creative Productions LLC",
-        timestamp: "8 hours ago",
-        type: "approved",
-        icon: CheckCircle
-    },
-    {
-        id: 5,
-        action: "Event Approved",
-        entity: "Charity Gala Evening",
-        timestamp: "10 hours ago",
-        type: "approved",
-        icon: CheckCircle
-    },
-    {
-        id: 6,
-        action: "Event Under Review",
-        entity: "Workshop Series: Design Thinking",
-        timestamp: "12 hours ago",
-        type: "pending",
-        icon: Clock
-    }
-]
-
-// System insights
-const systemInsights = [
-    {
-        title: "Total Tickets Sold",
-        value: "127,543",
-        description: "Platform-wide",
-        icon: Users,
-        iconBg: "bg-blue-100",
-        iconColor: "text-blue-600"
-    },
-    {
-        title: "Avg. Approval Time",
-        value: "18 hrs",
-        description: "Event review time",
-        icon: Clock,
-        iconBg: "bg-green-100",
-        iconColor: "text-green-600"
-    },
-    {
-        title: "Monthly Growth",
-        value: "+24.8%",
-        description: "New organizers",
-        icon: TrendingUp,
-        iconBg: "bg-purple-100",
-        iconColor: "text-purple-600"
-    }
-]
+import DashboardCard from '../../components/domain/admin/DashboardCard.jsx';
 
 export function AdminDashboard() {
     const navigate = useNavigate();
@@ -223,54 +43,17 @@ export function AdminDashboard() {
         fetchData()
     }, [])
 
-    const summaryMetrics = [
-        {
-            title: "TOTAL EVENTS",
-            value: summary?.totalEvents,
-            icon: Calendar,
-            iconBg: "bg-blue-100",
-            iconColor: "text-blue-600",
-            link: "/admin/events"
-        },
-        {
-            title: "ACTIVE EVENTS",
-            value: summary?.activeEvents,
-            icon: Zap,
-            iconBg: "bg-green-100",
-            iconColor: "text-green-600"
-        },
-        {
-            title: "PENDING REVIEWS",
-            value: summary?.pendingEvents,
-            icon: AlertCircle,
-            iconBg: "bg-orange-100",
-            iconColor: "text-orange-600",
-            link: "/admin/events?status=pending",
-            highlight: true
-        },
-        {
-            title: "ORGANIZER ACCOUNTS",
-            value: summary?.organizerAccounts,
-            icon: Users,
-            iconBg: "bg-purple-100",
-            iconColor: "text-purple-600",
-            link: "/admin/accounts?role=ORGANIZER"
-        },
-        {
-            title: "SUSPENDED ACCOUNTS",
-            value: summary?.bannedAccounts,
-            icon: UserX,
-            iconBg: "bg-red-100",
-            iconColor: "text-red-600",
-            link: "/admin/accounts?status=BANNED"
-        }
-    ]
-
-    if (loading) return <LoadingState />
-
-
     return (
         <div className="flex h-screen bg-[#F1F0E8]">
+
+            {loading && (
+                <LoadingState />
+            )}
+
+            {error && (
+                <EmptyState className='h-[600px]' />
+            )}
+
             {/* Sidebar */}
             <AdminSidebar />
 
@@ -308,33 +91,10 @@ export function AdminDashboard() {
 
                 {/* Main Dashboard Content */}
                 <div className="p-8">
-                    {/* 1. Top Summary Metrics */}
-                    <div className="grid grid-cols-5 gap-4 mb-8">
-                        {summaryMetrics.map((metric, index) => (
-                            <Link key={index} to={metric.link}>
-                                <Card
-                                    className={`bg-[#f7f7f7] shadow-sm hover:shadow-md transition-all cursor-pointer border border-gray-200 ${metric.highlight ? 'ring-2 ring-orange-400  border border-gray-200' : ''
-                                        }`}
-                                >
-                                    <CardContent className="p-6">
-                                        <div className="flex items-start justify-between mb-4">
-                                            <div className={`p-3 rounded-lg ${metric.iconBg}`}>
-                                                <metric.icon className={`h-6 w-6 ${metric.iconColor}`} />
-                                            </div>
-                                        </div>
-                                        <div className="text-3xl font-bold text-gray-900 mb-1">
-                                            {metric.value}
-                                        </div>
-                                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                                            {metric.title}
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </Link>
-                        ))}
-                    </div>
+                    {/* Top Summary Metrics */}
+                    <DashboardCard summary={summary} />
 
-                    {/* 2. Pending Actions - Requires Attention */}
+                    {/* Pending Actions - Requires Attention */}
                     <div className="mb-8">
                         {/* Pending Events */}
                         <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
