@@ -4,19 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b61f3f50-8065-4f51-be19-f5261948bd35" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/admin/AccountSummaryResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/dto/response/admin/EventSummaryResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/admin/AdminAccountController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/admin/AdminAccountController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/admin/AdminEventController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/controller/admin/AdminEventController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/EventRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/EventRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/repository/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/AdminAccountService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/AdminAccountService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/AdminEventService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/eventmanagement/backend/service/AdminEventService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/admin/AccountManagement.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/admin/AccountManagement.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/services/admin.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/admin.service.js" afterDir="false" />
-    </list>
+    <list default="true" id="b61f3f50-8065-4f51-be19-f5261948bd35" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

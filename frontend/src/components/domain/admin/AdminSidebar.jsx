@@ -4,11 +4,9 @@ import {
     CalendarCog,
     LayoutDashboard,
     LogOut,
-    Settings,
     UserCircle
 } from "lucide-react";
 import { Button } from "./Button.jsx";
-import { Link } from "react-router";
 import { NavLink } from "react-router-dom";
 
 export function AdminSidebar() {
@@ -41,8 +39,8 @@ export function AdminSidebar() {
                         <Button
                             variant="ghost"
                             className={`w-full justify-start mb-1 py-5 rounded-3xl  ${isActive
-                                    ? 'bg-[#6f8f99] hover:bg-[#728f9a] text-white'
-                                    : 'text-gray-100 hover:text-white hover:bg-[#6f8f99]'
+                                ? 'bg-[#6f8f99] hover:bg-[#728f9a] text-white'
+                                : 'text-gray-100 hover:text-white hover:bg-[#6f8f99]'
                                 }`}
                         >
                             <LayoutDashboard className="mr-3 h-4 w-4" />
@@ -63,8 +61,8 @@ export function AdminSidebar() {
                         <Button
                             variant="ghost"
                             className={`w-full justify-start mb-1 py-5 rounded-3xl  ${isActive
-                                    ? 'bg-[#6f8f99] hover:bg-[#728f9a] text-white'
-                                    : 'text-gray-100 hover:text-white hover:bg-[#6f8f99]'
+                                ? 'bg-[#6f8f99] hover:bg-[#728f9a] text-white'
+                                : 'text-gray-100 hover:text-white hover:bg-[#6f8f99]'
                                 }`}
                         >
                             <UserCircle className="mr-3 h-4 w-4" />
@@ -85,8 +83,8 @@ export function AdminSidebar() {
                         <Button
                             variant="ghost"
                             className={`w-full justify-start mb-1 py-5 rounded-3xl  ${isActive
-                                    ? 'bg-[#6f8f99] hover:bg-[#728f9a] text-white'
-                                    : 'text-gray-100 hover:text-white hover:bg-[#6f8f99]'
+                                ? 'bg-[#6f8f99] hover:bg-[#728f9a] text-white'
+                                : 'text-gray-100 hover:text-white hover:bg-[#6f8f99]'
                                 }`}
                         >
                             <CalendarCog className="mr-3 h-4 w-4" />
@@ -107,8 +105,8 @@ export function AdminSidebar() {
                         <Button
                             variant="ghost"
                             className={`w-full justify-start mb-1 py-5 rounded-3xl  ${isActive
-                                    ? 'bg-[#6f8f99] hover:bg-[#728f9a] text-white'
-                                    : 'text-gray-100 hover:text-white hover:bg-[#6f8f99]'
+                                ? 'bg-[#6f8f99] hover:bg-[#728f9a] text-white'
+                                : 'text-gray-100 hover:text-white hover:bg-[#6f8f99]'
                                 }`}
                         >
                             <BarChart3 className="mr-3 h-4 w-4" />
@@ -116,29 +114,6 @@ export function AdminSidebar() {
                         </Button>
                     )}
                 </NavLink>
-
-                {/* <NavLink
-                    to="/admin/settings"
-                    className={({ isActive }) =>
-                        isActive
-                            ? 'w-full'
-                            : 'w-full'
-                    }
-                >
-                    {({ isActive }) => (
-                        <Button
-                            variant="ghost"
-                            className={`w-full justify-start mb-1 py-5 rounded-3xl  ${
-                                isActive
-                                    ? 'bg-[#6f8f99] hover:bg-[#728f9a] text-white'
-                                    : 'text-gray-100 hover:text-white hover:bg-[#6f8f99]'
-                            }`}
-                        >
-                            <Settings className="mr-3 h-4 w-4"/>
-                            Settings
-                        </Button>
-                    )}
-                </NavLink> */}
             </nav>
 
             {/* Sign Out */}
