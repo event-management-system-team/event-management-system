@@ -8,14 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 
 import com.eventmanagement.backend.constants.ApplicationStatus;
 import com.eventmanagement.backend.constants.RecruitmentStatus;
@@ -39,9 +36,11 @@ public class RecruitmentServiceOrganizerTest {
 
     @Test
     void testGetDashBoardData_Success() {
+        UUID eventId = UUID.randomUUID();
         UUID recruitmentId = UUID.randomUUID();
         
         Event mockEvent = new Event();
+        mockEvent.setEventId(eventId);
         mockEvent.setEventName("Sự kiện FPT 2026");
 
         Recruitment mockRecruitment = new Recruitment();
@@ -49,17 +48,19 @@ public class RecruitmentServiceOrganizerTest {
         mockRecruitment.setEvent(mockEvent);
         mockRecruitment.setPositionName("Tình nguyện viên");
         mockRecruitment.setStatus(RecruitmentStatus.OPEN); 
-        mockRecruitment.setApprovedCount(2); 
         mockRecruitment.setVacancy(5); 
 
-        PageImpl<Recruitment> mockPage = new PageImpl<>(List.of(mockRecruitment));
-        when(recruitmentRepository.findAll(any(PageRequest.class))).thenReturn(mockPage);
+        when(recruitmentRepository.findByEvent_EventId(eventId)).thenReturn(List.of(mockRecruitment));
 
         when(staffApplicationRepository.countByRecruitment_RecruitmentIdAndApplicationStatus(
                 eq(recruitmentId), eq(ApplicationStatus.PENDING))).thenReturn(3);
 
         when(staffApplicationRepository.countByRecruitment_RecruitmentId(recruitmentId)).thenReturn(10);
-        RecruitmentDashBoardDTO result = recruitmentServiceOrganizer.getDashBoardData();
+        
+        when(staffApplicationRepository.countByRecruitment_RecruitmentIdAndApplicationStatus(
+                eq(recruitmentId), eq(ApplicationStatus.APPROVED))).thenReturn(2);
+
+        RecruitmentDashBoardDTO result = recruitmentServiceOrganizer.getDashBoardData(eventId);
 
         assertNotNull(result);
         RecruitmentDashBoardDTO.StatsDTO stats = result.getStats();
@@ -77,7 +78,7 @@ public class RecruitmentServiceOrganizerTest {
         assertEquals(recruitmentId, item.getRecruitmentId());
         assertEquals("Sự kiện FPT 2026 - Tình nguyện viên", item.getTitle()); 
         assertEquals(3, item.getNewCount());
-        assertEquals(2, item.getCurrentCount());
+        assertEquals(2, item.getCurrentCount()); 
         assertEquals(5, item.getTotal());
         assertTrue(item.isNew()); 
     }

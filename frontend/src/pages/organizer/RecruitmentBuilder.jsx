@@ -237,8 +237,20 @@ const RecruitmentFormBuilder = () => {
                           {isActive && <div className="absolute left-[-2px] top-4 bottom-4 w-1 bg-[#2dd4bf] rounded-r"></div>}
                           <label className="block font-bold text-gray-800 mb-2 text-sm">{item.question} {item.required && <span className="text-red-500">*</span>}</label>
                           {['SHORT_TEXT', 'LONG_TEXT'].includes(item.type) && <div className="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm text-gray-400 shadow-inner">{item.placeholder || 'Text input...'}</div>}
-                          {item.type === 'FILE_UPLOAD' && <div className="p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 text-center text-xs text-gray-400"><UploadCloud size={20} className="mx-auto mb-1"/> Upload File Here</div>}
-                          {item.type === 'MULTIPLE_CHOICE' && item.options?.map((opt, i) => <div key={i} className="flex items-center gap-2 mb-1"><div className="w-3 h-3 rounded border border-gray-300 bg-white"></div><span className="text-xs text-gray-600 font-medium">{opt}</span></div>)}
+                        {item.type === 'FILE_UPLOAD' && (
+                          <div className="p-6 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 flex flex-col items-center justify-center">
+                            <UploadCloud size={28} className="text-[#2dd4bf] mb-2" />
+                            <span className="text-sm font-bold text-gray-700 mb-1">Upload your CV / Portfolio</span>
+                            <span className="text-xs font-medium text-gray-400 mb-4">PDF, DOC, DOCX (Max 5MB)</span>
+                            <button 
+                              disabled 
+                              className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-500 shadow-sm cursor-not-allowed"
+                            >
+                              Browse Files
+                            </button>
+                          </div>
+                        )}                          
+                        {item.type === 'MULTIPLE_CHOICE' && item.options?.map((opt, i) => <div key={i} className="flex items-center gap-2 mb-1"><div className="w-3 h-3 rounded border border-gray-300 bg-white"></div><span className="text-xs text-gray-600 font-medium">{opt}</span></div>)}
                         </div>
                       );
                     })
