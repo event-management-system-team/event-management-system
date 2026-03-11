@@ -53,22 +53,6 @@ export function AccountManagement() {
         setSearchTerm(e.target.value)
     }
 
-    const handleStatusChange = (value) => {
-        setStatus(value)
-    }
-
-    const handleRoleChange = (value) => {
-        setRole(value)
-    }
-
-    const handleDateChange = (value) => {
-        setDate(value)
-    }
-
-    const handleSortChange = (value) => {
-        setSortOption(value)
-    }
-
     const openModal = () => {
         setIsModalOpen(true);
     };
@@ -150,12 +134,12 @@ export function AccountManagement() {
                     searchTerm={searchTerm}
                     onSearchChange={handleSearchChange}
                     status={status}
-                    setStatus={handleStatusChange}
+                    setStatus={setStatus}
                     role={role}
-                    setRole={handleRoleChange}
-                    setDate={handleDateChange}
+                    setRole={setRole}
+                    setDate={setDate}
                     sortOption={sortOption}
-                    setSortOption={handleSortChange}
+                    setSortOption={setSortOption}
                 />
 
                 {/* Account List Table */}

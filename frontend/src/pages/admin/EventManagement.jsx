@@ -57,26 +57,6 @@ export function EventManagement() {
         setSearchTerm(e.target.value)
     }
 
-    const handleStatusChange = (value) => {
-        setStatus(value)
-    }
-
-    const handleCategoryChange = (value) => {
-        setCategory(value)
-    }
-
-    const handlePriceTypeChange = (value) => {
-        setPriceType(value)
-    }
-
-    const handleDateChange = (value) => {
-        setDate(value)
-    }
-
-    const handleSortChange = (value) => {
-        setSortOption(value)
-    }
-
     return (
         <div className="flex h-screen bg-[#F1F0E8]">
 
@@ -142,14 +122,14 @@ export function EventManagement() {
                     searchTerm={searchTerm}
                     onSearchChange={handleSearchChange}
                     status={status}
-                    setStatus={handleStatusChange}
+                    setStatus={setStatus}
                     category={category}
-                    setCategory={handleCategoryChange}
+                    setCategory={setCategory}
                     priceType={priceType}
-                    setPriceType={handlePriceTypeChange}
-                    setDate={handleDateChange}
+                    setPriceType={setPriceType}
+                    setDate={setDate}
                     sortOption={sortOption}
-                    setSortOption={handleSortChange}
+                    setSortOption={setSortOption}
                 />
 
                 {/* Event List Table */}
