@@ -11,10 +11,17 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import com.eventmanagement.backend.dto.request.SubmitFeedbackRequest;
 import com.eventmanagement.backend.dto.response.organizer.FeedbackDetailResponseDTO;
 import com.eventmanagement.backend.dto.response.organizer.FeedbackResponseDTO;
+import com.eventmanagement.backend.dto.response.organizer.FeedbackAnalyticsResponse;
+import com.eventmanagement.backend.dto.response.organizer.FeedbackItemResponse;
 import com.eventmanagement.backend.model.CustomForm;
 import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.model.Feedback;
@@ -157,5 +164,61 @@ public class FeedbackService {
         feedback.setFeedbackData(request.getFeedbackData());
 
         return feedbackRepository.save(feedback);
+    }
+
+    public FeedbackAnalyticsResponse getFeedbackAnalytics(UUID eventId) {
+        if (!eventRepository.existsById(eventId)) {
+            throw new RuntimeException("Sự kiện không tồn tại!");
+        }
+
+        Double avgRating = feedbackRepository.findAverageRating(eventId);
+        Long totalResponses = feedbackRepository.countByEventId(eventId);
+        Double posPercentage = feedbackRepository.findPositivePercentage(eventId);
+
+        List<Object[]> rawDistribution = feedbackRepository.findRatingDistribution(eventId);
+        Map<Integer, Long> distributionMap = new HashMap<>();
+        for (Object[] row : rawDistribution) {
+            distributionMap.put((Integer) row[0], (Long) row[1]);
+        }
+
+        List<FeedbackAnalyticsResponse.RatingDistribution> ratingDistribution = new ArrayList<>();
+        for (int i = 1; i <= 10; i++) {
+            ratingDistribution
+                    .add(new FeedbackAnalyticsResponse.RatingDistribution(i, distributionMap.getOrDefault(i, 0L)));
+        }
+
+        return FeedbackAnalyticsResponse.builder()
+                .averageRating(avgRating != null ? round1(avgRating) : 0.0)
+                .totalResponses(totalResponses != null ? totalResponses : 0L)
+                .positiveFeedbackPct(posPercentage != null ? round1(posPercentage) : 0.0)
+                .ratingDistribution(ratingDistribution)
+                .build();
+    }
+
+    private Double round1(Double value) {
+        if (value == null)
+            return 0.0;
+        return BigDecimal.valueOf(value).setScale(1, RoundingMode.HALF_UP).doubleValue();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<FeedbackItemResponse> getFeedbackReviews(UUID eventId, Pageable pageable) {
+        if (!eventRepository.existsById(eventId)) {
+            throw new RuntimeException("Sự kiện không tồn tại!");
+        }
+
+        Page<Feedback> feedbackPage = feedbackRepository.findByEvent_EventIdOrderBySubmittedAtDesc(eventId, pageable);
+        return feedbackPage.map(this::toItemResponse);
+    }
+
+    private FeedbackItemResponse toItemResponse(Feedback feedback) {
+        return FeedbackItemResponse.builder()
+                .feedbackId(feedback.getId())
+                .attendeeName(feedback.getUser() != null ? feedback.getUser().getFullName() : "Khách ẩn danh")
+                .avatarUrl(feedback.getUser() != null ? feedback.getUser().getAvatarUrl() : null)
+                .rating(feedback.getRating())
+                .comment(feedback.getComment())
+                .submittedAt(feedback.getSubmittedAt())
+                .build();
     }
 }

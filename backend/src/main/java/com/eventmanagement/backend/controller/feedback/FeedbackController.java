@@ -19,10 +19,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import com.eventmanagement.backend.constants.FormType;
 import com.eventmanagement.backend.dto.request.CustomFormRequestDTO;
 import com.eventmanagement.backend.dto.request.SubmitFeedbackRequest;
+import com.eventmanagement.backend.dto.response.organizer.FeedbackAnalyticsResponse;
 import com.eventmanagement.backend.dto.response.organizer.FeedbackDetailResponseDTO;
+import com.eventmanagement.backend.dto.response.organizer.FeedbackItemResponse;
 import com.eventmanagement.backend.dto.response.organizer.FeedbackResponseDTO;
 import com.eventmanagement.backend.dto.response.organizer.RecruitmentDetailDTO;
 import com.eventmanagement.backend.model.CustomForm;
@@ -74,6 +80,20 @@ public class FeedbackController {
         Map<String, Object> response = new HashMap<>();
         response.put("feedbacks", feedbacks);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/events/{eventId}/analytics")
+    public ResponseEntity<FeedbackAnalyticsResponse> getFeedbackAnalytics(@PathVariable UUID eventId) {
+        return ResponseEntity.ok(feedbackService.getFeedbackAnalytics(eventId));
+    }
+
+    @GetMapping("/events/{eventId}/reviews")
+    public ResponseEntity<Page<FeedbackItemResponse>> getFeedbackReviews(
+            @PathVariable UUID eventId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(feedbackService.getFeedbackReviews(eventId, pageable));
     }
 
     @PostMapping("/events/{eventId}/forms")

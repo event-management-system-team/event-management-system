@@ -33,4 +33,33 @@ public interface FeedbackRepository extends JpaRepository<Feedback, UUID> {
     List<FeedbackResponseDTO> findFeedbacksByEventId(@Param("eventId") UUID eventId);
 
     boolean existsByEvent_EventIdAndUser_UserId(UUID eventId, UUID userId);
+
+    // Query 1 — Average Rating
+    @Query("SELECT AVG(f.rating) FROM Feedback f WHERE f.event.eventId = :eventId")
+    Double findAverageRating(@Param("eventId") UUID eventId);
+
+    // Query 2 — Total Responses
+    @Query("SELECT COUNT(f) FROM Feedback f WHERE f.event.eventId = :eventId")
+    Long countByEventId(@Param("eventId") UUID eventId);
+
+    // Query 3 — Positive Feedback %
+    @Query("""
+        SELECT COUNT(CASE WHEN f.rating >= 7 THEN 1 END) * 100.0 
+        / NULLIF(COUNT(f),0) 
+        FROM Feedback f WHERE f.event.eventId = :eventId
+    """)
+    Double findPositivePercentage(@Param("eventId") UUID eventId);
+
+    // Query 4 — Rating Distribution
+    @Query("""
+        SELECT f.rating, COUNT(f) 
+        FROM Feedback f 
+        WHERE f.event.eventId = :eventId 
+        GROUP BY f.rating 
+        ORDER BY f.rating
+    """)
+    List<Object[]> findRatingDistribution(@Param("eventId") UUID eventId);
+
+    // Query 5 — Review List (Pagination)
+    org.springframework.data.domain.Page<Feedback> findByEvent_EventIdOrderBySubmittedAtDesc(UUID eventId, org.springframework.data.domain.Pageable pageable);
 }
