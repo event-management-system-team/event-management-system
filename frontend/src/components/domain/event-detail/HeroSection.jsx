@@ -21,7 +21,7 @@ const HeroSection = ({ bannerUrl, location, eventName, startDate, endDate, categ
 
     return (
         <div>
-            <section className="relative w-full h-125 bg-slate-900 overflow-hidden">
+            <section className="relative w-full h-125 bg-slate-900 overflow-hidden font-sans">
                 <div className="absolute inset-0 bg-cover bg-center opacity-60"
                     style={{ backgroundImage: `url('${bannerUrl}')` }}
                 ></div>

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Star, ArrowLeft, CheckCircle2, Loader2, Calendar, Ticket } from 'lucide-react';
+import { Star, ArrowLeft, CheckCircle2, Loader2, Calendar, Ticket, Lock, Clock, Info } from 'lucide-react'; 
 import { Link, useParams } from 'react-router-dom';
 import axiosInstance from '../../config/axios';
 import { message } from 'antd';
+
+const npsEmojis = ['😡', '😠', '😞', '🙁', '😐', '🙂', '😊', '😀', '😁', '😍'];
 
 const SubmitFeedback = () => {
   const { eventId } = useParams();
@@ -19,6 +21,9 @@ const SubmitFeedback = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isFormActive, setIsFormActive] = useState(true); 
+  const [isClosed, setIsClosed] = useState(false); // Quá hạn điền form (Deadline)
+  const [isNotYetEnded, setIsNotYetEnded] = useState(false); // MỚI: Sự kiện chưa kết thúc
 
   // 1. FETCH DATA
   useEffect(() => {
@@ -27,14 +32,24 @@ const SubmitFeedback = () => {
         // Lấy thông tin Event 
         try {
           const eventRes = await axiosInstance.get(`/events/ids/${eventId}`);
-          // Bắt trường hợp Backend bọc data trong response.data.data
-          const eData = eventRes.data?.data || eventRes.data;
+          const eData = eventRes.data;
           
           if(eData) {
             setEventInfo({
               name: eData.eventName || eData.title || eData.name || 'Your Event',
               date: eData.startDate ? new Date(eData.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Ongoing'
             });
+
+            // LOGIC MỚI: CHỈ MỞ FORM KHI SỰ KIỆN ĐÃ KẾT THÚC
+            if (eData.endDate) {
+              const eventEndTime = new Date(eData.endDate).getTime();
+              const currentTime = new Date().getTime();
+              
+              // Nếu thời gian hiện tại vẫn nhỏ hơn thời gian kết thúc sự kiện -> Khóa
+              if (currentTime < eventEndTime) {
+                setIsNotYetEnded(true);
+              }
+            }
           }
         } catch (e) {
           console.error("Lấy thông tin event thất bại:", e);
@@ -45,19 +60,40 @@ const SubmitFeedback = () => {
         const formRes = await axiosInstance.get(`/events/${eventId}/forms?type=FEEDBACK`);
         const fData = formRes.data?.data || formRes.data;
 
-        if (fData && fData.formSchema) {
-          let schema = fData.formSchema;
-          if (typeof schema === 'string') schema = JSON.parse(schema);
-
-          if (schema.length > 0 && schema[0].type === 'Form_description') {
-            setFormSchema(schema.slice(1));
-          } else {
-            setFormSchema(schema);
+        // KIỂM TRA DEADLINE CỦA FORM (Nếu Organizer có cài đặt hạn chót điền form)
+        if (fData && fData.deadline) {
+          if (new Date().getTime() > new Date(fData.deadline).getTime()) {
+            setIsClosed(true);
           }
+        }
+
+        // KIỂM TRA XEM FORM CÓ PHẢI LÀ BẢN DRAFT HAY CHƯA TẠO KHÔNG?
+        if (!fData || fData.message === "Chưa có form" || fData.message === "No form found") {
+           setIsFormActive(false); 
+        } else {
+          const activeStatus = fData.active ?? fData.isActive ?? fData.is_active;
+          const isActive = activeStatus === true || activeStatus === "true";
+           
+           if (!isActive) {
+             setIsFormActive(false); // Form đang là Draft -> Khóa
+           } else {
+             setIsFormActive(true); // Form đã Public -> Mở
+             
+             if (fData.formSchema) {
+                let schema = fData.formSchema;
+                if (typeof schema === 'string') schema = JSON.parse(schema);
+
+                if (schema.length > 0 && schema[0].type === 'Form_description') {
+                  setFormSchema(schema.slice(1));
+                } else {
+                  setFormSchema(schema);
+                }
+             }
+           }
         }
       } catch (error) {
         console.error("Error fetching form schema:", error);
-        message.error("Failed to load feedback form!");
+        setIsFormActive(false); 
       } finally {
         setIsLoading(false);
       }
@@ -74,7 +110,7 @@ const SubmitFeedback = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (rating === 0) {
-      message.warning("Please provide an overall star rating!");
+      message.warning("Please provide an overall score before submitting!");
       return;
     }
 
@@ -103,8 +139,63 @@ const SubmitFeedback = () => {
     }
   };
 
-  // UI LOADING & SUCCESS
+  // ===================== CÁC MÀN HÌNH TRẠNG THÁI ===================== //
+
   if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-[#f2ede6]"><Loader2 className="animate-spin text-[#849b9f]" size={40}/></div>;
+  
+  // 1. SỰ KIỆN CHƯA KẾT THÚC
+  if (isNotYetEnded) {
+    return (
+      <div className="min-h-screen bg-[#f2ede6] flex items-center justify-center p-6 font-sans">
+        <div className="bg-white rounded-[32px] shadow-sm max-w-md w-full p-12 text-center">
+          <div className="w-20 h-20 bg-blue-50 text-blue-400 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Info size={40} />
+          </div>
+          <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Event Ongoing</h2>
+          <p className="text-gray-500 font-medium mb-10 leading-relaxed">
+            The feedback form for <strong>{eventInfo.name}</strong> will be available once the event has ended. Please check back later to share your thoughts!
+          </p>
+          <Link to="/" className="block w-full py-4 bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-2xl font-bold transition-all">Return to Home</Link>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. FORM ĐÃ QUÁ HẠN ĐIỀN (Qua form deadline)
+  if (isClosed) {
+    return (
+      <div className="min-h-screen bg-[#f2ede6] flex items-center justify-center p-6 font-sans">
+        <div className="bg-white rounded-[32px] shadow-sm max-w-md w-full p-12 text-center">
+          <div className="w-20 h-20 bg-orange-50 text-orange-400 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Clock size={40} />
+          </div>
+          <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Feedback Closed</h2>
+          <p className="text-gray-500 font-medium mb-10 leading-relaxed">
+            The feedback collection period for <strong>{eventInfo.name}</strong> has ended. Thank you for your interest!
+          </p>
+          <Link to="/" className="block w-full py-4 bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-2xl font-bold transition-all">Return to Home</Link>
+        </div>
+      </div>
+    );
+  }
+
+  // 3. FORM ĐANG LÀ DRAFT HOẶC CHƯA ĐƯỢC TẠO
+  if (!isFormActive) {
+    return (
+      <div className="min-h-screen bg-[#f2ede6] flex items-center justify-center p-6 font-sans">
+        <div className="bg-white rounded-[32px] shadow-sm max-w-md w-full p-12 text-center">
+          <div className="w-20 h-20 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Lock size={40} />
+          </div>
+          <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Feedback Unavailable</h2>
+          <p className="text-gray-500 font-medium mb-10 leading-relaxed">The feedback form for <strong>{eventInfo.name}</strong> is not available yet. It might be in draft mode or not published by the organizer.</p>
+          <Link to="/" className="block w-full py-4 bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-2xl font-bold transition-all">Return to Home</Link>
+        </div>
+      </div>
+    );
+  }
+
+  // 4. ĐÃ SUBMIT THÀNH CÔNG
   if (isSubmitted) {
     return (
       <div className="min-h-screen bg-[#f2ede6] flex items-center justify-center p-6 font-sans">
@@ -122,26 +213,50 @@ const SubmitFeedback = () => {
   const renderInput = (field) => {
     const type = field.type ? field.type.toUpperCase() : 'TEXT';
 
-    // 1. STAR RATING (NPS) - Phong cách phẳng, căn giữa nếu là câu đầu tiên
     if (type.includes('RATING') || type.includes('STAR') || type.includes('NPS')) {
+      const currentScore = answers[field.field_id] || 0;
+      
       return (
-        <div className="flex gap-2 sm:gap-4 mt-4 justify-center">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <button key={star} type="button" 
-              onClick={() => {
-                setRating(star); // Gắn rating tổng
-                handleAnswerChange(field.field_id, star); 
-              }} 
-              className="focus:outline-none transform transition-transform hover:scale-110 active:scale-95"
-            >
-              <Star size={44} className={`transition-colors duration-200 ${ star <= (answers[field.field_id] || 0) ? 'text-[#ffc107] fill-[#ffc107]' : 'text-gray-200 fill-gray-200'}`} />
-            </button>
-          ))}
+        <div className="mt-6 mb-4">
+          <div className="flex justify-between w-full gap-1 sm:gap-2 mb-4">
+            {npsEmojis.map((emoji, idx) => {
+              const score = idx + 1;
+              const isSelected = currentScore === score;
+              
+              return (
+                <button 
+                  key={idx} 
+                  type="button" 
+                  onClick={() => {
+                    setRating(score);
+                    handleAnswerChange(field.field_id, score); 
+                  }} 
+                  className="flex-1 flex flex-col items-center gap-2 focus:outline-none group"
+                >
+                  <div className={`text-2xl sm:text-3xl transition-all duration-300 transform ${
+                    isSelected 
+                      ? 'grayscale-0 opacity-100 scale-125' 
+                      : 'grayscale opacity-40 hover:grayscale-0 hover:opacity-100 hover:scale-110'
+                  }`}>
+                    {emoji}
+                  </div>
+                  <span className={`text-[11px] sm:text-xs font-bold transition-colors mt-1 ${
+                    isSelected ? 'text-[#849b9f]' : 'text-gray-400 group-hover:text-[#849b9f]'
+                  }`}>
+                    {score}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="flex justify-between text-[10px] sm:text-[11px] font-bold text-gray-400 uppercase tracking-wider px-2 mt-2">
+            <span>{field.leftLabel || 'Poor'}</span>
+            <span>{field.rightLabel || 'Excellent'}</span>
+          </div>
         </div>
       );
     }
 
-    // 2. MULTIPLE CHOICE - Thay radio bằng các nút bấm (Chips) mềm mại
     if (type.includes('MULTIPLE') || type.includes('RADIO') || type.includes('CHOICE')) {
       return (
         <div className="flex flex-wrap gap-3 mt-4">
@@ -166,8 +281,7 @@ const SubmitFeedback = () => {
       );
     }
 
-    // 3. LONG TEXT (Textarea) - Nền xám be, bo góc lớn, không viền
-    if (type.includes('LONG') || type.includes('PARAGRAPH') || type.includes('COMMENT')) {
+    if (type.includes('LONG') || type.includes('PARAGRAPH') || type.includes('COMMENT') || type.includes('OPEN_COMMENT')) {
       return (
         <textarea 
           rows="4" 
@@ -180,7 +294,6 @@ const SubmitFeedback = () => {
       );
     }
 
-    // 4. FALLBACK (Short Text)
     return (
       <input 
         type="text" 
@@ -197,15 +310,12 @@ const SubmitFeedback = () => {
     <div className="min-h-screen bg-[#f2ede6] py-12 px-4 sm:px-6 font-sans">
       <div className="max-w-3xl mx-auto">
         
-        {/* Nút Back mềm mại */}
         <Link to="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-gray-800 font-bold text-sm mb-8 transition-colors">
           <ArrowLeft size={16} /> Back to Event
         </Link>
 
-        {/* THÂN FORM */}
         <div className="bg-white rounded-[32px] shadow-sm p-8 sm:p-14">
           
-          {/* Header Sự Kiện (Style mới giống bản mẫu) */}
           <div className="flex flex-col sm:flex-row justify-between items-start gap-6 border-b border-gray-100 pb-10 mb-10">
             <div>
               <span className="text-[#849b9f] text-[11px] font-extrabold uppercase tracking-widest">Post-Event Feedback</span>
@@ -215,7 +325,6 @@ const SubmitFeedback = () => {
                 <span>{eventInfo.date}</span>
               </div>
             </div>
-            {/* Tag mô phỏng Ticket ID cho giống mockup */}
             <div className="bg-[#f6f5f2] rounded-2xl p-4 flex items-center gap-3 shrink-0">
               <div className="bg-white p-2 rounded-lg text-[#849b9f] shadow-sm"><Ticket size={20}/></div>
               <div>
@@ -226,11 +335,8 @@ const SubmitFeedback = () => {
           </div>
 
           <form onSubmit={handleSubmit}>
-            
-            {/* DANH SÁCH CÂU HỎI */}
             <div className="space-y-12">
-              {formSchema.map((field, index) => {
-                // Nếu là câu hỏi đánh giá sao, mình bôi đậm và căn giữa cho giống mockup
+              {formSchema.map((field) => {
                 const isStarRating = field.type && (field.type.toUpperCase().includes('NPS') || field.type.toUpperCase().includes('STAR'));
                 
                 return (
@@ -244,7 +350,6 @@ const SubmitFeedback = () => {
               })}
             </div>
 
-            {/* NÚT SUBMIT LỚN Ở DƯỚI */}
             <div className="mt-14">
               <button 
                 type="submit" 
@@ -261,7 +366,6 @@ const SubmitFeedback = () => {
                 Thank you for helping us make our events better!
               </p>
             </div>
-            
           </form>
         </div>
       </div>

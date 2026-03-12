@@ -1,11 +1,11 @@
 import { Route, Routes } from "react-router-dom";
 import PublicRoutes from "./PublicRoutes";
 import AdminRoutes from "./AdminRoutes";
+import OrganizerRoutes from "./OrganizerRoutes";
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
 import AttendeeRoutes from "./AttendeeRoutes";
-import OrganizerRoutes from "./OrganizerRoutes";
 import StaffRoutes from "./StaffRoutes";
 import ScrollToTop from '../hooks/useScrollToTop'
 
@@ -25,11 +25,14 @@ const AppRoutes = () => {
         {/* Organizer Routes */}
         <Route path="/organizer/*" element={<OrganizerRoutes />} />
 
-        {/* Public/Protected Routes */}
-        <Route path="/*" element={<PublicRoutes />} />
+        {/* Attendee Routes */}
         <Route path="/attendee/*" element={<AttendeeRoutes />} />
+
+        {/* Staff Routes */}
         <Route path="/staff/:eventSlug/*" element={<StaffRoutes />} />
 
+        {/* Public/Protected Routes */}
+        <Route path="/*" element={<PublicRoutes />} />
       </Routes>
     </ScrollToTop>
   );

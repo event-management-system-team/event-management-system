@@ -17,6 +17,11 @@ const organizerService = {
         return axiosInstance.get(`/events/${eventId}/assignments`);
     },
 
+    getStaffAssignmentByRole: (eventId) => {
+        return axiosInstance.get(`/events/${eventId}/assignments/by-role`);
+    },
+
+    // ORGANIZER - EVENTS
     getMyEvents: async (organizerId, page = 0, size = 5) => {
         const response = await axiosInstance.get('/organizer/events', {
             params: { organizerId, page, size }
@@ -24,9 +29,6 @@ const organizerService = {
         return response.data
     },
 
-    getStaffAssignmentByRole: (eventId) => {
-        return axiosInstance.get(`/events/${eventId}/assignments/by-role`);
-    },
     getMyEventStats: async (organizerId) => {
         const response = await axiosInstance.get('/organizer/events/stats', {
             params: { organizerId }
@@ -34,6 +36,61 @@ const organizerService = {
         return response.data
     },
 
+    createEvent: async (eventData, coverFile) => {
+        const formData = new FormData()
+        formData.append('event', new Blob([JSON.stringify(eventData)], { type: 'application/json' }))
+        if (coverFile) {
+            formData.append('coverFile', coverFile)
+        }
+        const response = await axiosInstance.post('/organizer/events', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            timeout: 30000,
+        })
+        return response.data
+    },
+
+    getEventById: async (eventId) => {
+        const response = await axiosInstance.get(`/organizer/events/${eventId}`)
+        return response.data
+    },
+
+    // Alias used by EventDetailDashboard & EventAttendeesPage
+    getEventDetail: async (eventId) => {
+        const response = await axiosInstance.get(`/organizer/events/${eventId}`)
+        return response.data
+    },
+
+    getEventAttendees: async (eventId, page = 0, size = 10) => {
+        const response = await axiosInstance.get(`/organizer/events/${eventId}/attendees`, {
+            params: { page, size }
+        })
+        return response.data
+    },
+
+    getEventTicketStats: async (eventId) => {
+        const response = await axiosInstance.get(`/organizer/events/${eventId}/ticket-stats`)
+        return response.data
+    },
+
+    deleteEvent: async (eventId) => {
+        const response = await axiosInstance.delete(`/organizer/events/${eventId}`)
+        return response.data
+    },
+
+    updateEvent: async (eventId, eventData, coverFile) => {
+        const formData = new FormData()
+        formData.append('event', new Blob([JSON.stringify(eventData)], { type: 'application/json' }))
+        if (coverFile) {
+            formData.append('coverFile', coverFile)
+        }
+        const response = await axiosInstance.put(`/organizer/events/${eventId}`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            timeout: 30000,
+        })
+        return response.data
+    },
+
+    // ROLES & STAFF
     getStaffRoleList: (eventId) => {
         return axiosInstance.get(`/events/${eventId}/role`)
     },
@@ -46,14 +103,14 @@ const organizerService = {
         return axiosInstance.get(`/events/${eventId}/staff`)
     },
 
+    // SCHEDULES
     createSchedule: (eventId, data) => {
         return axiosInstance.post(`/events/${eventId}/schedules`, data)
     },
 
+    // RESOURCES
     createResource: (eventId, data, file) => {
-
         const formData = new FormData()
-
         formData.append(
             "data",
             JSON.stringify({
@@ -62,24 +119,15 @@ const organizerService = {
                 resourceType: data.resourceType
             })
         )
-
         formData.append("file", file)
-
-        return axiosInstance.post(
-            `/events/${eventId}/resources`,
-            formData,
-            {
-                headers: {
-                    "Content-Type": "multipart/form-data"
-                }
-            }
-        )
+        return axiosInstance.post(`/events/${eventId}/resources`, formData, {
+            headers: { "Content-Type": "multipart/form-data" }
+        })
     },
 
     getResources: (eventId) => {
         return axiosInstance.get(`/events/${eventId}/resources`)
-    }
+    },
+}
 
-};
-
-export default organizerService;
+export default organizerService

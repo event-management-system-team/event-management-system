@@ -108,18 +108,14 @@ public class FeedbackController {
     }
 
     @GetMapping("/events/{eventId}/forms")
-public ResponseEntity<?> getEventForm(
+    public ResponseEntity<?> getEventForm(
     @PathVariable("eventId") UUID eventId,
     @RequestParam(value = "type", defaultValue = "FEEDBACK") String typeStr 
-) {
+    ) {
     try {
-        // Chuyển String thành Enum trước khi đưa xuống Service
         FormType type = FormType.valueOf(typeStr.toUpperCase());
-        
-        CustomForm form = customFormService.getFormByType(eventId, type); // Hoặc truyền type tùy logic Service bạn đang viết
-        
+        CustomForm form = customFormService.getFormByType(eventId, type); 
         if (form == null) {
-            // Nếu chưa có form, trả về 204 No Content hoặc 200 kèm object rỗng để React khỏi lỗi
             return ResponseEntity.ok(Map.of("message", "Chưa có form nào được tạo"));
         }
         return ResponseEntity.ok(form);
@@ -136,12 +132,8 @@ public ResponseEntity<?> getEventForm(
             @PathVariable UUID eventId,
             @RequestBody SubmitFeedbackRequest request) {
         try {
-            // 2. FIX LỖI EMAIL: Lấy nguyên cái Object User ra từ SecurityContext
             User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            
-            // Rút email chuẩn từ Object đó ra
             String currentUserEmail = currentUser.getEmail();
-            // Truyền email này xuống Service thay vì truyền ID
             Feedback savedFeedback = feedbackService.createFeedback(eventId, currentUserEmail, request);
             
             return ResponseEntity.ok(Map.of(
