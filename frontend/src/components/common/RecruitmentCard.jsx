@@ -1,19 +1,23 @@
 import { Briefcase, MapPin } from "lucide-react";
 import { Link } from 'react-router-dom'
 
-const RecruitmentCard = ({ positions = [], eventName, eventSlug, eventBannerUrl, deadline, createdAt, location, organizer }) => {
+const RecruitmentCard = ({ positions = [], eventName, eventSlug, eventBannerUrl, deadline, createdAt, location, organizer, status }) => {
 
     const isNew = (new Date() - new Date(createdAt)) / (1000 * 60 * 60 * 24) <= 3;
 
-    const dateObj = new Date(deadline);
-    const month = dateObj.toLocaleString('vi-VN', { month: 'short' });
-    const day = dateObj.getDate();
+    const dateObj = deadline ? new Date(deadline) : null;
+    const month = dateObj ? dateObj.toLocaleString('en-US', { month: 'short' }) : null;
+    const day = dateObj ? dateObj.getDate() : null;
 
     return (
         <Link to={`/recruitments/${eventSlug}`} className="block">
             <div className="relative bg-white rounded-2xl flex items-stretch border border-gray-100 shadow-sm hover:shadow-lg hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 cursor-pointer group overflow-hidden h-28 sm:h-[150px]">
 
-                {isNew && (
+                {status === 'CLOSED' ? (
+                    <span className="absolute top-0 right-0 bg-slate-500 text-white text-[9px] sm:text-[10px] font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-bl-xl z-20 shadow-sm tracking-widest uppercase">
+                        CLOSED
+                    </span>
+                ) : isNew && (
                     <span className="absolute top-0 right-0 bg-red-500 text-white text-[9px] sm:text-[10px] font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-bl-xl z-20 shadow-sm tracking-wider">
                         NEW
                     </span>
@@ -83,10 +87,19 @@ const RecruitmentCard = ({ positions = [], eventName, eventSlug, eventBannerUrl,
                     </div>
 
                     <div className="shrink-0 border-l border-gray-100 pl-3 sm:pl-6 ml-1 flex flex-col items-center justify-center min-w-[50px] sm:min-w-[70px]">
-                        <div className="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest mb-0.5 sm:mb-1 text-center">{month}</div>
-                        <div className="font-black text-2xl sm:text-3xl flex items-center justify-center leading-none">
-                            {day}
-                        </div>
+                        {dateObj ? (
+                            <>
+                                <div className="text-[12px] sm:text-[13px] font-black text-slate-400 uppercase tracking-widest mb-0.5 sm:mb-1 text-center">{month}</div>
+                                <div className="font-black text-2xl sm:text-3xl flex items-center justify-center leading-none text-slate-800">
+                                    {day}
+                                </div>
+                            </>
+                        ) : (
+                            <div className="flex flex-col items-center justify-center text-[#4ECDC4]">
+                                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest mb-0.5">OPEN</span>
+                                <span className="text-2xl sm:text-3xl font-black leading-none">∞</span>
+                            </div>
+                        )}
                     </div>
                 </div>
 

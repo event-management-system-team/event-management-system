@@ -26,6 +26,7 @@ public class CreateEventResponse {
     private String status;
     private Boolean isFree;
     private Integer totalCapacity;
+    private UUID categoryId;
     private String categoryName;
     private List<TicketResponse> tickets;
     private List<AgendaResponse> agendas;

@@ -1,9 +1,8 @@
 
 import React from 'react';
 import { Link, useLocation, useParams, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { logoutUser } from '../../store/slices/auth.slice';
-import useProfile from '../../hooks/useProfile';
 import {
   LayoutDashboard,
   CalendarDays,
@@ -14,17 +13,15 @@ import {
   LogOut
 } from 'lucide-react';
 
-// ==========================================
-// COMPONENT PHỤ: Nút bấm trên Menu
-// ==========================================
+
 const NavItem = ({ to, icon, label, isActive }) => {
   return (
     <Link
       to={to}
       className={`flex items-center gap-3 px-4 py-3 mb-1 rounded-xl font-medium transition-all duration-200
         ${isActive
-          ? 'bg-[#3b4758] text-white shadow-lg pointer-events-none' // Trạng thái Active: Nền xám xanh, chữ trắng, khóa click
-          : 'text-gray-400 hover:bg-gray-800 hover:text-white'      // Trạng thái Bình thường
+          ? 'bg-[#3b4758] text-white shadow-lg pointer-events-none'
+          : 'text-gray-400 hover:bg-gray-800 hover:text-white'
         }`}
     >
       <span className={isActive ? 'text-gray-100' : 'text-gray-400'}>{icon}</span>
@@ -33,15 +30,10 @@ const NavItem = ({ to, icon, label, isActive }) => {
   );
 };
 
-// ==========================================
-// COMPONENT CHÍNH: Sidebar
-// ==========================================
 const Sidebar = () => {
   const location = useLocation();
   const { eventId } = useParams();
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
-  const { profile } = useProfile();
   const navigate = useNavigate();
 
   //navavigate ve trang login
@@ -50,15 +42,14 @@ const Sidebar = () => {
     navigate('/login');
   };
 
-  // Hàm kiểm tra trang đang đứng để bật trạng thái Active
+
   const isDashboardActive = location.pathname.includes('/dashboard');
   const isMyEventsActive = location.pathname.includes('/my-events');
-  // Hỗ trợ cả 2 link '/staff' hoặc '/recruitment'
+
   const isStaffActive = location.pathname.includes('/staff') || location.pathname.includes('/recruitment');
   const isAppActive = location.pathname.includes('/applications');
   const isFeedbackActive = location.pathname.includes('/feedback');
 
-  // Xử lý link Feedback an toàn: Nếu đang ở trong 1 sự kiện có ID thì dùng ID đó, nếu không thì truyền tạm ID = 1
   const feedbackLink = eventId ? `/organizer/feedback/feedbacklist/${eventId}` : `/organizer/feedbacklist/1`;
 
   return (
@@ -75,19 +66,16 @@ const Sidebar = () => {
         </div>
       </div>
 
+      {/* 2. User Profile (FPT Software) */}
       <div className="mx-4 mb-6 p-3 bg-[#2d3a4f] rounded-xl flex items-center gap-3 border border-gray-700 shadow-sm">
         <img
-          src={profile?.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.fullName || user?.fullName || 'User')}&background=random`}
+          src="https://ui-avatars.com/api/?name=FPT+Software&background=random"
           alt="User"
           className="w-10 h-10 rounded-full object-cover border border-gray-500"
         />
         <div className="overflow-hidden">
-          <h3 className="text-white text-sm font-bold truncate">
-            {profile?.fullName || user?.fullName || 'Loading...'}
-          </h3>
-          <p className="text-[11px] text-gray-400 truncate">
-            {profile?.role || user?.role || 'Organizer'}
-          </p>
+          <h3 className="text-white text-sm font-bold truncate">FPT Software</h3>
+          <p className="text-[11px] text-gray-400 truncate">Senior Organizer</p>
         </div>
       </div>
 

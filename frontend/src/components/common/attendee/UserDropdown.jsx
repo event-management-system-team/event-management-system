@@ -17,17 +17,17 @@ const UserDropdown = ({ user }) => {
   const items = [
     {
       key: "profile",
-      label: <Link to="/me">My Profile</Link>,
+      label: <Link to="/attendee/me">My Profile</Link>,
       icon: <User size={16} />,
     },
     {
       key: "tickets",
-      label: <Link to="/my-tickets">My Tickets</Link>,
+      label: <Link to="/attendee/my-tickets">My Tickets</Link>,
       icon: <Ticket size={16} />,
     },
     {
       key: "applications",
-      label: <Link to="/my-applications">My Applications</Link>,
+      label: <Link to="/attendee/applications">My Applications</Link>,
       icon: <FileText size={16} />,
     },
     {

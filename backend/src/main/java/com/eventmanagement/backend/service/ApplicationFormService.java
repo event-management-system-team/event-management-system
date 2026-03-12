@@ -3,14 +3,18 @@ package com.eventmanagement.backend.service;
 import com.eventmanagement.backend.constants.FormType;
 import com.eventmanagement.backend.dto.response.attendee.ApplicationFormResponse;
 import com.eventmanagement.backend.dto.response.attendee.PositionResponse;
+import com.eventmanagement.backend.exception.BadRequestException;
+import com.eventmanagement.backend.exception.NotFoundException;
 import com.eventmanagement.backend.model.CustomForm;
 import com.eventmanagement.backend.model.Recruitment;
 import com.eventmanagement.backend.model.StaffApplication;
+import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.repository.CustomFormRepository;
 import com.eventmanagement.backend.repository.RecruitmentRepository;
 import com.eventmanagement.backend.repository.StaffApplicationRepository;
+import com.eventmanagement.backend.repository.UserRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -31,13 +36,15 @@ public class ApplicationFormService {
     private final StaffApplicationRepository applicationRepository;
     private final CloudinaryService cloudinaryService;
     private final ObjectMapper objectMapper;
+    private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
     public ApplicationFormResponse getFormForAttendee(String eventSlug) {
 
         CustomForm customForm = customFormRepository
                 .findByEvent_EventSlugAndFormTypeAndIsActiveTrue(eventSlug, FormType.RECRUITMENT)
-                .orElseThrow(() -> new RuntimeException("The recruitment form is not currently available!"));
+                .orElseThrow(() -> new RuntimeException(
+                        "The recruitment form is not currently available!"));
 
         List<Recruitment> recruitments = recruitmentRepository.findByEvent_EventSlug(eventSlug);
 
@@ -54,27 +61,41 @@ public class ApplicationFormService {
                                   String answersJson,
                                   MultipartFile cvFile) throws Exception {
 
-        if (applicationRepository.existsByRecruitmentIdAndUserId(recruitmentId, userId)) {
-            throw new IllegalStateException("You have already applied for this position!");
+        if (applicationRepository.existsByRecruitment_RecruitmentIdAndUser_UserId(recruitmentId, userId)) {
+            throw new BadRequestException("You have already applied for this position!");
         }
 
-        log.info("Loading CV to Cloudinary: {}", userId);
-        String cvUrl = cloudinaryService.uploadCV(cvFile);
+        Map<String, Object> applicationDataMap = objectMapper.readValue(
+                answersJson,
+                new TypeReference<Map<String, Object>>() {
+                });
 
-        ObjectNode applicationDataNode = (ObjectNode) objectMapper.readTree(answersJson);
+        if (cvFile != null && !cvFile.isEmpty()) {
+            log.info("Loading CV to Cloudinary: {}", userId);
+            String cvUrl = cloudinaryService.uploadCV(cvFile);
 
-        applicationDataNode.put("cvUrl", cvUrl);
+
+            applicationDataMap.put("cvUrl", cvUrl);
+        } else {
+            log.info("Candidate {} submitted application without CV", userId);
+        }
+
+
+        Recruitment recruitment = recruitmentRepository.findById(recruitmentId)
+                .orElseThrow(() -> new NotFoundException("Job position not found!"));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User information not found!"));
 
         StaffApplication application = StaffApplication.builder()
-                .recruitmentId(recruitmentId)
-                .userId(userId)
-                .applicationData(applicationDataNode)
+                .recruitment(recruitment)
+                .user(user)
+                .applicationData(applicationDataMap)
                 .build();
 
         applicationRepository.save(application);
         log.info("Apply success. Application ID: {}", application.getApplicationId());
     }
-
 
     private ApplicationFormResponse mapToResponse(CustomForm customForm, List<Recruitment> recruitments) {
 
@@ -98,6 +119,7 @@ public class ApplicationFormService {
                 .formSchema(customForm.getFormSchema())
                 .location(location)
                 .recruitments(positionResponses)
+                .status(recruitments.get(0).getStatus().name())
                 .build();
 
     }

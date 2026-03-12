@@ -1,0 +1,150 @@
+import React from 'react';
+import { Eye, Search, Download, Plus } from 'lucide-react';
+import Sidebar from '../../components/layout/Sidebar'; 
+import { useFeedbacks } from "../../hooks/useFeedback";
+import { Link, useParams } from 'react-router-dom';
+
+const FeedbackList = () => {
+  const { eventId } = useParams(); 
+  const { data: feedbacks, isLoading, isError } = useFeedbacks(eventId); 
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen bg-[#f8f7f2] font-sans items-center justify-center">
+        <p className="text-gray-500 font-medium">Loading feedbacks...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex min-h-screen bg-[#f8f7f2] font-sans items-center justify-center">
+        <p className="text-red-500 font-medium">Error loading feedbacks</p>
+      </div>
+    );
+  }
+
+  const eventName = feedbacks?.eventName || "Unknown Event"; 
+  const feedbackItems = feedbacks?.feedbacks || []; 
+
+  return (
+    <div className="flex min-h-screen bg-[#f8f7f2] font-sans w-full">
+      
+      <Sidebar />
+
+      <div className="flex-1 p-10 w-full overflow-x-hidden"> 
+        
+        {/*  header  */}
+        <div className="flex justify-between items-end mb-8">
+          <div>
+            <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-2">Attendee Feedback</h1>
+            <p className="text-gray-500 font-medium italic">
+              Showing all responses for <span className="text-gray-800 not-italic font-bold">{eventName}</span>
+            </p>
+          </div>
+          
+          <div className="flex gap-3">
+            <button className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-5 py-2.5 rounded-lg flex items-center gap-2 text-sm font-bold shadow-sm transition-all">
+               <Download size={18} /> Export Data
+            </button>
+            
+            <Link 
+              to={`/organizer/feedback/createform/${eventId}`} 
+              className="bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-5 py-2.5 rounded-lg flex items-center gap-2 text-sm font-bold shadow-md transition-all"
+            >
+               <Plus size={18} strokeWidth={2.5} /> Create Form
+            </Link>
+          </div>
+        </div>
+        {/*tim kiem*/}
+        <div className="bg-white p-2 rounded-2xl shadow-sm mb-6 flex items-center justify-between border border-gray-100">
+          <div className="flex items-center px-4 py-2 flex-1 gap-3">
+            <Search className="text-gray-300" size={20} />
+            <input 
+              type="text" 
+              placeholder="Search by name, email or content..." 
+              className="w-full outline-none text-gray-700 placeholder-gray-400 text-sm font-medium h-full"
+            />
+          </div>
+        </div>
+
+        {/* du lieu */}
+        <div className="bg-white rounded-2xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] overflow-hidden min-h-[500px] flex flex-col justify-between border border-gray-100">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-full">
+              <thead className="bg-white">
+                <tr className="border-b border-gray-100">
+                  <th className="px-8 py-6 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-left">Date & Time</th>
+                  <th className="px-6 py-6 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-left">Attendee</th>
+                  <th className="px-6 py-6 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-left">Rating</th>
+                  <th className="px-6 py-6 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-left">Ticket</th>
+                  <th className="px-6 py-6 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                
+                {feedbackItems.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="text-center py-20">
+                      <div className="flex flex-col items-center justify-center">
+                        <p className="text-gray-400 font-medium text-lg">No feedbacks received yet.</p>
+                        <p className="text-gray-300 text-sm mt-1">Wait for attendees to share their thoughts!</p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  feedbackItems.map((item) => (
+                    <tr key={item.feedbackId} className="hover:bg-gray-50/80 transition-colors group cursor-pointer">
+                      <td className="px-8 py-5 text-sm text-gray-500 font-semibold whitespace-nowrap">
+                        {new Date(item.createdAt).toLocaleString()}
+                      </td>
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-4">
+                          <img 
+                            src={item.userAvatar || `https://ui-avatars.com/api/?name=${item.userName}&background=random`} 
+                            className="w-10 h-10 rounded-full object-cover border border-gray-100 shadow-sm" 
+                            alt={item.userName} 
+                          />
+                          <div>
+                            <p className="text-sm font-bold text-gray-900">{item.userName}</p>
+                            <p className="text-xs text-gray-400 font-medium">{item.userEmail}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-5">
+                        <div className="flex gap-1 text-sm">
+                          {[...Array(5)].map((_, i) => (
+                            <span key={i} className={`${i < item.rating ? 'text-yellow-400' : 'text-gray-200'} text-base`}>★</span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-6 py-5">
+                        <span className="text-[11px] font-bold uppercase italic tracking-wider text-[#8c9db3] bg-[#f8f7f2] px-3 py-1 rounded-full border border-gray-100">
+                          {item.ticketName || 'General'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-5 text-center">
+                        <Link to={`/organizer/feedback/${item.feedbackId}`} className="inline-block text-gray-400 hover:text-[#8c9db3] p-2 rounded-full hover:bg-gray-100 transition-all">
+                          <Eye size={20} />
+                        </Link>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+          
+          <div className="px-8 py-6 border-t border-gray-50 flex justify-between items-center bg-gray-50/50">
+            <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest">
+              Total Responses: <span className="text-gray-700">{feedbackItems.length}</span>
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+export default FeedbackList;

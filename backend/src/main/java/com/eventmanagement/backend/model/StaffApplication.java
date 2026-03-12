@@ -8,7 +8,10 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.spi.ToolProvider;
 
 @Entity
 @Table(name = "staff_applications")
@@ -21,30 +24,32 @@ public class StaffApplication {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "application_id")
+    @Column(name = "application_id", updatable = false, nullable = false)
     private UUID applicationId;
 
-    @Column(name = "recruitment_id", nullable = false)
-    private UUID recruitmentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recruitment_id", nullable = false)
+    private Recruitment recruitment;
 
-    @Column(name = "user_id", nullable = false)
-    private UUID userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "application_data", columnDefinition = "jsonb")
-    private JsonNode applicationData;
+    private Map<String, Object> applicationData;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "status")
+    @Column(name = "status", columnDefinition = "application_status")
     @Builder.Default
-    private ApplicationStatus applicationStatus = ApplicationStatus.PENDING;
+    private ApplicationStatus applicationStatus  = ApplicationStatus.PENDING;
 
     @Column(name = "applied_at")
     @Builder.Default
     private LocalDateTime appliedAt = LocalDateTime.now();
 
-    @Column(name = "reviewed_at")
+    @Column(name = "reviewed_at", updatable = false)
     private LocalDateTime reviewedAt;
 
     @Column(name = "created_at", updatable = false)
@@ -56,6 +61,11 @@ public class StaffApplication {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
 }

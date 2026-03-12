@@ -12,15 +12,15 @@ const AdminRoutes = () => {
   return (
     <Routes>
       <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
-        <Route path="/" element={<AdminDashboard />} />
-        <Route path="/accounts" element={<AccountManagement />} />
+        <Route index element={<AdminDashboard />} />
+        <Route path="accounts" element={<AccountManagement />} />
         <Route
-          path="/accounts/account-detail/:id"
+          path="accounts/account-detail/:id"
           element={<AccountDetail />}
         />
-        <Route path="/events" element={<EventManagement />} />
-        <Route path="/events/event-detail/:id" element={<EventDetail />} />
-        <Route path="/analytics" element={<EventAnalytics />} />
+        <Route path="events" element={<EventManagement />} />
+        <Route path="events/event-detail/:slug" element={<EventDetail />} />
+        <Route path="analytics" element={<EventAnalytics />} />
       </Route>
     </Routes>
   );

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { autoRefreshToken } from "./store/slices/auth.slice";
 
 import AppRoutes from "./routes";
+import LoadingState from "./components/common/LoadingState";
 
 function App() {
   const hasRefreshed = useRef(false);
@@ -16,11 +17,7 @@ function App() {
   }, [dispatch]);
 
   if (appLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent" />
-      </div>
-    );
+    return <LoadingState />;
   }
 
   return <AppRoutes />;

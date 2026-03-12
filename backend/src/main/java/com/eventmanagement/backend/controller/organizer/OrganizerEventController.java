@@ -44,19 +44,45 @@ public class OrganizerEventController {
 
     @GetMapping
     public ResponseEntity<Page<OrganizerEventResponse>> getMyEvents(
-            @RequestParam UUID organizerId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        Page<OrganizerEventResponse> events = organizerEventService.getMyEvents(organizerId, page, size);
+        User organizer = getAuthenticatedUser();
+
+        Page<OrganizerEventResponse> events = organizerEventService.getMyEvents(organizer.getUserId(), page, size);
         return ResponseEntity.ok(events);
     }
 
-    @GetMapping("/stats")
-    public ResponseEntity<OrganizerEventStatsResponse> getMyEventStats(
-            @RequestParam UUID organizerId) {
+    @GetMapping("/{eventId}")
+    public ResponseEntity<CreateEventResponse> getEventById(@PathVariable UUID eventId) {
+        User organizer = getAuthenticatedUser();
+        CreateEventResponse response = organizerEventService.getEventById(eventId, organizer);
+        return ResponseEntity.ok(response);
+    }
 
-        OrganizerEventStatsResponse stats = organizerEventService.getMyEventStats(organizerId);
+    @PutMapping(value = "/{eventId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CreateEventResponse> updateEvent(
+            @PathVariable UUID eventId,
+            @RequestPart("event") @Valid CreateEventRequest request,
+            @RequestPart(value = "coverFile", required = false) MultipartFile coverFile) {
+
+        User organizer = getAuthenticatedUser();
+        CreateEventResponse response = organizerEventService.updateEvent(eventId, organizer, request, coverFile);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{eventId}")
+    public ResponseEntity<Void> deleteEvent(@PathVariable UUID eventId) {
+        User organizer = getAuthenticatedUser();
+        organizerEventService.deleteEvent(eventId, organizer);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<OrganizerEventStatsResponse> getMyEventStats() {
+
+        User organizer = getAuthenticatedUser();
+        OrganizerEventStatsResponse stats = organizerEventService.getMyEventStats(organizer.getUserId());
         return ResponseEntity.ok(stats);
     }
 
