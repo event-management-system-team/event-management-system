@@ -1,6 +1,7 @@
 package com.eventmanagement.backend.controller.organizer;
 
 import com.eventmanagement.backend.dto.request.CreateEventRequest;
+import com.eventmanagement.backend.dto.response.organizer.AttendeeResponse;
 import com.eventmanagement.backend.dto.response.organizer.CreateEventResponse;
 import com.eventmanagement.backend.dto.response.organizer.OrganizerEventResponse;
 import com.eventmanagement.backend.dto.response.organizer.OrganizerEventStatsResponse;
@@ -83,6 +84,24 @@ public class OrganizerEventController {
         User organizer = getAuthenticatedUser();
         OrganizerEventStatsResponse stats = organizerEventService.getMyEventStats(organizer.getUserId());
         return ResponseEntity.ok(stats);
+    }
+
+    @GetMapping("/{eventId}")
+    public ResponseEntity<OrganizerEventResponse> getEventDetail(
+            @PathVariable UUID eventId) {
+        
+        OrganizerEventResponse event = organizerEventService.getEventDetail(eventId);
+        return ResponseEntity.ok(event);
+    }
+
+    @GetMapping("/{eventId}/attendees")
+    public ResponseEntity<Page<AttendeeResponse>> getEventAttendees(
+            @PathVariable UUID eventId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<AttendeeResponse> attendees = organizerEventService.getEventAttendees(eventId, page, size);
+        return ResponseEntity.ok(attendees);
     }
 
     // get authenticated user

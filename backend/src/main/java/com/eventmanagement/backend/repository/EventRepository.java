@@ -105,4 +105,8 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
         @Modifying
         @Query(value = "DELETE FROM events WHERE event_id = :eventId", nativeQuery = true)
         void hardDeleteById(@Param("eventId") UUID eventId);
+
+        @EntityGraph(attributePaths = "ticketTypes")
+        @Query("SELECT e FROM Event e WHERE e.eventId = :eventId")
+        java.util.Optional<Event> findWithTicketsByEventId(@Param("eventId") UUID eventId);
 }
