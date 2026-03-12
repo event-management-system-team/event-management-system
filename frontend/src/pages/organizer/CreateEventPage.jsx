@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
     Info,
     Clock,
@@ -88,6 +88,10 @@ const Step1BasicInfo = ({ form, onChange, errors = {} }) => {
     const { categories, isLoading: catLoading } = useCategories();
     const fileInputRef = useRef(null);
     const [preview, setPreview] = useState(form.coverPreview || null);
+
+    useEffect(() => {
+        if (form.coverPreview) setPreview(form.coverPreview);
+    }, [form.coverPreview]);
 
     // ── Nominatim address autocomplete ──────────────────────────────────────
     const [suggestions, setSuggestions] = useState([]);
@@ -470,12 +474,19 @@ const Step2Tickets = ({ form, onChange, errors = {} }) => {
                                         <div className="relative">
                                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">₫</span>
                                             <input
-                                                type="number"
+                                                type="text"
+                                                inputMode="numeric"
                                                 placeholder="0"
-                                                min="0"
-                                                step="1000"
-                                                value={ticket.price}
-                                                onChange={(e) => handleTicketChange(idx, 'price', e.target.value)}
+                                                value={
+                                                    ticket.price === '' || ticket.price === undefined
+                                                        ? ''
+                                                        : Number(ticket.price).toLocaleString('vi-VN')
+                                                }
+                                                onChange={(e) => {
+                                                    // Xoá dấu chấm, lấy số thuần
+                                                    const raw = e.target.value.replace(/\./g, '').replace(/[^0-9]/g, '');
+                                                    handleTicketChange(idx, 'price', raw);
+                                                }}
                                                 className={`w-full pl-7 pr-3 py-2 text-sm border rounded-lg bg-white focus:outline-none focus:ring-2 transition ${errors[`ticket_${idx}_price`] ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
                                             />
                                         </div>
@@ -611,7 +622,7 @@ const Step3Agenda = ({ form, onChange, errors = {} }) => {
                     <span className="text-xs text-gray-400 font-medium">{form.agenda.length} session{form.agenda.length !== 1 ? 's' : ''}</span>
                 </div>
                 <p className="text-sm text-gray-400 mb-6">
-                    Plan out the schedule of your event. Add sessions, talks, or activities in order.
+                    Plan out the schedule of your event. Add sessions, or activities in order.
                 </p>
 
                 {/* Agenda items */}
@@ -754,7 +765,7 @@ const Step3Agenda = ({ form, onChange, errors = {} }) => {
 // ─────────────────────────────────────────────
 // Step 4 – Success screen
 // ─────────────────────────────────────────────
-const SuccessScreen = ({ form, onBack }) => {
+const SuccessScreen = ({ form, isEditMode }) => {
     const navigate = useNavigate();
     return (
         <div className="flex flex-col items-center justify-center py-16 px-4">
@@ -764,9 +775,13 @@ const SuccessScreen = ({ form, onBack }) => {
                     <CheckCircle2 size={36} className="text-[#4a9e9e]" strokeWidth={2} />
                 </div>
 
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Event Submitted Successfully!</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    {isEditMode ? 'Event Updated Successfully!' : 'Event Submitted Successfully!'}
+                </h2>
                 <p className="text-sm text-gray-400 mb-6">
-                    Your event has been submitted for review. You can track its status in your events dashboard.
+                    {isEditMode
+                        ? 'Your event has been updated and resubmitted for review.'
+                        : 'Your event has been submitted for review. You can track its status in your events dashboard.'}
                 </p>
 
                 {/* Event summary card */}
@@ -874,25 +889,96 @@ const validateStep3 = (form) => {
     if (form.agenda.length === 0) {
         e._agenda = 'At least one session is required';
     }
+    const eventStart = form.startTime;
+    const eventEnd = form.endTime;
     form.agenda.forEach((item, idx) => {
         if (!item.title.trim()) e[`agenda_${idx}_title`] = 'Session title is required';
-        if (!item.startTime) e[`agenda_${idx}_startTime`] = 'Start time is required';
-        if (!item.endTime) e[`agenda_${idx}_endTime`] = 'End time is required';
-        else if (item.startTime && item.endTime && item.endTime <= item.startTime)
+        if (!item.startTime) {
+            e[`agenda_${idx}_startTime`] = 'Start time is required';
+        } else if (eventStart && item.startTime < eventStart) {
+            e[`agenda_${idx}_startTime`] = `Must be at or after event start time (${eventStart})`;
+        }
+        if (!item.endTime) {
+            e[`agenda_${idx}_endTime`] = 'End time is required';
+        } else if (item.startTime && item.endTime <= item.startTime) {
             e[`agenda_${idx}_endTime`] = 'End time must be after start time';
+        } else if (eventEnd && item.endTime > eventEnd) {
+            e[`agenda_${idx}_endTime`] = `Must be at or before event end time (${eventEnd})`;
+        }
     });
     return e;
 };
 
 const CreateEventPage = () => {
     const navigate = useNavigate();
+    const { eventId } = useParams();
+    const isEditMode = Boolean(eventId);
+
     const [step, setStep] = useState(1);
     const [form, setForm] = useState(initialForm);
     const [saving, setSaving] = useState(false);
+    const [loadingEvent, setLoadingEvent] = useState(false);
     const [error, setError] = useState(null);
     const [errors, setErrors] = useState({});
 
     const updateForm = (partial) => setForm((prev) => ({ ...prev, ...partial }));
+
+    useEffect(() => {
+        if (!isEditMode) return;
+        let cancelled = false;
+        const fetchEvent = async () => {
+            setLoadingEvent(true);
+            try {
+                const data = await organizerService.getEventById(eventId);
+                if (cancelled) return;
+
+                const startDt = data.startDate ? dayjs(data.startDate) : null;
+                const endDt = data.endDate ? dayjs(data.endDate) : null;
+
+                setForm({
+                    eventName: data.eventName || '',
+                    categoryId: data.categoryId || '',
+                    description: data.description || '',
+                    startDate: startDt ? startDt.toDate() : null,
+                    endDate: endDt ? endDt.toDate() : null,
+                    startTime: startDt ? startDt.format('HH:mm') : '',
+                    endTime: endDt ? endDt.format('HH:mm') : '',
+                    location: data.location || '',
+                    lat: data.locationCoordinates?.lat ?? null,
+                    lng: data.locationCoordinates?.lng ?? null,
+                    coverFile: null,
+                    coverPreview: data.bannerUrl || null,
+                    tickets: data.tickets?.length > 0
+                        ? data.tickets.map((t) => ({
+                            name: t.ticketName || '',
+                            quantity: String(t.quantity ?? ''),
+                            price: String(t.price ?? ''),
+                        }))
+                        : [{ name: '', quantity: '', price: '' }],
+                    isFree: data.isFree ?? false,
+                    totalCapacity: data.totalCapacity ? String(data.totalCapacity) : '',
+                    agenda: data.agendas?.length > 0
+                        ? data.agendas.map((a) => ({
+                            title: a.title || '',
+                            startTime: a.startTime || '',
+                            endTime: a.endTime || '',
+                            location: a.location || '',
+                            description: a.description || '',
+                            speaker: '',
+                        }))
+                        : [],
+                });
+            } catch (err) {
+                if (!cancelled) {
+                    setError(err.response?.data?.message || 'Failed to load event data.');
+                }
+            } finally {
+                if (!cancelled) setLoadingEvent(false);
+            }
+        };
+        fetchEvent();
+        return () => { cancelled = true; };
+    }, [eventId, isEditMode]);
 
     const buildEventPayload = (isDraft = false) => ({
         eventName: form.eventName,
@@ -930,7 +1016,12 @@ const CreateEventPage = () => {
         setSaving(true);
         setError(null);
         try {
-            await organizerService.createEvent(buildEventPayload(true), form.coverFile);
+            const payload = buildEventPayload(true);
+            if (isEditMode) {
+                await organizerService.updateEvent(eventId, payload, form.coverFile);
+            } else {
+                await organizerService.createEvent(payload, form.coverFile);
+            }
             navigate('/organizer/my-events');
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to save draft. Please try again.');
@@ -973,7 +1064,12 @@ const CreateEventPage = () => {
         setSaving(true);
         setError(null);
         try {
-            await organizerService.createEvent(buildEventPayload(false), form.coverFile);
+            const payload = buildEventPayload(false);
+            if (isEditMode) {
+                await organizerService.updateEvent(eventId, payload, form.coverFile);
+            } else {
+                await organizerService.createEvent(payload, form.coverFile);
+            }
             setStep(4);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (err) {
@@ -983,10 +1079,19 @@ const CreateEventPage = () => {
         }
     };
 
+    if (loadingEvent) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-[#f0f0ec]">
+                <div className="inline-block w-8 h-8 border-3 border-gray-200 border-t-[#7FA5A5] rounded-full animate-spin" />
+                <p className="ml-3 text-sm text-gray-400">Loading event data...</p>
+            </div>
+        );
+    }
+
     if (step === 4) {
         return (
             <div className="min-h-screen bg-[#f0f0ec] p-8">
-                <SuccessScreen form={form} />
+                <SuccessScreen form={form} isEditMode={isEditMode} />
             </div>
         );
     }
@@ -1007,7 +1112,7 @@ const CreateEventPage = () => {
                             My Events
                         </button>
                         <span>›</span>
-                        <span className="font-semibold text-gray-700">Create New Event</span>
+                        <span className="font-semibold text-gray-700">{isEditMode ? 'Edit Event' : 'Create New Event'}</span>
                     </nav>
 
                     <div className="flex items-center gap-5">
