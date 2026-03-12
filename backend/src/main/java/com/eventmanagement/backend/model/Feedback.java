@@ -16,6 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,17 +35,15 @@ public class Feedback {
     @Column(name = "feedback_id")
     private UUID id;
 
+    @Column(name = "rating")
     private Integer rating;
-    
+
     @Column(columnDefinition = "TEXT")
     private String comment;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name="feedback_data", columnDefinition = "jsonb")
+    @Column(name = "feedback_data", columnDefinition = "jsonb")
     private List<Map<String, Object>> feedbackData;
-
-    @CreationTimestamp
-    private LocalDateTime createdAt;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -53,4 +52,18 @@ public class Feedback {
     @ManyToOne
     @JoinColumn(name = "event_id")
     private Event event;
+
+    @Column(name = "submitted_at")
+    private LocalDateTime submittedAt;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        if (submittedAt == null) {
+            submittedAt = LocalDateTime.now();
+        }
+    }
 }
