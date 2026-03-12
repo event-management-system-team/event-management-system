@@ -40,6 +40,10 @@ const AccountList = ({ searchTerm, status, role, date, sortOption, onLoading, on
 
     useEffect(() => {
         fetchData()
+    }, [])
+
+    useEffect(() => {
+        fetchData()
     }, [currentPage])
 
     const handleToggleBan = async (account) => {

@@ -1,8 +1,5 @@
-import { Bell, ChevronRight, } from 'lucide-react';
+import { ChevronRight, } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
-import { Avatar, AvatarFallback } from "../../components/domain/admin/Avatar.jsx";
-import { Button } from "../../components/domain/admin/Button.jsx";
-import { AdminSidebar } from "../../components/domain/admin/AdminSidebar.jsx";
 import { useEffect, useState } from "react";
 import { useAlert } from '../../hooks/useAlert.js';
 import { adminService } from '../../services/admin.service.js';
@@ -68,9 +65,6 @@ export function EventManagement() {
                 <EmptyState className='h-[600px]' />
             )}
 
-            {/* Sidebar */}
-            <AdminSidebar />
-
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
 
@@ -81,22 +75,6 @@ export function EventManagement() {
                             <span>Dashboard</span>
                             <ChevronRight className="h-4 w-4" />
                             <span>Event Management</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            {/* Notification Icon */}
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-9 w-9 rounded-full"
-                            >
-                                <Bell className="h-5 w-5 text-gray-600" />
-                            </Button>
-                            {/* Profile Icon */}
-                            <Avatar className="w-9 h-9 cursor-pointer">
-                                <AvatarFallback className="bg-[#7FA5A5] text-white text-sm">
-                                    AR
-                                </AvatarFallback>
-                            </Avatar>
                         </div>
                     </div>
                     <div className="flex items-start justify-between">

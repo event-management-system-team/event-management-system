@@ -1,10 +1,8 @@
-import { Bell, UserCircle, Clock, ArrowRight, } from 'lucide-react';
+import { UserCircle, Clock, ArrowRight, } from 'lucide-react';
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../../components/domain/admin/Button.jsx";
-import { Avatar, AvatarFallback } from "../../components/domain/admin/Avatar.jsx";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/domain/admin/Card.jsx";
 import { Badge } from "../../components/domain/admin/Badge.jsx";
-import { AdminSidebar } from "../../components/domain/admin/AdminSidebar.jsx";
 import { useEffect, useState } from 'react';
 import { adminService } from '../../services/admin.service.js';
 import LoadingState from '../../components/common/LoadingState.jsx';
@@ -54,9 +52,6 @@ export function AdminDashboard() {
                 <EmptyState className='h-[600px]' />
             )}
 
-            {/* Sidebar */}
-            <AdminSidebar />
-
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
                 {/* Header */}
@@ -64,17 +59,6 @@ export function AdminDashboard() {
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                             <span>Dashboard</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            {/* Notification Icon */}
-                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full relative">
-                                <Bell className="h-5 w-5 text-gray-600" />
-                                <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
-                            </Button>
-                            {/* Profile Icon */}
-                            <Avatar className="w-9 h-9 cursor-pointer">
-                                <AvatarFallback className="bg-[#7FA5A5] text-white text-sm">AR</AvatarFallback>
-                            </Avatar>
                         </div>
                     </div>
 

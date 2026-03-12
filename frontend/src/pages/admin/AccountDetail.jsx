@@ -1,6 +1,5 @@
 import {
     CheckCircle,
-    Bell,
     ChevronRight,
     Ban,
     Mail,
@@ -8,7 +7,6 @@ import {
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/domain/admin/Tabs.jsx';
 import { Link, useParams } from 'react-router';
-import { AdminSidebar } from "../../components/domain/admin/AdminSidebar.jsx";
 import { Button } from "../../components/domain/admin/Button.jsx";
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/domain/admin/Avatar.jsx";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/domain/admin/Card.jsx";
@@ -138,8 +136,6 @@ export function AccountDetail() {
 
     return (
         <div className="flex h-screen bg-[#F1F0E8]">
-            {/* Sidebar */}
-            <AdminSidebar />
 
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
@@ -156,22 +152,6 @@ export function AccountDetail() {
                             </Link>
                             <ChevronRight className="h-4 w-4" />
                             <span>Account Detail</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            {/* Notification Icon */}
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-9 w-9 rounded-full"
-                            >
-                                <Bell className="h-5 w-5 text-gray-600" />
-                            </Button>
-                            {/* Profile Icon */}
-                            <Avatar className="w-9 h-9 cursor-pointer">
-                                <AvatarFallback className="bg-[#7FA5A5] text-white text-sm">
-                                    AR
-                                </AvatarFallback>
-                            </Avatar>
                         </div>
                     </div>
                 </header>
@@ -251,7 +231,7 @@ export function AccountDetail() {
                 </div>
 
                 {/* Tabs Navigation */}
-                <div className="bg-[#f7f7f7] border-b border-gray-200 px-8">
+                <div className="bg-[#F1F0E8] border-b border-gray-200 px-8">
                     <Tabs defaultValue="basic" className="w-full">
                         <TabsList className="h-12 bg-transparent border-0 p-0 space-x-6">
                             <TabsTrigger

@@ -25,7 +25,7 @@ public class AdminAccountController {
     private final EventRepository eventRepository;
 
     @GetMapping
-    public ResponseEntity<Page<UserResponse>> getAll(
+    public ResponseEntity<Page<UserResponse>> getAllAccounts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(adminAccountService.getAllAccounts(page, size));
