@@ -1,12 +1,16 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { Eye, Search, Download, Plus } from 'lucide-react';
-import Sidebar from '../../components/layout/Sidebar'; 
 import { useFeedbacks } from "../../hooks/useFeedback";
 import { Link, useParams } from 'react-router-dom';
+import { Pagination } from 'antd';
 
 const FeedbackList = () => {
   const { eventId } = useParams(); 
   const { data: feedbacks, isLoading, isError } = useFeedbacks(eventId); 
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const listTopRef = useRef(null);
 
   if (isLoading) {
     return (
@@ -27,15 +31,32 @@ const FeedbackList = () => {
   const eventName = feedbacks?.eventName || "Unknown Event"; 
   const feedbackItems = feedbacks?.feedbacks || []; 
 
-  return (
-    <div className="flex min-h-screen bg-[#f8f7f2] font-sans w-full">
-      
-      <Sidebar />
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = feedbackItems.slice(indexOfFirstItem, indexOfLastItem);
 
-      <div className="flex-1 ml-64 p-10 w-full overflow-x-hidden"> 
+  const onChangePage = (page) => {
+    setCurrentPage(page);
+
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
+    setTimeout(() => {
+      if (listTopRef.current) {
+        listTopRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    }, 100);
+  };
+
+  return (
+    <div className="p-10 w-full overflow-x-hidden"> 
         
         {/*  header  */}
-        <div className="flex justify-between items-end mb-8">
+        <div className="flex justify-between items-end mb-8" ref={listTopRef}>
           <div>
             <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-2">Attendee Feedback</h1>
             <p className="text-gray-500 font-medium italic">
@@ -93,7 +114,7 @@ const FeedbackList = () => {
                     </td>
                   </tr>
                 ) : (
-                  feedbackItems.map((item) => (
+                  currentItems.map((item) => (
                     <tr key={item.feedbackId} className="hover:bg-gray-50/80 transition-colors group cursor-pointer">
                       <td className="px-8 py-5 text-sm text-gray-500 font-semibold whitespace-nowrap">
                         {new Date(item.createdAt).toLocaleString()}
@@ -135,14 +156,24 @@ const FeedbackList = () => {
             </table>
           </div>
           
-          <div className="px-8 py-6 border-t border-gray-50 flex justify-between items-center bg-gray-50/50">
+          <div className="px-8 py-6 border-t border-gray-50 flex flex-col sm:flex-row justify-between items-center gap-4 bg-gray-50/50">
             <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest">
               Total Responses: <span className="text-gray-700">{feedbackItems.length}</span>
             </p>
+            {feedbackItems.length > itemsPerPage && (
+              <Pagination
+                align="center"
+                responsive
+                current={currentPage}
+                pageSize={itemsPerPage}
+                showSizeChanger={false}
+                total={feedbackItems.length}
+                onChange={onChangePage}
+              />
+            )}
           </div>
         </div>
 
-      </div>
     </div>
   );
 };

@@ -7,6 +7,7 @@ import MyEventsPage from "../pages/organizer/MyEventsPage";
 import FeedbackList from "../pages/organizer/FeedbackList";
 import FeedbackBuilder from "../pages/organizer/FeedbackBuilder";
 import FeedbackDetail from "../pages/organizer/FeedbackDetail";
+import FeedbackAnalytics from "../pages/organizer/FeedbackAnalytics";
 import RecruitmentList from "../pages/organizer/RecruitmentList";
 import RecruitmentBuilder from "../pages/organizer/RecruitmentBuilder";
 import ApplicationList from "../pages/organizer/ApplicationList";
@@ -24,6 +25,7 @@ const OrganizerRoutes = () => {
                     <Route path="feedback/feedbacklist/:eventId" element={<FeedbackList />} />
                     <Route path="feedback/createform/:eventId" element={<FeedbackBuilder />} />
                     <Route path="feedback/:feedbackId" element={<FeedbackDetail />} />
+                    <Route path="feedback/analytics/:eventId" element={<FeedbackAnalytics />} />
                     <Route path="recruitmentlist/:eventId" element={<RecruitmentList />} />
                     <Route path="recruitmentcreate/:eventId" element={<RecruitmentBuilder />} />
                     <Route path="applications/:recruitmentId" element={<ApplicationList />} />

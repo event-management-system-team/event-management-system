@@ -1,14 +1,17 @@
+import { useParams } from "react-router-dom";
+import { useFeedbackAnalytics } from "../../hooks/useFeedbackAnalytics";
+
 import StatCards from "../../components/domain/feedback-analytic/StatCards";
 import RatingBarChart from "../../components/domain/feedback-analytic/RatingBarChart";
 import ReviewsList from "../../components/domain/feedback-analytic/ReviewsList";
-import Sidebar from "../../components/layout/Sidebar";
 
 export default function AnalyticsPage() {
+  const { eventId } = useParams();
+  const { analytics, isLoading, isError } = useFeedbackAnalytics(eventId);
+
   return (
-    <div className="flex min-h-screen bg-[#f8f7f2] font-sans w-full">
-      <Sidebar />
-      <div className="flex-1 ml-0 lg:ml-64 p-4 md:p-8 lg:p-10 w-full overflow-x-hidden space-y-4 md:space-y-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="p-4 md:p-8 lg:p-10 w-full space-y-4 md:space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
               Feedback & Reviews
@@ -33,12 +36,25 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        <StatCards />
+        {isError && (
+          <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl">
+            Something went wrong!
+          </div>
+        )}
 
-        <RatingBarChart />
+        <StatCards
+          averageRating={analytics?.averageRating}
+          totalResponses={analytics?.totalResponses}
+          positiveFeedbackPct={analytics?.positiveFeedbackPct}
+          isLoading={isLoading}
+        />
 
-        <ReviewsList />
-      </div>
+        <RatingBarChart
+          ratingDistribution={analytics?.ratingDistribution ?? []}
+          isLoading={isLoading}
+        />
+
+        <ReviewsList eventId={eventId} />
     </div>
   );
 }

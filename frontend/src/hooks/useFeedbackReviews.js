@@ -4,7 +4,10 @@ import feedbackService from "../services/feedback.service";
 export const useFeedbackReviews = (eventId, page = 0, size = 10) => {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["feedbacks", eventId, "reviews", page],
-    queryFn: () => feedbackService.getReviews(eventId, page, size),
+    queryFn: async () => {
+      const response = await feedbackService.getReviews(eventId, page, size);
+      return response.data;
+    },
     enabled: !!eventId,
     staleTime: 1000 * 60,
     placeholderData: (prev) => prev,
