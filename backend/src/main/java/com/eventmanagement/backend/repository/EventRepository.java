@@ -28,12 +28,6 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
 
     long countByStatusIn(List<EventStatus> statuses);
 
-    List<Event> findTop5ByStatusOrderByCreatedAtDesc(EventStatus status);
-
-    long countByStatus(EventStatus status);
-
-    long countByStatusIn(List<EventStatus> statuses);
-
     @Query("SELECT e FROM Event e " +
             "WHERE e.status IN :statuses " +
             "AND e.totalCapacity > 0 " +
