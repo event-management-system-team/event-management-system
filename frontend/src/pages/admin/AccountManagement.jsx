@@ -1,10 +1,8 @@
-import { Plus, Bell, ChevronRight, } from 'lucide-react';
+import { Plus, ChevronRight, } from 'lucide-react';
 import { useSearchParams } from 'react-router';
-import { AdminSidebar } from "../../components/domain/admin/AdminSidebar.jsx";
 import { CreateOrganizerModal } from "../../components/domain/admin/CreateOrganizerModal.jsx";
 import { useEffect, useState } from "react";
 import { Button } from "../../components/domain/admin/Button.jsx";
-import { Avatar, AvatarFallback } from "../../components/domain/admin/Avatar.jsx";
 import { adminService } from "../../services/admin.service.js";
 import { Alert } from "../../components/common/Alert.jsx";
 import { useAlert } from '../../hooks/useAlert.js';
@@ -31,6 +29,7 @@ export function AccountManagement() {
     const [searchTerm, setSearchTerm] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { alert, showAlert, closeAlert } = useAlert();
+    const [refreshKey, setRefreshKey] = useState(0);
 
     const fetchSummary = async () => {
         try {
@@ -61,10 +60,9 @@ export function AccountManagement() {
         setIsModalOpen(false);
     };
 
-    const handleOrganizerCreated = (newAccount) => {
-        setAccounts(prevAccounts => [newAccount, ...prevAccounts]);
-        setOriginalAccounts(prevOriginal => [newAccount, ...prevOriginal]);
-    }
+    const handleOrganizerCreated = () => {
+        setRefreshKey(prev => prev + 1);
+    };
 
     const handleBanAccount = () => {
         fetchSummary()
@@ -81,9 +79,6 @@ export function AccountManagement() {
                 <EmptyState className='h-[600px]' />
             )}
 
-            {/* Sidebar */}
-            <AdminSidebar />
-
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
                 {/* Header */}
@@ -94,18 +89,7 @@ export function AccountManagement() {
                             <ChevronRight className="h-4 w-4" />
                             <span>Account Management</span>
                         </div>
-                        <div className="flex items-center gap-3">
-                            {/* Notification Icon */}
-                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
-                                <Bell className="h-5 w-5 text-gray-600" />
-                            </Button>
-                            {/* Profile Icon */}
-                            <Avatar className="w-9 h-9 cursor-pointer">
-                                <AvatarFallback className="bg-[#7FA5A5] text-white text-sm">
-                                    AR
-                                </AvatarFallback>
-                            </Avatar>
-                        </div>
+
                     </div>
                     <div className="flex items-start justify-between">
                         <div>
@@ -115,7 +99,7 @@ export function AccountManagement() {
                             </p>
                         </div>
                         <Button
-                            className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5"
+                            className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5 h-11 hover:cursor-pointer"
                             onClick={openModal}
                         >
                             <Plus className="h-4 w-4" />
@@ -153,6 +137,7 @@ export function AccountManagement() {
                     onError={setError}
                     showAlert={showAlert}
                     onBan={handleBanAccount}
+                    refreshKey={refreshKey}
                 />
             </main>
 

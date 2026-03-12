@@ -1,19 +1,15 @@
 import { useEffect, useState } from 'react';
-import { AdminSidebar } from "../../components/domain/admin/AdminSidebar.jsx";
 import { Button } from "../../components/domain/admin/Button.jsx";
-import { Avatar, AvatarFallback } from "../../components/domain/admin/Avatar.jsx";
 import { adminService } from '../../services/admin.service.js';
 import dayjs from "dayjs";
 import LoadingState from '../../components/common/LoadingState.jsx';
-import html2pdf from 'html2pdf.js';
-import html2canvas from "html2canvas";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import GlobalAnalyticsCard from '../../components/domain/admin/GlobalAnalyticsCard.jsx';
 import EventChart from '../../components/domain/admin/EventChart.jsx';
 import AnalyticsFilter from '../../components/domain/admin/AnalyticsFilter.jsx';
 import EventPerformanceList from '../../components/domain/admin/EventPerformanceList.jsx';
-import { Bell, ChevronRight, Download } from 'lucide-react';
+import { ChevronRight, Download } from 'lucide-react';
 
 export function EventAnalytics() {
     const [events, setEvents] = useState([])
@@ -138,9 +134,6 @@ export function EventAnalytics() {
                 <EmptyState className='h-[600px]' />
             )}
 
-            {/* Sidebar */}
-            <AdminSidebar />
-
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
                 {/* Header */}
@@ -151,22 +144,6 @@ export function EventAnalytics() {
                             <ChevronRight className="h-4 w-4" />
                             <span>Event Analytics</span>
                         </div>
-                        <div className="flex items-center gap-3">
-                            {/* Notification Icon */}
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-9 w-9 rounded-full"
-                            >
-                                <Bell className="h-5 w-5 text-gray-600" />
-                            </Button>
-                            {/* Profile Icon */}
-                            <Avatar className="w-9 h-9 cursor-pointer">
-                                <AvatarFallback className="bg-[#7FA5A5] text-white text-sm">
-                                    AR
-                                </AvatarFallback>
-                            </Avatar>
-                        </div>
                     </div>
                     <div className="flex items-start justify-between">
                         <div>
@@ -176,11 +153,7 @@ export function EventAnalytics() {
                             </p>
                         </div>
                         <div className="flex gap-2">
-                            {/* <Button variant="outline" className="gap-2" onClick={handleExportPDF}>
-                                <FileText className="h-4 w-4" />
-                                Export PDF
-                            </Button> */}
-                            <Button variant="outline" className="gap-2" onClick={handleExportExcel}>
+                            <Button variant="outline" className="gap-2 h-12 rounded-full hover:cursor-pointer" onClick={handleExportExcel}>
                                 <Download className="h-4 w-4" />
                                 Export Excel Report
                             </Button>

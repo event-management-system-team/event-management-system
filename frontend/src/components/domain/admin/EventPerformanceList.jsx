@@ -126,8 +126,10 @@ const EventPerformanceList = ({ searchTerm, status, category, date, sortOption, 
                     </div>
 
                     {/* Event Rows */}
-                    {processedEvents?.length === 0 ? (
-                        <div className="text-center text-gray-500 border-none py-6">No events yet.</div>
+                    {!processedEvents || processedEvents?.length === 0 ? (
+                        <div className="flex items-center justify-center flex-1 text-sm text-gray-400 mt-15 mb-15">
+                            No event analytics data yet
+                        </div>
                     ) : (
                         processedEvents.map(event => {
                             const progress = ticketProgress(event.totalCapacity, event.ticketsSold)

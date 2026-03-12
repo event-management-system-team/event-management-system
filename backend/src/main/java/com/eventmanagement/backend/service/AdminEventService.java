@@ -88,6 +88,20 @@ public class AdminEventService {
         eventRepository.save(event);
     }
 
+    @Transactional
+    public void autoRejectExpiredPendingEvents() {
+        LocalDateTime deadline = LocalDateTime.now().plusDays(3);
+
+        List<Event> expiredEvents = eventRepository.findExpiredPendingEvents(EventStatus.PENDING, deadline);
+
+        for (Event event : expiredEvents) {
+            event.setStatus(EventStatus.REJECTED);
+            event.setRejectionReason("Event automatically rejected because it was not approved at least 3 days before the event start date");
+            event.setUpdatedAt(LocalDateTime.now());
+        }
+        eventRepository.saveAll(expiredEvents);
+    }
+
     private EventResponse mapToResponse(Event event) {
 
         EventResponse.CategoryDto categoryDto = null;
