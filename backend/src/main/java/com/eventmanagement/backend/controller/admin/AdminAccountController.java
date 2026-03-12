@@ -61,7 +61,7 @@ public class AdminAccountController {
         return ResponseEntity.ok(adminAccountService.toggleBanAccount(id));
     }
 
-    @PostMapping("/organizer")
+    @PostMapping("/create-organizer")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> createOrganizer(@Valid @RequestBody CreateOrganizerRequest request) {
         return ResponseEntity.ok(adminAccountService.createOrganizer(request));

@@ -29,6 +29,7 @@ export function AccountManagement() {
     const [searchTerm, setSearchTerm] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { alert, showAlert, closeAlert } = useAlert();
+    const [refreshKey, setRefreshKey] = useState(0);
 
     const fetchSummary = async () => {
         try {
@@ -59,10 +60,9 @@ export function AccountManagement() {
         setIsModalOpen(false);
     };
 
-    const handleOrganizerCreated = (newAccount) => {
-        setAccounts(prevAccounts => [newAccount, ...prevAccounts]);
-        setOriginalAccounts(prevOriginal => [newAccount, ...prevOriginal]);
-    }
+    const handleOrganizerCreated = () => {
+        setRefreshKey(prev => prev + 1);
+    };
 
     const handleBanAccount = () => {
         fetchSummary()
@@ -99,7 +99,7 @@ export function AccountManagement() {
                             </p>
                         </div>
                         <Button
-                            className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5 h-11"
+                            className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5 h-11 hover:cursor-pointer"
                             onClick={openModal}
                         >
                             <Plus className="h-4 w-4" />
@@ -137,6 +137,7 @@ export function AccountManagement() {
                     onError={setError}
                     showAlert={showAlert}
                     onBan={handleBanAccount}
+                    refreshKey={refreshKey}
                 />
             </main>
 

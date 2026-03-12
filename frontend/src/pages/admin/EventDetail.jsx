@@ -315,13 +315,9 @@ export function EventDetail() {
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="pt-3">
-                                        {/* <div className="prose max-w-none text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                                        <div className="prose max-w-none text-sm text-gray-700 leading-relaxed whitespace-pre-line">
                                             {event?.description}
-                                        </div> */}
-                                        <div
-                                            className="prose max-w-none text-sm text-gray-700 leading-relaxed whitespace-pre-line"
-                                            dangerouslySetInnerHTML={{ __html: event?.description }}
-                                        />
+                                        </div>
                                     </CardContent>
                                 </Card>
 
@@ -571,7 +567,7 @@ export function EventDetail() {
                                     {/* Action Buttons */}
                                     <div className="space-y-2 pt-4">
                                         <Button
-                                            className="w-full bg-green-600 hover:bg-green-700 text-white"
+                                            className="w-full bg-green-600 hover:bg-green-700 text-white hover:cursor-pointer"
                                             disabled={!allChecklistComplete}
                                             onClick={handleApproveEvent}
                                         >
@@ -588,7 +584,7 @@ export function EventDetail() {
                                         >
                                             <Button
                                                 variant="destructive"
-                                                className="w-full"
+                                                className="w-full hover:cursor-pointer"
                                             >
                                                 <X className="mr-2 h-4 w-4" />
                                                 Reject Submission
@@ -597,7 +593,7 @@ export function EventDetail() {
                                     </div>
 
                                     {!allChecklistComplete && (
-                                        <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                                        <div className="bg-orange-50 border border-orange-100 rounded-lg p-3">
                                             <p className="text-xs text-orange-800">
                                                 Complete all checklist items to enable approval
                                             </p>

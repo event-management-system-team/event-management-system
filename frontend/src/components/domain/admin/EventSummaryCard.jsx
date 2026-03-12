@@ -6,28 +6,28 @@ const EventSummaryCard = ({ summary }) => {
     const summaryMetrics = (summary) => [
         {
             title: "TOTAL EVENTS",
-            value: summary?.totalEvents,
+            value: summary?.totalEvents ?? 0,
             icon: Calendar,
             iconBg: "bg-blue-100",
             iconColor: "text-blue-600"
         },
         {
             title: "ACTIVE",
-            value: summary?.activeEvents,
+            value: summary?.activeEvents ?? 0,
             icon: Zap,
             iconBg: "bg-green-100",
             iconColor: "text-green-600"
         },
         {
             title: "PENDING",
-            value: summary?.pendingEvents,
+            value: summary?.pendingEvents ?? 0,
             icon: CalendarCheck,
             iconBg: "bg-orange-100",
             iconColor: "text-orange-600"
         },
         {
             title: "COMPLETED",
-            value: summary?.completedEvents,
+            value: summary?.completedEvents ?? 0,
             icon: CheckCircle,
             iconBg: "bg-gray-200",
             iconColor: "text-gray-600"

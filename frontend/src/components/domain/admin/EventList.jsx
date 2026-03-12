@@ -39,6 +39,7 @@ const EventList = ({ searchTerm, status, category, priceType, date, sortOption, 
     useEffect(() => {
         fetchData()
     }, [currentPage])
+
     const processedEvents = useMemo(() => {
         let list = [...originalEvents];
 
@@ -187,110 +188,116 @@ const EventList = ({ searchTerm, status, category, priceType, date, sortOption, 
                     </div>
 
                     {/* Event Rows */}
-                    {paginatedEvents.map(event => {
-                        const progress = ticketProgress(event?.totalCapacity, event?.registeredCount);
-                        const detailUrl = `/admin/events/event-detail/${event.eventSlug}`;
+                    {!paginatedEvents || paginatedEvents.length === 0 ? (
+                        <div className="flex items-center justify-center flex-1 text-sm text-gray-400 mt-15">
+                            No event data yet
+                        </div>
+                    ) : (
+                        paginatedEvents.map(event => {
+                            const progress = ticketProgress(event?.totalCapacity, event?.registeredCount);
+                            const detailUrl = `/admin/events/event-detail/${event.eventSlug}`;
 
-                        return (
-                            <div
-                                key={event?.eventId}
-                                className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-[#eef3f5]"
-                            >
-                                <div className="col-span-3 flex items-center gap-3">
-                                    <Avatar className='w-10 h-10'>
-                                        {event?.bannerUrl ? (
-                                            <AvatarImage src={event?.bannerUrl} alt={event.eventName} />
-                                        ) : (
-                                            <AvatarFallback className="bg-gray-300" />
-                                        )}
-                                    </Avatar>
-                                    <div>
-                                        <div className="font-medium text-sm text-gray-900">
-                                            {event?.eventName}
+                            return (
+                                <div
+                                    key={event?.eventId}
+                                    className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-[#eef3f5]"
+                                >
+                                    <div className="col-span-3 flex items-center gap-3">
+                                        <Avatar className='w-10 h-10'>
+                                            {event?.bannerUrl ? (
+                                                <AvatarImage src={event?.bannerUrl} alt={event.eventName} />
+                                            ) : (
+                                                <AvatarFallback className="bg-gray-300" />
+                                            )}
+                                        </Avatar>
+                                        <div>
+                                            <div className="font-medium text-sm text-gray-900">
+                                                {event?.eventName}
+                                            </div>
+                                            <div className="flex items-center gap-1.5 mt-0.5">
+                                                <span className="text-xs text-gray-500">{event?.category?.categoryName}</span>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-1.5 mt-0.5">
-                                            <span className="text-xs text-gray-500">{event?.category?.categoryName}</span>
+                                    </div>
+                                    <div className="col-span-2">
+                                        <div className="text-sm text-gray-900">
+                                            {event?.organizer?.fullName}
                                         </div>
                                     </div>
-                                </div>
-                                <div className="col-span-2">
-                                    <div className="text-sm text-gray-900">
-                                        {event?.organizer?.fullName}
-                                    </div>
-                                </div>
-                                <div className="col-span-2">
-                                    <div className="text-sm text-gray-900">
-                                        {dayjs(event?.startDate).format("MMM DD, YYYY")}
-                                    </div>
-                                    <div className="text-xs text-gray-500">
-                                        {dayjs(event?.startDate).format("hh:mm A")} -{" "}
-                                        {dayjs(event?.endDate).format("hh:mm A")}
-                                    </div>
-                                </div>
-                                <div className="col-span-2">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                            <div
-                                                className="h-full bg-blue-500 rounded-full"
-                                                style={{ width: `${progress}%` }}
-                                            />
+                                    <div className="col-span-2">
+                                        <div className="text-sm text-gray-900">
+                                            {dayjs(event?.startDate).format("MMM DD, YYYY")}
                                         </div>
-                                        <span className="text-xs text-gray-600 min-w-[35px]">{progress}%</span>
+                                        <div className="text-xs text-gray-500">
+                                            {dayjs(event?.startDate).format("hh:mm A")} -{" "}
+                                            {dayjs(event?.endDate).format("hh:mm A")}
+                                        </div>
                                     </div>
-                                    <div className="text-xs text-gray-600">
-                                        {event?.registeredCount}/{event?.totalCapacity}
+                                    <div className="col-span-2">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                                <div
+                                                    className="h-full bg-blue-500 rounded-full"
+                                                    style={{ width: `${progress}%` }}
+                                                />
+                                            </div>
+                                            <span className="text-xs text-gray-600 min-w-[35px]">{progress}%</span>
+                                        </div>
+                                        <div className="text-xs text-gray-600">
+                                            {event?.registeredCount}/{event?.totalCapacity}
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="col-span-1">
-                                    <Badge
-                                        variant={getStatusVariant(event.status)}
-                                        className={getStatusClasses(event.status)}
-                                    >
-                                        ● {event.status}
-                                    </Badge>
-                                </div>
-                                <div className="col-span-1">
-                                    <div className="text-sm text-gray-700 text-center">
-                                        {formatDate(event.createdAt)}
-                                    </div>
-                                </div>
-                                <div className="col-span-1 flex justify-end gap-1">
-                                    <Link to={detailUrl}>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-8 w-8"
-                                            title="View event details"
+                                    <div className="col-span-1">
+                                        <Badge
+                                            variant={getStatusVariant(event.status)}
+                                            className={getStatusClasses(event.status)}
                                         >
-                                            <Eye className="h-4 w-4 text-gray-500" />
-                                        </Button>
-                                    </Link>
-                                    {event?.status === "PENDING" && (<>
+                                            ● {event.status}
+                                        </Badge>
+                                    </div>
+                                    <div className="col-span-1">
+                                        <div className="text-sm text-gray-700 text-center">
+                                            {formatDate(event.createdAt)}
+                                        </div>
+                                    </div>
+                                    <div className="col-span-1 flex justify-end gap-1">
                                         <Link to={detailUrl}>
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
                                                 className="h-8 w-8"
-                                                title="Approve event"
+                                                title="View event details"
                                             >
-                                                <CheckCircle className="h-4 w-4 text-green-600" />
+                                                <Eye className="h-4 w-4 text-gray-500" />
                                             </Button>
                                         </Link>
+                                        {event?.status === "PENDING" && (<>
+                                            <Link to={detailUrl}>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8"
+                                                    title="Approve event"
+                                                >
+                                                    <CheckCircle className="h-4 w-4 text-green-600" />
+                                                </Button>
+                                            </Link>
 
-                                        <Link to={detailUrl}>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="h-8 w-8"
-                                                title="Reject event"
-                                            >
-                                                <X className="h-4 w-4 text-red-600" />
-                                            </Button>
-                                        </Link>
-                                    </>)}
-                                </div>
-                            </div>)
-                    })}
+                                            <Link to={detailUrl}>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8"
+                                                    title="Reject event"
+                                                >
+                                                    <X className="h-4 w-4 text-red-600" />
+                                                </Button>
+                                            </Link>
+                                        </>)}
+                                    </div>
+                                </div>)
+                        })
+                    )}
 
                     {/* Footer with Pagination */}
                     <div className="px-6 py-4 flex items-center justify-between text-sm text-gray-600">

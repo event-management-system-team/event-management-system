@@ -153,7 +153,7 @@ export function EventAnalytics() {
                             </p>
                         </div>
                         <div className="flex gap-2">
-                            <Button variant="outline" className="gap-2 h-12 rounded-full" onClick={handleExportExcel}>
+                            <Button variant="outline" className="gap-2 h-12 rounded-full hover:cursor-pointer" onClick={handleExportExcel}>
                                 <Download className="h-4 w-4" />
                                 Export Excel Report
                             </Button>
