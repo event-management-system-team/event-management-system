@@ -86,7 +86,7 @@ public class OrganizerEventController {
         return ResponseEntity.ok(stats);
     }
 
-    @GetMapping("/{eventId}")
+    @GetMapping("/{eventId}/detail")
     public ResponseEntity<OrganizerEventResponse> getEventDetail(
             @PathVariable UUID eventId) {
         
