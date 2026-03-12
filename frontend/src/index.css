@@ -1,1 +1,52 @@
 @import "tailwindcss";
+
+@theme  {
+  --color-white: #ffffff;
+  --color-primary: #8aa8b2;
+  --color-secondary: #b3c8cf;
+  --color-accent: #ff6b35;
+  --color-teal-accent: #4ecdc4;
+  --color-beige: #e5e1da;
+  --color-cream: #f1f0e8;
+  --color-background-light: #f7f7f7;
+  --color-background-dark: #171a1b;
+  --color-text-body: #374151;
+  --font-display: "Plus Jakarta Sans", sans-serif;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-display);
+    background-color: var(--color-cream);
+    color: var(--color-text-body);
+  }
+}
+
+@layer components {
+  .bg-login-gradient {
+    background: linear-gradient(135deg, #89a8b2 0%, #5d727a 100%);
+  }
+
+  .bg-button-gradient {
+    background: linear-gradient(90deg, #89a8b2 0%, #b3c8cf 100%);
+  }
+
+  .glass-effect {
+    @apply bg-white/15 backdrop-blur-md border border-white/20;
+  }
+}
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+/* Ẩn scrollbar cho Chrome, Safari và Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+/* Ẩn scrollbar cho IE, Edge và Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
