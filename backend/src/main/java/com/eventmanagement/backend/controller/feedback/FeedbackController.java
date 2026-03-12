@@ -35,29 +35,26 @@ import com.eventmanagement.backend.service.organizer.CustomFormService;
 import com.eventmanagement.backend.service.organizer.FeedbackService;
 import com.eventmanagement.backend.service.organizer.RecruitmentServiceOrganizer;
 
-
-
-
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials="true") 
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class FeedbackController {
 
     private final FeedbackRepository feedbackRepository;
     private final CustomFormRepository customFormRepository;
-    private final CustomFormService customFormService; 
-    private final FeedbackService feedbackService; 
+    private final CustomFormService customFormService;
+    private final FeedbackService feedbackService;
     private final RecruitmentService recruitmentService;
     private final RecruitmentServiceOrganizer recruitmentServiceOrganizer;
 
-     // DI qua constructor
+    // DI qua constructor
 
-    public FeedbackController(FeedbackRepository feedbackRepository, 
-                              CustomFormRepository customFormRepository, 
-                              CustomFormService customFormService, 
-                              FeedbackService feedbackService,
-                              RecruitmentService recruitmentService,
-                              RecruitmentServiceOrganizer recruitmentServiceOrganizer) {
+    public FeedbackController(FeedbackRepository feedbackRepository,
+            CustomFormRepository customFormRepository,
+            CustomFormService customFormService,
+            FeedbackService feedbackService,
+            RecruitmentService recruitmentService,
+            RecruitmentServiceOrganizer recruitmentServiceOrganizer) {
         this.feedbackRepository = feedbackRepository;
         this.customFormRepository = customFormRepository;
         this.customFormService = customFormService;
@@ -69,11 +66,11 @@ public class FeedbackController {
     @GetMapping("/events/{eventId}/feedback")
     public ResponseEntity<Map<String, Object>> getEventFeedbacks(@PathVariable UUID eventId) {
         List<FeedbackResponseDTO> feedbacks = feedbackRepository.findFeedbacksByEventId(eventId);
-        
+
         if (feedbacks == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy sự kiện");
         }
-        
+
         Map<String, Object> response = new HashMap<>();
         response.put("feedbacks", feedbacks);
         return ResponseEntity.ok(response);
@@ -91,11 +88,12 @@ public class FeedbackController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống: " + e.getMessage());
         }
     }
-    
+
     @GetMapping("/feedbacks/{feedbackId}")
     public ResponseEntity<FeedbackDetailResponseDTO> getFeedbackDetail(@PathVariable UUID feedbackId) {
         return ResponseEntity.ok(feedbackService.getFeedbackDetail(feedbackId));
     }
+
     @GetMapping("event/recruitments/{recruitmentId}")
     public ResponseEntity<RecruitmentDetailDTO> getRecruitmentDetail(@PathVariable UUID recruitmentId) {
         RecruitmentDetailDTO detail = recruitmentServiceOrganizer.getRecruitmentDetail(recruitmentId);
@@ -104,52 +102,52 @@ public class FeedbackController {
     }
 
     @GetMapping("/events/{eventId}/forms")
-public ResponseEntity<?> getEventForm(
-    @PathVariable("eventId") UUID eventId,
-    @RequestParam(value = "type", defaultValue = "FEEDBACK") String typeStr 
-) {
-    try {
-        // Chuyển String thành Enum trước khi đưa xuống Service
-        FormType type = FormType.valueOf(typeStr.toUpperCase());
-        
-        CustomForm form = customFormService.getFormByType(eventId, type); // Hoặc truyền type tùy logic Service bạn đang viết
-        
-        if (form == null) {
-            // Nếu chưa có form, trả về 204 No Content hoặc 200 kèm object rỗng để React khỏi lỗi
-            return ResponseEntity.ok(Map.of("message", "Chưa có form nào được tạo"));
-        }
-        return ResponseEntity.ok(form);
-    } catch (IllegalArgumentException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại form không hợp lệ (formType)");
-    } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống: " + e.getMessage());
-    }
-}
+    public ResponseEntity<?> getEventForm(
+            @PathVariable("eventId") UUID eventId,
+            @RequestParam(value = "type", defaultValue = "FEEDBACK") String typeStr) {
+        try {
+            // Chuyển String thành Enum trước khi đưa xuống Service
+            FormType type = FormType.valueOf(typeStr.toUpperCase());
 
-@PostMapping("feedbacks/events/{eventId}")
-@PreAuthorize("hasRole('ATTENDEE')")
+            CustomForm form = customFormService.getFormByType(eventId, type); // Hoặc truyền type tùy logic Service bạn
+                                                                              // đang viết
+
+            if (form == null) {
+                // Nếu chưa có form, trả về 204 No Content hoặc 200 kèm object rỗng để React
+                // khỏi lỗi
+                return ResponseEntity.ok(Map.of("message", "Chưa có form nào được tạo"));
+            }
+            return ResponseEntity.ok(form);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại form không hợp lệ (formType)");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("feedbacks/events/{eventId}")
+    @PreAuthorize("hasRole('ATTENDEE')")
     public ResponseEntity<?> submitFeedback(
             @PathVariable UUID eventId,
             @RequestBody SubmitFeedbackRequest request) {
         try {
             // 2. FIX LỖI EMAIL: Lấy nguyên cái Object User ra từ SecurityContext
             User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            
+
             // Rút email chuẩn từ Object đó ra
             String currentUserEmail = currentUser.getEmail();
             // Truyền email này xuống Service thay vì truyền ID
             Feedback savedFeedback = feedbackService.createFeedback(eventId, currentUserEmail, request);
-            
+
             return ResponseEntity.ok(Map.of(
-                "message", "Cảm ơn bạn đã gửi đánh giá!",
-                "feedbackId", savedFeedback.getId()
-            ));
+                    "message", "Cảm ơn bạn đã gửi đánh giá!",
+                    "feedbackId", savedFeedback.getId()));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("message", "Lỗi server nội bộ: " + e.getMessage()));
+                    .body(Map.of("message", "Lỗi server nội bộ: " + e.getMessage()));
         }
     }
-    }
+}
