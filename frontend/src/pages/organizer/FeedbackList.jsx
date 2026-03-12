@@ -32,7 +32,7 @@ const FeedbackList = () => {
       
       <Sidebar />
 
-      <div className="flex-1 p-10 w-full overflow-x-hidden"> 
+      <div className="flex-1 ml-64 p-10 w-full overflow-x-hidden"> 
         
         {/*  header  */}
         <div className="flex justify-between items-end mb-8">

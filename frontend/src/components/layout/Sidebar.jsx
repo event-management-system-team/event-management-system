@@ -53,7 +53,7 @@ const Sidebar = () => {
   const feedbackLink = eventId ? `/organizer/feedback/feedbacklist/${eventId}` : `/organizer/feedbacklist/1`;
 
   return (
-    <aside className="w-64 h-screen bg-[#1e293b] flex flex-col text-gray-300 fixed left-0 top-0 z-50 font-sans shadow-xl border-r border-gray-800">
+    <aside className="w-64 h-screen bg-[#1e293b] flex-col text-gray-300 fixed left-0 top-0 z-50 font-sans shadow-xl border-r border-gray-800 hidden lg:flex">
       
       {/* 1. Phần Logo */}
       <div className="p-6 flex items-center gap-3">
