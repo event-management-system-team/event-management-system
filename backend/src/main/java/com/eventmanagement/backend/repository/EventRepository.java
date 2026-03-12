@@ -29,7 +29,6 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
 
     long countByStatusIn(List<EventStatus> statuses);
 
-
     @Query("SELECT e FROM Event e " +
             "WHERE e.status IN :statuses " +
             "AND e.totalCapacity > 0 " +
@@ -107,4 +106,8 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
         @Modifying
         @Query(value = "DELETE FROM events WHERE event_id = :eventId", nativeQuery = true)
         void hardDeleteById(@Param("eventId") UUID eventId);
+
+        @EntityGraph(attributePaths = "ticketTypes")
+        @Query("SELECT e FROM Event e WHERE e.eventId = :eventId")
+        java.util.Optional<Event> findWithTicketsByEventId(@Param("eventId") UUID eventId);
 }

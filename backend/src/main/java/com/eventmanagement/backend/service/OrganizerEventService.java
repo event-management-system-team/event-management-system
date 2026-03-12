@@ -2,6 +2,7 @@ package com.eventmanagement.backend.service;
 
 import com.eventmanagement.backend.constants.EventStatus;
 import com.eventmanagement.backend.dto.request.CreateEventRequest;
+import com.eventmanagement.backend.dto.response.organizer.AttendeeResponse;
 import com.eventmanagement.backend.dto.response.organizer.CreateEventResponse;
 import com.eventmanagement.backend.dto.response.organizer.OrganizerEventResponse;
 import com.eventmanagement.backend.dto.response.organizer.OrganizerEventStatsResponse;
@@ -11,9 +12,11 @@ import com.eventmanagement.backend.exception.UnauthorizedException;
 import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.model.EventAgenda;
 import com.eventmanagement.backend.model.EventCategory;
+import com.eventmanagement.backend.model.EventRegistration;
 import com.eventmanagement.backend.model.TicketType;
 import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.repository.EventCategoryRepository;
+import com.eventmanagement.backend.repository.EventRegistrationRepository;
 import com.eventmanagement.backend.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +46,7 @@ public class OrganizerEventService {
 
     private final EventRepository eventRepository;
     private final EventCategoryRepository eventCategoryRepository;
+    private final EventRegistrationRepository eventRegistrationRepository;
     private final CloudinaryService cloudinaryService;
 
     // create event for organizer that support cover image
@@ -407,6 +411,19 @@ public class OrganizerEventService {
     }
 
     /**
+     * Lấy chi tiết một event của organizer
+     */
+    public OrganizerEventResponse getEventDetail(UUID eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Event not found: " + eventId));
+        
+        Event eventWithTickets = eventRepository.findWithTicketsByEventId(eventId)
+                .orElse(event);
+        
+        return mapToOrganizerResponse(eventWithTickets);
+    }
+
+    /**
      * Lấy thống kê event của organizer (total, active, upcoming, completed)
      * event upcoming: approved va start date > thoi gian hien tai
      * event active: (APPROVED - upcoming) + ONGOING
@@ -438,12 +455,18 @@ public class OrganizerEventService {
     private OrganizerEventResponse mapToOrganizerResponse(Event event) {
         int totalSold = 0;
         int totalTickets = 0;
+        BigDecimal totalRevenue = BigDecimal.ZERO;
 
         if (event.getTicketTypes() != null) {
             for (TicketType ticket : event.getTicketTypes()) {
                 if (Boolean.TRUE.equals(ticket.getIsActive())) {
-                    totalSold += ticket.getSoldCount() != null ? ticket.getSoldCount() : 0;
+                    int sold = ticket.getSoldCount() != null ? ticket.getSoldCount() : 0;
+                    totalSold += sold;
                     totalTickets += ticket.getQuantity() != null ? ticket.getQuantity() : 0;
+                    if (ticket.getPrice() != null) {
+                        totalRevenue = totalRevenue.add(
+                                ticket.getPrice().multiply(BigDecimal.valueOf(sold)));
+                    }
                 }
             }
         }
@@ -459,9 +482,41 @@ public class OrganizerEventService {
                 .status(event.getStatus() != null ? event.getStatus().name() : null)
                 .totalCapacity(event.getTotalCapacity())
                 .registeredCount(event.getRegisteredCount())
+                .checkedInCount(event.getCheckedInCount())
                 .totalSold(totalSold)
                 .totalTickets(totalTickets)
+                .totalRevenue(totalRevenue)
                 .categoryName(event.getCategory() != null ? event.getCategory().getCategoryName() : null)
+                .isFree(event.getIsFree())
+                .build();
+    }
+
+    /**
+     * Lấy danh sách attendees của một event có phân trang
+     */
+    public Page<AttendeeResponse> getEventAttendees(UUID eventId, int page, int size) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Event not found: " + eventId));
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<EventRegistration> registrations = eventRegistrationRepository.findByEventIdWithUserAndTicket(eventId, pageable);
+
+        return registrations.map(this::mapToAttendeeResponse);
+    }
+
+    private AttendeeResponse mapToAttendeeResponse(EventRegistration registration) {
+        User user = registration.getUser();
+        TicketType ticketType = registration.getTicketType();
+
+        return AttendeeResponse.builder()
+                .id(registration.getRegistrationId())
+                .fullName(user != null ? user.getFullName() : "Unknown")
+                .email(user != null ? user.getEmail() : null)
+                .avatarUrl(user != null ? user.getAvatarUrl() : null)
+                .ticketType(ticketType != null ? ticketType.getTicketName() : "General Admission")
+                .status(registration.getStatus())
+                .registrationDate(registration.getRegistrationDate())
+                .checkInTime(registration.getCheckInTime())
                 .build();
     }
 }
