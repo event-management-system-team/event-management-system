@@ -20,25 +20,20 @@ import com.eventmanagement.backend.repository.EventRepository;
 import com.eventmanagement.backend.repository.RecruitmentRepository;
 import com.eventmanagement.backend.repository.StaffApplicationRepository;
 
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class RecruitmentServiceOrganizer {
-
 
     private final RecruitmentRepository recruitmentRepository;
     private final StaffApplicationRepository staffApplicationRepository;
     private final CustomFormService customFormService;
     private final EventRepository eventRepository;
-
-    public RecruitmentServiceOrganizer(RecruitmentRepository recruitmentRepository, StaffApplicationRepository staffApplicationRepository, CustomFormService customFormService, EventRepository eventRepository) {
-        this.recruitmentRepository = recruitmentRepository;
-        this.staffApplicationRepository = staffApplicationRepository;
-        this.customFormService = customFormService;
-        this.eventRepository = eventRepository;
-        
-    }
-    
+     
    public RecruitmentDashBoardDTO getDashBoardData(UUID eventId) {
+    Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
     List<Recruitment> allRecruitments = recruitmentRepository.findByEvent_EventId(eventId);
     
     int totalActiveRoles = 0;
@@ -92,6 +87,7 @@ public class RecruitmentServiceOrganizer {
     return RecruitmentDashBoardDTO.builder()
         .stats(stats)
         .recentRecruitments(items)
+        .eventEndDate(event.getEndDate())
         .build();
 }
 public RecruitmentDetailDTO getRecruitmentDetail(UUID recruitmentId) {

@@ -44,10 +44,8 @@ public class FeedbackService {
     }
     public Map<String, Object> getFeedbackListData(UUID eventId) {
         List<FeedbackResponseDTO> feedbacks = feedbackRepository.findFeedbacksByEventId(eventId);
-        
         Map<String, Object> response = new HashMap<>();
         response.put("feedbacks", feedbacks);
-        
         return response;
     }
 
@@ -63,30 +61,18 @@ public class FeedbackService {
 
     CustomForm form = customFormRepository.findByEvent_EventId(event.getEventId()).orElse(null);
     List<Map<String, Object>> formSchema = (form != null) ? form.getFormSchema() : null;
-
     List<Map<String, Object>> enrichedDetails = new ArrayList<>();
-    
     if (feedback.getFeedbackData() != null) {
         for (Map<String, Object> answerItem : feedback.getFeedbackData()) {
             Map<String, Object> enrichedItem = new HashMap<>(answerItem);
-            
-            // Lấy field_id từ câu trả lời (có thể null đối với data cũ)
             String fieldId = (String) enrichedItem.get("field_id");
-            
-            // Lấy thẳng "question" từ data cũ (nếu có) để tương thích ngược
             String questionLabel = (String) enrichedItem.get("question");
-            
-            // Nếu data không có sẵn question, gán tạm label dựa trên fieldId
             if (questionLabel == null) {
                 questionLabel = (fieldId != null) ? "Câu hỏi " + fieldId : "Câu hỏi không xác định";
             }
-
-            // Nếu có Schema từ CustomForm, thử map để lấy câu hỏi chính xác nhất
             if (formSchema != null && fieldId != null) {
                 for (Map<String, Object> questionDef : formSchema) {
-                    // SỬA Ở ĐÂY: An toàn NullPointer và dùng đúng key "field_id" của React
                     if (fieldId.equals(questionDef.get("field_id"))) { 
-                        // SỬA Ở ĐÂY: Lấy "question" thay vì "label"
                         String schemaQuestion = (String) questionDef.get("question"); 
                         if (schemaQuestion != null) {
                             questionLabel = schemaQuestion;
@@ -95,12 +81,10 @@ public class FeedbackService {
                     }
                 }
             }
-            
             enrichedItem.put("question", questionLabel);
             enrichedDetails.add(enrichedItem);
         }
     }
-
     FeedbackDetailResponseDTO responseDTO = FeedbackDetailResponseDTO.builder()
             .eventName(event.getEventName())
             .submittedAt(event.getCreatedAt())
@@ -118,7 +102,6 @@ public class FeedbackService {
     feedbackResponse.setComment(feedback.getComment());
     feedbackResponse.setDetail(enrichedDetails);
     responseDTO.setFeedbackResponse(feedbackResponse);
-
     return responseDTO;
 }
 
@@ -128,31 +111,39 @@ public class FeedbackService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Sự kiện không tồn tại!"));
                 
-        // TÌM USER TRONG DATABASE BẰNG EMAIL LẤY TỪ TOKEN
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại hoặc phiên đăng nhập không hợp lệ!"));
 
-        UUID userId = user.getUserId(); // Rút ra ID thật để dùng cho các hàm check bên dưới
+        UUID userId = user.getUserId(); 
 
-        // ==== CÁC BƯỚC VALIDATE GIỮ NGUYÊN ====
         if (event.getStartDate().isAfter(LocalDateTime.now())) {
             throw new RuntimeException("Sự kiện chưa diễn ra, không thể gửi đánh giá!");
         }
 
-        // Kiểm tra xem đã đánh giá chưa (Dùng hàm vừa thêm ở Repository)
         boolean alreadySubmitted = feedbackRepository.existsByEvent_EventIdAndUser_UserId(eventId, userId);
         if (alreadySubmitted) {
             throw new RuntimeException("Bạn đã gửi đánh giá cho sự kiện này rồi!");
         }
-
-        // ==== LƯU VÀO DATABASE ====
+        
         Feedback feedback = new Feedback();
         feedback.setEvent(event);
         feedback.setUser(user);
         feedback.setRating(request.getRating());
         feedback.setComment(request.getComment());
         feedback.setFeedbackData(request.getFeedbackData());
-        
         return feedbackRepository.save(feedback);
+    }
+
+    public Map<String, Object> getEventInfoForFeedback(UUID eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sự kiện!"));
+        Map<String, Object> eventInfo = new HashMap<>();
+        eventInfo.put("eventId", event.getEventId());
+        eventInfo.put("eventName", event.getEventName());
+        eventInfo.put("startDate", event.getStartDate());
+        eventInfo.put("endDate", event.getEndDate());
+        eventInfo.put("bannerUrl", event.getBannerUrl()); 
+
+        return eventInfo;
     }
 }
