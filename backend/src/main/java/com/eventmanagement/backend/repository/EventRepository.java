@@ -109,4 +109,14 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
         @EntityGraph(attributePaths = "ticketTypes")
         @Query("SELECT e FROM Event e WHERE e.eventId = :eventId")
         java.util.Optional<Event> findWithTicketsByEventId(@Param("eventId") UUID eventId);
+
+        @Query("""
+            SELECT e FROM Event e
+            WHERE e.status = :status
+            AND e.startDate <= :deadline
+        """)
+        List<Event> findExpiredPendingEvents(
+            @Param("status") EventStatus status,
+            @Param("deadline") LocalDateTime deadline
+        );
 }
