@@ -1,16 +1,5 @@
 package com.eventmanagement.backend.service;
 
-import com.eventmanagement.backend.constants.EventStatus;
-import com.eventmanagement.backend.dto.response.attendee.*;
-import com.eventmanagement.backend.model.Event;
-import com.eventmanagement.backend.model.TicketType;
-import com.eventmanagement.backend.repository.EventRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,6 +7,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import com.eventmanagement.backend.constants.EventStatus;
+import com.eventmanagement.backend.dto.response.attendee.EventAgendaResponse;
+import com.eventmanagement.backend.dto.response.attendee.EventCategoryResponse;
+import com.eventmanagement.backend.dto.response.attendee.EventResponse;
+import com.eventmanagement.backend.dto.response.attendee.OrganizerResponse;
+import com.eventmanagement.backend.dto.response.attendee.TicketTypeResponse;
+import com.eventmanagement.backend.model.Event;
+import com.eventmanagement.backend.model.TicketType;
+import com.eventmanagement.backend.repository.EventRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor

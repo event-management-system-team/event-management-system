@@ -25,7 +25,7 @@ const RecruitmentFormBuilder = () => {
   const dragItem = useRef(null);
   const dragOverItem = useRef(null);
 
-  // 1. KÉO DỮ LIỆU FORM CŨ TỪ DATABASE
+  // 1. FETCH EXISTING FORM DATA
   useEffect(() => {
     const fetchExistingForm = async () => {
       try {
@@ -34,7 +34,7 @@ const RecruitmentFormBuilder = () => {
         if (response.status === 200 && response.data) {
           const dbData = response.data;
           
-          if(dbData.message === "Chưa có form") return; 
+          if(dbData.message === "Chưa có form" || dbData.message === "No form found") return; 
 
           setIsLocked(dbData.active === true || dbData.isActive === true || dbData.is_active === "true");
           setFormName(dbData.formName || dbData.form_name || "Staff Application Form");
@@ -66,14 +66,14 @@ const RecruitmentFormBuilder = () => {
           }
         }
       } catch (error) {
-        console.error("Lỗi khi kéo dữ liệu form:", error);
+        console.error("Error fetching form data:", error);
       }
     };
 
     if (eventId) fetchExistingForm();
   }, [eventId]);
 
-  // 2. CÁC HÀM XỬ LÝ GIAO DIỆN (DRAG, THÊM, SỬA, XÓA CÂU HỎI)
+  // 2. UI HANDLERS (DRAG, ADD, EDIT, DELETE QUESTIONS)
   const handleSort = () => {
     if (isLocked) return;
     let _formSchema = [...formSchema];
@@ -89,12 +89,12 @@ const RecruitmentFormBuilder = () => {
     const newId = `q_${Date.now()}`;
     let baseQuestion = { field_id: newId, type: type, required: false, question: 'New Question', placeholder: 'Type here...' };
     
-    if (type === 'SHORT_TEXT') baseQuestion.question = 'Họ và tên / SĐT';
-    else if (type === 'LONG_TEXT') baseQuestion.question = 'Kinh nghiệm của bạn';
+    if (type === 'SHORT_TEXT') baseQuestion.question = 'Full Name / Phone Number';
+    else if (type === 'LONG_TEXT') baseQuestion.question = 'Write your question here.';
     else if (type === 'FILE_UPLOAD') baseQuestion.question = 'Upload CV (PDF/Word)';
     else if (type === 'MULTIPLE_CHOICE') {
-      baseQuestion.question = 'Ca làm việc mong muốn';
-      baseQuestion.options = ['Sáng', 'Chiều', 'Tối'];
+      baseQuestion.question = 'Write your question here.';
+      baseQuestion.options = ['Option 1', 'Option 2', 'Option 3'];
     }
     setFormSchema([...formSchema, baseQuestion]);
     setActiveId(newId);
@@ -111,7 +111,6 @@ const RecruitmentFormBuilder = () => {
     setFormSchema(newSchema);
     setActiveId(newSchema.length > 0 ? newSchema[0].field_id : null);
   };
-
 
   const handleSaveAction = async (isActive) => {
     try {
@@ -137,16 +136,16 @@ const RecruitmentFormBuilder = () => {
       
       if (response.status === 200 || response.status === 201) {
         if (isActive) {
-          alert("Form tuyển dụng đã được Publish thành công!");
+          alert("Recruitment form published successfully!");
           setIsLocked(true);
         } else {
-          alert("Form nháp đã được lưu thành công!");
+          alert("Draft saved successfully!");
         }
       }
     } catch (error) {
-      console.error("Lỗi khi lưu form:", error);
+      console.error("Error saving form:", error);
       const errorMsg = error.response?.data || error.message;
-      alert("Đã có lỗi xảy ra khi lưu form: " + errorMsg);
+      alert("An error occurred while saving the form: " + errorMsg);
     }
   };
 
@@ -198,7 +197,7 @@ const RecruitmentFormBuilder = () => {
           {/* CỘT 1: TOOLBOX CÂU HỎI */}
           <div className="w-56 bg-white border-r border-gray-100 p-5 overflow-y-auto shrink-0 z-10">
             <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">Form Elements</h3>
-            <div className="space-y-2 mb-8">
+            <div className={`space-y-2 mb-8 ${isLocked ? 'opacity-50 pointer-events-none' : ''}`}>
               <ToolItem icon={<Type size={16} />} label="Short Answer" onClick={() => handleAddQuestion('SHORT_TEXT')} />
               <ToolItem icon={<AlignLeft size={16} />} label="Paragraph" onClick={() => handleAddQuestion('LONG_TEXT')} />
               <ToolItem icon={<UploadCloud size={16} />} label="File Upload" onClick={() => handleAddQuestion('FILE_UPLOAD')} />
@@ -217,13 +216,13 @@ const RecruitmentFormBuilder = () => {
                 </div>
                 <div className="p-10 pt-12">
                   <div className="mb-10">
-                    <input type="text" value={formName} onChange={(e) => setFormName(e.target.value)} className="w-full text-2xl font-extrabold text-gray-900 mb-2 leading-tight border-none outline-none bg-transparent hover:bg-gray-50 focus:bg-gray-50 rounded p-1" placeholder="Form Title" />
-                    <textarea value={formDesc} onChange={(e) => setFormDesc(e.target.value)} className="w-full text-gray-500 font-medium leading-relaxed border-none outline-none bg-transparent resize-none overflow-hidden hover:bg-gray-50 focus:bg-gray-50 rounded p-1" rows={2} placeholder="Form Description" />
+                    <input type="text" value={formName} disabled={isLocked} onChange={(e) => setFormName(e.target.value)} className={`w-full text-2xl font-extrabold text-gray-900 mb-2 leading-tight border-none outline-none bg-transparent rounded p-1 ${isLocked ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50 focus:bg-gray-50'}`} placeholder="Form Title" />
+                    <textarea value={formDesc} disabled={isLocked} onChange={(e) => setFormDesc(e.target.value)} className={`w-full text-gray-500 font-medium leading-relaxed border-none outline-none bg-transparent resize-none overflow-hidden rounded p-1 ${isLocked ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50 focus:bg-gray-50'}`} rows={2} placeholder="Form Description" />
                   </div>
 
                   {formSchema.length === 0 ? (
                     <div className="text-center p-10 border-2 border-dashed border-gray-200 rounded-xl text-gray-400 font-medium">
-                      Form đang trống. Click vào công cụ bên trái để thêm câu hỏi!
+                      Form is empty. Click a tool on the left to add a question!
                     </div>
                   ) : (
                     formSchema.map((item, index) => {
@@ -272,7 +271,7 @@ const RecruitmentFormBuilder = () => {
                             minDate={new Date()}
                             dateFormat="dd/MM/yyyy"
                             placeholderText="Choose a date..."
-                            className="w-full border-2 border-gray-200 rounded-xl p-3 text-sm font-medium text-gray-800 outline-none focus:border-[#2dd4bf] shadow-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            className="w-full border-2 border-gray-200 rounded-xl p-3 text-sm font-medium text-gray-800 outline-none focus:border-[#2dd4bf] shadow-sm"
                           />
                           <Calendar size={18} className="absolute right-4 top-3.5 text-gray-400 pointer-events-none" />
                         </div>
@@ -284,7 +283,7 @@ const RecruitmentFormBuilder = () => {
                           type="time"
                           value={deadlineTime}
                           onChange={(e) => setDeadlineTime(e.target.value)}
-                          className="w-full border-2 border-gray-200 rounded-xl p-3 text-sm font-medium text-gray-800 outline-none focus:border-[#2dd4bf] shadow-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                          className="w-full border-2 border-gray-200 rounded-xl p-3 text-sm font-medium text-gray-800 outline-none focus:border-[#2dd4bf] shadow-sm"
                         />
                       </div>
 
@@ -293,7 +292,7 @@ const RecruitmentFormBuilder = () => {
                           <p className="text-sm text-gray-700">
                             <span className="font-bold text-[#2dd4bf]">Application will close:</span>
                             <br/>
-                            <span className="font-bold text-gray-900">{deadlineDate.toLocaleDateString('vi-VN')} at {deadlineTime}</span>
+                            <span className="font-bold text-gray-900">{deadlineDate.toLocaleDateString('en-GB')} at {deadlineTime}</span>
                           </p>
                         </div>
                       )}
@@ -307,7 +306,7 @@ const RecruitmentFormBuilder = () => {
           {/* CỘT 3: FIELD PROPERTIES (PHẢI) */}
           <div className="w-80 bg-white border-l border-gray-100 p-6 overflow-y-auto shrink-0 z-10 flex flex-col shadow-[-4px_0_15px_rgba(0,0,0,0.02)]">
             {activeQuestion ? (
-              <>
+              <div className={`${isLocked ? 'opacity-50 pointer-events-none' : ''}`}>
                 <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
                   <h3 className="font-extrabold text-gray-900 text-lg">Field Properties</h3>
                   <span className="bg-[#f0fdfa] text-[#2dd4bf] border border-[#2dd4bf]/20 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">
@@ -316,20 +315,20 @@ const RecruitmentFormBuilder = () => {
                 </div>
 
                 <div className="mb-6">
-                  <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Nội dung câu hỏi</label>
+                  <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Question Text</label>
                   <textarea className="w-full border-2 border-gray-100 rounded-xl p-3 text-sm font-medium text-gray-800 outline-none focus:border-[#2dd4bf] resize-none h-20 shadow-sm" value={activeQuestion.question} onChange={(e) => handleUpdateActiveQuestion('question', e.target.value)}></textarea>
                 </div>
 
                 {['SHORT_TEXT', 'LONG_TEXT'].includes(activeQuestion.type) && (
                   <div className="mb-6">
-                    <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Gợi ý (Placeholder)</label>
+                    <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Placeholder</label>
                     <input type="text" className="w-full border-2 border-gray-100 rounded-xl p-3 text-sm font-medium text-gray-800 outline-none focus:border-[#2dd4bf] shadow-sm" value={activeQuestion.placeholder || ''} onChange={(e) => handleUpdateActiveQuestion('placeholder', e.target.value)}/>
                   </div>
                 )}
 
                 {activeQuestion.type === 'MULTIPLE_CHOICE' && (
                   <div className="mb-8 bg-gray-50 p-4 rounded-xl border border-gray-100">
-                    <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3">Các lựa chọn</label>
+                    <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3">Options</label>
                     <div className="space-y-2 mb-4">
                       {activeQuestion.options?.map((opt, i) => (
                         <div key={i} className="flex items-center gap-2 bg-white p-1 rounded-lg border border-gray-200 focus-within:border-[#2dd4bf] shadow-sm">
@@ -338,20 +337,20 @@ const RecruitmentFormBuilder = () => {
                         </div>
                       ))}
                     </div>
-                    <button onClick={() => handleUpdateActiveQuestion('options', [...(activeQuestion.options || []), `Lựa chọn mới`])} className="w-full py-2.5 bg-white border border-gray-200 border-dashed rounded-lg text-sm font-bold text-[#2dd4bf] flex justify-center items-center gap-2 hover:bg-[#f0fdfa] transition-all"><PlusCircle size={16}/> Thêm lựa chọn</button>
+                    <button onClick={() => handleUpdateActiveQuestion('options', [...(activeQuestion.options || []), `New Option`])} className="w-full py-2.5 bg-white border border-gray-200 border-dashed rounded-lg text-sm font-bold text-[#2dd4bf] flex justify-center items-center gap-2 hover:bg-[#f0fdfa] transition-all"><PlusCircle size={16}/> Add Option</button>
                   </div>
                 )}
 
                 <div className="flex justify-between items-center mb-8 py-4 mt-auto bg-gray-50 px-4 rounded-xl border border-gray-100">
-                  <span className="text-sm font-bold text-gray-700">Bắt buộc trả lời</span>
+                  <span className="text-sm font-bold text-gray-700">Required</span>
                   <div onClick={() => handleUpdateActiveQuestion('required', !activeQuestion.required)} className={`w-11 h-6 rounded-full relative cursor-pointer shadow-inner transition-colors ${activeQuestion.required ? 'bg-[#2dd4bf]' : 'bg-gray-300'}`}>
                     <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-all shadow-sm ${activeQuestion.required ? 'left-6' : 'left-1'}`}></div>
                   </div>
                 </div>
 
-                <button onClick={() => handleRemoveQuestion(activeId)} className="w-full py-3.5 bg-white border border-red-200 text-red-500 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-red-50 shadow-sm transition-colors"><Trash2 size={18}/> Xóa câu hỏi này</button>
-              </>
-            ) : <div className="text-center text-gray-400 mt-20 text-sm font-medium">Vui lòng chọn một câu hỏi để chỉnh sửa.</div>}
+                <button onClick={() => handleRemoveQuestion(activeId)} className="w-full py-3.5 bg-white border border-red-200 text-red-500 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-red-50 shadow-sm transition-colors"><Trash2 size={18}/> Delete this question</button>
+              </div>
+            ) : <div className="text-center text-gray-400 mt-20 text-sm font-medium">Please select a question to edit.</div>}
           </div>
 
         </div>

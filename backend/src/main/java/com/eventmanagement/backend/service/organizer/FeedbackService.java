@@ -155,4 +155,20 @@ public class FeedbackService {
         
         return feedbackRepository.save(feedback);
     }
+
+// Hàm mới: Lấy thông tin cơ bản của Event cho trang Feedback
+    public Map<String, Object> getEventInfoForFeedback(UUID eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sự kiện!"));
+
+        // Trả về dạng Map để chặn đứng lỗi LazyLoading của Hibernate
+        Map<String, Object> eventInfo = new HashMap<>();
+        eventInfo.put("eventId", event.getEventId());
+        eventInfo.put("eventName", event.getEventName());
+        eventInfo.put("startDate", event.getStartDate());
+        eventInfo.put("endDate", event.getEndDate());
+        eventInfo.put("bannerUrl", event.getBannerUrl()); 
+
+        return eventInfo;
+    }
 }

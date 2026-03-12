@@ -29,6 +29,7 @@ import com.eventmanagement.backend.model.CustomForm;
 import com.eventmanagement.backend.model.Feedback;
 import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.repository.CustomFormRepository;
+import com.eventmanagement.backend.repository.EventRepository;
 import com.eventmanagement.backend.repository.FeedbackRepository;
 import com.eventmanagement.backend.service.attendee.RecruitmentService;
 import com.eventmanagement.backend.service.organizer.CustomFormService;
@@ -49,6 +50,7 @@ public class FeedbackController {
     private final FeedbackService feedbackService; 
     private final RecruitmentService recruitmentService;
     private final RecruitmentServiceOrganizer recruitmentServiceOrganizer;
+    private final EventRepository eventRepository;
 
      // DI qua constructor
 
@@ -57,13 +59,15 @@ public class FeedbackController {
                               CustomFormService customFormService, 
                               FeedbackService feedbackService,
                               RecruitmentService recruitmentService,
-                              RecruitmentServiceOrganizer recruitmentServiceOrganizer) {
+                              RecruitmentServiceOrganizer recruitmentServiceOrganizer,
+                              EventRepository eventRepository) {
         this.feedbackRepository = feedbackRepository;
         this.customFormRepository = customFormRepository;
         this.customFormService = customFormService;
         this.feedbackService = feedbackService;
         this.recruitmentService = recruitmentService;
         this.recruitmentServiceOrganizer = recruitmentServiceOrganizer;
+        this.eventRepository = eventRepository;
     }
 
     @GetMapping("/events/{eventId}/feedback")
@@ -152,4 +156,14 @@ public ResponseEntity<?> getEventForm(
                 .body(Map.of("message", "Lỗi server nội bộ: " + e.getMessage()));
         }
     }
+
+    @GetMapping("/events/ids/{eventId}")
+    public ResponseEntity<?> getEventInfo(@PathVariable UUID eventId) {
+        try {
+            Map<String, Object> eventInfo = feedbackService.getEventInfoForFeedback(eventId);
+            return ResponseEntity.ok(eventInfo);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
+        }
     }
+}
