@@ -1,13 +1,15 @@
 import { MapPin, Calendar, ArrowRight, Flame } from "lucide-react";
 import { Carousel } from 'antd';
 import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 
 const HeroSlider = ({ events }) => {
 
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     const formatDate = (dateString) => {
-        if (!dateString) return 'Updating';
+        if (!dateString) return t("updating");
         return new Date(dateString).toLocaleDateString('vi-VN', {
             day: '2-digit',
             month: '2-digit',
@@ -40,7 +42,7 @@ const HeroSlider = ({ events }) => {
                             <div className="relative z-10 max-w-2xl space-y-6">
                                 <div className="inline-flex items-center gap-2 bg-red-500/90 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
                                     <Flame size={14} fill="currentColor" />
-                                    Hot Event
+                                    {t("hot_event")}
                                 </div>
 
                                 <h1 className="text-white text-5xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight">
@@ -55,13 +57,13 @@ const HeroSlider = ({ events }) => {
                                     <span className="w-1.5 h-1.5 bg-white/50 rounded-full"></span>
                                     <span className="flex items-center gap-2">
                                         <MapPin className="text-red-400" size={20} />
-                                        {event.location || "Updating"}
+                                        {event.location || t("updating")}
                                     </span>
                                 </div>
 
                                 <button className="bg-red-500 hover:bg-red-600 text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg shadow-red-500/30 transition-all flex items-center gap-2 transform hover:-translate-y-1"
                                     onClick={() => navigate(`/events/${event?.eventSlug}`)}>
-                                    Book Tickets Now
+                                    {t("book_tickets_now")}
                                     <ArrowRight size={20} />
                                 </button>
                             </div>

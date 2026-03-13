@@ -4,6 +4,7 @@ import NavMenu from "./NavMenu";
 import SearchBar from "../SearchBar";
 import AuthButtons from "../AuthButton";
 import UserDropdown from "./UserDropdown";
+import LanguageSwitcher from "../LanguageSwitcher";
 
 const HeaderApp = () => {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
@@ -16,6 +17,7 @@ const HeaderApp = () => {
           <NavMenu />
 
           <div className="flex items-center gap-6">
+            <LanguageSwitcher />
             <SearchBar />
 
             {isAuthenticated ? <UserDropdown user={user} /> : <AuthButtons />}
