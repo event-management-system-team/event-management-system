@@ -7,8 +7,10 @@ import {
   setSelectedTickets,
   setSelectedEvent,
 } from "../../../store/slices/booking.slice";
+import { useTranslation } from "react-i18next";
 
 const SidebarTicket = ({ minPrice, ticketTypes, event, eventStatus }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading } = useSelector((state) => state.booking);
@@ -111,11 +113,11 @@ const SidebarTicket = ({ minPrice, ticketTypes, event, eventStatus }) => {
     <div className="bg-white rounded-[28px] shadow-xl overflow-hidden border border-[#E5E1DA]">
       <div className="p-6 border-b border-[#E5E1DA] flex items-center justify-between">
         <span className="text-sm font-medium text-slate-500 uppercase tracking-widest">
-          Starting at
+          {t("starting_at")}
         </span>
         <div className="text-right">
-          <span className="text-2xl font-black text-primary">
-            {minPrice ? formatCurrency(minPrice) : "Free"}
+          <span className="font-sans text-2xl font-black text-primary">
+            {minPrice ? formatCurrency(minPrice) : t("free")}
           </span>
         </div>
       </div>
@@ -124,9 +126,9 @@ const SidebarTicket = ({ minPrice, ticketTypes, event, eventStatus }) => {
         <div className="flex items-start sm:items-center gap-2.5 p-3 bg-amber-50/80 rounded-xl border border-amber-100 mb-2">
           <Info className="w-4 h-4 text-amber-500 shrink-0 mt-0.5 sm:mt-0" />
           <p className="text-[12px] text-amber-700 font-medium leading-relaxed">
-            Maximum of{" "}
-            <span className="font-bold text-amber-600">{maxTickets} tickets</span>{" "}
-            per account.
+            {t("maximum_of")}{" "}
+            <span className="font-bold text-amber-600">{maxTickets}</span>{" "}
+            {t("tickets_per_account")}
           </p>
         </div>
 
@@ -163,12 +165,12 @@ const SidebarTicket = ({ minPrice, ticketTypes, event, eventStatus }) => {
                   ) : (
                     <p className="text-[11px] text-red-500 font-bold uppercase tracking-widest mt-1">
                       {isEventEnded
-                        ? "Event Ended"
+                        ? t("event_ended")
                         : isSoldOut
-                        ? "Sold Out"
-                        : isBeforeSale
-                        ? "Not Started"
-                        : "Sale Ended"}
+                          ? t("sold_out")
+                          : isBeforeSale
+                            ? t("not_started")
+                            : t("sale_ended")}
                     </p>
                   )}
                   {(ticket.saleStart || ticket.saleEnd) && (
@@ -213,9 +215,9 @@ const SidebarTicket = ({ minPrice, ticketTypes, event, eventStatus }) => {
                 <Ticket />
               </div>
               <div>
-                <p className="font-bold text-slate-800">Tickets</p>
+                <p className="font-bold text-slate-800">{t("tickets_title")}</p>
                 <p className="text-sm text-green-600 font-bold mt-0.5">
-                  Admission is free
+                  {t("admission_is_free")}
                 </p>
               </div>
             </div>
@@ -247,7 +249,7 @@ const SidebarTicket = ({ minPrice, ticketTypes, event, eventStatus }) => {
 
       <div className="p-6 bg-slate-100/50">
         <div className="flex items-center justify-between mb-6">
-          <span className="text-slate-600 font-semibold">Subtotal</span>
+          <span className="text-slate-600 font-semibold">{t("subtotal")}</span>
           <span className="text-xl font-bold">{formatCurrency(subTotal)}</span>
         </div>
 
@@ -268,26 +270,26 @@ const SidebarTicket = ({ minPrice, ticketTypes, event, eventStatus }) => {
                 <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" />
               </span>
               <span className="text-sm tracking-widest font-bold">
-                Securing your seats...
+                {t("securing_your_seats")}
               </span>
             </span>
           ) : isEventEnded ? (
-            "Event Ended"
+            t("event_ended")
           ) : !ticketTypes || ticketTypes.length === 0 ? (
-            "Register Now"
+            t("register_now")
           ) : subTotal > 0 ? (
-            "Buy Tickets Now"
+            t("buy_tickets_now")
           ) : hasSelectedTickets ? (
-            "Register Now"
+            t("register_now")
           ) : (
-            "Select Tickets"
+            t("select_tickets")
           )}
         </button>
 
         {subTotal > 0 && (
           <div className="mt-4 flex items-center justify-center gap-2 text-[10px] text-slate-500 uppercase tracking-widest font-bold">
             <Lock className="w-3 h-3" />
-            Safe payment via VNPay
+            {t("safe_payment_via")}
           </div>
         )}
       </div>

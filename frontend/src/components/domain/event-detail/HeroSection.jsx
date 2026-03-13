@@ -1,7 +1,9 @@
 import { CalendarDays, Clock, MapPin, Tag } from 'lucide-react'
 import DynamicBreadcrumb from '../../common/DynamicBreadcrumb';
+import { useTranslation } from "react-i18next";
 
 const HeroSection = ({ bannerUrl, location, eventName, startDate, endDate, category, status }) => {
+    const { t } = useTranslation();
 
     // 1. Hàm chỉ lấy Ngày 
     const formatDate = (dateString) => {
@@ -45,7 +47,7 @@ const HeroSection = ({ bannerUrl, location, eventName, startDate, endDate, categ
                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-100"></span>
                                         <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
                                     </span>
-                                    HAPPENING NOW
+                                    {t("happening_now")}
                                 </div>
                             )}
                         </div>
