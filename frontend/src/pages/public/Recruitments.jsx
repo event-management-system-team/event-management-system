@@ -8,8 +8,10 @@ import DynamicBreadcrumb from '../../components/common/DynamicBreadcrumb';
 import SidebarFilter from '../../components/domain/recruitments/SidebarFilter';
 import { Filter } from 'lucide-react';
 import RecruitmentList from '../../components/domain/recruitments/RecruitmentList';
+import { useTranslation } from "react-i18next";
 
 const RecruitmentPage = () => {
+    const { t } = useTranslation();
 
     const formatdeadline = (deadlineString) => {
         const deadline = new deadline(deadlineString);
@@ -53,7 +55,7 @@ const RecruitmentPage = () => {
                     <div className="flex items-center gap-1.5 text-gray-400">
                         <Filter className="w-3.5 h-3.5" strokeWidth={3} />
                         <h3 className="text-[13px] font-bold uppercase tracking-widest">
-                            Filters
+                            {t("FILTERS")}
                         </h3>
                     </div>
                 </div>

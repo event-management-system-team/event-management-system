@@ -1,22 +1,24 @@
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { Breadcrumb } from 'antd';
+import { useTranslation } from "react-i18next";
 
 const DynamicBreadcrumb = ({ baseColor = "text-slate-500", activeColor = "text-slate-800" }) => {
+    const { t } = useTranslation();
 
     const location = useLocation();
     const pathSegments = location.pathname.split('/').filter(Boolean)
 
     const routeLabels = {
-        'events': 'Events',
-        'recruitments': 'Recruitments',
-        'me': 'Profile',
-        'home': 'Home',
+        'events': t("events", "Events"),
+        'recruitments': t("recruitments", "Recruitments"),
+        'me': t("my_profile", "Profile"),
+        'home': t("home", "Home"),
     };
 
 
     const breadcrumbItems = [
-        { title: <Link to="/" className={`inline-flex items-center gap-1.5 whitespace-nowrap ${baseColor} hover:opacity-80 transition-opacity`}>Home</Link> },
+        { title: <Link to="/" className={`inline-flex items-center gap-1.5 whitespace-nowrap ${baseColor} hover:opacity-80 transition-opacity`}>{t("home", "Home")}</Link> },
 
         ...pathSegments.map((segment, index) => {
             const url = `/${pathSegments.slice(0, index + 1).join('/')}`;

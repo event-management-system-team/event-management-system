@@ -11,6 +11,7 @@ import { createSearchParams, useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 import { useTranslation } from "react-i18next";
 
+
 const IconMap = {
   Monitor: <Monitor size={32} />,
   Music: <Music size={32} />,
@@ -89,7 +90,7 @@ const CategorySection = () => {
 
                       </div>
                       <span className="font-bold text-gray-700 group-hover:text-primary transition-colors text-center">
-                        {cat.categoryName}
+                        {t(cat.categoryName)}
                       </span>
                     </div>
                   </button>

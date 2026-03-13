@@ -2,11 +2,13 @@ import { LayoutGrid } from "lucide-react"
 import useCategories from '../../../hooks/useCategories';
 import LoadingState from "../../common/LoadingState";
 import EmptyState from "../../common/EmptyState";
+import { useTranslation } from "react-i18next";
 
 
 const FilterCategory = ({ categories: initialCategories = [], setCategories }) => {
 
     const { categories, isLoading, isEmpty } = useCategories();
+    const { t } = useTranslation();
 
     const handleToggle = (isChecked, currentSlug) => {
         if (isChecked) {
@@ -22,7 +24,7 @@ const FilterCategory = ({ categories: initialCategories = [], setCategories }) =
             <div className="mb-8">
                 <div className="flex items-center gap-2 mb-4">
                     <LayoutGrid className="text-primary w-5 h-5" strokeWidth={2.5} />
-                    <span className="font-bold text-sm">Categories</span>
+                    <span className="font-bold text-sm">{t("categories")}</span>
                 </div>
 
                 {isLoading ? (
@@ -44,7 +46,7 @@ const FilterCategory = ({ categories: initialCategories = [], setCategories }) =
                                         onChange={() => handleToggle(isChecked, cat.categorySlug)}
                                     />
                                     <span className="text-sm font-medium group-hover:text-primary transition-colors truncate">
-                                        {cat.categoryName}
+                                        {t(cat.categoryName)}
                                     </span>
                                 </label>
                             )
