@@ -1,6 +1,8 @@
 import { ChevronRight, Users } from 'lucide-react';
+import { useTranslation } from "react-i18next";
 
 const HeroSection = ({ eventBannerUrl, eventName, totalVacancy }) => {
+    const { t } = useTranslation();
     return (
         <section className="relative min-h-105 pt-12 pb-28 overflow-hidden">
             <div className="absolute inset-0 z-0">
@@ -11,9 +13,9 @@ const HeroSection = ({ eventBannerUrl, eventName, totalVacancy }) => {
             <div className="max-w-300 mx-auto px-6 relative z-10">
 
                 <div className="flex items-center gap-2 text-white/80 text-xs font-medium mb-8">
-                    <a className="hover:text-white transition-colors" href="/">Home</a>
+                    <a className="hover:text-white transition-colors" href="/">{t("home")}</a>
                     <ChevronRight size={14} />
-                    <a className="hover:text-white transition-colors" href="/recruitments">Recruitments</a>
+                    <a className="hover:text-white transition-colors" href="/recruitments">{t("recruitments")}</a>
                     <ChevronRight size={14} />
                     <span className="text-white">{eventName}</span>
                 </div>
@@ -21,7 +23,7 @@ const HeroSection = ({ eventBannerUrl, eventName, totalVacancy }) => {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-10">
                     <div className="flex-1">
                         <p className="text-[#4ECDC4] font-bold tracking-[0.2em] text-[11px] uppercase mb-3">
-                            RECRUITMENT IS NOW OPEN
+                            {t("recruitment_is_now_open")}
                         </p>
                         <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.15]">
                             {eventName}
@@ -34,7 +36,7 @@ const HeroSection = ({ eventBannerUrl, eventName, totalVacancy }) => {
                             <Users size={24} className="shrink-0 text-[#4ECDC4]" />
 
                             <p className="text-[13px] font-semibold tracking-wider uppercase w-20 leading-snug">
-                                TOTAL OPENINGS
+                                {t("total_openings")}
                             </p>
                         </div>
 

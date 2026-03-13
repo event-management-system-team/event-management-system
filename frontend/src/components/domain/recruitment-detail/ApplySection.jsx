@@ -1,10 +1,12 @@
 import { Progress } from 'antd'
 import { ArrowRight, Calendar, MapPin, Clock } from 'lucide-react'
 import { useNavigate } from 'react-router';
+import { useTranslation } from "react-i18next";
 
 const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage, formattedDeadline, totalAvailable, totalVacancy, deadlineDate, startDate, endDate }) => {
-
     const navigate = useNavigate();
+    const { t } = useTranslation();
+
     return (
         <div className="bg-white rounded-2xl p-7 shadow-xl shadow-slate-200/50 border border-[#E5E1DA]/50">
             <div className="flex justify-between items-center mb-8">
@@ -12,7 +14,7 @@ const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage,
                     {status}
                 </span>
                 <span className="text-slate-400 text-xs font-medium">
-                    {daysLeft > 0 ? daysLeft : 0} days left
+                    {daysLeft > 0 ? daysLeft : 0} {t("days_left")}
                 </span>
             </div>
 
@@ -20,13 +22,13 @@ const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage,
                 <div className="flex items-start gap-4">
                     <Calendar size={18} className="text-primary mt-0.5" />
                     <div>
-                        <p className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold mb-1">Deadline</p>
+                        <p className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold mb-1">{t("deadline")}</p>
 
                         {deadlineDate ? (
                             <p className="text-[14px] font-bold text-slate-900">{formattedDeadline}</p>
                         ) : (
                             <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-[#4ECDC4]/10 text-[#4ECDC4] text-[11px] font-bold uppercase tracking-wide border border-[#4ECDC4]/20">
-                                Open until filled
+                                {t("open_until_filled")}
                             </span>
                         )}
                     </div>
@@ -35,7 +37,7 @@ const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage,
                 <div className="flex items-start gap-4">
                     <Clock size={18} className="text-primary mt-0.5" />
                     <div>
-                        <p className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold mb-1">Event Duration</p>
+                        <p className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold mb-1">{t("event_duration")}</p>
                         <p className="text-[14px] font-bold text-slate-600 leading-relaxed">
                             {(() => {
                                 const startStr = startDate ? new Date(startDate).toLocaleDateString('en-GB') : 'TBA';
@@ -52,7 +54,7 @@ const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage,
                 <div className="flex items-start gap-4">
                     <MapPin size={18} className="text-primary mt-0.5" />
                     <div>
-                        <p className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold">Location</p>
+                        <p className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold">{t("location")}</p>
                         <p className="text-[14px] font-bold text-slate-600 leading-relaxed">{location}</p>
                     </div>
                 </div>
@@ -60,7 +62,7 @@ const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage,
 
             <div className="space-y-3 mb-8">
                 <div className="flex justify-between text-[11px] font-extrabold uppercase tracking-wide">
-                    <span className="text-slate-500">Available Slots</span>
+                    <span className="text-slate-500">{t("available_slots")}</span>
                     <span className="text-teal-accent">{totalAvailable} / {totalVacancy}</span>
                 </div>
 
@@ -84,7 +86,7 @@ const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage,
                disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:bg-slate-200"
                 onClick={() => navigate(`/attendee/recruitments/${eventSlug}/apply-staff`)}
             >
-                {status === 'CLOSED' ? 'CLOSED' : (totalAvailable <= 0 ? 'Fully Booked' : 'Apply Now')}
+                {status === 'CLOSED' ? t("closed") : (totalAvailable <= 0 ? t("fully_booked") : t("apply_now"))}
 
                 {!(totalAvailable <= 0 || status === 'CLOSED') && (
                     <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1.5" />
