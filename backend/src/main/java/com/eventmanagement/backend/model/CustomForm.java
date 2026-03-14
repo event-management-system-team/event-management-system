@@ -51,7 +51,6 @@ public class CustomForm {
     @JsonIgnore
     private Event event;
 
-
     @Column(name = "form_name")
     private String formName;
 

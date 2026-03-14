@@ -6,21 +6,21 @@ const AccountSummaryCard = ({ summary }) => {
     const summaryMetrics = (summary) => [
         {
             title: "TOTAL ACCOUNTS",
-            value: summary?.totalAccounts,
+            value: summary?.totalAccounts ?? 0,
             icon: Users,
             iconBg: "bg-blue-100",
             iconColor: "text-blue-600"
         },
         {
             title: "ACTIVE",
-            value: summary?.activeAccounts,
+            value: summary?.activeAccounts ?? 0,
             icon: CheckCircle,
             iconBg: "bg-green-100",
             iconColor: "text-green-600"
         },
         {
             title: "BANNED",
-            value: summary?.bannedAccounts,
+            value: summary?.bannedAccounts ?? 0,
             icon: UserX,
             iconBg: "bg-red-100",
             iconColor: "text-red-600"

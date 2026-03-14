@@ -10,35 +10,35 @@ const GlobalAnalyticsCard = ({ summary, formatVND, formatNumber }) => {
     const globalMetrics = [
         {
             title: "TOTAL EVENTS",
-            value: formatTotalNumber(summary?.totalEvents),
+            value: formatTotalNumber(summary?.totalEvents ?? 0),
             icon: Calendar,
             iconBg: "bg-blue-100",
             iconColor: "text-blue-600"
         },
         {
             title: "ACTIVE EVENTS",
-            value: formatTotalNumber(summary?.activeEvents),
+            value: formatTotalNumber(summary?.activeEvents ?? 0),
             icon: Zap,
             iconBg: "bg-green-100",
             iconColor: "text-green-600"
         },
         {
             title: "TOTAL TICKETS SOLD",
-            value: formatTotalNumber(summary?.totalTicketsSold),
+            value: formatTotalNumber(summary?.totalTicketsSold ?? 0),
             icon: Target,
             iconBg: "bg-purple-100",
             iconColor: "text-purple-600"
         },
         {
             title: "TOTAL REVENUE",
-            value: formatVND(summary?.totalRevenue),
+            value: formatVND(summary?.totalRevenue ?? 0),
             icon: DollarSign,
             iconBg: "bg-emerald-100",
             iconColor: "text-emerald-600"
         },
         {
             title: "AVG ATTENDANCE RATE",
-            value: `${formatNumber(summary?.averageAttendanceRate)} %`,
+            value: `${formatNumber(summary?.averageAttendanceRate ?? 0)} %`,
             icon: Users,
             iconBg: "bg-orange-100",
             iconColor: "text-orange-600"

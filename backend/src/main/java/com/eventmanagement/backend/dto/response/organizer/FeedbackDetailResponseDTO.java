@@ -4,22 +4,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 
 @Data
 @Builder
-@Getter
-@Setter
+@AllArgsConstructor
 public class FeedbackDetailResponseDTO {
     private String eventName;
     private LocalDateTime submittedAt;
     private AttendeeInfor attendeeInfor;
     private FeedbackResponse feedbackResponse;
-
     @Data
     public static class AttendeeInfor {
         private String fullName;

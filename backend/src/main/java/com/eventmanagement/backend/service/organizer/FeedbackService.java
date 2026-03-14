@@ -52,10 +52,8 @@ public class FeedbackService {
 
     public Map<String, Object> getFeedbackListData(UUID eventId) {
         List<FeedbackResponseDTO> feedbacks = feedbackRepository.findFeedbacksByEventId(eventId);
-
         Map<String, Object> response = new HashMap<>();
         response.put("feedbacks", feedbacks);
-
         return response;
     }
 
@@ -132,30 +130,27 @@ public class FeedbackService {
         return responseDTO;
     }
 
+
     @Transactional
     public Feedback createFeedback(UUID eventId, String email, SubmitFeedbackRequest request) {
 
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Sự kiện không tồn tại!"));
-
         // TÌM USER TRONG DATABASE BẰNG EMAIL LẤY TỪ TOKEN
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại hoặc phiên đăng nhập không hợp lệ!"));
 
-        UUID userId = user.getUserId(); // Rút ra ID thật để dùng cho các hàm check bên dưới
+        UUID userId = user.getUserId(); 
 
-        // ==== CÁC BƯỚC VALIDATE GIỮ NGUYÊN ====
         if (event.getStartDate().isAfter(LocalDateTime.now())) {
             throw new RuntimeException("Sự kiện chưa diễn ra, không thể gửi đánh giá!");
         }
 
-        // Kiểm tra xem đã đánh giá chưa (Dùng hàm vừa thêm ở Repository)
         boolean alreadySubmitted = feedbackRepository.existsByEvent_EventIdAndUser_UserId(eventId, userId);
         if (alreadySubmitted) {
             throw new RuntimeException("Bạn đã gửi đánh giá cho sự kiện này rồi!");
         }
-
-        // ==== LƯU VÀO DATABASE ====
+        
         Feedback feedback = new Feedback();
         feedback.setEvent(event);
         feedback.setUser(user);
@@ -220,5 +215,18 @@ public class FeedbackService {
                 .comment(feedback.getComment())
                 .submittedAt(feedback.getSubmittedAt())
                 .build();
+    }
+
+    public Map<String, Object> getEventInfoForFeedback(UUID eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sự kiện!"));
+        Map<String, Object> eventInfo = new HashMap<>();
+        eventInfo.put("eventId", event.getEventId());
+        eventInfo.put("eventName", event.getEventName());
+        eventInfo.put("startDate", event.getStartDate());
+        eventInfo.put("endDate", event.getEndDate());
+        eventInfo.put("bannerUrl", event.getBannerUrl()); 
+
+        return eventInfo;
     }
 }

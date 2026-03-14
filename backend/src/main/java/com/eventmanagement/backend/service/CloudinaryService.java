@@ -145,6 +145,36 @@ public class CloudinaryService {
             return null;
         }
     }
+    // upload event banner for function create event
+    public String uploadEventBanner(MultipartFile file) throws IOException {
+        log.info("Starting event banner upload to Cloudinary: {}", file.getOriginalFilename());
+
+        validateImage(file);
+
+        String publicId = folder + "/events/" + UUID.randomUUID().toString();
+
+        try {
+            Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
+                    ObjectUtils.asMap(
+                            "public_id", publicId,
+                            "resource_type", "image",
+                            "transformation", new Transformation()
+                                    .width(1200)
+                                    .height(600)
+                                    .crop("fill")
+                                    .quality("auto")
+                                    .fetchFormat("auto")));
+
+            String url = (String) uploadResult.get("secure_url");
+            log.info("Event banner uploaded successfully: {}", url);
+
+            return url;
+
+        } catch (Exception e) {
+            log.error("Failed to upload event banner to Cloudinary: {}", e.getMessage());
+            throw new IOException("Failed to upload event banner: " + e.getMessage());
+        }
+    }
 
     public String uploadCV(MultipartFile file) throws IOException {
         log.info("Starting document upload to Cloudinary: {}", file.getOriginalFilename());

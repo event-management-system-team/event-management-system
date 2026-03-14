@@ -109,8 +109,6 @@ public class RecruitmentController {
     @PostMapping("/create")
     public ResponseEntity<?> createRecruitment(@RequestBody Recruitment recruitment) {
         try {
-            // Lưu thẳng vào bảng recruitments
-            // (Trong thực tế bạn nên có EventId truyền từ Frontend xuống để setEvent cho nó)
             recruitment.setStatus(RecruitmentStatus.OPEN);
             Recruitment savedJob = recruitmentRepository.save(recruitment);
             return ResponseEntity.ok(savedJob);
@@ -156,7 +154,6 @@ public class RecruitmentController {
                     .body("Lỗi khi tải Workspace: " + e.getMessage());
         }
     }
-
 
     @GetMapping("/events/{eventId}/forms")
     public ResponseEntity<?> getForm(@PathVariable UUID eventId, @RequestParam("type") String typeStr) {
