@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Eye, Search, Plus, Lock } from 'lucide-react';
-import Sidebar from '../../components/layout/Sidebar'; 
+import React, { useState, useRef } from 'react';
+import { Eye, Search, Download, Plus } from 'lucide-react';
 import { useFeedbacks } from "../../hooks/useFeedback";
 import { Link, useParams } from 'react-router-dom';
-import axiosInstance from '../../config/axios'; // Đừng quên import axiosInstance
+import { Pagination } from 'antd';
 
 const FeedbackList = () => {
   const { eventId } = useParams(); 
@@ -34,6 +33,10 @@ const FeedbackList = () => {
     }
   }, [eventId]);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const listTopRef = useRef(null);
+
   if (isLoading) {
     return (
       <div className="flex min-h-screen bg-[#f8f7f2] font-sans items-center justify-center">
@@ -53,16 +56,32 @@ const FeedbackList = () => {
   const eventName = feedbacks?.eventName || "Unknown Event"; 
   const feedbackItems = feedbacks?.feedbacks || []; 
 
-  return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-[#f8f7f2] font-sans w-full">
-      
-      <Sidebar />
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = feedbackItems.slice(indexOfFirstItem, indexOfLastItem);
 
-      {/* Main Content */}
-      <div className="flex-1 p-4 sm:p-6 lg:p-10 w-full overflow-x-hidden"> 
+  const onChangePage = (page) => {
+    setCurrentPage(page);
+
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
+    setTimeout(() => {
+      if (listTopRef.current) {
+        listTopRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    }, 100);
+  };
+
+  return (
+    <div className="p-10 w-full overflow-x-hidden"> 
         
-        {/* --- HEADER --- */}
-        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-end gap-4 lg:gap-0 mb-6 lg:mb-8">
+        {/*  header  */}
+        <div className="flex justify-between items-end mb-8" ref={listTopRef}>
           <div>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-900 tracking-tight mb-1 sm:mb-2">Attendee Feedback</h1>
             <p className="text-gray-500 font-medium italic text-xs sm:text-sm">
@@ -125,7 +144,7 @@ const FeedbackList = () => {
                     </td>
                   </tr>
                 ) : (
-                  feedbackItems.map((item) => (
+                  currentItems.map((item) => (
                     <tr key={item.feedbackId} className="hover:bg-gray-50/80 transition-colors group cursor-pointer">
                       <td className="px-6 lg:px-8 py-4 lg:py-5 text-xs sm:text-sm text-gray-500 font-semibold whitespace-nowrap">
                         {new Date(item.createdAt).toLocaleString()}
@@ -167,14 +186,24 @@ const FeedbackList = () => {
             </table>
           </div>
           
-          <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 border-t border-gray-50 flex justify-between items-center bg-gray-50/50 mt-auto">
-            <p className="text-[10px] sm:text-[11px] text-gray-400 font-bold uppercase tracking-widest">
+          <div className="px-8 py-6 border-t border-gray-50 flex flex-col sm:flex-row justify-between items-center gap-4 bg-gray-50/50">
+            <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest">
               Total Responses: <span className="text-gray-700">{feedbackItems.length}</span>
             </p>
+            {feedbackItems.length > itemsPerPage && (
+              <Pagination
+                align="center"
+                responsive
+                current={currentPage}
+                pageSize={itemsPerPage}
+                showSizeChanger={false}
+                total={feedbackItems.length}
+                onChange={onChangePage}
+              />
+            )}
           </div>
         </div>
 
-      </div>
     </div>
   );
 };
