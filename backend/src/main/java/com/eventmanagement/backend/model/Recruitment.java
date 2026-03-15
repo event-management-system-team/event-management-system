@@ -50,6 +50,10 @@ public class Recruitment {
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "form_id")
+    private CustomForm customForm;
+
     @Column(name = "position_name", nullable = false)
     private String positionName;
 
@@ -91,7 +95,6 @@ public class Recruitment {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "benefits", columnDefinition = "jsonb")
