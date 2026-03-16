@@ -49,6 +49,12 @@ export const adminService = {
         });
     },
 
+    checkPhoneAvailability: (phone) => {
+        return axiosInstance.get(`/accounts/check-phone`, {
+            params: { phone }
+        });
+    },
+
     // EVENT-MANAGEMENT
     getAllEventsPlain: () => {
         return axiosInstance.get(`/events/all`);
