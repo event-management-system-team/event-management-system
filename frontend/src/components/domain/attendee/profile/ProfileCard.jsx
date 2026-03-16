@@ -13,11 +13,13 @@ import {
   changePasswordSchema,
 } from "../../../../schemas/profile.schema";
 import { logoutUser, setUser } from "../../../../store/slices/auth.slice";
+import { useTranslation } from "react-i18next";
 
 export const ProfileCard = () => {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [profileData, setProfileData] = useState(null);
@@ -58,7 +60,7 @@ export const ProfileCard = () => {
         });
       } catch (err) {
         console.error("Failed to load profile:", err);
-        setError("Failed to load profile");
+        setError(t("failed_to_load_profile"));
       }
     };
     loadProfile();
@@ -97,7 +99,7 @@ export const ProfileCard = () => {
         })
       );
 
-      setSuccess("Profile updated successfully!");
+      setSuccess(t("profile_updated_successfully"));
 
       // Check if password fields are filled
       const passwordData = {
@@ -113,14 +115,14 @@ export const ProfileCard = () => {
       ) {
         await handlePasswordSubmit(async (pwdData) => {
           await profileService.changePassword(pwdData);
-          setSuccess("Profile and password updated successfully!");
+          setSuccess(t("profile_and_password_updated"));
           resetPassword();
         })();
       }
 
       setIsEditMode(false);
     } catch (err) {
-      setError(err.response?.data?.message || "Update failed");
+      setError(err.response?.data?.message || t("update_failed"));
     } finally {
       setLoading(false);
     }
@@ -157,9 +159,9 @@ export const ProfileCard = () => {
         }),
       );
 
-      setSuccess("Avatar updated successfully!");
+      setSuccess(t("avatar_updated"));
     } catch (err) {
-      setError(err.response?.data?.error || "Avatar upload failed");
+      setError(err.response?.data?.error || t("avatar_upload_failed"));
     } finally {
       setUploadingAvatar(false);
     }
@@ -228,9 +230,9 @@ export const ProfileCard = () => {
 
         <div className="mt-8 text-center">
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">
-            Member since{" "}
+            {t("member_since")}{" "}
             {profileData.createdAt
-              ? new Date(profileData.createdAt).toLocaleDateString("en-US", {
+              ? new Date(profileData.createdAt).toLocaleDateString(i18n.language === "vi" ? "vi-VN" : "en-US", {
                 month: "long",
                 year: "numeric",
               })
