@@ -104,7 +104,7 @@ const RecruitmentList = () => {
           
           {!isEventEnded ? (
             <Link 
-              to={`/organizer/recruitmentcreate/${eventId}`} 
+              to={`/organizer/recruitment-post/${eventId}`} 
               className="w-full sm:w-auto justify-center bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-5 py-2.5 rounded-lg flex items-center gap-2 text-sm font-bold shadow-md transition-all active:scale-95"
             >
               <Plus size={18} strokeWidth={2.5} /> Create Recruitment
