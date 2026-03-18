@@ -4,6 +4,10 @@ import { useSelector } from "react-redux";
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { isAuthenticated, user } = useSelector((state) => state.auth);
 
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
   if (allowedRoles && !allowedRoles.includes(user?.role)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F1F0E8]">
@@ -26,10 +30,6 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
         </div>
       </div>
     );
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
   }
 
   return children ? children : <Outlet />;

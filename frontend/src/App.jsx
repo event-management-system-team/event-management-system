@@ -4,9 +4,6 @@ import { autoRefreshToken } from "./store/slices/auth.slice";
 
 import AppRoutes from "./routes";
 import LoadingState from "./components/common/LoadingState";
-import StatCards from "./components/domain/feedback-analytic/StatCards";
-import RatingBarChart from "./components/domain/feedback-analytic/RatingBarChart";
-import ReviewsList from "./components/domain/feedback-analytic/ReviewsList";
 
 function App() {
   const hasRefreshed = useRef(false);
