@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Clock, Lock } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
-import Sidebar from '../../components/layout/Sidebar'; 
 import axiosInstance from '../../config/axios';
 
 const RecruitmentList = () => {
@@ -90,8 +89,7 @@ const RecruitmentList = () => {
   ];
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-[#ecebe4] font-sans w-full">
-      <Sidebar />
+    <div className="flex flex-col min-h-screen w-full">
 
       <div className="flex-1 p-4 sm:p-6 lg:p-10 w-full overflow-x-hidden"> 
         

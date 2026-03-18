@@ -3,7 +3,6 @@ import {
   Search, Eye, X, Download, CheckCircle, Quote, FileText, Star 
 } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
-import Sidebar from '../../components/layout/Sidebar'; 
 import axiosInstance from '../../config/axios';
 import { message } from 'antd'; 
 
@@ -77,8 +76,7 @@ const ApplicationList = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-[#ecebe4] font-sans">
-      <Sidebar />
+    <div className="flex flex-col min-h-screen w-full">
 
       {/* Main Content Area */}
       <div className="flex-1 p-4 sm:p-6 lg:p-10 w-full overflow-x-hidden relative">
@@ -98,7 +96,7 @@ const ApplicationList = () => {
             </div>
           </div>
           <Link 
-            to={`/organizer/recruitments`} 
+            to={`/organizer/recruitmentlist/${recruitmentId}`} 
             className="w-full sm:w-auto justify-center bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 text-xs sm:text-sm font-bold shadow-md transition-all"
           >
              Back to Recruitments

@@ -3,7 +3,6 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
   ArrowLeft, Calendar, Users, Briefcase, FileText, CheckCircle, Edit
 } from 'lucide-react';
-import Sidebar from '../../components/layout/Sidebar';
 import axiosInstance from '../../config/axios';
 
 const RecruitmentDetail = () => {
@@ -33,8 +32,7 @@ const RecruitmentDetail = () => {
   if (!detailData) return <div className="flex h-screen items-center justify-center font-bold text-red-500 bg-[#f8f7f2]">Recruitment post not found!</div>;
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen bg-[#ecebe4] font-sans overflow-hidden">
-      <Sidebar />
+    <div className="flex flex-col h-screen w-full overflow-hidden">
 
       <div className="flex-1 flex flex-col overflow-y-auto">
         
@@ -60,7 +58,7 @@ const RecruitmentDetail = () => {
             </div>
             
             <Link 
-              to={`/organizer/recruitmentedit/${detailData.recruitmentId}`}
+              to={`/organizer/recruitmentcreate/${detailData.eventId}`}
               className="w-full sm:w-auto justify-center bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-5 py-2.5 rounded-lg flex items-center gap-2 text-sm font-bold shadow-sm transition-all"
             >
               <Edit size={16} /> Edit Post

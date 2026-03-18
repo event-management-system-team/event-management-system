@@ -30,9 +30,7 @@ const OrganizerRoutes = () => {
                     <Route path="events/:eventId" element={<EventDetailDashboard />} />
                     <Route path="events/:eventId/attendees" element={<EventAttendeesPage />} />
 
-                    {/* Events */}
-                    <Route path="my-events" element={<MyEventsPage />} />
-                    <Route path="create-event" element={<CreateEventPage />} />
+                    {/* Edit Event */}
                     <Route path="edit-event/:eventId" element={<CreateEventPage />} />
 
                     {/* Feedback */}
@@ -47,7 +45,7 @@ const OrganizerRoutes = () => {
                     <Route path="recruitments/:recruitmentId" element={<RecruitmentDetail />} />
 
                     {/* Staff */}
-                    <Route path=":id/staff" element={<StaffManagement />} />
+                    <Route path="events/:eventId/staff" element={<StaffManagement />} />
                 </Route>
             </Route>
         </Routes>

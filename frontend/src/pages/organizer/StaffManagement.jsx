@@ -16,7 +16,7 @@ import WorkScheduleTab from '../../components/domain/organizer/WorkScheduleTab.j
 
 export default function StaffManagement() {
 
-    const { id } = useParams();
+    const { eventId } = useParams();
     const [activeTab, setActiveTab] = useState('staff');
 
     const [loading, setLoading] = useState(true);
@@ -115,14 +115,14 @@ export default function StaffManagement() {
 
                     {/* TAB 1: Staff Information */}
                     <StaffListTab
-                        id={id}
+                        id={eventId}
                         onLoading={setLoading}
                         onError={setError}
                     />
 
                     {/* TAB 2: Work Schedule */}
                     <WorkScheduleTab
-                        id={id}
+                        id={eventId}
                         isScheduleModalOpen={isScheduleModalOpen}
                         closeScheduleModal={closeScheduleModal}
                         onLoading={setLoading}
@@ -132,7 +132,7 @@ export default function StaffManagement() {
 
                     {/* TAB 3: Resources */}
                     <ResourceTab
-                        id={id}
+                        id={eventId}
                         isResourceModalOpen={isResourceModalOpen}
                         closeResourceModal={closeResourceModal}
                         onLoading={setLoading}
