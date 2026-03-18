@@ -26,6 +26,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -48,10 +49,12 @@ public class Recruitment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id", nullable = false)
+    @JsonIgnore
     private Event event;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "form_id")
+    @JsonIgnore
     private CustomForm customForm;
 
     @Column(name = "position_name", nullable = false)
