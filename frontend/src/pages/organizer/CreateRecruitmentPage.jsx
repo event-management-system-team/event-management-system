@@ -42,9 +42,7 @@ const CreateRecruitmentPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#f0f0ec]">
-      {/* Nội dung chính — đẩy sang phải w-64 = 256px để tránh sidebar */}
-      <div className="flex-1 ml-64 flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen">
         {step === 4 ? (
           <div className="flex-1 p-8">
             <RecruitmentSuccessScreen form={form} />
@@ -160,7 +158,6 @@ const CreateRecruitmentPage = () => {
           </>
         )}
       </div>
-    </div>
   );
 };
 
