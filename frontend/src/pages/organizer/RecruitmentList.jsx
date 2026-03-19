@@ -42,14 +42,14 @@ const RecruitmentList = () => {
           color: 'bg-red-400', 
           text: 'Closed', 
           buttonText: 'View Detail', 
-          isActive: false 
+          isActive: true  // Organizer vẫn cần xem detail dù đã closed
         };
       default:
         return { 
           color: 'bg-gray-400', 
           text: status || 'Unknown', 
           buttonText: 'View Detail', 
-          isActive: false 
+          isActive: true 
         };
     }
   };
@@ -172,16 +172,25 @@ const RecruitmentList = () => {
                     </div>
                   </div>
 
-                  {/* Cột 3: Nút bấm (Theo ảnh mẫu) */}
-                  <div className="w-full md:w-1/3 flex items-center justify-between md:justify-end gap-6 mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-none border-gray-50">
-                    <Link 
-                      to={`/organizer/recruitments/${job.recruitmentId}`} 
-                      className={`px-6 py-2.5 rounded-full text-xs lg:text-sm font-bold transition-all shadow-sm whitespace-nowrap ${
-                        ui.isActive 
-                          ? 'bg-[#111827] text-white hover:bg-gray-800' 
-                          : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                      }`}
-                      onClick={(e) => !ui.isActive && job.status !== 'CLOSED' && e.preventDefault()}
+                  {/* Cột 3: Nút bấm */}
+                  <div className="w-full md:w-1/3 flex items-center justify-end gap-3 mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-none border-gray-50">
+                    {/* Nút Applications */}
+                    <Link
+                      to={`/organizer/applications/${job.recruitmentId}`}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs lg:text-sm font-bold bg-orange-50 text-orange-600 hover:bg-orange-100 transition-all shadow-sm whitespace-nowrap"
+                    >
+                      Applications
+                      {job.newCount > 0 && (
+                        <span className="bg-orange-500 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                          {job.newCount}
+                        </span>
+                      )}
+                    </Link>
+
+                    {/* Nút View Detail */}
+                    <Link
+                      to={`/organizer/recruitments/${job.recruitmentId}`}
+                      className="px-6 py-2.5 rounded-full text-xs lg:text-sm font-bold transition-all shadow-sm whitespace-nowrap bg-[#111827] text-white hover:bg-gray-800"
                     >
                       {ui.buttonText}
                     </Link>

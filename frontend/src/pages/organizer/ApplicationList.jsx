@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Search, Eye, X, Download, CheckCircle, Quote, FileText, Star 
+  Search, Eye, X, Download, CheckCircle, Quote, FileText, Star, ArrowLeft
 } from 'lucide-react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../config/axios';
 import { message } from 'antd'; 
 
 const ApplicationList = () => {
-  const { recruitmentId } = useParams(); 
+  const { recruitmentId } = useParams();
+  const navigate = useNavigate();
   
   const [applications, setApplications] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
@@ -81,13 +82,19 @@ const ApplicationList = () => {
       {/* Main Content Area */}
       <div className="flex-1 p-4 sm:p-6 lg:p-10 w-full overflow-x-hidden relative">
         
-        {/* Header & Toolbars */}
+        {/* Header */}
         <div className="mb-6 lg:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight mb-1 sm:mb-2">Application List</h1>
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-4z text-gray-400 hover:text-gray-700 text-sm font-medium mb-3 transition-colors group"
+          >
+            <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight mb-1 sm:mb-2">Application List</h1>
+          </button>
           <p className="text-xs sm:text-sm text-gray-500 font-medium">Review and manage potential staff members.</p>
         </div>
 
-        {/* Search & Actions - Responsive Stack */}
+        {/* Search */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between mb-6 lg:mb-8 gap-4 sm:gap-0">
           <div className="w-full sm:max-w-xs lg:w-80">
             <div className="bg-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-2 sm:gap-3 w-full">
@@ -95,12 +102,6 @@ const ApplicationList = () => {
               <input type="text" placeholder="Search candidates..." className="w-full outline-none text-xs sm:text-sm font-medium text-gray-700 placeholder-gray-400 bg-transparent"/>
             </div>
           </div>
-          <Link 
-            to={`/organizer/recruitmentlist/${recruitmentId}`} 
-            className="w-full sm:w-auto justify-center bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 text-xs sm:text-sm font-bold shadow-md transition-all"
-          >
-             Back to Recruitments
-          </Link>
         </div>
 
         {/* Table Container - Responsive Horizontal Scroll */}

@@ -14,6 +14,7 @@ import {
     MapPin,
     Pencil,
     Trash2,
+    AlertCircle,
 } from 'lucide-react';
 import dayjs from 'dayjs';
 import organizerService from '../../services/organizer.service';
@@ -383,6 +384,15 @@ const MyEventsPage = () => {
                                         <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dotColor}`} />
                                         {statusConfig.label}
                                     </span>
+                                    {/* Hiển thị rejection reason nếu bị REJECTED */}
+                                    {event.status === 'REJECTED' && event.rejectionReason && (
+                                        <div className="flex items-start gap-1 mt-1.5" title={event.rejectionReason}>
+                                            <AlertCircle size={11} className="text-red-400 shrink-0 mt-0.5" />
+                                            <p className="text-[11px] text-red-500 font-medium leading-tight line-clamp-2">
+                                                {event.rejectionReason}
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Ticket Stats */}
@@ -406,7 +416,17 @@ const MyEventsPage = () => {
 
                                 {/* Actions */}
                                 <div className="col-span-1 flex items-center justify-end gap-1">
-                                    {(event.status === 'PENDING' || event.status === 'DRAFT') ? (
+                                    {/* Nút Manage cho tất cả trạng thái */}
+                                    <button
+                                        className="text-sm text-[#7FA5A5] hover:text-[#5d8585] font-medium transition-colors cursor-pointer px-2"
+                                        onClick={() => navigate(`/organizer/events/${event.eventId}`)}
+                                        title="View Event Detail"
+                                    >
+                                        Manage
+                                    </button>
+
+                                    {/* Edit + Delete chỉ hiện khi PENDING hoặc DRAFT */}
+                                    {(event.status === 'PENDING' || event.status === 'DRAFT') && (
                                         <>
                                             <button
                                                 onClick={() => navigate(`/organizer/edit-event/${event.eventId}`)}
@@ -423,13 +443,6 @@ const MyEventsPage = () => {
                                                 <Trash2 size={15} />
                                             </button>
                                         </>
-                                    ) : (
-                                        <button
-                                            className="text-sm text-[#7FA5A5] hover:text-[#5d8585] font-medium transition-colors cursor-pointer"
-                                            onClick={() => navigate(`/organizer/events/${event.eventId}`)}
-                                        >
-                                            Manage
-                                        </button>
                                     )}
                                 </div>
                             </div>

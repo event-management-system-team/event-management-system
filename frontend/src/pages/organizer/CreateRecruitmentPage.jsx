@@ -1,7 +1,5 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Rocket, AlertCircle } from "lucide-react";
-
-import Sidebar from "../../components/layout/Sidebar";
 import {
   StepIndicator,
   ProgressHeader,

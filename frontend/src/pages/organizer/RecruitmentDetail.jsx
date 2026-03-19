@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
-  ArrowLeft, Calendar, Users, Briefcase, FileText, CheckCircle, Edit
+  ArrowLeft, Calendar, Users, Briefcase, FileText, CheckCircle, Edit, ClipboardList
 } from 'lucide-react';
 import axiosInstance from '../../config/axios';
 
@@ -31,6 +31,13 @@ const RecruitmentDetail = () => {
   if (isLoading) return <div className="flex h-screen items-center justify-center font-bold text-gray-500 bg-[#f8f7f2]">Loading Data...</div>;
   if (!detailData) return <div className="flex h-screen items-center justify-center font-bold text-red-500 bg-[#f8f7f2]">Recruitment post not found!</div>;
 
+  // Truyền recruitmentId qua location.state để RecruitmentBuilder load đúng bài edit
+  const handleEdit = () => {
+    navigate(`/organizer/recruitmentcreate/${detailData.eventId}`, {
+      state: { recruitmentId }
+    });
+  };
+
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden">
 
@@ -57,12 +64,25 @@ const RecruitmentDetail = () => {
               </p>
             </div>
             
-            <Link 
-              to={`/organizer/recruitmentcreate/${detailData.eventId}`}
-              className="w-full sm:w-auto justify-center bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-5 py-2.5 rounded-lg flex items-center gap-2 text-sm font-bold shadow-sm transition-all"
-            >
-              <Edit size={16} /> Edit Post
-            </Link>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+              {/* View Applications */}
+              <Link
+                to={`/organizer/applications/${recruitmentId}`}
+                className="w-full sm:w-auto justify-center flex items-center gap-2 bg-orange-50 border border-orange-200 text-orange-600 hover:bg-orange-100 px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm transition-all"
+              >
+                <ClipboardList size={16} /> View Applications
+              </Link>
+
+              {/* Edit Post — chỉ hiện khi status OPEN */}
+              {detailData.status === 'OPEN' && (
+                <button
+                  onClick={handleEdit}
+                  className="w-full sm:w-auto justify-center flex items-center gap-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm transition-all"
+                >
+                  <Edit size={16} /> Edit Post
+                </button>
+              )}
+            </div>
           </div>
         </div>
 

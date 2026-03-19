@@ -33,11 +33,11 @@ const OrganizerRoutes = () => {
                     {/* Edit Event */}
                     <Route path="edit-event/:eventId" element={<CreateEventPage />} />
 
-                    {/* Feedback */}
+                    {/* Feedback — specific routes BEFORE the generic catch-all */}
                     <Route path="feedback/feedbacklist/:eventId" element={<FeedbackList />} />
                     <Route path="feedback/createform/:eventId" element={<FeedbackBuilder />} />
-                    <Route path="feedback/:feedbackId" element={<FeedbackDetail />} />
                     <Route path="feedback/analytics/:eventId" element={<FeedbackAnalytics />} />
+                    <Route path="feedback/:feedbackId" element={<FeedbackDetail />} />
                     <Route path="recruitmentlist/:eventId" element={<RecruitmentList />} />
                     <Route path="recruitmentcreate/:eventId" element={<RecruitmentBuilder />} />
                     <Route path="recruitment-post/:eventId" element={<CreateRecruitmentPage />} />

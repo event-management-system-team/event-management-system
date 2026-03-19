@@ -54,22 +54,30 @@ const Step1RoleDetails = ({ form, onChange, errors = {} }) => (
           <label className="block text-xs font-semibold text-gray-600 mb-1.5">
             Event <span className="text-red-400">*</span>
           </label>
-          <select
-            value={form.eventId}
-            onChange={(e) => onChange({ eventId: e.target.value })}
-            className={`w-full px-4 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 bg-white transition appearance-none ${
-              errors.eventId
-                ? "border-red-400 focus:ring-red-200"
-                : "border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]"
-            }`}
-          >
-            <option value="">— Select event —</option>
-            {(form.eventOptions || []).map((ev) => (
-              <option key={ev.eventId} value={ev.eventId}>
-                {ev.eventName}
-              </option>
-            ))}
-          </select>
+          {/* Nếu đã có eventId từ URL, hiển thị readonly badge */}
+          {form.eventId && (form.eventOptions || []).length === 0 ? (
+            <div className="w-full px-4 py-2.5 text-sm border border-[#4a9e9e] rounded-xl bg-[#f0fafa] text-[#4a9e9e] font-medium">
+              Event ID: {form.eventId.slice(0, 8)}...
+            </div>
+          ) : (
+            <select
+              value={form.eventId}
+              onChange={(e) => onChange({ eventId: e.target.value })}
+              disabled={!!form.eventId && (form.eventOptions || []).length > 0 && form.eventId === form.eventId}
+              className={`w-full px-4 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 bg-white transition appearance-none ${
+                errors.eventId
+                  ? "border-red-400 focus:ring-red-200"
+                  : "border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]"
+              }`}
+            >
+              <option value="">— Select event —</option>
+              {(form.eventOptions || []).map((ev) => (
+                <option key={ev.eventId} value={ev.eventId}>
+                  {ev.eventName}
+                </option>
+              ))}
+            </select>
+          )}
           <FieldError msg={errors.eventId} />
         </div>
       </div>

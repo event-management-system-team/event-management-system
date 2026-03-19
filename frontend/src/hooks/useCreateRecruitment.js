@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import dayjs from "dayjs";
 import recruitmentService from "../services/recruitment.service";
+import organizerService from "../services/organizer.service";
 import { validateStep1, validateStep2 } from "../schemas/recruitment.schema";
 
 const initialForm = {
@@ -20,6 +22,7 @@ const initialForm = {
 
 const useCreateRecruitment = (preselectedEventId = "") => {
   const navigate = useNavigate();
+  const user = useSelector((state) => state.auth?.user);
 
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
@@ -29,6 +32,18 @@ const useCreateRecruitment = (preselectedEventId = "") => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [errors, setErrors] = useState({});
+
+  // Load danh sách events của organizer vào dropdown
+  useEffect(() => {
+    const organizerId = user?.user_id || user?.userId || user?.id;
+    if (!organizerId) return;
+    organizerService.getMyEvents(organizerId, 0, 100)
+      .then((data) => {
+        const list = data?.content || data?.events || data || [];
+        setForm((prev) => ({ ...prev, eventOptions: list }));
+      })
+      .catch(() => {});
+  }, [user]);
 
   const updateForm = (partial) => setForm((prev) => ({ ...prev, ...partial }));
 
@@ -56,7 +71,8 @@ const useCreateRecruitment = (preselectedEventId = "") => {
         form.eventId,
         buildPayload("DRAFT"),
       );
-      navigate("/organizer/recruitments");
+      // Navigate về recruitment list của event vừa tạo
+      navigate(`/organizer/recruitmentlist/${form.eventId}`);
     } catch (err) {
       setError(err?.response?.data?.message || "Failed to save draft.");
     } finally {

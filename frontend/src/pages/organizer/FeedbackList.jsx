@@ -9,21 +9,28 @@ const FeedbackList = () => {
   const { eventId } = useParams();
   const { data: feedbacks, isLoading, isError } = useFeedbacks(eventId);
 
-  // STATE MỚI: Quản lý trạng thái kết thúc của sự kiện
+  // STATE: Quản lý trạng thái kết thúc và tên event
   const [isEventEnded, setIsEventEnded] = useState(false);
+  const [eventName, setEventName] = useState("");
 
-  // EFFECT MỚI: Gọi API lấy chi tiết Event để check endDate
+  // EFFECT: Gọi API lấy chi tiết Event để check endDate và lấy tên event
   useEffect(() => {
     const checkEventStatus = async () => {
       try {
-        const response = await axiosInstance.get(`/events/ids/${eventId}`);
+        const response = await axiosInstance.get(`/organizer/events/${eventId}`);
         const eventData = response.data?.data || response.data;
 
-        if (eventData && eventData.endDate) {
-          // So sánh thời gian hiện tại với ngày kết thúc sự kiện
-          const isEnded =
-            new Date().getTime() > new Date(eventData.endDate).getTime();
-          setIsEventEnded(isEnded);
+        if (eventData) {
+          // Lấy tên event
+          if (eventData.eventName || eventData.name) {
+            setEventName(eventData.eventName || eventData.name);
+          }
+          // Check nếu event đã kết thúc
+          if (eventData.endDate) {
+            const isEnded =
+              new Date().getTime() > new Date(eventData.endDate).getTime();
+            setIsEventEnded(isEnded);
+          }
         }
       } catch (error) {
         console.error("Lỗi khi kiểm tra thời gian sự kiện:", error);
@@ -34,6 +41,7 @@ const FeedbackList = () => {
       checkEventStatus();
     }
   }, [eventId]);
+
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -57,7 +65,7 @@ const FeedbackList = () => {
     );
   }
 
-  const eventName = feedbacks?.eventName || "Unknown Event";
+  const resolvedEventName = eventName || feedbacks?.eventName || "Event";
   const feedbackItems = feedbacks?.feedbacks || [];
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -92,7 +100,7 @@ const FeedbackList = () => {
           <p className="text-gray-500 font-medium italic text-xs sm:text-sm">
             Showing all responses for{" "}
             <span className="text-gray-800 not-italic font-bold">
-              {eventName}
+              {resolvedEventName}
             </span>
           </p>
         </div>
