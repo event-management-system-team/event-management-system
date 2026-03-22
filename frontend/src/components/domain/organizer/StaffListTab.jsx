@@ -67,42 +67,48 @@ const StaffListTab = ({ id, onLoading, onError }) => {
                         <div
                             className="grid grid-cols-12 gap-4 px-6 py-3 border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wide items-center">
                             <div className="col-span-5 ml-5">Staff Member</div>
-                            <div className="col-span-4">Phone Number</div>
-                            <div className="col-span-3">Role</div>
+                            <div className="col-span-4 text-center">Phone Number</div>
+                            <div className="col-span-3 text-center">Position</div>
                         </div>
 
                         {/* Account Rows */}
-                        {staffs?.map(staff => (
-                            <div
-                                key={staff.staffId}
-                                className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-[#eef3f5]"
-                            >
-                                <div className="col-span-5 flex items-center gap-3 ml-5">
-                                    <Avatar className="w-10 h-10 mr-4">
-                                        {staff.avatarUrl ? (
-                                            <AvatarImage src={staff.avatarUrl} alt={staff.fullName} />
-                                        ) : (
-                                            <AvatarFallback className="bg-gray-300" />
-                                        )}
-                                    </Avatar>
+                        {staffs.length === 0 ? (
+                            <div className="flex items-center justify-center flex-1 text-sm text-gray-400 mt-15">
+                                No staff data yet
+                            </div>
+                        ) : (
+                            staffs.map(staff => (
+                                <div
+                                    key={staff.staffId}
+                                    className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-[#eef3f5]"
+                                >
+                                    <div className="col-span-5 flex items-center gap-3 ml-5">
+                                        <Avatar className="w-10 h-10 mr-4">
+                                            {staff.avatarUrl ? (
+                                                <AvatarImage src={staff.avatarUrl} alt={staff.fullName} />
+                                            ) : (
+                                                <AvatarFallback className="bg-gray-300" />
+                                            )}
+                                        </Avatar>
 
-                                    <div>
-                                        <div className="font-medium text-sm text-gray-900">
-                                            {staff.fullName}
+                                        <div>
+                                            <div className="font-medium text-sm text-gray-900">
+                                                {staff.fullName}
+                                            </div>
+                                            <div className="text-xs text-gray-500">{staff.email}</div>
                                         </div>
-                                        <div className="text-xs text-gray-500">{staff.email}</div>
+                                    </div>
+                                    <div className="col-span-4 text-sm text-gray-600 text-center">
+                                        {staff.phone}
+                                    </div>
+                                    <div className="col-span-3 text-sm text-gray-900 font-medium text-center">
+                                        <Badge className='text-white'>
+                                            {staff.role}
+                                        </Badge>
                                     </div>
                                 </div>
-                                <div className="col-span-4 text-sm text-gray-600">
-                                    {staff.phone}
-                                </div>
-                                <div className="col-span-3 text-sm text-gray-900 font-medium">
-                                    <Badge className='text-white'>
-                                        {staff.role}
-                                    </Badge>
-                                </div>
-                            </div>
-                        ))}
+                            ))
+                        )}
 
                         {/* Footer with Pagination */}
                         <div className="px-6 py-4 flex items-center justify-between text-sm text-gray-600">

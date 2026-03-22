@@ -1,19 +1,8 @@
-import {
-    Calendar,
-    Bell,
-    UserCircle,
-    ChevronRight,
-    MapPin,
-    Clock,
-    CheckCircle,
-    X
-} from 'lucide-react';
+import { Calendar, UserCircle, ChevronRight, MapPin, Clock, CheckCircle, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
-import { Avatar, AvatarFallback } from "../../components/domain/admin/Avatar.jsx";
 import { Button } from "../../components/domain/admin/Button.jsx";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/domain/admin/Card.jsx";
-import { AdminSidebar } from "../../components/domain/admin/AdminSidebar.jsx";
 import { Badge } from "../../components/domain/admin/Badge.jsx";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/domain/admin/Tabs.jsx';
 import { Checkbox } from '../../components/domain/admin/Checkbox.jsx'
@@ -214,8 +203,6 @@ export function EventDetail() {
 
     return (
         <div className="flex h-screen bg-[#F1F0E8]">
-            {/* Sidebar */}
-            <AdminSidebar />
 
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
@@ -233,22 +220,6 @@ export function EventDetail() {
                             </Link>
                             <ChevronRight className="h-4 w-4" />
                             <span>Event Detail</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            {/* Notification Icon */}
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-9 w-9 rounded-full"
-                            >
-                                <Bell className="h-5 w-5 text-gray-600" />
-                            </Button>
-                            {/* Profile Icon */}
-                            <Avatar className="w-9 h-9 cursor-pointer">
-                                <AvatarFallback className="bg-[#7FA5A5] text-white text-sm">
-                                    AR
-                                </AvatarFallback>
-                            </Avatar>
                         </div>
                     </div>
                 </header>
@@ -332,12 +303,6 @@ export function EventDetail() {
                                 >
                                     General Information
                                 </TabsTrigger>
-                                <TabsTrigger
-                                    value="analytics"
-                                    className="h-12 bg-transparent border-b-2 border-transparent data-[state=active]:border-[#7FA5A5] data-[state=active]:text-[#7FA5A5] rounded-none px-6 data-[state=active]:shadow-none"
-                                >
-                                    Analytics Preview
-                                </TabsTrigger>
                             </TabsList>
 
                             <TabsContent value="general" className="mt-6 space-y-6">
@@ -350,13 +315,9 @@ export function EventDetail() {
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="pt-3">
-                                        {/* <div className="prose max-w-none text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                                        <div className="prose max-w-none text-sm text-gray-700 leading-relaxed whitespace-pre-line">
                                             {event?.description}
-                                        </div> */}
-                                        <div
-                                            className="prose max-w-none text-sm text-gray-700 leading-relaxed whitespace-pre-line"
-                                            dangerouslySetInnerHTML={{ __html: event?.description }}
-                                        />
+                                        </div>
                                     </CardContent>
                                 </Card>
 
@@ -489,22 +450,6 @@ export function EventDetail() {
                                     </CardContent>
                                 </Card>
                             </TabsContent>
-
-                            <TabsContent value="analytics" className="mt-6">
-                                <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
-                                    <CardHeader className="border-b border-gray-100">
-                                        <CardTitle className="text-lg">Analytics Preview</CardTitle>
-                                        <CardDescription>
-                                            Event performance metrics and insights
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent className="pt-6">
-                                        <p className="text-sm text-gray-600">
-                                            Analytics data would be displayed here...
-                                        </p>
-                                    </CardContent>
-                                </Card>
-                            </TabsContent>
                         </Tabs>
                     </div>
 
@@ -622,7 +567,7 @@ export function EventDetail() {
                                     {/* Action Buttons */}
                                     <div className="space-y-2 pt-4">
                                         <Button
-                                            className="w-full bg-green-600 hover:bg-green-700 text-white"
+                                            className="w-full bg-green-600 hover:bg-green-700 text-white hover:cursor-pointer"
                                             disabled={!allChecklistComplete}
                                             onClick={handleApproveEvent}
                                         >
@@ -639,7 +584,7 @@ export function EventDetail() {
                                         >
                                             <Button
                                                 variant="destructive"
-                                                className="w-full"
+                                                className="w-full hover:cursor-pointer"
                                             >
                                                 <X className="mr-2 h-4 w-4" />
                                                 Reject Submission
@@ -648,7 +593,7 @@ export function EventDetail() {
                                     </div>
 
                                     {!allChecklistComplete && (
-                                        <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                                        <div className="bg-orange-50 border border-orange-100 rounded-lg p-3">
                                             <p className="text-xs text-orange-800">
                                                 Complete all checklist items to enable approval
                                             </p>

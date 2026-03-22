@@ -35,7 +35,7 @@ export default function StaffManagement() {
             case "resources":
                 return (
                     <Button
-                        className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5 py-5 h-12 w-40"
+                        className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5 py-5 h-12 w-40 hover:cursor-pointer"
                         onClick={openResourceModal}
                     >
                         <Plus className="h-4 w-4" />
@@ -46,7 +46,7 @@ export default function StaffManagement() {
                 return (
                     <div className='flex gap-3'>
                         <Button
-                            className="gap-2 bg-[#f7f7f7] hover:bg-[#B3C8CF] text-gray rounded-full px-5 py-5 h-12 w-40 border-1 border-gray-400"
+                            className="gap-2 bg-[#f7f7f7] hover:bg-[#B3C8CF] text-gray rounded-full px-5 py-5 h-12 w-40 border-1 border-gray-200 hover:cursor-pointer"
                             onClick={openScheduleModal}
                         >
                             <Calendar1 className="h-4 w-4" />
@@ -73,7 +73,7 @@ export default function StaffManagement() {
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
                 {/* Header */}
-                <header className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-5 pt-8">
+                <header className="bg-[#F1F0E8] px-8 py-5 pt-8">
                     <div className="flex items-start justify-between">
                         <div>
                             <h1 className="text-foreground text-2xl mb-1 font-semibold">Staff Management</h1>
@@ -89,22 +89,25 @@ export default function StaffManagement() {
 
                 {/* Tabs */}
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                    <TabsList className="w-full justify-start bg-[#F1F0E8] rounded-none h-16">
+                    <TabsList
+                        className="flex ml-7 gap-2 px-2 py-6 bg-white border-none rounded-xl shadow-sm w-fit">
                         <TabsTrigger
                             value="staff"
-                            className="relative rounded-none px-8 py-5 border-b-2 border-transparent text-gray-600 data-[state=active]:border-b-2 data-[state=active]:border-b-[#7FA5A5] data-[state=active]:text-gray-700 data-[state=active]:font-semibold"
+                            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-mediumb text-gray-500 transition-all hover:text-gray-900 data-[state=active]:bg-[#7FA5A5] data-[state=active]:text-white data-[state=active]:shadow p-4.5 hover:cursor-pointer"
                         >
-                            Staff Information
+                            Staff
                         </TabsTrigger>
+
                         <TabsTrigger
                             value="schedule"
-                            className="relative rounded-none px-8 py-5 border-b-2 border-transparent text-gray-600 data-[state=active]:border-b-2 data-[state=active]:border-b-[#7FA5A5] data-[state=active]:text-gray-700 data-[state=active]:font-semibold"
+                            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-gray-500       transition-all hover:text-gray-900 data-[state=active]:bg-[#7FA5A5] data-[state=active]:text-white  data-[state=active]:shadow p-4.5 hover:cursor-pointer"
                         >
                             Work Schedule
                         </TabsTrigger>
+
                         <TabsTrigger
                             value="resources"
-                            className="relative rounded-none px-8 py-5 border-b-2 border-transparent text-gray-600 data-[state=active]:border-b-2 data-[state=active]:border-b-[#7FA5A5] data-[state=active]:text-gray-700 data-[state=active]:font-semibold"
+                            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-gray-500    transition-all hover:text-gray-900 data-[state=active]:bg-[#7FA5A5] data-[state=active]:text-white  data-[state=active]:shadow p-4.5 hover:cursor-pointer"
                         >
                             Resources
                         </TabsTrigger>

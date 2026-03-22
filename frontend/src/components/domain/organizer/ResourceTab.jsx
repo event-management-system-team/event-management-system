@@ -111,7 +111,7 @@ const ResourceTab = ({ id, isResourceModalOpen, closeResourceModal, onLoading, o
         <>
             <TabsContent value="resources" className="space-y-4">
                 {/* Recent Files */}
-                <Card className="shadow-sm border-none">
+                <Card className="shadow-sm border-none bg-[#f7f7f7]">
                     <CardContent>
                         <div className="space-y-4">
                             {resources && resources.length > 0 ? (
@@ -151,7 +151,19 @@ const ResourceTab = ({ id, isResourceModalOpen, closeResourceModal, onLoading, o
                                         </div>
                                     </div>
                                 ))) : (
-                                <div className="text-center text-gray-500 border-none">No resource yet.</div>
+                                <div className="flex flex-col items-center justify-center py-16 text-center">
+                                    <div className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100 mb-4">
+                                        <FileText className="w-8 h-8 text-gray-400" />
+                                    </div>
+
+                                    <p className="text-base font-medium text-gray-700">
+                                        No resources yet
+                                    </p>
+
+                                    <p className="text-sm text-gray-500 mt-3">
+                                        Uploaded files will appear here.
+                                    </p>
+                                </div>
                             )}
 
                         </div>

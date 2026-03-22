@@ -11,7 +11,7 @@ import { Popconfirm } from "antd";
 import { adminService } from "../../../services/admin.service";
 import dayjs from "dayjs";
 
-const AccountList = ({ searchTerm, status, role, date, sortOption, onLoading, onError, showAlert, onBan }) => {
+const AccountList = ({ searchTerm, status, role, date, sortOption, onLoading, onError, showAlert, onBan, refreshKey }) => {
     const [accounts, setAccounts] = useState([])
     const [originalAccounts, setOriginalAccounts] = useState([])
     const [currentPage, setCurrentPage] = useState(0);
@@ -37,6 +37,14 @@ const AccountList = ({ searchTerm, status, role, date, sortOption, onLoading, on
             onLoading(false)
         }
     }
+
+    useEffect(() => {
+        fetchData()
+    }, [])
+
+    useEffect(() => {
+        fetchData()
+    }, [refreshKey])
 
     useEffect(() => {
         fetchData()
@@ -191,113 +199,119 @@ const AccountList = ({ searchTerm, status, role, date, sortOption, onLoading, on
                     </div>
 
                     {/* Account Rows */}
-                    {paginatedAccounts?.map(account => (
-                        <div
-                            key={account.userId}
-                            className="grid grid-cols-11 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-[#eef3f5]"
-                        >
-                            <div className="col-span-4 flex items-center gap-3 ml-5">
-                                <Avatar className="w-10 h-10 mr-4">
-                                    {account.avatarUrl ? (
-                                        <AvatarImage src={account.avatarUrl} alt={account.fullName} />
-                                    ) : (
-                                        <AvatarFallback className="bg-gray-300" />
-                                    )}
-                                </Avatar>
+                    {!paginatedAccounts || paginatedAccounts.length === 0 ? (
+                        <div className="flex items-center justify-center flex-1 text-sm text-gray-400 mt-15">
+                            No account data yet
+                        </div>
+                    ) : (
+                        paginatedAccounts.map(account => (
+                            <div
+                                key={account.userId}
+                                className="grid grid-cols-11 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-[#eef3f5]"
+                            >
+                                <div className="col-span-4 flex items-center gap-3 ml-5">
+                                    <Avatar className="w-10 h-10 mr-4">
+                                        {account.avatarUrl ? (
+                                            <AvatarImage src={account.avatarUrl} alt={account.fullName} />
+                                        ) : (
+                                            <AvatarFallback className="bg-gray-300" />
+                                        )}
+                                    </Avatar>
 
-                                <div>
-                                    <div className="font-medium text-sm text-gray-900">
-                                        {account.fullName}
+                                    <div>
+                                        <div className="font-medium text-sm text-gray-900">
+                                            {account.fullName}
+                                        </div>
+                                        <div className="text-xs text-gray-500">{account.email}</div>
                                     </div>
-                                    <div className="text-xs text-gray-500">{account.email}</div>
+                                </div>
+                                <div className="col-span-2 text-sm text-gray-600">
+                                    {account.phone}
+                                </div>
+                                <div className="col-span-1 text-sm text-gray-900 font-medium">
+                                    {formatRole(account.role)}
+                                </div>
+                                <div className="col-span-2 text-sm text-gray-600">
+                                    {formatDate(account.createdAt)}
+                                </div>
+                                <div className="col-span-1">
+                                    <Badge
+                                        variant={getStatusVariant(account.status)}
+                                        className={getStatusClasses(account.status)}
+                                    >
+                                        ● {account.status}
+                                    </Badge>
+                                </div>
+                                <div className="col-span-1 flex justify-end gap-1">
+                                    <Link to={`/admin/accounts/account-detail/${account.userId}`}>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8 hover:bg-gray-100 cursor-pointer"
+                                            title="View account details"
+                                        >
+                                            <Eye className="h-4 w-4 text-gray-500" />
+                                        </Button>
+                                    </Link>
+                                    <DropdownMenu modal={false}>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" size="icon"
+                                                className="h-8 w-8 hover:bg-gray-100 cursor-pointer">
+                                                <MoreVertical className="h-4 w-4 text-gray-500" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end"
+                                            className="bg-[#f7f7f7] border-2 border-gray-200">
+                                            <Link to={`/admin/accounts/account-detail/${account.userId}`}>
+                                                <DropdownMenuItem>
+                                                    <UserCircle className="mr-2 h-4 w-4" />
+                                                    View account details
+                                                </DropdownMenuItem>
+                                            </Link>
+
+                                            {account.role !== "ADMIN" && (
+                                                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
+                                                    {account.status === "BANNED" ? (
+                                                        <Popconfirm
+                                                            title="Activate account"
+                                                            description="Are you sure to activate this account?"
+                                                            onConfirm={() => handleToggleBan(account)}
+                                                            okText="Yes"
+                                                            cancelText="No"
+                                                        >
+                                                            <div
+                                                                className="flex items-center gap-2 w-full"
+                                                                onClick={(e) => e.stopPropagation()}
+                                                            >
+                                                                <CheckCircle className="mr-2 h-4 w-4" />
+                                                                Activate account
+                                                            </div>
+                                                        </Popconfirm>
+                                                    ) : (
+                                                        <Popconfirm
+                                                            title="Ban account"
+                                                            description="Are you sure to ban this account?"
+                                                            onConfirm={() => handleToggleBan(account)}
+                                                            okText="Yes"
+                                                            cancelText="No"
+                                                        >
+                                                            <div
+                                                                className="flex items-center gap-2 w-full"
+                                                                onClick={(e) => e.stopPropagation()}
+                                                            >
+                                                                <UserX className="mr-2 h-4 w-4" />
+                                                                Ban account
+                                                            </div>
+                                                        </Popconfirm>
+                                                    )}
+                                                </DropdownMenuItem>
+                                            )}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </div>
                             </div>
-                            <div className="col-span-2 text-sm text-gray-600">
-                                {account.phone}
-                            </div>
-                            <div className="col-span-1 text-sm text-gray-900 font-medium">
-                                {formatRole(account.role)}
-                            </div>
-                            <div className="col-span-2 text-sm text-gray-600">
-                                {formatDate(account.createdAt)}
-                            </div>
-                            <div className="col-span-1">
-                                <Badge
-                                    variant={getStatusVariant(account.status)}
-                                    className={getStatusClasses(account.status)}
-                                >
-                                    ● {account.status}
-                                </Badge>
-                            </div>
-                            <div className="col-span-1 flex justify-end gap-1">
-                                <Link to={`/admin/accounts/account-detail/${account.userId}`}>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-8 w-8 hover:bg-gray-100 cursor-pointer"
-                                        title="View account details"
-                                    >
-                                        <Eye className="h-4 w-4 text-gray-500" />
-                                    </Button>
-                                </Link>
-                                <DropdownMenu modal={false}>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="icon"
-                                            className="h-8 w-8 hover:bg-gray-100 cursor-pointer">
-                                            <MoreVertical className="h-4 w-4 text-gray-500" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end"
-                                        className="bg-[#f7f7f7] border-2 border-gray-200">
-                                        <Link to={`/admin/accounts/account-detail/${account.userId}`}>
-                                            <DropdownMenuItem>
-                                                <UserCircle className="mr-2 h-4 w-4" />
-                                                View account details
-                                            </DropdownMenuItem>
-                                        </Link>
-
-                                        {account.role !== "ADMIN" && (
-                                            <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
-                                                {account.status === "BANNED" ? (
-                                                    <Popconfirm
-                                                        title="Activate account"
-                                                        description="Are you sure to activate this account?"
-                                                        onConfirm={() => handleToggleBan(account)}
-                                                        okText="Yes"
-                                                        cancelText="No"
-                                                    >
-                                                        <div
-                                                            className="flex items-center gap-2 w-full"
-                                                            onClick={(e) => e.stopPropagation()}
-                                                        >
-                                                            <CheckCircle className="mr-2 h-4 w-4" />
-                                                            Activate account
-                                                        </div>
-                                                    </Popconfirm>
-                                                ) : (
-                                                    <Popconfirm
-                                                        title="Ban account"
-                                                        description="Are you sure to ban this account?"
-                                                        onConfirm={() => handleToggleBan(account)}
-                                                        okText="Yes"
-                                                        cancelText="No"
-                                                    >
-                                                        <div
-                                                            className="flex items-center gap-2 w-full"
-                                                            onClick={(e) => e.stopPropagation()}
-                                                        >
-                                                            <UserX className="mr-2 h-4 w-4" />
-                                                            Ban account
-                                                        </div>
-                                                    </Popconfirm>
-                                                )}
-                                            </DropdownMenuItem>
-                                        )}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
-                        </div>
-                    ))}
+                        ))
+                    )}
 
                     {/* Footer with Pagination */}
                     <div className="px-6 py-4 flex items-center justify-between text-sm text-gray-600">

@@ -7,7 +7,7 @@ const DashboardCard = ({ summary }) => {
     const summaryMetrics = [
         {
             title: "TOTAL EVENTS",
-            value: summary?.totalEvents,
+            value: summary?.totalEvents ?? 0,
             icon: Calendar,
             iconBg: "bg-blue-100",
             iconColor: "text-blue-600",
@@ -15,14 +15,14 @@ const DashboardCard = ({ summary }) => {
         },
         {
             title: "ACTIVE EVENTS",
-            value: summary?.activeEvents,
+            value: summary?.activeEvents ?? 0,
             icon: Zap,
             iconBg: "bg-green-100",
             iconColor: "text-green-600"
         },
         {
             title: "PENDING REVIEWS",
-            value: summary?.pendingEvents,
+            value: summary?.pendingEvents ?? 0,
             icon: AlertCircle,
             iconBg: "bg-orange-100",
             iconColor: "text-orange-600",
@@ -31,7 +31,7 @@ const DashboardCard = ({ summary }) => {
         },
         {
             title: "ORGANIZER ACCOUNTS",
-            value: summary?.organizerAccounts,
+            value: summary?.organizerAccounts ?? 0,
             icon: Users,
             iconBg: "bg-purple-100",
             iconColor: "text-purple-600",
@@ -39,7 +39,7 @@ const DashboardCard = ({ summary }) => {
         },
         {
             title: "SUSPENDED ACCOUNTS",
-            value: summary?.bannedAccounts,
+            value: summary?.bannedAccounts ?? 0,
             icon: UserX,
             iconBg: "bg-red-100",
             iconColor: "text-red-600",
