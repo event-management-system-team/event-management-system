@@ -10,11 +10,13 @@ import TicketCard from "../../components/domain/payment-status/TicketCard";
 import TicketSkeleton from "../../components/domain/payment-status/TicketSkeleton";
 import OrderDetails from "../../components/domain/payment-status/OrderDetails";
 import SuccessActions from "../../components/domain/payment-status/SuccessActions";
+import { useTranslation } from "react-i18next";
 
 const PaymentSuccessPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   const orderCode = searchParams.get("orderCode");
 
@@ -65,7 +67,7 @@ const PaymentSuccessPage = () => {
           </div>
         ) : (
           <div className="w-full bg-white/50 rounded-xl p-8 text-center text-[#6a787c]">
-            Process...
+            {t("processing")}
           </div>
         )}
 

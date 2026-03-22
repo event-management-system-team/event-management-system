@@ -2,8 +2,11 @@ import React from "react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { MdArrowForward } from "react-icons/md";
 import { Button } from "../../common/Button";
+import { useTranslation } from "react-i18next";
 
 const OrderSummary = ({ event, tickets, subTotal, loading, onConfirm }) => {
+  const { t } = useTranslation();
+
   const formatCurrency = (amount) =>
     new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -50,12 +53,12 @@ const OrderSummary = ({ event, tickets, subTotal, loading, onConfirm }) => {
             ))}
 
             <div className="flex justify-between text-sm text-gray-500">
-              <span>Service Fee</span>
-              <span className="font-medium text-black">Free</span>
+              <span>{t("service_fee")}</span>
+              <span className="font-medium text-black">{t("free_label")}</span>
             </div>
 
             <div className="flex justify-between items-center pt-4 mt-2">
-              <span className="font-bold text-lg">Total Payment</span>
+              <span className="font-bold text-lg">{t("total_payment")}</span>
               <span className="text-2xl font-black text-[#FF6B35]">
                 {formatCurrency(subTotal)}
               </span>
@@ -85,11 +88,11 @@ const OrderSummary = ({ event, tickets, subTotal, loading, onConfirm }) => {
                       d="M4 12a8 8 0 018-8v8z"
                     />
                   </svg>
-                  Process...
+                  {t("processing")}
                 </span>
               ) : (
                 <>
-                  CONFIRM & PAY
+                  {t("confirm_and_pay")}
                   <MdArrowForward className="size-5 transition-transform group-hover:translate-x-1" />
                 </>
               )}

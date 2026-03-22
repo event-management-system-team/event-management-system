@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import { MdPayments } from "react-icons/md";
 import { HiCheckCircle } from "react-icons/hi2";
+import { useTranslation } from "react-i18next";
 
 const PaymentMethods = ({ isFree }) => {
   const [selected, setSelected] = useState("vnpay");
+  const { t } = useTranslation();
 
   const methods = [
     {
       id: "vnpay",
       name: "VNPay",
-      desc: "Scan QR or use Bank App",
+      desc: t("scan_qr_or_bank"),
       icon: "https://lh3.googleusercontent.com/aida-public/AB6AXuDIACIyhlHji8pAkTc_74g2_LOSX0HP9FkeXEq08NoOKJkmytAjbu4amNeRPV8iznClmoYoOM_Yh5cUC5TOfmmolzngvKK7Z7nJz30G-dptJSeZAx4qu8x3jXUjMgYQXUxmiLQwCIirkGZNplrkYegG7Q0Oj1ZhU_B5irM8sqK5_kvCnU-3t2WYzxkAhCKYyMNA89yZJ_Y3TmMjfVZrcbWsRRdouV7r-m7HUiGZ1-IZPfJd_d_gvPkp-sMsrXgcq6G6JOUwx4n0HsE",
     },
   ];
@@ -19,14 +21,14 @@ const PaymentMethods = ({ isFree }) => {
     return (
       <section className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
         <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-          <MdPayments className="text-[#89A8B2] size-5" /> Payment Method
+          <MdPayments className="text-[#89A8B2] size-5" /> {t("payment_method")}
         </h2>
         <div className="flex items-center gap-4 p-5 rounded-xl bg-green-50 border border-green-100">
           <HiCheckCircle className="size-10 text-green-500 shrink-0" />
           <div>
-            <p className="font-bold text-green-800 text-base">Free Admission</p>
+            <p className="font-bold text-green-800 text-base">{t("free_admission")}</p>
             <p className="text-sm text-green-600 mt-0.5">
-              No payment required — click "Confirm" to get your ticket instantly.
+              {t("free_admission_desc")}
             </p>
           </div>
         </div>
@@ -38,7 +40,7 @@ const PaymentMethods = ({ isFree }) => {
   return (
     <section className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
       <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-        <MdPayments className="text-[#89A8B2] size-5" /> Payment Method
+        <MdPayments className="text-[#89A8B2] size-5" /> {t("payment_method")}
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {methods.map((method) => (
