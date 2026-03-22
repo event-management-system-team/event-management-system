@@ -2,7 +2,7 @@ import { Progress } from 'antd'
 import { ArrowRight, Calendar, MapPin, Clock } from 'lucide-react'
 import { useNavigate } from 'react-router';
 
-const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage, formattedDeadline, totalAvailable, totalVacancy, deadlineDate, startDate, endDate }) => {
+const ApplySection = ({ eventSlug, active, location, daysLeft, filledPercentage, formattedDeadline, totalAvailable, totalVacancy, deadlineDate, startDate, endDate }) => {
 
     const navigate = useNavigate();
     return (
@@ -77,16 +77,16 @@ const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage,
 
 
             <button
-                disabled={totalAvailable <= 0 || status === 'CLOSED'}
+                disabled={totalAvailable <= 0 || !active}
                 className="w-full py-4 text-[15px] font-extrabold rounded-xl transition-all duration-300 flex items-center justify-center gap-3 group uppercase
                bg-primary text-white shadow-lg shadow-primary/30 
                hover:bg-primary/90 hover:shadow-primary/50 hover:-translate-y-1
                disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:bg-slate-200"
                 onClick={() => navigate(`/attendee/recruitments/${eventSlug}/apply-staff`)}
             >
-                {status === 'CLOSED' ? 'CLOSED' : (totalAvailable <= 0 ? 'Fully Booked' : 'Apply Now')}
+                {!active ? 'CLOSED' : (totalAvailable <= 0 ? 'Fully Booked' : 'Apply Now')}
 
-                {!(totalAvailable <= 0 || status === 'CLOSED') && (
+                {!(totalAvailable <= 0 || !active) && (
                     <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1.5" />
                 )}
             </button>

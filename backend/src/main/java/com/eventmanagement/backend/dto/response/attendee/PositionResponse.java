@@ -1,5 +1,6 @@
 package com.eventmanagement.backend.dto.response.attendee;
 
+import com.eventmanagement.backend.constants.RecruitmentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,4 +18,5 @@ public class PositionResponse {
     private int vacancy;
     private int availableSlots;
     private String requirements;
+    private RecruitmentStatus status;
 }

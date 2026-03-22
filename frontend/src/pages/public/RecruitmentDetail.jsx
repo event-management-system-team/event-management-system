@@ -62,7 +62,7 @@ const RecruitmentDetailPage = () => {
 
                             <ApplySection
                                 eventSlug={eventSlug}
-                                status={recruitment.status}
+                                active={recruitment.active}
                                 formattedDeadline={formattedDeadline}
                                 filledPercentage={filledPercentage}
                                 daysLeft={daysLeft}
