@@ -12,8 +12,13 @@ import com.eventmanagement.backend.model.CustomForm;
 
 @Repository
 public interface CustomFormRepository extends JpaRepository<CustomForm, UUID> {
-Optional<CustomForm> findByEvent_EventIdAndFormType( UUID eventId, FormType type );    
+    Optional<CustomForm> findByEvent_EventIdAndFormType(UUID eventId, FormType type);
+
     Optional<CustomForm> findByEvent_EventSlugAndFormTypeAndIsActiveTrue(String eventSlug, FormType formType);
+
     Optional<CustomForm> findByEvent_EventId(UUID eventId);
+
     List<CustomForm> findByFormTypeAndIsActive(FormType formType, boolean isActive);
+
+    List<CustomForm> findByEvent_EventIdAndFormTypeAndIsActiveTrue(UUID eventId, FormType formType);
 }

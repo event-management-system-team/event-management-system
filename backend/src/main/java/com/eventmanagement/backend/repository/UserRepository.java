@@ -16,6 +16,8 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     Boolean existsByEmail(String email);
 
+    Boolean existsByPhone(String phone);
+
     Page<User> findAll(Pageable pageable);
 
     long countByStatus(Status status);

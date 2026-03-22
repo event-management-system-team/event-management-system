@@ -58,7 +58,7 @@ export function CreateOrganizerModal({ isOpen, onClose, onCreated, onAlert }) {
         return null;
     }
 
-    const validatePhone = (phoneNumber = "") => {
+    const validatePhone = async (phoneNumber = "") => {
         const phone = phoneNumber.trim();
 
         if (!phone) {
@@ -72,6 +72,16 @@ export function CreateOrganizerModal({ isOpen, onClose, onCreated, onAlert }) {
         } else if (phone.charAt(0) === "0" && phone.charAt(1) === "0") {
             return "Phone number cannot start with 00";
         }
+
+        try {
+            const response = await adminService.checkPhoneAvailability(phone);
+            if (response.data === true) {
+                return "Phone number already exists";
+            }
+        } catch (error) {
+            console.error("Error checking phone:", error);
+        }
+
         return null;
     }
 
@@ -100,7 +110,7 @@ export function CreateOrganizerModal({ isOpen, onClose, onCreated, onAlert }) {
                 break;
 
             case "phone":
-                error = validatePhone(formData.phone);
+                error = await validatePhone(formData.phone);
                 break;
 
             case "fullName":
@@ -126,7 +136,7 @@ export function CreateOrganizerModal({ isOpen, onClose, onCreated, onAlert }) {
         const emailError = await validateEmail(formData.email);
         if (emailError) newErrors.email = emailError;
 
-        const phoneError = validatePhone(formData.phone);
+        const phoneError = await validatePhone(formData.phone);
         if (phoneError) newErrors.phone = phoneError;
 
         const passwordError = validatePassword(formData.password);
@@ -157,8 +167,15 @@ export function CreateOrganizerModal({ isOpen, onClose, onCreated, onAlert }) {
 
         try {
             setIsSubmitting(true);
-            const response = await adminService.createOrganizer(formData);
+            await adminService.createOrganizer(formData);
             onAlert("success", "Created organizer successfully");
+
+            setFormData({
+                fullName: "",
+                email: "",
+                phone: "",
+                password: ""
+            })
 
             onCreated()
             setTimeout(() => {
