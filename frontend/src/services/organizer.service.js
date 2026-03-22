@@ -56,7 +56,7 @@ const organizerService = {
 
     // Alias used by EventDetailDashboard & EventAttendeesPage
     getEventDetail: async (eventId) => {
-        const response = await axiosInstance.get(`/organizer/events/${eventId}`)
+        const response = await axiosInstance.get(`/organizer/events/${eventId}/detail`)
         return response.data
     },
 

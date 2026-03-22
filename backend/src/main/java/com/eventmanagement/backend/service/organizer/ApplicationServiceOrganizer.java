@@ -35,7 +35,7 @@ public class ApplicationServiceOrganizer {
     public List<ApplicationResponseDTO> getApplicationsByRecruitment(UUID recruitmentId) {
         List<StaffApplication> applications = staffapplicationRepository.findByRecruitment_RecruitmentId(recruitmentId);
         
-return applications.stream().map(app -> {
+    return applications.stream().map(app -> {
     String coverLetter = null;
     String resume = null;
     if (app.getApplicationData() != null) {
@@ -58,7 +58,7 @@ return applications.stream().map(app -> {
             .createdAt(app.getCreatedAt())
             .updatedAt(app.getUpdatedAt())
             .build();
-}).collect(Collectors.toList());
+    }).collect(Collectors.toList());
  
     }
     
@@ -69,7 +69,6 @@ return applications.stream().map(app -> {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn ứng tuyển với ID: " + applicationId));
         application.setApplicationStatus(newStatus);
         application.setReviewedAt(LocalDateTime.now()); 
-
         staffapplicationRepository.save(application);
         
     }
@@ -79,7 +78,7 @@ return applications.stream().map(app -> {
         StaffApplication application = staffapplicationRepository.findById(applicationId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn ứng tuyển này!"));
         application.setApplicationStatus(newStatus);
-          if (newStatus == ApplicationStatus.APPROVED) {
+        if (newStatus == ApplicationStatus.APPROVED) {
             Recruitment recruitment = application.getRecruitment();
             Event event = recruitment.getEvent();
             User applicant = application.getUser();
@@ -88,7 +87,7 @@ return applications.stream().map(app -> {
                     event.getEventId(), applicant.getUserId()
             );
 
-            if (!isAlreadyStaff) {
+        if (!isAlreadyStaff) {
                 EventStaff newStaff = new EventStaff();
                 newStaff.setEvent(event);
                 newStaff.setUser(applicant);   
@@ -112,7 +111,6 @@ return applications.stream().map(app -> {
             coverLetter = (String) app.getApplicationData().get("coverLetter");
             resume = (String) app.getApplicationData().get("resume");
         }
-
         return ApplicationResponseDTO.builder()
                 .id(app.getApplicationId())
                 .name(app.getUser().getFullName())
@@ -126,5 +124,4 @@ return applications.stream().map(app -> {
                 .appliedAt(app.getAppliedAt())
                 .build();
     }
-    
 }

@@ -1,9 +1,10 @@
 package com.eventmanagement.backend.repository;
 
-import com.eventmanagement.backend.constants.EventStatus;
-import com.eventmanagement.backend.model.Event;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
-import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -13,10 +14,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import com.eventmanagement.backend.constants.EventStatus;
+import com.eventmanagement.backend.model.Event;
+
+import jakarta.transaction.Transactional;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, UUID> {
@@ -109,4 +110,14 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
         @EntityGraph(attributePaths = "ticketTypes")
         @Query("SELECT e FROM Event e WHERE e.eventId = :eventId")
         java.util.Optional<Event> findWithTicketsByEventId(@Param("eventId") UUID eventId);
+
+        @Query("""
+            SELECT e FROM Event e
+            WHERE e.status = :status
+            AND e.startDate <= :deadline
+        """)
+        List<Event> findExpiredPendingEvents(
+            @Param("status") EventStatus status,
+            @Param("deadline") LocalDateTime deadline
+        );
 }

@@ -1,6 +1,5 @@
 package com.eventmanagement.backend.controller.recruitment;
 
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,9 +13,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,11 +25,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.eventmanagement.backend.constants.FormType;
-import com.eventmanagement.backend.constants.RecruitmentStatus;
+import com.eventmanagement.backend.dto.request.CreateRecruitmentRequest;
+import com.eventmanagement.backend.dto.request.UpdateRecruitmentRequest;
 import com.eventmanagement.backend.dto.request.WorkspaceRequestDTO;
 import com.eventmanagement.backend.dto.response.attendee.ApplicationFormResponse;
 import com.eventmanagement.backend.dto.response.attendee.RecruitmentResponse;
 import com.eventmanagement.backend.dto.response.organizer.RecruitmentDashBoardDTO;
+import com.eventmanagement.backend.dto.response.organizer.RecruitmentDetailDTO;
 import com.eventmanagement.backend.model.CustomForm;
 import com.eventmanagement.backend.model.Recruitment;
 import com.eventmanagement.backend.repository.RecruitmentRepository;
@@ -53,7 +56,6 @@ public class RecruitmentController {
     private final RecruitmentRepository recruitmentRepository;
     private final RecruitmentServiceOrganizer recruitmentServiceOrganizer;
 
-
     @GetMapping("/recent")
     public ResponseEntity<List<RecruitmentResponse>> getRecentRecruitment() {
         List<RecruitmentResponse> recruitments = (List<RecruitmentResponse>) recruitmentService.getRecentRecruitments();
@@ -67,20 +69,21 @@ public class RecruitmentController {
             @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate deadline,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Page<RecruitmentResponse> responses = recruitmentService.searchRecruitments(keyword, location, deadline, page, size);
+        Page<RecruitmentResponse> responses = recruitmentService.searchRecruitments(keyword, location, deadline, page,
+                size);
         return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/{eventSlug}")
-    public ResponseEntity<RecruitmentResponse> getRecruitmentByEvent_EventSlug(@PathVariable("eventSlug") String eventSlug) {
-        RecruitmentResponse response = recruitmentService.getRecruitmentByEventSlug(eventSlug);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<RecruitmentResponse> getRecruitmentByEventSlug(
+            @PathVariable("eventSlug") String eventSlug) {
+        return ResponseEntity.ok(recruitmentService.getRecruitmentByEventSlug(eventSlug));
     }
 
     @GetMapping("/{eventSlug}/apply-staff")
-    public ResponseEntity<ApplicationFormResponse> getApplicationForm(@PathVariable String eventSlug) {
-        ApplicationFormResponse response = applicationFormService.getFormForAttendee(eventSlug);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApplicationFormResponse> getApplicationForm(
+            @PathVariable String eventSlug) {
+        return ResponseEntity.ok(applicationFormService.getFormForAttendee(eventSlug));
     }
 
     @PostMapping(value = "/{eventSlug}/apply-staff", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -89,34 +92,19 @@ public class RecruitmentController {
             @RequestParam("recruitmentId") UUID recruitmentId,
             @RequestParam("userId") UUID userId,
             @RequestParam("answers") String answersJson,
-            @RequestParam(value = "files", required = false) MultipartFile cv
-    ) {
+            @RequestParam(value = "files", required = false) MultipartFile cv) {
         try {
             applicationFormService.submitApplication(recruitmentId, userId, answersJson, cv);
-            return ResponseEntity.ok().body("Success!!");
-
+            return ResponseEntity.ok("Success!!");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @GetMapping("/dashboards/{eventId}")
-    public ResponseEntity<RecruitmentDashBoardDTO> getDashboardData(@PathVariable UUID eventId) {
-        RecruitmentDashBoardDTO response = recruitmentServiceOrganizer.getDashBoardData(eventId);
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/create")
-    public ResponseEntity<?> createRecruitment(@RequestBody Recruitment recruitment) {
-        try {
-            // Lưu thẳng vào bảng recruitments
-            // (Trong thực tế bạn nên có EventId truyền từ Frontend xuống để setEvent cho nó)
-            recruitment.setStatus(RecruitmentStatus.OPEN);
-            Recruitment savedJob = recruitmentRepository.save(recruitment);
-            return ResponseEntity.ok(savedJob);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi khi tạo công việc: " + e.getMessage());
-        }
+    public ResponseEntity<RecruitmentDashBoardDTO> getDashboardData(
+            @PathVariable UUID eventId) {
+        return ResponseEntity.ok(recruitmentServiceOrganizer.getDashBoardData(eventId));
     }
 
     @PostMapping("/events/{eventId}/workspace")
@@ -138,6 +126,7 @@ public class RecruitmentController {
             Map<String, Object> workspaceData = new HashMap<>();
             CustomForm form = customFormService.getFormByType(eventId, FormType.RECRUITMENT);
             workspaceData.put("form", form);
+
             List<Recruitment> rawPositions = recruitmentRepository.findByEvent_EventId(eventId);
             List<Map<String, Object>> safePositions = new ArrayList<>();
             for (Recruitment r : rawPositions) {
@@ -147,7 +136,6 @@ public class RecruitmentController {
                 posDto.put("vacancy", r.getVacancy());
                 safePositions.add(posDto);
             }
-
             workspaceData.put("positions", safePositions);
 
             return ResponseEntity.ok(workspaceData);
@@ -157,11 +145,68 @@ public class RecruitmentController {
         }
     }
 
-
     @GetMapping("/events/{eventId}/forms")
-    public ResponseEntity<?> getForm(@PathVariable UUID eventId, @RequestParam("type") String typeStr) {
-
+    public ResponseEntity<?> getFormsByEvent(
+            @PathVariable UUID eventId,
+            @RequestParam("type") String typeStr) {
         FormType type = FormType.valueOf(typeStr.toUpperCase());
         return ResponseEntity.ok(customFormService.getFormByType(eventId, type));
+    }
+
+    @PostMapping("/events/{eventId}/create")
+    public ResponseEntity<?> createRecruitment(
+            @PathVariable UUID eventId,
+            @RequestBody CreateRecruitmentRequest request) {
+        try {
+            Recruitment saved = recruitmentServiceOrganizer.createRecruitment(eventId, request);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("recruitmentId", saved.getRecruitmentId());
+            response.put("positionName", saved.getPositionName());
+            response.put("vacancy", saved.getVacancy());
+            response.put("status", saved.getStatus());
+            response.put("deadline", saved.getDeadline());
+            response.put("createdAt", saved.getCreatedAt());
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi khi tạo tuyển dụng: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/{recruitmentId}")
+    public ResponseEntity<?> updateRecruitment(
+            @PathVariable UUID recruitmentId,
+            @RequestBody UpdateRecruitmentRequest request) {
+        try {
+            Recruitment updated = recruitmentServiceOrganizer.updateRecruitment(recruitmentId, request);
+            return ResponseEntity.ok(updated);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi khi cập nhật tuyển dụng: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{recruitmentId}")
+    public ResponseEntity<?> deleteRecruitment(@PathVariable UUID recruitmentId) {
+        try {
+            recruitmentServiceOrganizer.deleteRecruitment(recruitmentId);
+            return ResponseEntity.ok("Đã xoá tuyển dụng thành công!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi khi xoá tuyển dụng: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/{recruitmentId}/detail")
+    public ResponseEntity<?> getRecruitmentDetail(@PathVariable UUID recruitmentId) {
+        try {
+            RecruitmentDetailDTO detail = recruitmentServiceOrganizer.getRecruitmentDetail(recruitmentId);
+            return ResponseEntity.ok(detail);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
     }
 }

@@ -250,6 +250,28 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
         !errors.location &&
         !errors.time
 
+    const resetForm = () => {
+        setFormData({
+            scheduleName: "",
+            description: "",
+            location: "",
+            startTime: "",
+            endTime: ""
+        });
+
+        setSelectedRoles([]);
+        setSelectedDate(null);
+        setTimeRange(null);
+
+        setErrors({
+            scheduleName: "",
+            description: "",
+            location: "",
+            date: "",
+            time: ""
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (isSubmitting) return;
@@ -272,6 +294,8 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
 
             const response = await organizerService.createSchedule(eventId, data)
             onAlert("success", "Created schedule successfully")
+
+            resetForm()
 
             onCreated(response.data);
             setTimeout(() => {

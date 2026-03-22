@@ -18,19 +18,17 @@ import lombok.NoArgsConstructor;
 public class RecruitmentDashBoardDTO {
     private StatsDTO stats; // chua con so thong ke
     private List<RecruitmentItemDTO> recentRecruitments; // chua con list recruitment moi nhat
-
+    private LocalDateTime eventEndDate;
     @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-
     public static class StatsDTO {
       private int activeRoles;
       private int totalApplications;
       private int pendingReviews;
       private int hiredStaff;  
-}
-
+    }
     @Data
     @Builder
     @NoArgsConstructor
@@ -44,7 +42,7 @@ public class RecruitmentDashBoardDTO {
         private String status; // recruiting/ closed
         private boolean isNew; // co moi khong
         private LocalDateTime deadline; // han nop don
-
+        
     }
 
 }
