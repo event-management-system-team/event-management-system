@@ -1,5 +1,5 @@
 import React from "react";
-import { ProfileCard } from "../../components/domain/profile/ProfileCard";
+import { ProfileCard } from "../../components/domain/attendee/profile/ProfileCard";
 
 const ProfilePage = () => {
   return (

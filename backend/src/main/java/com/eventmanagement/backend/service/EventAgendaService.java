@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -15,8 +14,8 @@ public class EventAgendaService {
 
     private final EventAgendaRepository repository;
 
-    public List<EventAgendaResponse> getEventAgenda(UUID eventId) {
-        List<EventAgenda> eventAgendas = repository.findByEvent_EventIdOrderByOrderIndexAsc(eventId);
+    public List<EventAgendaResponse> getEventAgenda(String slug) {
+        List<EventAgenda> eventAgendas = repository.findByEvent_EventSlugOrderByOrderIndexAsc(slug);
 
         return eventAgendas.stream().map(agenda -> EventAgendaResponse.builder()
                 .agendaId(agenda.getAgendaId())

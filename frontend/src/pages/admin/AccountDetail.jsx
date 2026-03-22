@@ -1,22 +1,18 @@
 import {
     CheckCircle,
-    Bell,
     ChevronRight,
-    Edit,
     Ban,
     Mail,
     ExternalLink
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/domain/admin/Tabs.jsx';
 import { Link, useParams } from 'react-router';
-import { AdminSidebar } from "../../components/domain/admin/AdminSidebar.jsx";
 import { Button } from "../../components/domain/admin/Button.jsx";
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/domain/admin/Avatar.jsx";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/domain/admin/Card.jsx";
 import { Badge } from "../../components/domain/admin/Badge.jsx";
 import { useEffect, useState } from "react";
 import { adminService } from "../../services/admin.service.js";
-import { EditAccountModal } from "../../components/domain/admin/EditAccountModal.jsx";
 import { Alert } from "../../components/common/Alert.jsx";
 import { useAlert } from '../../hooks/useAlert.js';
 import { Popconfirm } from 'antd';
@@ -27,7 +23,6 @@ export function AccountDetail() {
     const [account, setAccount] = useState(null);
     const [error, setError] = useState(null);
     const [eventCount, setEventCount] = useState(0);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const { alert, showAlert, closeAlert } = useAlert();
 
     const fetchAccount = async () => {
@@ -81,7 +76,8 @@ export function AccountDetail() {
                 fetchAccount();
             }, 300);
         } catch (error) {
-            showAlert("error", "Operation failed", 4000);
+            console.error(error)
+            showAlert("error", "Operation failed");
         }
     }
 
@@ -140,8 +136,6 @@ export function AccountDetail() {
 
     return (
         <div className="flex h-screen bg-[#F1F0E8]">
-            {/* Sidebar */}
-            <AdminSidebar />
 
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
@@ -158,22 +152,6 @@ export function AccountDetail() {
                             </Link>
                             <ChevronRight className="h-4 w-4" />
                             <span>Account Detail</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            {/* Notification Icon */}
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-9 w-9 rounded-full"
-                            >
-                                <Bell className="h-5 w-5 text-gray-600" />
-                            </Button>
-                            {/* Profile Icon */}
-                            <Avatar className="w-9 h-9 cursor-pointer">
-                                <AvatarFallback className="bg-[#7FA5A5] text-white text-sm">
-                                    AR
-                                </AvatarFallback>
-                            </Avatar>
                         </div>
                     </div>
                 </header>
@@ -218,13 +196,6 @@ export function AccountDetail() {
                             <>
                                 {account?.status === "ACTIVE" ? (
                                     <div className="flex gap-2">
-                                        <Button
-                                            className="gap-2 bg-[#7FA5A5] hover:bg-[#6D9393] text-white"
-                                            onClick={() => setIsEditModalOpen(true)}
-                                        >
-                                            <Edit className="h-4 w-4" />
-                                            Edit Profile
-                                        </Button>
                                         <Popconfirm
                                             title="Ban account"
                                             description="Are you sure to ban this account?"
@@ -232,7 +203,7 @@ export function AccountDetail() {
                                             okText="Yes"
                                             cancelText="No"
                                         >
-                                            <Button variant="destructive" className="gap-2">
+                                            <Button variant="destructive" className="gap-2 hover:cursor-pointer">
                                                 <Ban className="h-4 w-4" />
                                                 Ban Account
                                             </Button>
@@ -247,7 +218,7 @@ export function AccountDetail() {
                                             okText="Yes"
                                             cancelText="No"
                                         >
-                                            <Button className="gap-2 bg-green-600 hover:bg-green-700 text-white">
+                                            <Button className="gap-2 bg-green-600 hover:bg-green-700 text-white hover:cursor-pointer">
                                                 <CheckCircle className="h-4 w-4" />
                                                 Activate Account
                                             </Button>
@@ -260,7 +231,7 @@ export function AccountDetail() {
                 </div>
 
                 {/* Tabs Navigation */}
-                <div className="bg-[#f7f7f7] border-b border-gray-200 px-8">
+                <div className="bg-[#F1F0E8] border-b border-gray-200 px-8">
                     <Tabs defaultValue="basic" className="w-full">
                         <TabsList className="h-12 bg-transparent border-0 p-0 space-x-6">
                             <TabsTrigger
@@ -269,14 +240,6 @@ export function AccountDetail() {
                             >
                                 Basic Info
                             </TabsTrigger>
-                            {/*{account?.role === "ORGANIZER" && (*/}
-                            {/*    <TabsTrigger*/}
-                            {/*        value="events"*/}
-                            {/*        className="h-12 bg-transparent border-b-2 border-transparent data-[state=active]:border-[#7FA5A5] data-[state=active]:text-[#7FA5A5] rounded-none px-5 data-[state=active]:shadow-none"*/}
-                            {/*    >*/}
-                            {/*        Events*/}
-                            {/*    </TabsTrigger>*/}
-                            {/*)}*/}
                         </TabsList>
 
                         <TabsContent value="basic" className="mt-0">
@@ -372,44 +335,9 @@ export function AccountDetail() {
                                 </div>
                             </div>
                         </TabsContent>
-
-                        {/*{account?.role === "ORGANIZER" && (*/}
-                        {/*    <TabsContent value="events" className="mt-0">*/}
-                        {/*        <div className="p-8">*/}
-                        {/*            <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">*/}
-                        {/*                <CardHeader className="border-b border-gray-100">*/}
-                        {/*                    <CardTitle className="text-lg">Events Overview</CardTitle>*/}
-                        {/*                    <CardDescription>*/}
-                        {/*                        List of events created by this account*/}
-                        {/*                    </CardDescription>*/}
-                        {/*                </CardHeader>*/}
-                        {/*                <CardContent className="pt-6">*/}
-                        {/*                    <p className="text-sm text-gray-600">*/}
-                        {/*                        Events list would be displayed here...*/}
-                        {/*                    </p>*/}
-                        {/*                </CardContent>*/}
-                        {/*            </Card>*/}
-                        {/*        </div>*/}
-                        {/*    </TabsContent>*/}
-                        {/*)}*/}
                     </Tabs>
                 </div>
             </main>
-
-            <EditAccountModal
-                isOpen={isEditModalOpen}
-                onClose={() => setIsEditModalOpen(false)}
-                accountData={{
-                    id: account?.userId,
-                    fullName: account?.fullName,
-                    email: account?.email,
-                    phone: account?.phone,
-                    role: account?.role
-                }}
-                onSuccess={(updatedAccount) => {
-                    setAccount(updatedAccount)
-                }}
-            />
 
             {/* Global Alert */}
             <div className="fixed top-6 right-6 z-[999] w-[360px]">

@@ -8,7 +8,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.repository.UserRepository;
-
+import java.lang.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.FilterChain;
@@ -16,7 +16,7 @@ import jakarta.servlet.ServletException;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.UUID;
-
+import lombok.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,7 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
-
+    @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 

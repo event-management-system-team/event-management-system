@@ -20,14 +20,6 @@ const PublicRoutes = () => {
           path="/recruitments/:eventSlug"
           element={<RecruitmentDetailPage />}
         />
-        <Route 
-          path="/me" 
-          element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          } 
-        />
       </Route>
     </Routes>
   );

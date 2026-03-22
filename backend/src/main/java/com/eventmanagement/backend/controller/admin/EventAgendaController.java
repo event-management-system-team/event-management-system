@@ -11,18 +11,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/admin/events")
+@RequestMapping("/api/events")
 @RequiredArgsConstructor
 public class EventAgendaController {
 
     private final EventAgendaService service;
 
-    @GetMapping("/{id}/agenda")
+    @GetMapping("/{slug}/agenda")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<EventAgendaResponse>> getEventAgenda(@PathVariable UUID id) {
-        return ResponseEntity.ok(service.getEventAgenda(id));
+    public ResponseEntity<List<EventAgendaResponse>> getEventAgenda(@PathVariable String slug) {
+        return ResponseEntity.ok(service.getEventAgenda(slug));
     }
 }

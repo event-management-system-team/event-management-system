@@ -11,17 +11,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/admin/events")
+@RequestMapping("/api/events")
 @RequiredArgsConstructor
 public class TicketTypeController {
     private final TicketTypeService service;
 
-    @GetMapping("/{id}/ticket-types")
+    @GetMapping("/{slug}/ticket-types")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<TicketTypeResponse>> getTicketTypes(@PathVariable UUID id) {
-        return ResponseEntity.ok(service.getTicketTypes(id));
+    public ResponseEntity<List<TicketTypeResponse>> getTicketTypes(@PathVariable String slug) {
+        return ResponseEntity.ok(service.getTicketTypes(slug));
     }
 }

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -25,10 +26,15 @@ public class OrganizerEventResponse {
 
     private Integer totalCapacity;
     private Integer registeredCount;
+    private Integer checkedInCount;
 
     // Tổng sold và tổng quantity từ tất cả ticket types
     private Integer totalSold;
     private Integer totalTickets;
 
+    private BigDecimal totalRevenue;
+
     private String categoryName;
+    
+    private Boolean isFree;
 }

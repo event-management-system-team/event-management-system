@@ -18,7 +18,7 @@ import {
 export const LoginForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error, isAuthenticated } = useSelector(
+  const { loading, error, isAuthenticated, user } = useSelector(
     (state) => state.auth,
   );
 
@@ -34,10 +34,16 @@ export const LoginForm = () => {
   });
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/");
+    if (isAuthenticated && user) {
+      if (user.role === "ORGANIZER") {
+        navigate("/organizer/dashboard");
+      } else if (user.role === "ADMIN") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/");
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user, navigate]);
 
   useEffect(() => {
     return () => dispatch(clearError());
@@ -138,7 +144,7 @@ export const LoginForm = () => {
             </label>
             <div className="text-sm font-bold text-[#FF6B35] hover:opacity-80 transition-opacity">
               <Link
-              to="/forgot-password"
+                to="/forgot-password"
               >
                 Forgot password?
               </Link>

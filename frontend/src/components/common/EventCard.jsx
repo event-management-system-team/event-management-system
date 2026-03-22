@@ -1,7 +1,7 @@
 import { MapPin, ShoppingCart, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const EventCard = ({ startDate, totalCapacity, registeredCount, bannerUrl, eventName, category, location, isFree, minPrice, eventSlug }) => {
+const EventCard = ({ startDate, totalCapacity, registeredCount, bannerUrl, eventName, category, location, isFree, minPrice, eventSlug, status }) => {
 
     const dateObj = new Date(startDate);
     const month = dateObj.toLocaleString('en-US', { month: 'short' });
@@ -10,10 +10,10 @@ const EventCard = ({ startDate, totalCapacity, registeredCount, bannerUrl, event
     const isAlmostFull = totalCapacity > 0 && (totalCapacity - registeredCount <= 5);
 
     return (
-        <Link className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1 duration-300 flex flex-col"
+        <Link className="group bg-white rounded-2xl border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1 duration-300 flex flex-col relative"
             to={`/events/${eventSlug}`}>
 
-            <div className="relative aspect-[4/3] overflow-hidden">
+            <div className="relative aspect-[4/3] rounded-t-2xl overflow-hidden">
                 <img className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     src={bannerUrl}
                     alt={eventName} />
@@ -32,9 +32,25 @@ const EventCard = ({ startDate, totalCapacity, registeredCount, bannerUrl, event
                     </div>
                 )}
 
-                {isAlmostFull && (
-                    <div className="absolute top-4 right-4 bg-orange-500 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase shadow-lg">
-                        Low Stock
+                <div className="absolute top-4 right-4 flex flex-col gap-2 items-end z-10">
+                    {isAlmostFull && (
+                        <div className="bg-orange-500 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase shadow-lg">
+                            Low Stock
+                        </div>
+                    )}
+                </div>
+
+                {status === 'ONGOING' && (
+                    <div className="absolute top-0 right-5 z-20 pointer-events-none drop-shadow-md">
+                        {/* Lá cờ đuôi nheo treo từ viền trên xuống */}
+                        <div
+                            className="bg-red-600 flex flex-col items-center pt-2 pb-2.5 w-10 h-16"
+                            style={{ clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 50% 80%, 0% 100%)' }}
+                        >
+                            <span className="text-white text-[13px] font-black leading-[1.05] tracking-wide">N</span>
+                            <span className="text-white text-[13px] font-black leading-[1.05] tracking-wide">O</span>
+                            <span className="text-white text-[13px] font-black leading-[1.05] tracking-wide">W</span>
+                        </div>
                     </div>
                 )}
             </div>
@@ -46,7 +62,7 @@ const EventCard = ({ startDate, totalCapacity, registeredCount, bannerUrl, event
 
                 <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
                     <MapPin size={14} />
-                    {location}
+                    <span className="truncate">{location}</span>
                 </div>
 
                 <div className="flex-1">

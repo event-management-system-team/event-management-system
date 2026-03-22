@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import {
     Calendar,
     Zap,
@@ -11,6 +12,8 @@ import {
     ChevronLeft,
     ChevronRight,
     MapPin,
+    Pencil,
+    Trash2,
 } from 'lucide-react';
 import dayjs from 'dayjs';
 import organizerService from '../../services/organizer.service';
@@ -50,6 +53,7 @@ const getEventDisplayStatus = (status, startDate) => {
 const MyEventsPage = () => {
     const { user } = useSelector((state) => state.auth);
     const organizerId = user?.user_id;
+    const navigate = useNavigate();
 
     const [events, setEvents] = useState([]);
     const [stats, setStats] = useState({ totalEvents: 0, activeCount: 0, upcomingCount: 0, completedCount: 0 });
@@ -60,8 +64,9 @@ const MyEventsPage = () => {
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [showSearch, setShowSearch] = useState(false);
+    const [deleteTarget, setDeleteTarget] = useState(null);
+    const [deleting, setDeleting] = useState(false);
 
-    
     const abortRef = useRef(null);
 
     const fetchEvents = useCallback(async (page) => {
@@ -155,6 +160,22 @@ const MyEventsPage = () => {
         if (currentPage < totalPages - 1) setCurrentPage((p) => p + 1);
     };
 
+    const handleDeleteConfirm = async () => {
+        if (!deleteTarget) return;
+        setDeleting(true);
+        try {
+            await organizerService.deleteEvent(deleteTarget.eventId);
+            setDeleteTarget(null);
+            fetchEvents(currentPage);
+            fetchStats();
+        } catch (err) {
+            const msg = err.response?.data?.message || 'Failed to delete event.';
+            setError(msg);
+        } finally {
+            setDeleting(false);
+        }
+    };
+
     const statCards = [
         {
             title: 'TOTAL EVENTS',
@@ -206,7 +227,10 @@ const MyEventsPage = () => {
                         Overview of your current, upcoming and past event performances.
                     </p>
                 </div>
-                <button className="flex items-center gap-2 bg-[#2d3a4f] hover:bg-[#1e293b] text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+                <button
+                    onClick={() => navigate('/organizer/create-event')}
+                    className="flex items-center gap-2 bg-[#2d3a4f] hover:bg-[#1e293b] text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm"
+                >
                     <Plus size={18} />
                     Create New Event
                 </button>
@@ -305,7 +329,7 @@ const MyEventsPage = () => {
                 {!loading &&
                     filteredEvents.map((event) => {
                         const statusConfig = getStatusDisplay(event.status, event.startDate);
-                        const progress = getTicketProgress(event.totalSold, event.totalTickets);
+                        const progress = getTicketProgress(event.registeredCount, event.totalCapacity);
                         const progressColor = getProgressBarColor(progress);
 
                         return (
@@ -365,8 +389,8 @@ const MyEventsPage = () => {
                                 <div className="col-span-3">
                                     <div className="flex items-center gap-3">
                                         <span className="text-sm text-gray-700 font-medium min-w-20">
-                                            {(event.totalSold || 0).toLocaleString()}/
-                                            {(event.totalTickets || 0).toLocaleString()}
+                                            {(event.registeredCount || 0).toLocaleString()}/
+                                            {(event.totalCapacity || 0).toLocaleString()}
                                         </span>
                                         <span className="text-xs text-gray-400 min-w-10">
                                             {progress}%
@@ -381,10 +405,29 @@ const MyEventsPage = () => {
                                 </div>
 
                                 {/* Actions */}
-                                <div className="col-span-1 text-right">
-                                    <button className="text-sm text-[#7FA5A5] hover:text-[#5d8585] font-medium transition-colors">
-                                        Manage
-                                    </button>
+                                <div className="col-span-1 flex items-center justify-end gap-1">
+                                    {(event.status === 'PENDING' || event.status === 'DRAFT') ? (
+                                        <>
+                                            <button
+                                                onClick={() => navigate(`/organizer/edit-event/${event.eventId}`)}
+                                                className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-amber-600 hover:text-amber-700 hover:bg-amber-50 font-medium rounded-lg cursor-pointer transition-colors"
+                                                title="Edit Event"
+                                            >
+                                                <Pencil size={15} />
+                                            </button>
+                                            <button
+                                                onClick={() => setDeleteTarget(event)}
+                                                className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-red-400 hover:text-red-600 hover:bg-red-50 font-medium rounded-lg cursor-pointer transition-colors"
+                                                title="Delete Event"
+                                            >
+                                                <Trash2 size={15} />
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <button className="text-sm text-[#7FA5A5] hover:text-[#5d8585] font-medium transition-colors cursor-pointer">
+                                            Manage
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         );
@@ -417,6 +460,42 @@ const MyEventsPage = () => {
                     </div>
                 )}
             </div>
+
+            {/* Delete Confirmation Modal */}
+            {deleteTarget && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                    <div className="bg-white rounded-2xl shadow-xl p-7 max-w-sm w-full mx-4">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center">
+                                <Trash2 size={20} className="text-red-500" />
+                            </div>
+                            <h3 className="text-lg font-bold text-gray-900">Delete Event</h3>
+                        </div>
+                        <p className="text-sm text-gray-500 mb-1">
+                            Are you sure you want to delete this event?
+                        </p>
+                        <p className="text-sm font-medium text-gray-800 mb-5 truncate">
+                            "{deleteTarget.eventName}"
+                        </p>
+                        <div className="flex items-center justify-end gap-3">
+                            <button
+                                onClick={() => setDeleteTarget(null)}
+                                disabled={deleting}
+                                className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleDeleteConfirm}
+                                disabled={deleting}
+                                className="px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg cursor-pointer transition-colors disabled:opacity-60"
+                            >
+                                {deleting ? 'Deleting...' : 'Delete'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

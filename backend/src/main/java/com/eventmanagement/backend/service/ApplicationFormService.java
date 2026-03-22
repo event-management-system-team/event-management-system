@@ -1,8 +1,11 @@
 package com.eventmanagement.backend.service;
 
 import com.eventmanagement.backend.constants.FormType;
+import com.eventmanagement.backend.constants.RecruitmentStatus;
 import com.eventmanagement.backend.dto.response.attendee.ApplicationFormResponse;
 import com.eventmanagement.backend.dto.response.attendee.PositionResponse;
+import com.eventmanagement.backend.exception.BadRequestException;
+import com.eventmanagement.backend.exception.NotFoundException;
 import com.eventmanagement.backend.model.CustomForm;
 import com.eventmanagement.backend.model.Recruitment;
 import com.eventmanagement.backend.model.StaffApplication;
@@ -41,7 +44,8 @@ public class ApplicationFormService {
 
         CustomForm customForm = customFormRepository
                 .findByEvent_EventSlugAndFormTypeAndIsActiveTrue(eventSlug, FormType.RECRUITMENT)
-                .orElseThrow(() -> new RuntimeException("The recruitment form is not currently available!"));
+                .orElseThrow(() -> new RuntimeException(
+                        "The recruitment form is not currently available!"));
 
         List<Recruitment> recruitments = recruitmentRepository.findByEvent_EventSlug(eventSlug);
 
@@ -59,25 +63,34 @@ public class ApplicationFormService {
                                   MultipartFile cvFile) throws Exception {
 
         if (applicationRepository.existsByRecruitment_RecruitmentIdAndUser_UserId(recruitmentId, userId)) {
-            throw new IllegalStateException("You have already applied for this position!");
+            throw new BadRequestException("You have already applied for this position!");
         }
-
-        log.info("Loading CV to Cloudinary: {}", userId);
-        String cvUrl = cloudinaryService.uploadCV(cvFile);
 
         Map<String, Object> applicationDataMap = objectMapper.readValue(
                 answersJson,
                 new TypeReference<Map<String, Object>>() {
-                }
-        );
+                });
 
-        applicationDataMap.put("cvUrl", cvUrl);
+        if (cvFile != null && !cvFile.isEmpty()) {
+            log.info("Loading CV to Cloudinary: {}", userId);
+            String cvUrl = cloudinaryService.uploadCV(cvFile);
+
+
+            applicationDataMap.put("cvUrl", cvUrl);
+        } else {
+            log.info("Candidate {} submitted application without CV", userId);
+        }
+
 
         Recruitment recruitment = recruitmentRepository.findById(recruitmentId)
-                .orElseThrow(() -> new IllegalArgumentException("Job position not found!"));
+                .orElseThrow(() -> new NotFoundException("Job position not found!"));
+
+        if (recruitment.getStatus() == RecruitmentStatus.CLOSED) {
+            throw new BadRequestException("This position has either been filled or the deadline has passed!");
+        }
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User information not found!"));
+                .orElseThrow(() -> new NotFoundException("User information not found!"));
 
         StaffApplication application = StaffApplication.builder()
                 .recruitment(recruitment)
@@ -89,7 +102,6 @@ public class ApplicationFormService {
         log.info("Apply success. Application ID: {}", application.getApplicationId());
     }
 
-
     private ApplicationFormResponse mapToResponse(CustomForm customForm, List<Recruitment> recruitments) {
 
         List<PositionResponse> positionResponses = recruitments.stream()
@@ -98,6 +110,7 @@ public class ApplicationFormService {
                         .positionName(r.getPositionName())
                         .vacancy(r.getVacancy())
                         .availableSlots(Math.max(0, r.getVacancy() - r.getApprovedCount()))
+                        .status(r.getStatus())
                         .requirements(r.getRequirements())
                         .build())
                 .toList();
