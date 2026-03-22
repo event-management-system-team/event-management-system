@@ -254,5 +254,14 @@
   "fullname_max_50": "Full name must be at most 50 characters long",
   "fullname_letters_only": "Full name must contain only letters and spaces",
   "phone_10_digits": "Phone number must be a 10-digit number",
-  "passwords_not_match": "Passwords do not match"
+  "passwords_not_match": "Passwords do not match",
+  "sidebar_connecting": "Connecting you to thousands of events",
+  "sidebar_discover": "Discover the best moments happening around you.",
+  "sidebar_events": "Events",
+  "sidebar_members": "Members",
+  "sidebar_join_community": "Join the event-loving community today",
+  "sidebar_quick_tickets": "Quick Tickets Booking",
+  "sidebar_apply_staff": "Apply as Staff",
+  "sidebar_manage_tickets": "Manage Tickets",
+  "sidebar_exclusive_offers": "Exclusive Offers"
 }

@@ -253,5 +253,14 @@
     "fullname_max_50": "Họ tên tối đa 50 ký tự",
     "fullname_letters_only": "Họ tên chỉ được chứa chữ cái và khoảng trắng",
     "phone_10_digits": "Số điện thoại phải có 10 chữ số",
-    "passwords_not_match": "Mật khẩu không khớp"
+    "passwords_not_match": "Mật khẩu không khớp",
+    "sidebar_connecting": "Kết nối bạn với hàng nghìn sự kiện",
+    "sidebar_discover": "Khám phá những khoảnh khắc tuyệt vời nhất xung quanh bạn.",
+    "sidebar_events": "Sự kiện",
+    "sidebar_members": "Thành viên",
+    "sidebar_join_community": "Tham gia cộng đồng yêu sự kiện ngay hôm nay",
+    "sidebar_quick_tickets": "Đặt vé nhanh chóng",
+    "sidebar_apply_staff": "Ứng tuyển nhân viên",
+    "sidebar_manage_tickets": "Quản lý vé",
+    "sidebar_exclusive_offers": "Ưu đãi độc quyền"
 }

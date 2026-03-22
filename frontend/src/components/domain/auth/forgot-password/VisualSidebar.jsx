@@ -1,7 +1,9 @@
 import { StatCard } from "./StatCard";
 import LogoImg from "../../../../assets/logo.png";
+import { useTranslation } from "react-i18next";
 
 export const VisualSidebar = () => {
+  const { t } = useTranslation();
   return (
     <div className="hidden md:flex md:w-1/2 bg-login-gradient relative overflow-hidden flex-col items-center justify-center p-12 text-white">
       <div
@@ -28,15 +30,15 @@ export const VisualSidebar = () => {
         </div>
 
         <h2 className="text-4xl lg:text-5xl font-black leading-tight mb-6">
-          Connecting you to thousands of events
+          {t("sidebar_connecting")}
         </h2>
         <p className="text-lg opacity-90 font-medium mb-12">
-          Discover the best moments happening around you.
+          {t("sidebar_discover")}
         </p>
 
         <div className="grid grid-cols-2 gap-6 w-full">
-          <StatCard label="Events" value="15,000+" />
-          <StatCard label="Members" value="500k+" />
+          <StatCard label={t("sidebar_events")} value="15,000+" />
+          <StatCard label={t("sidebar_members")} value="500k+" />
         </div>
       </div>
     </div>

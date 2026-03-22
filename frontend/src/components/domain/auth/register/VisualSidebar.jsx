@@ -4,13 +4,16 @@ import { FaChessBishop } from "react-icons/fa";
 import { IoSettings } from "react-icons/io5";
 import { BsBuildingFillExclamation } from "react-icons/bs";
 import LogoImg from '../../../../assets/logo.png'
+import { useTranslation } from "react-i18next";
 
 export const VisualSidebar = () => {
+  const { t } = useTranslation();
+
   const stats = [
-    { icon: <BsFillTicketPerforatedFill />, text: "Quick Tickets Booking" },
-    { icon: <FaChessBishop />, text: "Apply as Staff" },
-    { icon: <IoSettings />, text: "Manage Tickets" },
-    { icon: <BsBuildingFillExclamation />, text: "Exclusive Offers" },
+    { icon: <BsFillTicketPerforatedFill />, text: t("sidebar_quick_tickets") },
+    { icon: <FaChessBishop />, text: t("sidebar_apply_staff") },
+    { icon: <IoSettings />, text: t("sidebar_manage_tickets") },
+    { icon: <BsBuildingFillExclamation />, text: t("sidebar_exclusive_offers") },
   ];
 
   return (
@@ -37,8 +40,8 @@ export const VisualSidebar = () => {
           <h1 className="text-4xl font-extrabold tracking-tight">EventHub</h1>
         </div>
 
-        <h2 className="text-4xl lg:text-5xl font-black leading-tight mb-6">
-          Join the event-loving community today
+        <h2 className="font-sans text-4xl lg:text-5xl font-black leading-tight mb-6">
+          {t("sidebar_join_community")}
         </h2>
 
         <div className="flex flex-col gap-4 w-full">
