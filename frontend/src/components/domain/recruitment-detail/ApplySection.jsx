@@ -35,16 +35,9 @@ const ApplySection = ({ eventSlug, active, location, daysLeft, filledPercentage,
                 <div className="flex items-start gap-4">
                     <Clock size={18} className="text-primary mt-0.5" />
                     <div>
-                        <p className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold mb-1">Event Duration</p>
+                        <p className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold mb-1">Event Date</p>
                         <p className="text-[14px] font-bold text-slate-600 leading-relaxed">
-                            {(() => {
-                                const startStr = startDate ? new Date(startDate).toLocaleDateString('en-GB') : 'TBA';
-                                const endStr = endDate ? new Date(endDate).toLocaleDateString('en-GB') : 'TBA';
-
-                                if (startStr === 'TBA' && endStr === 'TBA') return 'TBA';
-                                if (startStr === endStr) return startStr;
-                                return `${startStr} - ${endStr}`;
-                            })()}
+                            {startDate ? new Date(startDate).toLocaleDateString('en-GB') : 'TBA'}
                         </p>
                     </div>
                 </div>
