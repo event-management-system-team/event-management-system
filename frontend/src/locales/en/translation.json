@@ -263,5 +263,21 @@
   "sidebar_quick_tickets": "Quick Tickets Booking",
   "sidebar_apply_staff": "Apply as Staff",
   "sidebar_manage_tickets": "Manage Tickets",
-  "sidebar_exclusive_offers": "Exclusive Offers"
+  "sidebar_exclusive_offers": "Exclusive Offers",
+  "my_tickets_title": "My Tickets",
+  "my_tickets_subtitle": "Manage and access your upcoming event passes.",
+  "tab_all": "All",
+  "tab_confirmed": "Confirmed",
+  "tab_pending": "Pending",
+  "tab_cancelled": "Cancelled",
+  "tab_approved": "Approved",
+  "tab_rejected": "Rejected",
+  "no_tickets_message": "You do not have any tickets at the moment.",
+  "no_tickets_filtered": "You do not have any {{filter}} tickets at the moment.",
+  "want_more_excitement": "Want more excitement?",
+  "explore_events_area": "Explore hundreds of events happening in your area.",
+  "browse_new_events": "Browse New Events",
+  "my_applications_title": "My Applications",
+  "my_applications_subtitle": "Manage and track your staff applications for upcoming events.",
+  "no_applications_found": "No applications found"
 }

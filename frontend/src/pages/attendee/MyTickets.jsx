@@ -4,10 +4,12 @@ import { Pagination } from "antd";
 import EmptyState from "../../components/common/EmptyState";
 import { Link } from "react-router-dom";
 import bookingService from "../../services/booking.service";
+import { useTranslation } from "react-i18next";
 
 import TicketCard from "../../components/domain/my-events/TicketCard";
 
 const MyTicketsPage = () => {
+  const { t } = useTranslation();
   const [filter, setFilter] = useState("All");
   const [ticketGroups, setTicketGroups] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -15,6 +17,13 @@ const MyTicketsPage = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
+
+  const tabs = [
+    { key: "All", label: t("tab_all") },
+    { key: "Confirmed", label: t("tab_confirmed") },
+    { key: "Pending", label: t("tab_pending") },
+    { key: "Cancelled", label: t("tab_cancelled") },
+  ];
 
   useEffect(() => {
     const fetchMyTickets = async () => {
@@ -79,29 +88,35 @@ const MyTicketsPage = () => {
     }, 100);
   };
 
+  const getEmptyMessage = () => {
+    if (filter === "All") return t("no_tickets_message");
+    const filterLabel = tabs.find((tab) => tab.key === filter)?.label?.toLowerCase() || "";
+    return t("no_tickets_filtered", { filter: filterLabel });
+  };
+
   return (
     <main className="max-w-[1200px] mx-auto px-4 md:px-6 py-8 md:py-12 w-full font-sans min-h-screen">
       <div className="mb-6 md:mb-8" ref={listTopRef}>
         <h1 className="text-3xl md:text-5xl font-black tracking-tight text-gray-900 mb-2 md:mb-3">
-          My Tickets
+          {t("my_tickets_title")}
         </h1>
         <p className="text-gray-500 font-medium text-base md:text-lg">
-          Manage and access your upcoming event passes.
+          {t("my_tickets_subtitle")}
         </p>
       </div>
 
       <div className="bg-white p-1 rounded-full flex gap-2 mb-10 w-fit border border-gray-200 shadow-sm overflow-x-auto">
-        {["All", "Confirmed", "Pending", "Cancelled"].map((tab) => (
+        {tabs.map((tab) => (
           <button
-            key={tab}
-            onClick={() => setFilter(tab)}
+            key={tab.key}
+            onClick={() => setFilter(tab.key)}
             className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${
-              filter === tab
+              filter === tab.key
                 ? "bg-[#8aa8b2] text-white shadow-md shadow-[#8aa8b2]/20"
                 : "text-gray-600 hover:bg-gray-100"
             }`}
           >
-            {tab}
+            {tab.label}
           </button>
         ))}
       </div>
@@ -135,22 +150,22 @@ const MyTicketsPage = () => {
       ) : (
         <EmptyState
           className="mb-10"
-          message={`You do not have any ${filter !== "All" ? filter.toLowerCase() : ""} tickets at the moment.`}
+          message={getEmptyMessage()}
         />
       )}
 
       <div className="border-2 border-dashed border-gray-200 rounded-[32px] md:rounded-[40px] py-12 md:py-16 px-4 md:px-6 text-center flex flex-col items-center gap-4 md:gap-5 bg-white/40">
         <h2 className="text-2xl md:text-3xl font-black text-gray-900">
-          Want more excitement?
+          {t("want_more_excitement")}
         </h2>
         <p className="text-gray-500 font-semibold text-lg max-w-lg">
-          Explore hundreds of events happening in your area.
+          {t("explore_events_area")}
         </p>
         <Link
           to="/events"
           className="mt-2 bg-[#B3C8CF] hover:bg-[#8aa8b2] text-gray-600 px-10 py-4 rounded-2xl font-black flex items-center gap-2 transition-all group shadow-sm"
         >
-          Browse New Events
+          {t("browse_new_events")}
           <ArrowRight
             size={20}
             className="group-hover:translate-x-1 transition-transform"

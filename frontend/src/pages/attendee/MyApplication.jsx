@@ -2,9 +2,11 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import ApplicationList from "../../components/domain/attendee/my-application/ApplicationList";
 import applicationService from "../../services/application.service";
+import { useTranslation } from "react-i18next";
 
 const MyApplicationPage = () => {
   const [filter, setFilter] = useState("All");
+  const { t, i18n } = useTranslation();
 
   const {
     data: applications = [],
@@ -18,7 +20,7 @@ const MyApplicationPage = () => {
   const formatDate = (isoString) => {
     if (!isoString) return "N/A";
     const date = new Date(isoString);
-    return date.toLocaleDateString("en-US", {
+    return date.toLocaleDateString(i18n.language === "vi" ? "vi-VN" : "en-US", {
       year: "numeric",
       month: "short",
       day: "2-digit",
@@ -38,6 +40,13 @@ const MyApplicationPage = () => {
     }
   };
 
+  const tabs = [
+    { key: "All", label: t("tab_all") },
+    { key: "Pending", label: t("tab_pending") },
+    { key: "Approved", label: t("tab_approved") },
+    { key: "Rejected", label: t("tab_rejected") },
+  ];
+
   const filteredApps = applications.filter((app) => {
     if (filter === "All") return true;
     return app.status === filter.toUpperCase();
@@ -47,25 +56,25 @@ const MyApplicationPage = () => {
     <main className="max-w-[1000px] mx-auto px-6 py-10 w-full font-sans">
       <div className="flex flex-col gap-2 mb-8">
         <h1 className="text-4xl md:text-5xl font-black tracking-tight">
-          My Applications
+          {t("my_applications_title")}
         </h1>
         <p className="text-gray-500 font-medium">
-          Manage and track your staff applications for upcoming events.
+          {t("my_applications_subtitle")}
         </p>
       </div>
 
       <div className="bg-white p-1 rounded-full flex gap-1 sm:gap-2 mb-10 w-full md:w-fit border border-gray-200 shadow-sm overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        {["All", "Pending", "Approved", "Rejected"].map((tab) => (
+        {tabs.map((tab) => (
           <button
-            key={tab}
-            onClick={() => setFilter(tab)}
+            key={tab.key}
+            onClick={() => setFilter(tab.key)}
             className={`px-4 sm:px-6 py-2 rounded-full text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${
-              filter === tab
+              filter === tab.key
                 ? "bg-[#8aa8b2] text-white shadow-md shadow-[#8aa8b2]/20"
                 : "text-gray-600 hover:bg-gray-100"
             }`}
           >
-            {tab}
+            {tab.label}
           </button>
         ))}
       </div>

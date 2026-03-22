@@ -262,5 +262,21 @@
     "sidebar_quick_tickets": "Đặt vé nhanh chóng",
     "sidebar_apply_staff": "Ứng tuyển nhân viên",
     "sidebar_manage_tickets": "Quản lý vé",
-    "sidebar_exclusive_offers": "Ưu đãi độc quyền"
+    "sidebar_exclusive_offers": "Ưu đãi độc quyền",
+    "my_tickets_title": "Vé Của Tôi",
+    "my_tickets_subtitle": "Quản lý và truy cập vé sự kiện sắp tới của bạn.",
+    "tab_all": "Tất cả",
+    "tab_confirmed": "Đã xác nhận",
+    "tab_pending": "Đang chờ",
+    "tab_cancelled": "Đã hủy",
+    "tab_approved": "Đã duyệt",
+    "tab_rejected": "Bị từ chối",
+    "no_tickets_message": "Bạn chưa có vé nào tại thời điểm này.",
+    "no_tickets_filtered": "Bạn chưa có vé {{filter}} nào tại thời điểm này.",
+    "want_more_excitement": "Muốn thêm trải nghiệm?",
+    "explore_events_area": "Khám phá hàng trăm sự kiện đang diễn ra quanh bạn.",
+    "browse_new_events": "Khám Phá Sự Kiện",
+    "my_applications_title": "Đơn Ứng Tuyển",
+    "my_applications_subtitle": "Quản lý và theo dõi đơn ứng tuyển nhân viên của bạn.",
+    "no_applications_found": "Không tìm thấy đơn ứng tuyển"
 }
