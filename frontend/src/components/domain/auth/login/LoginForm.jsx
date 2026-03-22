@@ -14,10 +14,12 @@ import {
   loginWithGoogle,
   clearError,
 } from "../../../../store/slices/auth.slice";
+import { useTranslation } from "react-i18next";
 
 export const LoginForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   const { loading, error, isAuthenticated } = useSelector(
     (state) => state.auth,
   );
@@ -70,10 +72,10 @@ export const LoginForm = () => {
 
         <div className="text-center mb-10">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back! 👋
+            {t("welcome_back")}
           </h2>
           <p className="text-gray-500 ">
-            Please log in to continue your journey.
+            {t("login_subtitle")}
           </p>
         </div>
 
@@ -95,14 +97,14 @@ export const LoginForm = () => {
             text="continue_with"
             shape="pill"
             width="384"
-            locale="en"
+            locale={i18n.language === "vi" ? "vi" : "en"}
           />
         </div>
 
         <div className="relative flex items-center mb-8">
           <div className="grow border-t border-gray-300"></div>
           <span className="shrink mx-4 text-gray-400 text-sm font-medium">
-            Or continue with
+            {t("or_continue_with")}
           </span>
           <div className="grow border-t border-gray-300"></div>
         </div>
@@ -110,14 +112,14 @@ export const LoginForm = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <InputField
             id="email"
-            label="Email or Phone Number"
+            label={t("email_or_phone")}
             placeholder="example@email.com"
             error={errors.email}
             {...register("email")}
           />
           <InputField
             id="password"
-            label="Password"
+            label={t("password")}
             type="password"
             placeholder="••••••••"
             error={errors.password}
@@ -133,20 +135,20 @@ export const LoginForm = () => {
                 onChange={(e) => setRememberMe(e.target.checked)}
               />
               <span className="ml-2 text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">
-                Remember me
+                {t("remember_me")}
               </span>
             </label>
             <div className="text-sm font-bold text-[#FF6B35] hover:opacity-80 transition-opacity">
               <Link
                 to="/forgot-password"
               >
-                Forgot password?
+                {t("forgot_password")}
               </Link>
             </div>
           </div>
 
           <Button type="submit">
-            <span>{loading ? "Logging in..." : "Login Now"}</span>
+            <span>{loading ? t("logging_in") : t("login_now")}</span>
             <span className="group-hover:translate-x-1 transition-transform">
               <MdArrowForward className="text-xl" />
             </span>
@@ -154,9 +156,9 @@ export const LoginForm = () => {
         </form>
 
         <p className="mt-10 text-center text-gray-600 dark:text-gray-400 text-sm font-medium">
-          Don't have an account?
+          {t("no_account")}
           <span className="text-[#8aa8b2] font-bold hover:underline ml-1">
-            <Link to="/register">Sign up now</Link>
+            <Link to="/register">{t("sign_up_now")}</Link>
           </span>
         </p>
       </div>
