@@ -9,7 +9,7 @@ const ApplySection = ({ eventSlug, active, location, daysLeft, filledPercentage,
         <div className="bg-white rounded-2xl p-7 shadow-xl shadow-slate-200/50 border border-[#E5E1DA]/50">
             <div className="flex justify-between items-center mb-8">
                 <span className="bg-[#4ECDC4]/10 text-[#4ECDC4] text-[10px] font-extrabold px-3 py-1.5 rounded-full uppercase tracking-widest">
-                    {status}
+                    {active ? 'OPEN' : 'CLOSED'}
                 </span>
                 <span className="text-slate-400 text-xs font-medium">
                     {daysLeft > 0 ? daysLeft : 0} days left
