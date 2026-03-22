@@ -22,6 +22,7 @@ const extractEventId = (pathname) => {
     /\/organizer\/feedback\/createform\/([^/]+)/,
     /\/organizer\/feedback\/analytics\/([^/]+)/,
     /\/organizer\/recruitmentlist\/([^/]+)/,
+    /\/organizer\/recruitmentcreate\/([^/]+)/,
     /\/organizer\/recruitment-post\/([^/]+)/,
     /\/organizer\/edit-event\/([^/]+)/,
   ];

@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
     Calendar,
@@ -52,8 +51,6 @@ const getEventDisplayStatus = (status, startDate) => {
 };
 
 const MyEventsPage = () => {
-    const { user } = useSelector((state) => state.auth);
-    const organizerId = user?.user_id;
     const navigate = useNavigate();
 
     const [events, setEvents] = useState([]);
@@ -71,18 +68,13 @@ const MyEventsPage = () => {
     const abortRef = useRef(null);
 
     const fetchEvents = useCallback(async (page) => {
-        if (!organizerId) {
-            setLoading(false);
-            return;
-        }
-
         if (abortRef.current) abortRef.current.abort();
         const controller = new AbortController();
         abortRef.current = controller;
 
         try {
             setLoading(true);
-            const data = await organizerService.getMyEvents(organizerId, page, EVENTS_PER_PAGE);
+            const data = await organizerService.getMyEvents(page, EVENTS_PER_PAGE);
             if (controller.signal.aborted) return;
             setEvents(data.content || []);
             setTotalPages(data.totalPages || 0);
@@ -95,17 +87,16 @@ const MyEventsPage = () => {
         } finally {
             if (!controller.signal.aborted) setLoading(false);
         }
-    }, [organizerId]);
+    }, []);
 
     const fetchStats = useCallback(async () => {
-        if (!organizerId) return;
         try {
-            const data = await organizerService.getMyEventStats(organizerId);
+            const data = await organizerService.getMyEventStats();
             setStats(data);
         } catch (err) {
             console.error('Failed to load stats:', err);
         }
-    }, [organizerId]);
+    }, []);
 
     useEffect(() => {
         fetchEvents(currentPage);
@@ -114,7 +105,7 @@ const MyEventsPage = () => {
         return () => {
             if (abortRef.current) abortRef.current.abort();
         };
-    }, [organizerId, currentPage, fetchEvents, fetchStats]);
+    }, [currentPage, fetchEvents, fetchStats]);
 
     const filteredEvents = useMemo(() => {
         if (!searchTerm.trim()) return events;

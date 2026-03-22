@@ -86,9 +86,9 @@ const ApplicationList = () => {
         <div className="mb-6 lg:mb-8">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-4z text-gray-400 hover:text-gray-700 text-sm font-medium mb-3 transition-colors group"
+            className="flex items-center gap-4 text-gray-400 hover:text-gray-700 text-sm font-medium mb-3 transition-colors group"
           >
-            <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+            <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
             <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight mb-1 sm:mb-2">Application List</h1>
           </button>
           <p className="text-xs sm:text-sm text-gray-500 font-medium">Review and manage potential staff members.</p>
