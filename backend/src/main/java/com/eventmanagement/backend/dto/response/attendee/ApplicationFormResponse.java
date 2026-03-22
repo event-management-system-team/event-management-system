@@ -20,5 +20,4 @@ public class ApplicationFormResponse {
     private LocalDateTime deadline;
     private List<Map<String, Object>> formSchema;
     private List<PositionResponse> recruitments;
-    private String status;
 }

@@ -58,30 +58,30 @@ public class ApplicationController {
 
     @PutMapping("/{applicationId}/status")
     public ResponseEntity<?> updateApplicationStatus(
-            @PathVariable UUID applicationId, 
+            @PathVariable UUID applicationId,
             @RequestBody UpdateApplicationStatusRequest request) {
         try {
             if (request.getStatus() == null) {
                 return ResponseEntity.badRequest().body(Map.of(
-                    "message", "Trạng thái (status) không được để trống!"
+                        "message", "Trạng thái (status) không được để trống!"
                 ));
             }
 
-            StaffApplication updatedApp = applicationServiceOrganizer.updateApplicationStatuss(applicationId, request.getStatus());
-            
+            StaffApplication updatedApp = applicationServiceOrganizer.updateApplicationStatuses(applicationId, request.getStatus());
+
             return ResponseEntity.ok(Map.of(
-                "message", "Cập nhật trạng thái ứng viên thành công!",
-                "status", updatedApp.getApplicationStatus() 
+                    "message", "Cập nhật trạng thái ứng viên thành công!",
+                    "status", updatedApp.getApplicationStatus()
             ));
-            
+
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
-                "message", e.getMessage()
+                    "message", e.getMessage()
             ));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                "message", "Lỗi hệ thống: " + e.getMessage()
+                    "message", "Lỗi hệ thống: " + e.getMessage()
             ));
         }
     }

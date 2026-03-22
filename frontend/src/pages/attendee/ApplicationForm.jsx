@@ -13,10 +13,11 @@ import ClosedRecruitmentRedirect from '../../components/domain/attendee/applicat
 const ApplicationFormPage = () => {
     const { eventSlug } = useParams();
 
-    const { data: recruitmentData, isLoading, isError } = useQuery({
+    const { data: applicationForm, isLoading, isError } = useQuery({
         queryKey: ['recruitments', eventSlug, 'applicationForm'],
         queryFn: () => recruitmentService.getApplicationForm(eventSlug),
         enabled: !!eventSlug,
+        retry: false,
     })
 
     const {
@@ -28,20 +29,23 @@ const ApplicationFormPage = () => {
         queryFn: () => profileService.getMyProfile(),
     });
 
-    const { form, selectedRole, setSelectedRole, selectedPosition, isSubmitting, isFull, handleSubmit } = useApplicationForm(recruitmentData?.recruitments, userProfile, eventSlug);
+    const { form, selectedRole, setSelectedRole, selectedPosition, isSubmitting, isFull, handleSubmit } = useApplicationForm(applicationForm?.recruitments, userProfile, eventSlug);
 
     if (isLoading || isProfileLoading) {
         return <LoadingState />;
     }
 
-    if (isError || !recruitmentData || isProfileError || !userProfile) {
+    if (isError) {
+        return <ClosedRecruitmentRedirect />;
+    }
+
+    if (!applicationForm || isProfileError || !userProfile) {
         return <EmptyState />;
     }
 
-    if (recruitmentData?.status === 'CLOSED') {
-        return <ClosedRecruitmentRedirect />;
-    }
-    const { formSchema, eventName, deadline, location, recruitments } = recruitmentData;
+
+
+    const { formSchema, eventName, deadline, location, recruitments } = applicationForm;
     const normFile = (e) => {
         if (Array.isArray(e)) {
             return e;
