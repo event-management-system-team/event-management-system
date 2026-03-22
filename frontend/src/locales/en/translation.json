@@ -243,5 +243,16 @@
   "creating_account": "Creating Account...",
   "create_account": "Create Account",
   "already_have_account": "Already have an account?",
-  "login_now_link": "Login now"
+  "login_now_link": "Login now",
+  "email_is_required": "Email is required",
+  "invalid_email_format": "Invalid email format",
+  "password_is_required": "Password is required",
+  "password_min_8": "Password must be at least 8 characters long",
+  "confirm_password_required": "Confirm Password is required",
+  "fullname_is_required": "Full name is required",
+  "fullname_min_2": "Full name must be at least 2 characters long",
+  "fullname_max_50": "Full name must be at most 50 characters long",
+  "fullname_letters_only": "Full name must contain only letters and spaces",
+  "phone_10_digits": "Phone number must be a 10-digit number",
+  "passwords_not_match": "Passwords do not match"
 }

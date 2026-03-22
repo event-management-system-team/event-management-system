@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { registerSchema } from "../../../../schemas/register.schema";
+import { createRegisterSchema } from "../../../../schemas/register.schema";
 import {
   registerUser,
   clearError,
@@ -38,7 +38,7 @@ export const RegisterForm = () => {
     watch,
     trigger,
   } = useForm({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(createRegisterSchema(t)),
     mode: "onBlur",
     defaultValues: {
       fullName: "",

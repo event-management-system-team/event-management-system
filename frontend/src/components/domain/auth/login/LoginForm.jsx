@@ -7,7 +7,7 @@ import { InputField } from "../../../common/InputField";
 import { Button } from "../../../common/Button";
 import { MdArrowForward } from "react-icons/md";
 import LogoImg from "../../../../assets/logo.png";
-import { loginSchema } from "../../../../schemas/login.schema";
+import { createLoginSchema } from "../../../../schemas/login.schema";
 import { useState, useEffect } from "react";
 import {
   loginUser,
@@ -31,7 +31,7 @@ export const LoginForm = () => {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(createLoginSchema(t)),
     mode: "onBlur",
   });
 

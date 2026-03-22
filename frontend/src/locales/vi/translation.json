@@ -242,5 +242,16 @@
     "creating_account": "Đang tạo tài khoản...",
     "create_account": "Tạo Tài Khoản",
     "already_have_account": "Đã có tài khoản?",
-    "login_now_link": "Đăng nhập ngay"
+    "login_now_link": "Đăng nhập ngay",
+    "email_is_required": "Email là bắt buộc",
+    "invalid_email_format": "Định dạng email không hợp lệ",
+    "password_is_required": "Mật khẩu là bắt buộc",
+    "password_min_8": "Mật khẩu phải có ít nhất 8 ký tự",
+    "confirm_password_required": "Xác nhận mật khẩu là bắt buộc",
+    "fullname_is_required": "Họ tên là bắt buộc",
+    "fullname_min_2": "Họ tên phải có ít nhất 2 ký tự",
+    "fullname_max_50": "Họ tên tối đa 50 ký tự",
+    "fullname_letters_only": "Họ tên chỉ được chứa chữ cái và khoảng trắng",
+    "phone_10_digits": "Số điện thoại phải có 10 chữ số",
+    "passwords_not_match": "Mật khẩu không khớp"
 }
