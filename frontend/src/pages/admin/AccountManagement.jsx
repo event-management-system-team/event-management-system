@@ -1,5 +1,5 @@
 import { Plus, ChevronRight, } from 'lucide-react';
-import { useSearchParams } from 'react-router';
+import { useSearchParams } from 'react-router-dom';
 import { CreateOrganizerModal } from "../../components/domain/admin/CreateOrganizerModal.jsx";
 import { useEffect, useState } from "react";
 import { Button } from "../../components/domain/admin/Button.jsx";
@@ -69,7 +69,7 @@ export function AccountManagement() {
     }
 
     return (
-        <div className="flex h-screen bg-[#F1F0E8]">
+        <div className="flex flex-col flex-1 bg-[#F1F0E8]">
 
             {loading && (
                 <LoadingState />

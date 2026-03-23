@@ -145,7 +145,7 @@ public class BookingService {
                                                 .build());
                         }
                         ticketRepository.saveAll(tickets);
-                        confirmOrderInternal(order, tickets);
+                        confirmOrderInternal(order, tickets, TicketStatus.CONFIRMED); // free → CONFIRMED
 
                         log.info("[Booking] Free order confirmed: {}", order.getOrderCode());
                         return OrderResponse.from(order);
@@ -197,7 +197,7 @@ public class BookingService {
                 ticketRepository.saveAll(tickets);
 
                 if (total.compareTo(BigDecimal.ZERO) == 0) {
-                        confirmOrderInternal(order, tickets);
+                        confirmOrderInternal(order, tickets, TicketStatus.CONFIRMED); // free (giá 0) → CONFIRMED
                 } else {
                         redisTemplate.delete(reservationKey);
                 }
@@ -214,23 +214,28 @@ public class BookingService {
                         log.info("[Booking] Order {} already paid, skip", orderCode);
                         return;
                 }
-                if (order.getStatus() == OrderStatus.CANCELLED)
-                        throw new RuntimeException("Order đã bị hủy: " + orderCode);
+                if (order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.EXPIRED)
+                        throw new RuntimeException("Order đã bị hủy hoặc hết hạn: " + orderCode);
 
                 List<Ticket> tickets = ticketRepository.findByOrderOrderId(order.getOrderId());
                 if (tickets.isEmpty())
                         throw new RuntimeException("Tickets not found for order: " + orderCode);
 
-                confirmOrderInternal(order, tickets);
+                confirmOrderInternal(order, tickets, TicketStatus.PAID); // vnpay success → PAID
         }
 
-        private void confirmOrderInternal(Order order, List<Ticket> tickets) {
+        /**
+         * Xác nhận order thành công.
+         * - ticketFinalStatus = CONFIRMED : vé miễn phí (không qua thanh toán)
+         * - ticketFinalStatus = PAID      : vé có phí (sau khi VNPay callback thành công)
+         */
+        private void confirmOrderInternal(Order order, List<Ticket> tickets, TicketStatus ticketFinalStatus) {
                 order.setStatus(OrderStatus.PAID);
                 order.setPaidAt(LocalDateTime.now());
                 orderRepository.save(order);
 
                 tickets.forEach(t -> {
-                        t.setStatus(TicketStatus.CONFIRMED);
+                        t.setStatus(ticketFinalStatus);
                         t.setQrCodeUrl(buildQrCode(t.getTicketCode()));
                 });
                 ticketRepository.saveAll(tickets);
@@ -243,7 +248,7 @@ public class BookingService {
                         redisTemplate.delete(buildReservationKey(ticketTypeId, order.getUser().getUserId()));
                 }
                 emailService.sendTicketEmail(order.getUser(), order, tickets);
-                log.info("[Booking] Ticket email queued for order: {}", order.getOrderCode());
+                log.info("[Booking] Order {} confirmed — tickets set to {}", order.getOrderCode(), ticketFinalStatus);
         }
 
         @Scheduled(fixedRate = 60_000)
@@ -255,7 +260,7 @@ public class BookingService {
                         return;
 
                 expiredOrders.forEach(order -> {
-                        order.setStatus(OrderStatus.CANCELLED);
+                        order.setStatus(OrderStatus.EXPIRED); // EXPIRED = hết giờ thanh toán (phân biệt CANCELLED thủ công)
                         order.setCancelledAt(LocalDateTime.now());
                         orderRepository.save(order);
 

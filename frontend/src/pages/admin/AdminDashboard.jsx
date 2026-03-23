@@ -6,6 +6,7 @@ import { Badge } from "../../components/domain/admin/Badge.jsx";
 import { useEffect, useState } from 'react';
 import { adminService } from '../../services/admin.service.js';
 import LoadingState from '../../components/common/LoadingState.jsx';
+import EmptyState from '../../components/common/EmptyState.jsx';
 import dayjs from "dayjs";
 import DashboardCard from '../../components/domain/admin/DashboardCard.jsx';
 
@@ -42,7 +43,7 @@ export function AdminDashboard() {
     }, [])
 
     return (
-        <div className="flex h-screen bg-[#F1F0E8]">
+        <div className="flex flex-col flex-1 bg-[#F1F0E8]">
 
             {loading && (
                 <LoadingState />

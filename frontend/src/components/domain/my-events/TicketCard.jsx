@@ -18,10 +18,12 @@ const TicketCard = ({
     switch (status?.toUpperCase()) {
       case "PENDING":
         return "bg-[#FF6B35]/10 text-[#FF6B35] border-[#FF6B35]/20";
-      case "APPROVED":
       case "CONFIRMED":
         return "bg-[#4ECDC4]/10 text-[#4ECDC4] border-[#4ECDC4]/20";
-      case "REJECTED":
+      case "PAID":
+        return "bg-green-500/10 text-green-600 border-green-500/20";
+      case "CHECKED_IN":
+        return "bg-blue-500/10 text-blue-600 border-blue-500/20";
       case "CANCELLED":
         return "bg-red-500/10 text-red-500 border-red-500/20";
       default:
@@ -69,11 +71,11 @@ const TicketCard = ({
           {ticketCount} Tickets
         </div>
 
-        <div className={`flex flex-col sm:flex-row gap-2 mt-2 ${['PENDING', 'CANCELLED', 'REJECTED'].includes(status?.toUpperCase()) ? 'invisible pointer-events-none' : ''}`}>
+        <div className={`flex flex-col sm:flex-row gap-2 mt-2 ${['PENDING', 'CANCELLED'].includes(status?.toUpperCase()) ? 'invisible pointer-events-none' : ''}`}>
           <Link
             to={`/attendee/tickets/${eventSlug}`}
             className="w-full sm:flex-1 bg-[#8aa8b2] hover:bg-[#7a97a1] text-white py-2 md:py-2.5 rounded-lg flex items-center justify-center gap-2 text-xs md:text-sm font-bold transition-colors"
-            tabIndex={['PENDING', 'CANCELLED', 'REJECTED'].includes(status?.toUpperCase()) ? -1 : 0}
+            tabIndex={['PENDING', 'CANCELLED'].includes(status?.toUpperCase()) ? -1 : 0}
           >
             Details
           </Link>
