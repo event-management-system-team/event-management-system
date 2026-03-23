@@ -66,7 +66,7 @@ export const StepIndicator = ({ currentStep }) => {
   );
 };
 
-export const ProgressHeader = ({ step, saving, onSaveDraft }) => {
+export const ProgressHeader = ({ step, saving, onSaveDraft,eventId }) => {
   const navigate = useNavigate();
   const progressPct = step === 1 ? 30 : step === 2 ? 65 : 95;
 
@@ -75,7 +75,7 @@ export const ProgressHeader = ({ step, saving, onSaveDraft }) => {
       <div className="flex items-center justify-between px-8 py-3">
         <nav className="flex items-center gap-2 text-sm text-gray-400">
           <button
-            onClick={() => navigate("/organizer/recruitments")}
+      onClick={() => navigate(`/organizer/recruitmentlist/${eventId}`)}
             className="hover:text-gray-700 transition"
           >
             Recruitments

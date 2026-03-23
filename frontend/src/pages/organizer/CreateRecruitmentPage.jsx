@@ -53,6 +53,7 @@ const CreateRecruitmentPage = () => {
               step={step}
               saving={saving}
               onSaveDraft={handleSaveDraft}
+              eventId={preselectedEventId} 
             />
 
             <main className="flex-1 max-w-3xl w-full mx-auto py-10 px-4">

@@ -2,6 +2,8 @@ import { getResourceConfig } from '../../../../../utils/resource.utils'
 import ResourceCard from './ResourceCard';
 const MainContent = ({ filteredResources }) => {
 
+
+
     return (
         <>
             <div className="text-right px-2 border-b border-slate-200/80 mb-8 pb-3">

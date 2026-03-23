@@ -1,6 +1,8 @@
 package com.eventmanagement.backend.service.organizer;
 
 import java.lang.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,19 +11,19 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.eventmanagement.backend.dto.request.SubmitFeedbackRequest;
-import com.eventmanagement.backend.dto.response.organizer.FeedbackDetailResponseDTO;
-import com.eventmanagement.backend.dto.response.organizer.FeedbackResponseDTO;
+import com.eventmanagement.backend.dto.response.admin.EventResponse;
 import com.eventmanagement.backend.dto.response.organizer.FeedbackAnalyticsResponse;
+import com.eventmanagement.backend.dto.response.organizer.FeedbackDetailResponseDTO;
 import com.eventmanagement.backend.dto.response.organizer.FeedbackItemResponse;
+import com.eventmanagement.backend.dto.response.organizer.FeedbackResponseDTO;
 import com.eventmanagement.backend.model.CustomForm;
 import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.model.Feedback;
@@ -229,4 +231,26 @@ public class FeedbackService {
 
         return eventInfo;
     }
+
+public EventResponse getEventById(UUID eventId) {
+    // 1. Tìm Event trong Database
+    Event event = eventRepository.findById(eventId)
+            .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Không tìm thấy sự kiện với ID: " + eventId));
+    
+    // 2. Map thủ công từ Entity (Event) sang DTO (EventResponse)
+    EventResponse response = new EventResponse();
+    
+    // Chú ý: Bạn sửa lại các hàm get/set dưới đây cho ĐÚNG VỚI TÊN BIẾN trong class của bạn nhé
+    response.setEventId(event.getEventId()); 
+    response.setEventName(event.getEventName()); // Có thể của bạn là event.getTitle() hoặc event.getName()
+    response.setStartDate(event.getStartDate());
+    response.setEndDate(event.getEndDate());
+    
+    // Nếu EventResponse của bạn cần thêm dữ liệu gì thì cứ set tiếp ở đây...
+    // response.setLocation(event.getLocation());
+    // response.setStatus(event.getStatus());
+                System.out.println("Event ID: " + event.getEventId());
+    return response;
+}
 }
