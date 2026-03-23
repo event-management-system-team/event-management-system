@@ -224,6 +224,37 @@ public class BookingService {
                 confirmOrderInternal(order, tickets, TicketStatus.PAID); // vnpay success → PAID
         }
 
+        @Transactional
+        public void cancelOrderOnPaymentFail(String orderCode) {
+                Order order = orderRepository.findByOrderCode(orderCode)
+                                .orElseThrow(() -> new NotFoundException("Order not found: " + orderCode));
+
+                // Idempotent: nếu đã cancel/expired/paid thì bỏ qua
+                if (order.getStatus() == OrderStatus.CANCELLED
+                                || order.getStatus() == OrderStatus.EXPIRED
+                                || order.getStatus() == OrderStatus.PAID) {
+                        log.info("[Booking] Order {} already in terminal state {}, skip cancel",
+                                        orderCode, order.getStatus());
+                        return;
+                }
+
+                order.setStatus(OrderStatus.CANCELLED);
+                order.setCancelledAt(LocalDateTime.now());
+                orderRepository.save(order);
+
+                List<Ticket> tickets = ticketRepository.findByOrderOrderId(order.getOrderId());
+                tickets.forEach(t -> t.setStatus(TicketStatus.CANCELLED));
+                ticketRepository.saveAll(tickets);
+
+                if (!tickets.isEmpty() && tickets.get(0).getTicketType() != null) {
+                        UUID ticketTypeId = tickets.get(0).getTicketType().getTicketTypeId();
+                        ticketTypeRepository.releaseReservedTickets(ticketTypeId, tickets.size());
+                }
+
+                log.info("[Booking] Order {} cancelled due to payment failure — {} tickets released",
+                                orderCode, tickets.size());
+        }
+
         /**
          * Xác nhận order thành công.
          * - ticketFinalStatus = CONFIRMED : vé miễn phí (không qua thanh toán)

@@ -67,6 +67,8 @@ public class PaymentController {
             } else {
                 String responseCode = params.get("vnp_ResponseCode");
 
+                bookingService.cancelOrderOnPaymentFail(orderCode);
+
                 return redirectTo(frontendUrl
                         + "/attendee/payment/failed?orderCode=" + orderCode
                         + "&code=" + responseCode);
