@@ -176,13 +176,19 @@ const RecruitmentList = () => {
 
                   {/* Cột 3: Nút bấm (Theo ảnh mẫu) */}
                   <div className="w-full md:w-1/3 flex items-center justify-between md:justify-end gap-6 mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-none border-gray-50">
+                      {/* Nút application */}
+
+                  <Link 
+                    to={`/organizer/applications/${job.recruitmentId}`} 
+                    className="px-6 py-2.5 rounded-full text-xs lg:text-sm font-bold transition-all shadow-sm whitespace-nowrap bg-white text-[#4a9e9e] border border-[#4a9e9e] hover:bg-[#eaf5f5]"
+                  >
+                    Applications
+                  </Link>
+
+                  {/* nút view detail */}
                     <Link 
                       to={`/organizer/recruitments/${job.recruitmentId}`} 
-                      className={`px-6 py-2.5 rounded-full text-xs lg:text-sm font-bold transition-all shadow-sm whitespace-nowrap ${
-                        ui.isActive 
-                          ? 'bg-[#111827] text-white hover:bg-gray-800' 
-                          : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                      }`}
+                      className={`px-6 py-2.5 rounded-full text-xs lg:text-sm font-bold transition-all shadow-sm whitespace-nowrap`}
                       onClick={(e) => !ui.isActive && job.status !== 'CLOSED' && e.preventDefault()}
                     >
                       {ui.buttonText}

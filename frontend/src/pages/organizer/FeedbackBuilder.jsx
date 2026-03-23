@@ -6,12 +6,14 @@ import {
 } from 'lucide-react';
 import Sidebar from '../../components/layout/Sidebar'; 
 import axiosInstance from '../../config/axios'; 
+import { Alert } from '../../components/common/Alert';
 
 const FeedbackBuilder = () => {
   const navigate = useNavigate();
-  const { eventId } = useParams(); 
-
+  const { eventId } = useParams();
+  const [titleError, setTitleError] = useState(''); // THÊM DÒNG NÀY
   const [formName, setFormName] = useState('Event Feedback Form');
+  const [appAlert, setAppAlert] = useState({ type: '', message: '' });
   // const [formDesc, setFormDesc] = useState('Please help us improve our future events by leaving your feedback.');
   
   // Khởi tạo mặc định theo schema mới
@@ -67,7 +69,7 @@ const FeedbackBuilder = () => {
               // Map type cũ
               if (newType === 'SHORT_TEXT') newType = 'text';
               if (newType === 'LONG_TEXT' || newType === 'OPEN_COMMENT') newType = 'paragraph';
-              if (newType === 'MULTIPLE_CHOICE') newType = 'radio';
+              if (newType === 'SINGLE_CHOICE') newType = 'radio';
               if (newType === 'CHECKBOX') newType = 'checkbox';
               if (newType === 'DROPDOWN') newType = 'dropdown';
               if (newType === 'FILE_UPLOAD') newType = 'fileUpload';
@@ -168,14 +170,22 @@ const FeedbackBuilder = () => {
   };
 
   const handleSaveAction = async (isActive) => {
+    // 1. Kiểm tra Blank Title cho Test Case
+    if (!formName || formName.trim() === '') {
+      setAppAlert({ 
+        type: 'error', 
+        message: 'Failed to create form because title is empty.' 
+      });
+      return; 
+    }
+
+    setAppAlert({ type: '', message: '' }); // Xoá cảnh báo nếu đã hợp lệ
+
     try {
       const payload = { 
-        formName: formName,
+        formName: formName.trim(),
         formType: "FEEDBACK",
-        formSchema: [
-          // { type: 'Form_description', content: formDesc },
-          ...formSchema
-        ],
+        formSchema: [...formSchema],
         isActive: isActive
       };
 
@@ -183,15 +193,15 @@ const FeedbackBuilder = () => {
       
       if (response.status === 200 || response.status === 201) {
         if (isActive) {
-          alert("Form saved and published successfully!");
+          setAppAlert({ type: 'success', message: "Form saved and published successfully!" });
           setIsLocked(true);
         } else {
-          alert("Draft saved successfully! (Not published yet)");
+          setAppAlert({ type: 'success', message: "Draft saved successfully! (Not published yet)" });
         }
       }
     } catch (error) {
       console.error("Error saving form:", error);
-      alert("An error occurred while saving the form. Please try again.");
+      setAppAlert({ type: 'error', message: "An error occurred while saving the form. Please try again." });
     }
   };
 
@@ -202,7 +212,7 @@ const FeedbackBuilder = () => {
     const map = {
       'text': 'SHORT ANSWER',
       'paragraph': 'PARAGRAPH',
-      'radio': 'MULTIPLE CHOICE',
+      'radio': 'SINGLE CHOICE',
       'checkbox': 'CHECKBOXES',
       'dropdown': 'DROPDOWN',
       'fileUpload': 'FILE UPLOAD',
@@ -253,7 +263,7 @@ const FeedbackBuilder = () => {
             <div className={`flex lg:block gap-3 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 snap-x ${isLocked ? 'opacity-50 pointer-events-none' : ''}`}>
               <div onClick={() => handleAddQuestion('text')} className="shrink-0 w-44 lg:w-full snap-start"><ToolItem icon={<TypeIcon size={18} className="text-gray-400"/>} title="Short Answer" desc="Small text field" /></div>
               <div onClick={() => handleAddQuestion('paragraph')} className="shrink-0 w-44 lg:w-full snap-start"><ToolItem icon={<AlignLeft size={18} className="text-gray-400"/>} title="Paragraph" desc="Long text area" /></div>
-              <div onClick={() => handleAddQuestion('radio')} className="shrink-0 w-44 lg:w-full snap-start"><ToolItem icon={<CheckSquare size={18} className="text-gray-400"/>} title="Multiple Choice" desc="Select one option" /></div>
+              <div onClick={() => handleAddQuestion('radio')} className="shrink-0 w-44 lg:w-full snap-start"><ToolItem icon={<CheckSquare size={18} className="text-gray-400"/>} title="Single Choice" desc="Select one option" /></div>
               <div onClick={() => handleAddQuestion('checkbox')} className="shrink-0 w-44 lg:w-full snap-start"><ToolItem icon={<ListChecks size={18} className="text-gray-400"/>} title="Checkboxes" desc="Select multiple options" /></div>
               <div onClick={() => handleAddQuestion('dropdown')} className="shrink-0 w-44 lg:w-full snap-start"><ToolItem icon={<ChevronDown size={18} className="text-gray-400"/>} title="Dropdown" desc="Select from list" /></div>
               
@@ -272,8 +282,32 @@ const FeedbackBuilder = () => {
                 </div>
 
                 <div className="p-5 sm:p-8 lg:p-10">
+                  <Alert 
+                    type={appAlert.type} 
+                    message={appAlert.message} 
+                    onClose={() => setAppAlert({ type: '', message: '' })} 
+                  />
                   <div className="mb-8 lg:mb-10">
-                    <input type="text" value={formName} disabled={isLocked} onChange={(e) => setFormName(e.target.value)} className={`w-full text-xl sm:text-2xl font-extrabold text-gray-900 mb-2 border-none outline-none bg-transparent rounded p-1.5 ${isLocked ? 'opacity-80 cursor-not-allowed' : 'hover:bg-gray-50 focus:bg-gray-50 focus:ring-2 focus:ring-[#8c9db3]/20'}`} />
+                    <input 
+                      type="text" 
+                      value={formName} 
+                      disabled={isLocked} 
+                      placeholder="Enter form title..."
+                      onChange={(e) => {
+                        setFormName(e.target.value);
+                        // Tự động xoá lỗi khi người dùng nhập lại text hợp lệ
+                        if (e.target.value.trim() !== '') {
+                          setAppAlert({ type: '', message: '' });
+                        }
+                      }} 
+                      className={`w-full text-xl sm:text-2xl font-extrabold text-gray-900 mb-2 border outline-none bg-transparent rounded p-1.5 transition-all ${
+                        isLocked 
+                          ? 'border-transparent opacity-80 cursor-not-allowed' 
+                          : appAlert.type === 'error' && formName.trim() === ''
+                            ? 'border-red-400 bg-red-50 focus:ring-2 focus:ring-red-200' 
+                            : 'border-transparent hover:bg-gray-50 focus:bg-gray-50 focus:ring-2 focus:ring-[#8c9db3]/20'
+                      }`} 
+                    />
                   </div>
 
                   {formSchema.map((item, index) => {
