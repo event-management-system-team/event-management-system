@@ -7,7 +7,6 @@ import {
     CalendarClock,
     CheckCircle2,
     Plus,
-    SlidersHorizontal,
     Search,
     ChevronLeft,
     ChevronRight,
@@ -63,9 +62,16 @@ const MyEventsPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const [showSearch, setShowSearch] = useState(false);
+    const [activeFilter, setActiveFilter] = useState('all');
     const [deleteTarget, setDeleteTarget] = useState(null);
     const [deleting, setDeleting] = useState(false);
+
+    const FILTER_TAGS = [
+        { key: 'all', label: 'Tất cả' },
+        { key: 'completed', label: 'Completed' },
+        { key: 'upcoming', label: 'Upcoming' },
+        { key: 'rejected', label: 'Rejected' },
+    ];
 
     const abortRef = useRef(null);
 
@@ -116,15 +122,29 @@ const MyEventsPage = () => {
     }, [organizerId, currentPage, fetchEvents, fetchStats]);
 
     const filteredEvents = useMemo(() => {
-        if (!searchTerm.trim()) return events;
-        const lower = searchTerm.toLowerCase();
-        return events.filter(
-            (e) =>
-                e.eventName?.toLowerCase().includes(lower) ||
-                e.location?.toLowerCase().includes(lower) ||
-                e.categoryName?.toLowerCase().includes(lower)
-        );
-    }, [events, searchTerm]);
+        let result = events;
+
+        // Filter by status tag
+        if (activeFilter !== 'all') {
+            result = result.filter((e) => {
+                const display = getEventDisplayStatus(e.status, e.startDate);
+                return display.label.toLowerCase() === activeFilter;
+            });
+        }
+
+        // Filter by search term
+        if (searchTerm.trim()) {
+            const lower = searchTerm.toLowerCase();
+            result = result.filter(
+                (e) =>
+                    e.eventName?.toLowerCase().includes(lower) ||
+                    e.location?.toLowerCase().includes(lower) ||
+                    e.categoryName?.toLowerCase().includes(lower)
+            );
+        }
+
+        return result;
+    }, [events, searchTerm, activeFilter]);
 
     const getStatusDisplay = (status, startDate) => getEventDisplayStatus(status, startDate);
 
@@ -264,38 +284,33 @@ const MyEventsPage = () => {
             {/* Event Listings */}
             <div className="bg-background-light border border-gray-200 rounded-xl shadow-sm">
                 {/* Listings Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                    <h2 className="text-lg font-semibold text-gray-900">Event Listings</h2>
+                <div className="px-6 pt-5 pb-4 border-b border-gray-100">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-lg font-semibold text-gray-900">Event Listings</h2>
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Search events..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-full bg-white focus:outline-none focus:ring-2 focus:ring-[#7FA5A5]/30 focus:border-[#7FA5A5] w-56"
+                            />
+                        </div>
+                    </div>
                     <div className="flex items-center gap-2">
-                        {showSearch && (
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                <input
-                                    type="text"
-                                    placeholder="Search events..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#7FA5A5]/30 focus:border-[#7FA5A5] w-60"
-                                    autoFocus
-                                />
-                            </div>
-                        )}
-                        <button
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                            title="Filter"
-                        >
-                            <SlidersHorizontal size={18} className="text-gray-500" />
-                        </button>
-                        <button
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                            title="Search"
-                            onClick={() => {
-                                setShowSearch(!showSearch);
-                                if (showSearch) setSearchTerm('');
-                            }}
-                        >
-                            <Search size={18} className="text-gray-500" />
-                        </button>
+                        {FILTER_TAGS.map((tag) => (
+                            <button
+                                key={tag.key}
+                                onClick={() => setActiveFilter(tag.key)}
+                                className={`px-4 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer ${activeFilter === tag.key
+                                        ? 'bg-[#2d3a4f] text-white border-[#2d3a4f]'
+                                        : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                                    }`}
+                            >
+                                {tag.label}
+                            </button>
+                        ))}
                     </div>
                 </div>
 
@@ -406,7 +421,7 @@ const MyEventsPage = () => {
 
                                 {/* Actions */}
                                 <div className="col-span-1 flex items-center justify-end gap-1">
-                                    {(event.status === 'PENDING' || event.status === 'DRAFT') ? (
+                                    {(event.status === 'PENDING' || event.status === 'DRAFT' || event.status === 'REJECTED') ? (
                                         <>
                                             <button
                                                 onClick={() => navigate(`/organizer/edit-event/${event.eventId}`)}
@@ -426,7 +441,7 @@ const MyEventsPage = () => {
                                     ) : (
                                         <button
                                             onClick={() => navigate(`/organizer/events/${event.eventId}`)}
-                                            className="text-sm text-[#7FA5A5] hover:text-[#5d8585] font-medium transition-colors cursor-pointer"
+                                            className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-[#7FA5A5] hover:text-[#5d8585] hover:bg-[#7FA5A5]/10 font-medium rounded-lg cursor-pointer transition-colors"
                                         >
                                             Manage
                                         </button>
