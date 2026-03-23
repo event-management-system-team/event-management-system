@@ -1,6 +1,7 @@
 package com.eventmanagement.backend.service;
 
 import com.eventmanagement.backend.constants.FormType;
+import com.eventmanagement.backend.constants.RecruitmentStatus;
 import com.eventmanagement.backend.dto.response.attendee.ApplicationFormResponse;
 import com.eventmanagement.backend.dto.response.attendee.PositionResponse;
 import com.eventmanagement.backend.exception.BadRequestException;
@@ -84,6 +85,10 @@ public class ApplicationFormService {
         Recruitment recruitment = recruitmentRepository.findById(recruitmentId)
                 .orElseThrow(() -> new NotFoundException("Job position not found!"));
 
+        if (recruitment.getStatus() == RecruitmentStatus.CLOSED) {
+            throw new BadRequestException("This position has either been filled or the deadline has passed!");
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User information not found!"));
 
@@ -105,6 +110,7 @@ public class ApplicationFormService {
                         .positionName(r.getPositionName())
                         .vacancy(r.getVacancy())
                         .availableSlots(Math.max(0, r.getVacancy() - r.getApprovedCount()))
+                        .status(r.getStatus())
                         .requirements(r.getRequirements())
                         .build())
                 .toList();
@@ -119,7 +125,6 @@ public class ApplicationFormService {
                 .formSchema(customForm.getFormSchema())
                 .location(location)
                 .recruitments(positionResponses)
-                .status(recruitments.get(0).getStatus().name())
                 .build();
 
     }

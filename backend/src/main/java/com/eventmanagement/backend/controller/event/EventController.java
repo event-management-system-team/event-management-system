@@ -58,4 +58,5 @@ public class EventController {
         EventResponse event = eventService.getEventBySlug(eventSlug);
         return ResponseEntity.ok(event);
     }
+    
 }

@@ -71,9 +71,14 @@ const useCreateRecruitment = (preselectedEventId = "") => {
         form.eventId,
         buildPayload("DRAFT"),
       );
+<<<<<<< HEAD
       // Navigate về recruitment list của event vừa tạo
       navigate(`/organizer/recruitmentlist/${form.eventId}`);
     } catch (err) {
+=======
+    navigate(`/organizer/recruitmentlist/${form.eventId}`);    
+  } catch (err) {
+>>>>>>> develop
       setError(err?.response?.data?.message || "Failed to save draft.");
     } finally {
       setSaving(false);
@@ -125,12 +130,18 @@ const useCreateRecruitment = (preselectedEventId = "") => {
     }
   };
 
-  const handleBack = () => {
-    setError(null);
-    setErrors({});
+const handleBack = () => {
+  setError(null);
+  setErrors({});
+  
+  if (step === 1) {
+navigate(`/organizer/recruitmentlist/${form.eventId}`);
+    return;
+  } else {
     setStep((s) => s - 1);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  }
+};
 
   const clearFieldError = (key) => {
     setErrors((prev) => {

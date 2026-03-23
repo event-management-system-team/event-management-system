@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
+<<<<<<< HEAD
   ArrowLeft, Calendar, Users, Briefcase, FileText, CheckCircle, Edit, ClipboardList
+=======
+  ArrowLeft, Calendar, Users, Briefcase, FileText, CheckCircle
+>>>>>>> develop
 } from 'lucide-react';
 import axiosInstance from '../../config/axios';
 
@@ -63,6 +67,7 @@ const RecruitmentDetail = () => {
                 <Briefcase size={16} className="shrink-0"/> <span className="truncate">{detailData.eventName}</span>
               </p>
             </div>
+<<<<<<< HEAD
             
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
               {/* View Applications */}
@@ -83,6 +88,8 @@ const RecruitmentDetail = () => {
                 </button>
               )}
             </div>
+=======
+>>>>>>> develop
           </div>
         </div>
 

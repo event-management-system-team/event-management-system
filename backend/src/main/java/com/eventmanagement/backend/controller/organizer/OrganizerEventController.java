@@ -53,12 +53,6 @@ public class OrganizerEventController {
         return ResponseEntity.ok(events);
     }
 
-    @GetMapping("/{eventId}")
-    public ResponseEntity<CreateEventResponse> getEventById(@PathVariable UUID eventId) {
-        User organizer = getAuthenticatedUser();
-        CreateEventResponse response = organizerEventService.getEventById(eventId, organizer);
-        return ResponseEntity.ok(response);
-    }
 
     @PutMapping(value = "/{eventId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CreateEventResponse> updateEvent(
@@ -89,7 +83,7 @@ public class OrganizerEventController {
     @GetMapping("/{eventId}/detail")
     public ResponseEntity<OrganizerEventResponse> getEventDetail(
             @PathVariable UUID eventId) {
-        
+
         OrganizerEventResponse event = organizerEventService.getEventDetail(eventId);
         return ResponseEntity.ok(event);
     }

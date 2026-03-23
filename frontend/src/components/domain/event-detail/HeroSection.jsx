@@ -17,8 +17,6 @@ const HeroSection = ({ bannerUrl, location, eventName, startDate, endDate, categ
         return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
     };
 
-    const isSameDay = formatDate(startDate) === formatDate(endDate);
-
     return (
         <div>
             <section className="relative w-full h-125 bg-slate-900 overflow-hidden font-sans">
@@ -66,9 +64,7 @@ const HeroSection = ({ bannerUrl, location, eventName, startDate, endDate, categ
                                 <div className="flex items-center gap-2">
                                     <CalendarDays className="w-5 h-5 text-primary shrink-0" />
                                     <span>
-                                        {isSameDay
-                                            ? formatDate(startDate)
-                                            : `${formatDate(startDate)} - ${formatDate(endDate)}`}
+                                        {formatDate(startDate)}
                                     </span>
                                 </div>
 

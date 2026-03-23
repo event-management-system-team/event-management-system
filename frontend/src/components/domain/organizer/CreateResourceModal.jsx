@@ -203,7 +203,7 @@ export function CreateResourceModal({ eventId, isOpen, onClose, onAlert, onCreat
 
         } catch (err) {
             const msg = err.response?.data?.message || "Failed to create resource. Please try again";
-            onAlert("err", msg)
+            onAlert("error", msg)
         } finally {
             setIsSubmitting(false)
         }
