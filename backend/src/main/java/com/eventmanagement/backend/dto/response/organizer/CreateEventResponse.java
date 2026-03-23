@@ -49,6 +49,7 @@ public class CreateEventResponse {
     public static class AgendaResponse {
         private UUID agendaId;
         private String title;
+        private String date;
         private String startTime;
         private String endTime;
         private String description;
