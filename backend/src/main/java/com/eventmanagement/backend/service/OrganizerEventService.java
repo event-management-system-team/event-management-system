@@ -211,6 +211,7 @@ public class OrganizerEventService {
                 agendaResponses.add(CreateEventResponse.AgendaResponse.builder()
                         .agendaId(ea.getAgendaId())
                         .title(ea.getTitle())
+                        .date(ea.getStartTime() != null ? ea.getStartTime().toLocalDate().toString() : null)
                         .startTime(ea.getStartTime() != null ? ea.getStartTime().toLocalTime().toString() : null)
                         .endTime(ea.getEndTime() != null ? ea.getEndTime().toLocalTime().toString() : null)
                         .description(ea.getDescription())
