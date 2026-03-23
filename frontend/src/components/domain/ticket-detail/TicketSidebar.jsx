@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import { QrCode, Download, ArrowRightLeft, Laptop, Apple, HelpCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { QrCode, Download, HelpCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
+import { useExportTicket } from '../../../hooks/useExportTicket'
 
 const TicketSidebar = ({ ticket, totalTickets, currentIndex, onNext, onPrev }) => {
   const [imgError, setImgError] = useState(false);
+
+  const { singleRef, isExporting, exportSingle } = useExportTicket();
 
   if (!ticket) return null;
 
@@ -14,8 +17,9 @@ const TicketSidebar = ({ ticket, totalTickets, currentIndex, onNext, onPrev }) =
 
   return (
     <div className="md:w-[40%] bg-[#f7f7f7] p-8 flex flex-col justify-center items-center relative">
-      <div className="w-full max-w-[320px] bg-white rounded-[28px] p-8 shadow-sm border border-gray-100 flex flex-col items-center">
-        
+      <div ref={singleRef}
+        className="w-full max-w-[320px] bg-white rounded-[28px] p-8 shadow-sm border border-gray-100 flex flex-col items-center">
+
         {totalTickets > 1 ? (
           <div className="w-full flex justify-between items-center mb-6">
             <button onClick={onPrev} className="p-1.5 bg-gray-50 rounded-full hover:bg-gray-100 text-gray-400 transition shadow-sm border border-gray-100">
@@ -40,7 +44,8 @@ const TicketSidebar = ({ ticket, totalTickets, currentIndex, onNext, onPrev }) =
         </div>
 
         <div className="w-full space-y-3">
-          <button className="w-full bg-[#89A8B2] text-white font-bold py-3.5 rounded-xl hover:bg-[#89A8B2]/90 transition-all flex items-center justify-center gap-2">
+          <button onClick={() => exportSingle(`${ticket.eventName}_${ticket.ticketCode}`)}
+            className="w-full bg-[#89A8B2] text-white font-bold py-3.5 rounded-xl hover:bg-[#89A8B2]/90 transition-all flex items-center justify-center gap-2">
             <Download size={18} /> Download
           </button>
         </div>

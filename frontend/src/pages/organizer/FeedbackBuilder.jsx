@@ -11,7 +11,6 @@ import { Alert } from '../../components/common/Alert';
 const FeedbackBuilder = () => {
   const navigate = useNavigate();
   const { eventId } = useParams();
-  const [titleError, setTitleError] = useState(''); // THÊM DÒNG NÀY
   const [formName, setFormName] = useState('Event Feedback Form');
   const [appAlert, setAppAlert] = useState({ type: '', message: '' });
   // const [formDesc, setFormDesc] = useState('Please help us improve our future events by leaving your feedback.');
@@ -110,31 +109,35 @@ const FeedbackBuilder = () => {
   };
 
   const handleAddQuestion = (type) => {
-    if (isLocked) return;
-    const newId = `q_${Date.now()}`;
-    let baseQuestion = { fieldId: newId, type: type, required: false, label: 'New Question' };
+      if (isLocked) return;
+      const newId = `q_${Date.now()}`;
+      let baseQuestion = { fieldId: newId, type: type, required: false, label: 'New Question' };
 
-    if (type === 'text') {
-      baseQuestion.label = 'Short Answer';
-      baseQuestion.placeholder = 'Type short answer here...';
-    } else if (type === 'paragraph') {
-      baseQuestion.label = 'Long Answer';
-      baseQuestion.placeholder = 'Type detailed answer here...';
-      baseQuestion.maxChars = 500;
-    } else if (type === 'NPS') {
-      baseQuestion.label = 'How satisfied are you?';
-      baseQuestion.leftLabel = 'Poor';
-      baseQuestion.rightLabel = 'Excellent';
-    } else if (['radio', 'checkbox', 'dropdown'].includes(type)) {
-      baseQuestion.label = 'Select your option(s)';
-      baseQuestion.options = ['Option 1', 'Option 2', 'Option 3'];
-    } else if (type === 'fileUpload') {
-      baseQuestion.label = 'Upload Document';
-    }
+      if (type === 'text') {
+        baseQuestion.label = 'Short Answer';
+        baseQuestion.placeholder = 'Type short answer here...';
+      } else if (type === 'paragraph') {
+        baseQuestion.label = 'Long Answer';
+        baseQuestion.placeholder = 'Type detailed answer here...';
+        baseQuestion.maxChars = 500;
+      } else if (type === 'NPS') {
+        baseQuestion.label = 'How satisfied are you?';
+        baseQuestion.leftLabel = 'Poor';
+        baseQuestion.rightLabel = 'Excellent';
+      } else if (type === 'radio') {
+        // Cập nhật label cho Single Choice (radio) ở đây
+        baseQuestion.label = 'Write your question here.';
+        baseQuestion.options = ['Option 1', 'Option 2', 'Option 3'];
+      } else if (['checkbox', 'dropdown'].includes(type)) {
+        baseQuestion.label = 'Select your option(s)';
+        baseQuestion.options = ['Option 1', 'Option 2', 'Option 3'];
+      } else if (type === 'fileUpload') {
+        baseQuestion.label = 'Upload Document';
+      }
 
-    setFormSchema([...formSchema, baseQuestion]);
-    setActiveId(newId);
-  };
+      setFormSchema([...formSchema, baseQuestion]);
+      setActiveId(newId);
+    };
 
   const handleUpdateActiveQuestion = (key, value) => {
     if (isLocked) return;

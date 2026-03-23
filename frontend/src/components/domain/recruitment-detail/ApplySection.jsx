@@ -9,7 +9,7 @@ const ApplySection = ({ eventSlug, active, location, daysLeft, filledPercentage,
         <div className="bg-white rounded-2xl p-7 shadow-xl shadow-slate-200/50 border border-[#E5E1DA]/50">
             <div className="flex justify-between items-center mb-8">
                 <span className="bg-[#4ECDC4]/10 text-[#4ECDC4] text-[10px] font-extrabold px-3 py-1.5 rounded-full uppercase tracking-widest">
-                    {status}
+                    {active ? 'OPEN' : 'CLOSED'}
                 </span>
                 <span className="text-slate-400 text-xs font-medium">
                     {daysLeft > 0 ? daysLeft : 0} days left
@@ -35,16 +35,9 @@ const ApplySection = ({ eventSlug, active, location, daysLeft, filledPercentage,
                 <div className="flex items-start gap-4">
                     <Clock size={18} className="text-primary mt-0.5" />
                     <div>
-                        <p className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold mb-1">Event Duration</p>
+                        <p className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold mb-1">Event Date</p>
                         <p className="text-[14px] font-bold text-slate-600 leading-relaxed">
-                            {(() => {
-                                const startStr = startDate ? new Date(startDate).toLocaleDateString('en-GB') : 'TBA';
-                                const endStr = endDate ? new Date(endDate).toLocaleDateString('en-GB') : 'TBA';
-
-                                if (startStr === 'TBA' && endStr === 'TBA') return 'TBA';
-                                if (startStr === endStr) return startStr;
-                                return `${startStr} - ${endStr}`;
-                            })()}
+                            {startDate ? new Date(startDate).toLocaleDateString('en-GB') : 'TBA'}
                         </p>
                     </div>
                 </div>

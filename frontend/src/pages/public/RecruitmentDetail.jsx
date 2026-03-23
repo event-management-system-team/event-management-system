@@ -15,6 +15,7 @@ const RecruitmentDetailPage = () => {
     const { data: recruitment, isLoading, isError } = useRecruitmentDetail(eventSlug);
 
 
+
     const deadlineDate = recruitment?.deadline ? new Date(recruitment.deadline) : null;
 
     const formattedDeadline = deadlineDate
@@ -35,6 +36,8 @@ const RecruitmentDetailPage = () => {
     if (isError || !recruitment) {
         return <EmptyState message="Not Found Job" />;
     }
+
+
 
     return (
         <div className="bg-background-light font-sans text-slate-900 min-h-screen">
