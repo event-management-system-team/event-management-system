@@ -10,9 +10,21 @@ import {
   MessageSquare,
   Settings,
   LogOut,
+  Briefcase // Import thêm icon
 } from "lucide-react";
 
-const NavItem = ({ to, icon, label, isActive }) => {
+// Thêm prop 'disabled' vào NavItem
+const NavItem = ({ to, icon, label, isActive, disabled }) => {
+  // Nếu bị disabled, đổi màu chữ và cấm click
+  if (disabled) {
+    return (
+      <div className="flex items-center gap-3 px-4 py-3 mb-1 rounded-xl font-medium text-gray-600 cursor-not-allowed">
+        <span>{icon}</span>
+        <span>{label}</span>
+      </div>
+    );
+  }
+
   return (
     <Link
       to={to}
@@ -33,11 +45,11 @@ const NavItem = ({ to, icon, label, isActive }) => {
 
 const Sidebar = () => {
   const location = useLocation();
-  const { eventId } = useParams();
+  // Lấy eventId từ URL (nếu có)
+  const { eventId } = useParams(); 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  //navavigate ve trang login
   const handleLogout = async () => {
     await dispatch(logoutUser());
     navigate("/login");
@@ -45,16 +57,18 @@ const Sidebar = () => {
 
   const isDashboardActive = location.pathname.includes("/dashboard");
   const isMyEventsActive = location.pathname.includes("/my-events");
-
-  const isStaffActive =
-    location.pathname.includes("/staff") ||
-    location.pathname.includes("/recruitment");
+  
+  // Tách riêng các trạng thái Active
+  const isStaffActive = location.pathname.includes("/staff");
+  const isRecruitmentActive = location.pathname.includes("/recruitmentlist");
   const isAppActive = location.pathname.includes("/applications");
   const isFeedbackActive = location.pathname.includes("/feedback");
 
-  const feedbackLink = eventId
-    ? `/organizer/feedback/feedbacklist/${eventId}`
-    : `/organizer/feedbacklist/1`;
+  // Xây dựng link. Nếu không có eventId, gán tạm '#', component NavItem sẽ tự disable nó
+  const staffLink = eventId ? `/organizer/staff/${eventId}` : "#"; // Giả sử route staff cũng cần ID
+  const recruitmentLink = eventId ? `/organizer/recruitmentlist/${eventId}` : "#";
+  const feedbackLink = eventId ? `/organizer/feedback/feedbacklist/${eventId}` : "#";
+  const appLink = eventId ? `/organizer/applications/${eventId}` : "#"; // Giả sử application cũng cần ID
 
   return (
     <aside className="w-64 h-screen bg-[#1e293b] flex-col text-gray-300 fixed left-0 top-0 z-50 font-sans shadow-xl border-r border-gray-800 hidden lg:flex">
@@ -73,7 +87,7 @@ const Sidebar = () => {
         </div>
       </div>
 
-      {/* 2. User Profile (FPT Software) */}
+      {/* 2. User Profile */}
       <div className="mx-4 mb-6 p-3 bg-[#2d3a4f] rounded-xl flex items-center gap-3 border border-gray-700 shadow-sm">
         <img
           src="https://ui-avatars.com/api/?name=FPT+Software&background=random"
@@ -81,19 +95,18 @@ const Sidebar = () => {
           className="w-10 h-10 rounded-full object-cover border border-gray-500"
         />
         <div className="overflow-hidden">
-          <h3 className="text-white text-sm font-bold truncate">
-            FPT Software
-          </h3>
+          <h3 className="text-white text-sm font-bold truncate">FPT Software</h3>
           <p className="text-[11px] text-gray-400 truncate">Senior Organizer</p>
         </div>
       </div>
 
-      {/* 3. Phần Menu chính (tự cuộn nếu quá dài) */}
+      {/* 3. Phần Menu chính */}
       <nav className="flex-1 px-4 overflow-y-auto scrollbar-hide space-y-1">
         <p className="px-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3 mt-1">
           Main Menu
         </p>
 
+        {/* Các menu KHÔNG CẦN eventId -> Luôn click được */}
         <NavItem
           to="/organizer/dashboard"
           icon={<LayoutDashboard size={20} />}
@@ -106,26 +119,39 @@ const Sidebar = () => {
           label="My Events"
           isActive={isMyEventsActive}
         />
+
+        {/* Các menu CẦN eventId -> Bị mờ đi (disabled) nếu chưa chọn sự kiện */}
         <NavItem
-          to="/organizer/staff"
+          to={staffLink}
           icon={<Users size={20} />}
           label="Staff Management"
           isActive={isStaffActive}
+          disabled={!eventId} 
         />
         <NavItem
-          to="/organizer/applications"
+          to={recruitmentLink}
+          icon={<Briefcase size={20} />}
+          label="Recruitments"
+          isActive={isRecruitmentActive}
+          disabled={!eventId}
+        />
+        <NavItem
+          to={appLink}
           icon={<FileText size={20} />}
           label="Applications"
           isActive={isAppActive}
+          disabled={!eventId}
         />
         <NavItem
           to={feedbackLink}
           icon={<MessageSquare size={20} />}
           label="Feedback & Rating"
           isActive={isFeedbackActive}
+          disabled={!eventId}
         />
       </nav>
 
+      {/* ... Phần Logout giữ nguyên ... */}
       <div className="p-4 mt-auto border-t border-gray-700/50 bg-[#1a2333]">
         <div className="space-y-1">
           <Link
