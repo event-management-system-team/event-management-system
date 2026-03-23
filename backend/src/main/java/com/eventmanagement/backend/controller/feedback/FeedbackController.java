@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,13 +22,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-
 import com.eventmanagement.backend.constants.FormType;
 import com.eventmanagement.backend.dto.request.CustomFormRequestDTO;
 import com.eventmanagement.backend.dto.request.SubmitFeedbackRequest;
+import com.eventmanagement.backend.dto.response.admin.EventResponse;
 import com.eventmanagement.backend.dto.response.organizer.FeedbackAnalyticsResponse;
 import com.eventmanagement.backend.dto.response.organizer.FeedbackDetailResponseDTO;
 import com.eventmanagement.backend.dto.response.organizer.FeedbackItemResponse;
@@ -169,5 +169,11 @@ public class FeedbackController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Lỗi server nội bộ: " + e.getMessage()));
         }
+    }
+
+    @GetMapping("/events/ids/{eventId}")
+    public ResponseEntity<EventResponse> getEventById(@PathVariable("eventId") UUID eventId) {
+        EventResponse event = feedbackService.getEventById(eventId);
+        return ResponseEntity.ok(event);
     }
 }
