@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
     CalendarDays,
@@ -102,8 +101,6 @@ const CustomBarTooltip = ({ active, payload, label }) => {
 };
 
 const OrganizerDashboardPage = () => {
-    const { user } = useSelector((state) => state.auth);
-    const organizerId = user?.user_id;
     const navigate = useNavigate();
 
     const [stats, setStats] = useState({
@@ -116,12 +113,11 @@ const OrganizerDashboardPage = () => {
     const [loading, setLoading] = useState(true);
 
     const fetchData = useCallback(async () => {
-        if (!organizerId) return;
         setLoading(true);
         try {
             const [statsData, eventsData] = await Promise.all([
-                organizerService.getMyEventStats(organizerId),
-                organizerService.getMyEvents(organizerId, 0, 20),
+                organizerService.getMyEventStats(),
+                organizerService.getMyEvents(0, 20),
             ]);
             setStats(statsData);
             setEvents(eventsData.content || []);
@@ -130,7 +126,7 @@ const OrganizerDashboardPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [organizerId]);
+    }, []);
 
     useEffect(() => {
         fetchData();
