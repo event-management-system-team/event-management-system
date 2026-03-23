@@ -99,7 +99,7 @@ const ResourceTab = ({ id, isResourceModalOpen, closeResourceModal, onLoading, o
 
         if (file.fileType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
             const officeViewer = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(file.fileUrl)}`;
-            // const googleViewer = `https://docs.google.com/gview?url=${encodeURIComponent(file.fileUrl)}&embedded=true`
+            // const officeViewer = `https://docs.google.com/gview?url=${encodeURIComponent(file.fileUrl)}&embedded=true`
             window.open(officeViewer, "_blank");
             return;
         }
@@ -177,7 +177,7 @@ const ResourceTab = ({ id, isResourceModalOpen, closeResourceModal, onLoading, o
                 isOpen={isResourceModalOpen}
                 onClose={closeResourceModal}
                 onCreated={handleResourceCreated}
-                showAlert={showAlert}
+                onAlert={showAlert}
             />
         </>
     )
