@@ -252,8 +252,8 @@ public class OrganizerEventService {
         if (!event.getOrganizer().getUserId().equals(organizer.getUserId())) {
             throw new UnauthorizedException("You are not the organizer of this event");
         }
-        if (event.getStatus() != EventStatus.DRAFT && event.getStatus() != EventStatus.PENDING) {
-            throw new BadRequestException("Only DRAFT or PENDING events can be deleted");
+        if (event.getStatus() != EventStatus.DRAFT && event.getStatus() != EventStatus.PENDING && event.getStatus() != EventStatus.REJECTED) {
+            throw new BadRequestException("Only DRAFT, PENDING, or REJECTED events can be deleted");
         }
         eventRepository.hardDeleteAgendasByEventId(eventId);
         eventRepository.hardDeleteTicketsByEventId(eventId);
@@ -287,8 +287,8 @@ public class OrganizerEventService {
         if (!event.getOrganizer().getUserId().equals(organizer.getUserId())) {
             throw new UnauthorizedException("You are not the organizer of this event");
         }
-        if (event.getStatus() != EventStatus.DRAFT && event.getStatus() != EventStatus.PENDING) {
-            throw new BadRequestException("Only DRAFT or PENDING events can be edited");
+        if (event.getStatus() != EventStatus.DRAFT && event.getStatus() != EventStatus.PENDING && event.getStatus() != EventStatus.REJECTED) {
+            throw new BadRequestException("Only DRAFT, PENDING, or REJECTED events can be edited");
         }
 
         EventCategory category = eventCategoryRepository.findById(request.getCategoryId())

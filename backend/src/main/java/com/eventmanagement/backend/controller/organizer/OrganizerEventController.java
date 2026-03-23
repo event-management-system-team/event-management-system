@@ -65,6 +65,13 @@ public class OrganizerEventController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{eventId}")
+    public ResponseEntity<CreateEventResponse> getEventById(@PathVariable UUID eventId) {
+        User organizer = getAuthenticatedUser();
+        CreateEventResponse response = organizerEventService.getEventById(eventId, organizer);
+        return ResponseEntity.ok(response);
+    }
+
     @DeleteMapping("/{eventId}")
     public ResponseEntity<Void> deleteEvent(@PathVariable UUID eventId) {
         User organizer = getAuthenticatedUser();
