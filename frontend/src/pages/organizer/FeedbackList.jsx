@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Eye, Search, Download, Plus } from "lucide-react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { Eye, Search, Plus, Lock, Filter, Calendar } from "lucide-react";
 import { useFeedbacks } from "../../hooks/useFeedback";
 import { Link, useParams } from "react-router-dom";
 import { Pagination } from "antd";
@@ -9,24 +9,37 @@ const FeedbackList = () => {
   const { eventId } = useParams();
   const { data: feedbacks, isLoading, isError } = useFeedbacks(eventId);
 
-  // STATE MỚI: Quản lý trạng thái kết thúc của sự kiện
   const [isEventEnded, setIsEventEnded] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const listTopRef = useRef(null);
 
-  // EFFECT MỚI: Gọi API lấy chi tiết Event để check endDate
+  // --- STATE MỚI: Quản lý các bộ lọc ---
+  const [searchTerm, setSearchTerm] = useState("");
+  const [ratingFilter, setRatingFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("");
+  const [eventName, setEventName] = useState("Loading...");
+
   useEffect(() => {
     const checkEventStatus = async () => {
       try {
         const response = await axiosInstance.get(`/events/ids/${eventId}`);
         const eventData = response.data?.data || response.data;
 
-        if (eventData && eventData.endDate) {
-          // So sánh thời gian hiện tại với ngày kết thúc sự kiện
-          const isEnded =
-            new Date().getTime() > new Date(eventData.endDate).getTime();
-          setIsEventEnded(isEnded);
+        if (eventData) {
+          // --- THÊM DÒNG NÀY ---
+          // Thay .name bằng .title hoặc .eventName tùy thuộc vào cấu trúc Backend của bạn trả về
+          setEventName(eventData.name || eventData.title || eventData.eventName || "Unknown Event");
+
+          if (eventData.endDate) {
+            const isEnded =
+              new Date().getTime() > new Date(eventData.endDate).getTime();
+            setIsEventEnded(isEnded);
+          }
         }
       } catch (error) {
         console.error("Lỗi khi kiểm tra thời gian sự kiện:", error);
+        setEventName("Unknown Event"); // Fallback nếu API lỗi
       }
     };
 
@@ -35,9 +48,81 @@ const FeedbackList = () => {
     }
   }, [eventId]);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  const listTopRef = useRef(null);
+  const feedbackItems = feedbacks?.feedbacks || [];
+
+  // --- LOGIC MỚI: Xử lý tìm kiếm và lọc dữ liệu ---
+  const filteredFeedbacks = useMemo(() => {
+    let result = feedbackItems;
+
+    // 1. Tìm kiếm theo tên hoặc email
+    if (searchTerm.trim() !== "") {
+      const lowerCaseSearch = searchTerm.toLowerCase();
+      result = result.filter(
+        (item) =>
+          item.userName?.toLowerCase().includes(lowerCaseSearch) ||
+          item.userEmail?.toLowerCase().includes(lowerCaseSearch)
+      );
+    }
+
+    // 2. Lọc theo số sao (Rating)
+    if (ratingFilter !== "all") {
+      result = result.filter((item) => item.rating === Number(ratingFilter));
+    }
+
+    // 3. Lọc theo ngày (Date)
+    if (dateFilter) {
+      result = result.filter((item) => {
+        const dateObj = new Date(item.createdAt);
+        // Định dạng ngày về YYYY-MM-DD để so sánh chuẩn xác với input date
+        const yyyy = dateObj.getFullYear();
+        const mm = String(dateObj.getMonth() + 1).padStart(2, "0");
+        const dd = String(dateObj.getDate()).padStart(2, "0");
+        const formattedItemDate = `${yyyy}-${mm}-${dd}`;
+        
+        return formattedItemDate === dateFilter;
+      });
+    }
+
+    return result;
+  }, [feedbackItems, searchTerm, ratingFilter, dateFilter]);
+
+  // Cập nhật lại số phân trang dựa trên danh sách đã lọc
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredFeedbacks.slice(indexOfFirstItem, indexOfLastItem);
+
+  // --- LOGIC MỚI: Reset trang về 1 khi người dùng thay đổi bộ lọc ---
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleRatingChange = (e) => {
+    setRatingFilter(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleDateChange = (e) => {
+    setDateFilter(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const onChangePage = (page) => {
+    setCurrentPage(page);
+
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
+    setTimeout(() => {
+      if (listTopRef.current) {
+        listTopRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    }, 100);
+  };
 
   if (isLoading) {
     return (
@@ -57,33 +142,9 @@ const FeedbackList = () => {
     );
   }
 
-  const eventName = feedbacks?.eventName || "Unknown Event";
-  const feedbackItems = feedbacks?.feedbacks || [];
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = feedbackItems.slice(indexOfFirstItem, indexOfLastItem);
-
-  const onChangePage = (page) => {
-    setCurrentPage(page);
-
-    if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
-    }
-
-    setTimeout(() => {
-      if (listTopRef.current) {
-        listTopRef.current.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
-    }, 100);
-  };
-
   return (
     <div className="p-10 w-full overflow-x-hidden">
-      {/*  header  */}
+      {/* --- HEADER --- */}
       <div className="flex justify-between items-end mb-8" ref={listTopRef}>
         <div>
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-900 tracking-tight mb-1 sm:mb-2">
@@ -98,7 +159,6 @@ const FeedbackList = () => {
         </div>
 
         <div className="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 w-full lg:w-auto">
-          {/* LOGIC MỚI: Ẩn/Hiện nút dựa trên isEventEnded */}
           {!isEventEnded ? (
             <Link
               to={`/organizer/feedback/createform/${eventId}`}
@@ -124,15 +184,58 @@ const FeedbackList = () => {
         </div>
       </div>
 
-      {/* --- SEARCH BAR --- */}
-      <div className="bg-white p-1.5 sm:p-2 rounded-xl sm:rounded-2xl shadow-sm mb-6 flex items-center justify-between border border-gray-100">
-        <div className="flex items-center px-3 sm:px-4 py-2 flex-1 gap-2 sm:gap-3">
-          <Search className="text-gray-300 w-4 h-4 sm:w-5 sm:h-5" />
+      {/* --- CẬP NHẬT: TOOLBAR TÌM KIẾM VÀ LỌC --- */}
+      <div className="bg-white p-2 rounded-xl sm:rounded-2xl shadow-sm mb-6 flex flex-col md:flex-row items-center justify-between border border-gray-100 gap-2 md:gap-4">
+        {/* Search Input */}
+        <div className="flex items-center px-3 sm:px-4 py-2 flex-1 gap-2 sm:gap-3 w-full border-b md:border-b-0 md:border-r border-gray-100">
+          <Search className="text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
           <input
             type="text"
-            placeholder="Search by name, email or content..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            placeholder="Search by name or email..."
             className="w-full outline-none text-gray-700 placeholder-gray-400 text-xs sm:text-sm font-medium h-full bg-transparent"
           />
+        </div>
+
+        {/* Filter Container */}
+        <div className="flex items-center gap-4 px-3 py-1 w-full md:w-auto overflow-x-auto">
+          {/* Rating Filter */}
+          <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100 whitespace-nowrap">
+            <Filter className="text-gray-400 w-4 h-4" />
+            <select
+              value={ratingFilter}
+              onChange={handleRatingChange}
+              className="outline-none text-xs sm:text-sm font-medium text-gray-600 bg-transparent cursor-pointer"
+            >
+              <option value="all">All Ratings</option>
+              <option value="5">5 Stars</option>
+              <option value="4">4 Stars</option>
+              <option value="3">3 Stars</option>
+              <option value="2">2 Stars</option>
+              <option value="1">1 Star</option>
+            </select>
+          </div>
+
+          {/* Date Filter */}
+          <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100 whitespace-nowrap">
+            <Calendar className="text-gray-400 w-4 h-4" />
+            <input
+              type="date"
+              value={dateFilter}
+              onChange={handleDateChange}
+              className="outline-none text-xs sm:text-sm font-medium text-gray-600 bg-transparent cursor-pointer"
+            />
+            {/* Nút xóa ngày lọc nhanh */}
+            {dateFilter && (
+              <button 
+                onClick={() => {setDateFilter(""); setCurrentPage(1);}}
+                className="ml-1 text-gray-400 hover:text-red-500 font-bold"
+              >
+                ×
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -160,15 +263,15 @@ const FeedbackList = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {feedbackItems.length === 0 ? (
+              {filteredFeedbacks.length === 0 ? (
                 <tr>
                   <td colSpan="5" className="text-center py-16 sm:py-20">
                     <div className="flex flex-col items-center justify-center">
                       <p className="text-gray-400 font-medium text-base sm:text-lg">
-                        No feedbacks received yet.
+                        No feedbacks found.
                       </p>
                       <p className="text-gray-300 text-xs sm:text-sm mt-1">
-                        Wait for attendees to share their thoughts!
+                        Try adjusting your search or filters.
                       </p>
                     </div>
                   </td>
@@ -207,7 +310,11 @@ const FeedbackList = () => {
                         {[...Array(5)].map((_, i) => (
                           <span
                             key={i}
-                            className={`${i < item.rating ? "text-yellow-400" : "text-gray-200"} text-sm sm:text-base`}
+                            className={`${
+                              i < item.rating
+                                ? "text-yellow-400"
+                                : "text-gray-200"
+                            } text-sm sm:text-base`}
                           >
                             ★
                           </span>
@@ -234,19 +341,20 @@ const FeedbackList = () => {
           </table>
         </div>
 
+        {/* --- CẬP NHẬT: Đổi tổng số response thành số lượng đã lọc --- */}
         <div className="px-8 py-6 border-t border-gray-50 flex flex-col sm:flex-row justify-between items-center gap-4 bg-gray-50/50">
           <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest">
             Total Responses:{" "}
-            <span className="text-gray-700">{feedbackItems.length}</span>
+            <span className="text-gray-700">{filteredFeedbacks.length}</span>
           </p>
-          {feedbackItems.length > itemsPerPage && (
+          {filteredFeedbacks.length > itemsPerPage && (
             <Pagination
               align="center"
               responsive
               current={currentPage}
               pageSize={itemsPerPage}
               showSizeChanger={false}
-              total={feedbackItems.length}
+              total={filteredFeedbacks.length}
               onChange={onChangePage}
             />
           )}
