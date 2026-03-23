@@ -59,12 +59,12 @@ public class OrganizerEventService {
         LocalDateTime endDateTime = parseDateTime(request.getEndDate(), request.getEndTime());
 
         if (endDateTime.isBefore(startDateTime)) {
-            throw new BadRequestException("End date/time must be after start date/time");
+            throw new BadRequestException("End time must be after start time");
         }
 
-        //start date > now
+        //start time > now
         if (!request.isDraft() && startDateTime.isBefore(LocalDateTime.now())) {
-            throw new BadRequestException("Start date/time must be in the future");
+            throw new BadRequestException("Step 1: Start time must be after now");
         }
 
         String bannerUrl = null;
@@ -141,8 +141,12 @@ public class OrganizerEventService {
         if (request.getAgenda() != null && !request.getAgenda().isEmpty()) {
             int order = 0;
             for (CreateEventRequest.AgendaRequest agendaReq : request.getAgenda()) {
-                LocalDateTime agendaStart = parseDateTime(request.getStartDate(), agendaReq.getStartTime());
-                LocalDateTime agendaEnd = parseDateTime(request.getStartDate(), agendaReq.getEndTime());
+                LocalDateTime agendaStart = parseDateTime(
+                        agendaReq.getDate() != null ? agendaReq.getDate() : request.getStartDate(),
+                        agendaReq.getStartTime());
+                LocalDateTime agendaEnd = parseDateTime(
+                        agendaReq.getDate() != null ? agendaReq.getDate() : request.getStartDate(),
+                        agendaReq.getEndTime());
 
                 EventAgenda agenda = EventAgenda.builder()
                         .event(event)
@@ -366,8 +370,12 @@ public class OrganizerEventService {
         if (request.getAgenda() != null && !request.getAgenda().isEmpty()) {
             int order = 0;
             for (CreateEventRequest.AgendaRequest agendaReq : request.getAgenda()) {
-                LocalDateTime agendaStart = parseDateTime(request.getStartDate(), agendaReq.getStartTime());
-                LocalDateTime agendaEnd = parseDateTime(request.getStartDate(), agendaReq.getEndTime());
+                LocalDateTime agendaStart = parseDateTime(
+                        agendaReq.getDate() != null ? agendaReq.getDate() : request.getStartDate(),
+                        agendaReq.getStartTime());
+                LocalDateTime agendaEnd = parseDateTime(
+                        agendaReq.getDate() != null ? agendaReq.getDate() : request.getStartDate(),
+                        agendaReq.getEndTime());
 
                 EventAgenda agenda = EventAgenda.builder()
                         .event(event)

@@ -424,7 +424,10 @@ const MyEventsPage = () => {
                                             </button>
                                         </>
                                     ) : (
-                                        <button className="text-sm text-[#7FA5A5] hover:text-[#5d8585] font-medium transition-colors cursor-pointer">
+                                        <button
+                                            onClick={() => navigate(`/organizer/events/${event.eventId}`)}
+                                            className="text-sm text-[#7FA5A5] hover:text-[#5d8585] font-medium transition-colors cursor-pointer"
+                                        >
                                             Manage
                                         </button>
                                     )}
