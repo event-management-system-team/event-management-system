@@ -12,6 +12,7 @@ import {
   LogOut,
   Lock,
   BarChart3,
+  BarChart2,
   UserCheck,
 } from "lucide-react";
 
@@ -100,12 +101,14 @@ const Sidebar = () => {
   const eventDashboardLink  = eventId ? `/organizer/events/${eventId}` : null;
   const attendeesLink       = eventId ? `/organizer/events/${eventId}/attendees` : null;
   const feedbackLink        = eventId ? `/organizer/feedback/feedbacklist/${eventId}` : null;
+  const analyticsLink       = eventId ? `/organizer/feedback/analytics/${eventId}` : null;
   const recruitmentLink     = eventId ? `/organizer/recruitmentlist/${eventId}` : null;
   const staffLink           = eventId ? `/organizer/events/${eventId}/staff` : null;
   
   // Active states
   const isEventDashboardActive  = eventId ? location.pathname === `/organizer/events/${eventId}` : false;
   const isAttendeesActive       = location.pathname.includes("/attendees");
+  const isAnalyticsActive       = location.pathname.includes("/feedback/analytics");
 
   // User display — backend trả snake_case: full_name, avatar_url, email
   const displayName = user?.full_name || user?.fullName || user?.name || user?.email || "Organizer";
@@ -187,9 +190,15 @@ const Sidebar = () => {
         )}
 
         {feedbackLink ? (
-          <NavItem to={feedbackLink} icon={<MessageSquare size={20} />} label="Feedback" isActive={isFeedbackActive} />
+          <NavItem to={feedbackLink} icon={<MessageSquare size={20} />} label="Feedback" isActive={isFeedbackActive && !isAnalyticsActive} />
         ) : (
           <DisabledNavItem icon={<MessageSquare size={20} />} label="Feedback" />
+        )}
+
+        {analyticsLink ? (
+          <NavItem to={analyticsLink} icon={<BarChart2 size={20} />} label="Feedback Analytics" isActive={isAnalyticsActive} />
+        ) : (
+          <DisabledNavItem icon={<BarChart2 size={20} />} label="Feedback Analytics" />
         )}
 
         {recruitmentLink ? (

@@ -71,14 +71,9 @@ const useCreateRecruitment = (preselectedEventId = "") => {
         form.eventId,
         buildPayload("DRAFT"),
       );
-<<<<<<< HEAD
       // Navigate về recruitment list của event vừa tạo
       navigate(`/organizer/recruitmentlist/${form.eventId}`);
     } catch (err) {
-=======
-    navigate(`/organizer/recruitmentlist/${form.eventId}`);    
-  } catch (err) {
->>>>>>> develop
       setError(err?.response?.data?.message || "Failed to save draft.");
     } finally {
       setSaving(false);

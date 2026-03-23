@@ -1,5 +1,7 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { useFeedbackAnalytics } from "../../hooks/useFeedbackAnalytics";
+import axiosInstance from "../../config/axios";
 
 import StatCards from "../../components/domain/feedback-analytic/StatCards";
 import RatingBarChart from "../../components/domain/feedback-analytic/RatingBarChart";
@@ -8,6 +10,17 @@ import ReviewsList from "../../components/domain/feedback-analytic/ReviewsList";
 export default function AnalyticsPage() {
   const { eventId } = useParams();
   const { analytics, isLoading, isError } = useFeedbackAnalytics(eventId);
+  const [eventName, setEventName] = useState("");
+
+  useEffect(() => {
+    if (!eventId) return;
+    axiosInstance.get(`/organizer/events/${eventId}`)
+      .then((res) => {
+        const data = res.data?.data || res.data;
+        setEventName(data?.eventName || data?.name || "This Event");
+      })
+      .catch(() => setEventName("This Event"));
+  }, [eventId]);
 
   return (
     <div className="p-4 md:p-8 lg:p-10 w-full space-y-4 md:space-y-6">
@@ -19,20 +32,23 @@ export default function AnalyticsPage() {
             <p className="text-gray-500 text-sm mt-1">
               Analytic Dashboard for{" "}
               <span className="text-[#89A8B2] font-semibold">
-                Annual Tech Summit 2023
+                {eventName || "..."}
               </span>
             </p>
           </div>
           <div className="flex gap-2">
-            <button className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-semibold hover:bg-gray-50 shadow-sm">
-              ↓ Export
-            </button>
-            <button
-              onClick={() => console.log("Create Feedback Form")}
+            <Link
+              to={`/organizer/feedback/feedbacklist/${eventId}`}
+              className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-semibold hover:bg-gray-50 shadow-sm"
+            >
+              View All Feedback
+            </Link>
+            <Link
+              to={`/organizer/feedback/createform/${eventId}`}
               className="px-5 py-2 bg-[#89A8B2] text-white rounded-full text-sm font-bold hover:opacity-90 shadow-md"
             >
               + Create Feedback Form
-            </button>
+            </Link>
           </div>
         </div>
 

@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 import React, { useState, useEffect, useRef } from "react";
-import { Eye, Search, Download, Plus, Lock } from "lucide-react";
-=======
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import { Eye, Search, Plus, Lock, Filter, Calendar } from "lucide-react";
->>>>>>> develop
+import { Eye, Search, Filter, Calendar, Plus, Lock } from "lucide-react";
 import { useFeedbacks } from "../../hooks/useFeedback";
 import { Link, useParams } from "react-router-dom";
 import { Pagination } from "antd";
@@ -14,25 +9,11 @@ const FeedbackList = () => {
   const { eventId } = useParams();
   const { data: feedbacks, isLoading, isError } = useFeedbacks(eventId);
 
-<<<<<<< HEAD
   // STATE: Quản lý trạng thái kết thúc và tên event
   const [isEventEnded, setIsEventEnded] = useState(false);
   const [eventName, setEventName] = useState("");
 
   // EFFECT: Gọi API lấy chi tiết Event để check endDate và lấy tên event
-=======
-  const [isEventEnded, setIsEventEnded] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  const listTopRef = useRef(null);
-
-  // --- STATE MỚI: Quản lý các bộ lọc ---
-  const [searchTerm, setSearchTerm] = useState("");
-  const [ratingFilter, setRatingFilter] = useState("all");
-  const [dateFilter, setDateFilter] = useState("");
-  const [eventName, setEventName] = useState("Loading...");
-
->>>>>>> develop
   useEffect(() => {
     const checkEventStatus = async () => {
       try {
@@ -40,18 +21,11 @@ const FeedbackList = () => {
         const eventData = response.data?.data || response.data;
 
         if (eventData) {
-<<<<<<< HEAD
           // Lấy tên event
           if (eventData.eventName || eventData.name) {
             setEventName(eventData.eventName || eventData.name);
           }
           // Check nếu event đã kết thúc
-=======
-          // --- THÊM DÒNG NÀY ---
-          // Thay .name bằng .title hoặc .eventName tùy thuộc vào cấu trúc Backend của bạn trả về
-          setEventName(eventData.name || eventData.title || eventData.eventName || "Unknown Event");
-
->>>>>>> develop
           if (eventData.endDate) {
             const isEnded =
               new Date().getTime() > new Date(eventData.endDate).getTime();
@@ -69,88 +43,29 @@ const FeedbackList = () => {
     }
   }, [eventId]);
 
-<<<<<<< HEAD
+
+  // STATE: Filter & Search
+  const [searchTerm, setSearchTerm] = useState("");
+  const [ratingFilter, setRatingFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const listTopRef = useRef(null);
-=======
-  const feedbackItems = feedbacks?.feedbacks || [];
 
-  // --- LOGIC MỚI: Xử lý tìm kiếm và lọc dữ liệu ---
-  const filteredFeedbacks = useMemo(() => {
-    let result = feedbackItems;
-
-    // 1. Tìm kiếm theo tên hoặc email
-    if (searchTerm.trim() !== "") {
-      const lowerCaseSearch = searchTerm.toLowerCase();
-      result = result.filter(
-        (item) =>
-          item.userName?.toLowerCase().includes(lowerCaseSearch) ||
-          item.userEmail?.toLowerCase().includes(lowerCaseSearch)
-      );
-    }
-
-    // 2. Lọc theo số sao (Rating)
-    if (ratingFilter !== "all") {
-      result = result.filter((item) => item.rating === Number(ratingFilter));
-    }
-
-    // 3. Lọc theo ngày (Date)
-    if (dateFilter) {
-      result = result.filter((item) => {
-        const dateObj = new Date(item.createdAt);
-        // Định dạng ngày về YYYY-MM-DD để so sánh chuẩn xác với input date
-        const yyyy = dateObj.getFullYear();
-        const mm = String(dateObj.getMonth() + 1).padStart(2, "0");
-        const dd = String(dateObj.getDate()).padStart(2, "0");
-        const formattedItemDate = `${yyyy}-${mm}-${dd}`;
-        
-        return formattedItemDate === dateFilter;
-      });
-    }
-
-    return result;
-  }, [feedbackItems, searchTerm, ratingFilter, dateFilter]);
-
-  // Cập nhật lại số phân trang dựa trên danh sách đã lọc
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredFeedbacks.slice(indexOfFirstItem, indexOfLastItem);
-
-  // --- LOGIC MỚI: Reset trang về 1 khi người dùng thay đổi bộ lọc ---
+  // HANDLERS
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
   };
-
   const handleRatingChange = (e) => {
     setRatingFilter(e.target.value);
     setCurrentPage(1);
   };
-
   const handleDateChange = (e) => {
     setDateFilter(e.target.value);
     setCurrentPage(1);
   };
-
-  const onChangePage = (page) => {
-    setCurrentPage(page);
-
-    if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
-    }
-
-    setTimeout(() => {
-      if (listTopRef.current) {
-        listTopRef.current.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
-    }, 100);
-  };
->>>>>>> develop
 
   if (isLoading) {
     return (
@@ -170,13 +85,26 @@ const FeedbackList = () => {
     );
   }
 
-<<<<<<< HEAD
   const resolvedEventName = eventName || feedbacks?.eventName || "Event";
   const feedbackItems = feedbacks?.feedbacks || [];
 
+  // COMPUTE: filteredFeedbacks
+  const filteredFeedbacks = feedbackItems.filter((item) => {
+    const matchesSearch =
+      !searchTerm ||
+      item.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.userEmail?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRating =
+      ratingFilter === "all" || item.rating === Number(ratingFilter);
+    const matchesDate =
+      !dateFilter ||
+      new Date(item.createdAt).toLocaleDateString("en-CA") === dateFilter;
+    return matchesSearch && matchesRating && matchesDate;
+  });
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = feedbackItems.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredFeedbacks.slice(indexOfFirstItem, indexOfLastItem);
 
   const onChangePage = (page) => {
     setCurrentPage(page);
@@ -195,8 +123,6 @@ const FeedbackList = () => {
     }, 100);
   };
 
-=======
->>>>>>> develop
   return (
     <div className="p-10 w-full overflow-x-hidden">
       {/* --- HEADER --- */}
