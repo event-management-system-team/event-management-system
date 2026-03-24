@@ -1,30 +1,29 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../admin/Avatar";
 import { Badge } from "../admin/Badge";
 import { Card, CardContent } from "../admin/Card";
-import { adminService } from "../../../services/admin.service";
 import dayjs from "dayjs";
 
-const EventPerformanceList = ({ searchTerm, status, category, date, sortOption, onLoading, onError, formatVND, formatNumber }) => {
-    const [events, setEvents] = useState([])
+const EventPerformanceList = ({ events, searchTerm, status, category, date, sortOption, formatVND, formatNumber }) => {
+    // const [events, setEvents] = useState([])
 
-    const fetchData = async () => {
-        try {
-            onLoading(true)
-            const response = await adminService.getEventAnalytics()
+    // const fetchData = async () => {
+    //     try {
+    //         onLoading(true)
+    //         const response = await adminService.getEventAnalytics()
 
-            setEvents(response.data)
-        } catch (error) {
-            onError("Cannot load event analytics");
-            console.error(error)
-        } finally {
-            onLoading(false)
-        }
-    }
+    //         setEvents(response.data)
+    //     } catch (error) {
+    //         onError("Cannot load event analytics");
+    //         console.error(error)
+    //     } finally {
+    //         onLoading(false)
+    //     }
+    // }
 
-    useEffect(() => {
-        fetchData()
-    }, [])
+    // useEffect(() => {
+    //     fetchData()
+    // }, [])
 
     const processedEvents = useMemo(() => {
         let list = [...events];

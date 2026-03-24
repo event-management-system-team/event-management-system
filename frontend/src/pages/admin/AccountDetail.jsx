@@ -16,6 +16,8 @@ import { adminService } from "../../services/admin.service.js";
 import { Alert } from "../../components/common/Alert.jsx";
 import { useAlert } from '../../hooks/useAlert.js';
 import { Popconfirm } from 'antd';
+import LoadingState from '../../components/common/LoadingState.jsx';
+import EmptyState from '../../components/common/EmptyState.jsx';
 
 export function AccountDetail() {
     const { id } = useParams();
@@ -130,9 +132,8 @@ export function AccountDetail() {
         return `${datePart} at ${timePart}`;
     }
 
-    if (loading) return <div className="absolute top-0 left-0 w-full h-1 bg-blue-500 animate-pulse z-10" />
-    if (error) return <div>Something went wrong: {error}</div>;
-    if (!account) return <div>Cannot find account detail.</div>;
+    if (loading) return <LoadingState />
+    if (error || !account) return <EmptyState className='h-[600px]' />
 
     return (
         <div className="flex h-screen bg-[#F1F0E8]">

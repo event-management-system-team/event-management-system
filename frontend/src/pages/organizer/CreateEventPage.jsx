@@ -267,6 +267,7 @@ const Step1BasicInfo = ({ form, onChange, errors = {} }) => {
                             onChange={(date) => onChange({ startDate: date })}
                             dateFormat="dd/MM/yyyy"
                             placeholderText="dd/mm/yyyy"
+                            minDate={new Date()}
                             className={`w-full px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 transition ${errors.startDate ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
                             wrapperClassName="w-full"
                         />
@@ -588,6 +589,7 @@ const ToggleSetting = ({ icon, title, description, checked, onChange }) => (
 // ─────────────────────────────────────────────
 const emptyAgendaItem = () => ({
     title: '',
+    date: null,
     startTime: '',
     endTime: '',
     location: '',
@@ -596,6 +598,10 @@ const emptyAgendaItem = () => ({
 });
 
 const Step3Agenda = ({ form, onChange, errors = {} }) => {
+    // Check if event spans multiple days
+    const isMultiDay = form.startDate && form.endDate &&
+        dayjs(form.endDate).startOf('day').diff(dayjs(form.startDate).startOf('day'), 'day') >= 1;
+
     const addItem = () => {
         onChange({ agenda: [...form.agenda, emptyAgendaItem()] });
     };
@@ -669,6 +675,30 @@ const Step3Agenda = ({ form, onChange, errors = {} }) => {
                                 />
                                 <FieldError msg={errors[`agenda_${idx}_title`]} />
                             </div>
+
+                            {/* Session Date — only show for multi-day events */}
+                            {isMultiDay && (
+                                <div className="mb-3">
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                                        <Calendar size={11} className="inline mr-1 text-[#4a9e9e]" />
+                                        Session Date <span className="text-red-400">*</span>
+                                    </label>
+                                    <DatePicker
+                                        selected={item.date}
+                                        onChange={(date) => handleChange(idx, 'date', date)}
+                                        dateFormat="dd/MM/yyyy"
+                                        placeholderText="Select session date"
+                                        minDate={form.startDate}
+                                        maxDate={form.endDate}
+                                        className={`w-full px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 transition bg-white ${errors[`agenda_${idx}_date`]
+                                            ? 'border-red-400 focus:ring-red-200'
+                                            : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'
+                                            }`}
+                                        wrapperClassName="w-full"
+                                    />
+                                    <FieldError msg={errors[`agenda_${idx}_date`]} />
+                                </div>
+                            )}
 
                             {/* Time row */}
                             <div className="grid grid-cols-2 gap-3 mb-3">
@@ -827,7 +857,7 @@ const SuccessScreen = ({ form, isEditMode }) => {
         </div>
     );
 };
-``
+
 // ─────────────────────────────────────────────
 // MAIN COMPONENT
 // ─────────────────────────────────────────────
@@ -861,10 +891,20 @@ const validateStep1 = (form) => {
     if (!form.categoryId) e.categoryId = 'Please select a category';
     if (!form.description.trim()) e.description = 'Description is required';
     if (!form.startDate) e.startDate = 'Start date is required';
+    else if (dayjs(form.startDate).startOf('day').isBefore(dayjs().startOf('day')))
+        e.startDate = 'Start date must be today or later';
     if (!form.endDate) e.endDate = 'End date is required';
-    else if (form.startDate && form.endDate.getTime() < form.startDate.getTime()) e.endDate = 'End date must be after start date';
+    else if (form.startDate && dayjs(form.endDate).startOf('day').isBefore(dayjs(form.startDate).startOf('day')))
+        e.endDate = 'End date cannot be before start date';
     if (!form.startTime) e.startTime = 'Start time is required';
     if (!form.endTime) e.endTime = 'End time is required';
+    // Same-day event: endTime must be after startTime
+    if (form.startDate && form.endDate && form.startTime && form.endTime) {
+        const sameDay = dayjs(form.endDate).startOf('day').diff(dayjs(form.startDate).startOf('day'), 'day') === 0;
+        if (sameDay && form.endTime <= form.startTime) {
+            e.endTime = 'End time must be after start time for same-day events';
+        }
+    }
     if (!form.location.trim()) e.location = 'Venue address is required';
     return e;
 };
@@ -889,20 +929,38 @@ const validateStep3 = (form) => {
     if (form.agenda.length === 0) {
         e._agenda = 'At least one session is required';
     }
+    const isMultiDay = form.startDate && form.endDate &&
+        dayjs(form.endDate).startOf('day').diff(dayjs(form.startDate).startOf('day'), 'day') >= 1;
     const eventStart = form.startTime;
     const eventEnd = form.endTime;
+
     form.agenda.forEach((item, idx) => {
         if (!item.title.trim()) e[`agenda_${idx}_title`] = 'Session title is required';
+
+        // Date validation for multi-day events
+        if (isMultiDay) {
+            if (!item.date) {
+                e[`agenda_${idx}_date`] = 'Session date is required';
+            } else {
+                const sessionDate = dayjs(item.date).startOf('day');
+                const start = dayjs(form.startDate).startOf('day');
+                const end = dayjs(form.endDate).startOf('day');
+                if (sessionDate.isBefore(start) || sessionDate.isAfter(end)) {
+                    e[`agenda_${idx}_date`] = 'Session date must be within event dates';
+                }
+            }
+        }
+
         if (!item.startTime) {
             e[`agenda_${idx}_startTime`] = 'Start time is required';
-        } else if (eventStart && item.startTime < eventStart) {
+        } else if (!isMultiDay && eventStart && item.startTime < eventStart) {
             e[`agenda_${idx}_startTime`] = `Must be at or after event start time (${eventStart})`;
         }
         if (!item.endTime) {
             e[`agenda_${idx}_endTime`] = 'End time is required';
         } else if (item.startTime && item.endTime <= item.startTime) {
             e[`agenda_${idx}_endTime`] = 'End time must be after start time';
-        } else if (eventEnd && item.endTime > eventEnd) {
+        } else if (!isMultiDay && eventEnd && item.endTime > eventEnd) {
             e[`agenda_${idx}_endTime`] = `Must be at or before event end time (${eventEnd})`;
         }
     });
@@ -920,6 +978,17 @@ const CreateEventPage = () => {
     const [loadingEvent, setLoadingEvent] = useState(false);
     const [error, setError] = useState(null);
     const [errors, setErrors] = useState({});
+
+
+    const scrollToFirstError = (errs) => {
+        setTimeout(() => {
+            const firstErrEl = document.querySelector('.border-red-400, [class*="border-red"]');
+            if (firstErrEl) {
+                firstErrEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstErrEl.focus?.();
+            }
+        }, 100);
+    };
 
     const updateForm = (partial) => setForm((prev) => ({ ...prev, ...partial }));
 
@@ -960,6 +1029,7 @@ const CreateEventPage = () => {
                     agenda: data.agendas?.length > 0
                         ? data.agendas.map((a) => ({
                             title: a.title || '',
+                            date: a.date ? new Date(a.date) : null,
                             startTime: a.startTime || '',
                             endTime: a.endTime || '',
                             location: a.location || '',
@@ -1001,14 +1071,22 @@ const CreateEventPage = () => {
             })),
         isFree: form.isFree,
         totalCapacity: form.isFree ? (parseInt(form.totalCapacity, 10) || 0) : undefined,
-        agenda: form.agenda.map((item) => ({
-            title: item.title,
-            startTime: item.startTime,
-            endTime: item.endTime,
-            description: item.description || '',
-            location: item.location || '',
-            speaker: item.speaker || '',
-        })),
+        agenda: form.agenda.map((item) => {
+            const isMultiDay = form.startDate && form.endDate &&
+                dayjs(form.endDate).startOf('day').diff(dayjs(form.startDate).startOf('day'), 'day') >= 1;
+            const sessionDate = isMultiDay && item.date
+                ? dayjs(item.date).format('YYYY-MM-DD')
+                : dayjs(form.startDate).format('YYYY-MM-DD');
+            return {
+                title: item.title,
+                date: sessionDate,
+                startTime: item.startTime,
+                endTime: item.endTime,
+                description: item.description || '',
+                location: item.location || '',
+                speaker: item.speaker || '',
+            };
+        }),
         draft: isDraft,
     });
 
@@ -1032,7 +1110,12 @@ const CreateEventPage = () => {
 
     const handleContinue = () => {
         const e = validateStep1(form);
-        if (Object.keys(e).length > 0) { setErrors(e); return; }
+        if (Object.keys(e).length > 0) {
+            setErrors(e);
+            showToast(`Please fix ${Object.keys(e).length} error(s) before continuing`);
+            scrollToFirstError(e);
+            return;
+        }
         setErrors({});
         setError(null);
         setStep(2);
@@ -1049,7 +1132,12 @@ const CreateEventPage = () => {
     // Step 2 → Step 3
     const handleContinueToAgenda = () => {
         const e = validateStep2(form);
-        if (Object.keys(e).length > 0) { setErrors(e); return; }
+        if (Object.keys(e).length > 0) {
+            setErrors(e);
+            showToast(`Please fix ${Object.keys(e).length} error(s) before continuing`);
+            scrollToFirstError(e);
+            return;
+        }
         setErrors({});
         setError(null);
         setStep(3);
@@ -1059,7 +1147,12 @@ const CreateEventPage = () => {
     // Step 3 → Submit
     const handleSubmitFinal = async () => {
         const e = validateStep3(form);
-        if (Object.keys(e).length > 0) { setErrors(e); return; }
+        if (Object.keys(e).length > 0) {
+            setErrors(e);
+
+            scrollToFirstError(e);
+            return;
+        }
         setErrors({});
         setSaving(true);
         setError(null);
@@ -1140,8 +1233,8 @@ const CreateEventPage = () => {
                 <StepIndicator currentStep={step} />
 
                 {step === 1 && <Step1BasicInfo form={form} onChange={(v) => { updateForm(v); setErrors((prev) => { const k = Object.keys(v)[0]; const n = { ...prev }; delete n[k]; return n; }); }} errors={errors} />}
-                {step === 2 && <Step2Tickets form={form} onChange={updateForm} errors={errors} />}
-                {step === 3 && <Step3Agenda form={form} onChange={updateForm} errors={errors} />}
+                {step === 2 && <Step2Tickets form={form} onChange={(v) => { updateForm(v); setErrors((prev) => { const n = { ...prev }; Object.keys(v).forEach((k) => { if (k === 'tickets') { Object.keys(n).forEach((ek) => { if (ek.startsWith('ticket_')) delete n[ek]; }); } else { delete n[k]; } }); return n; }); }} errors={errors} />}
+                {step === 3 && <Step3Agenda form={form} onChange={(v) => { updateForm(v); setErrors((prev) => { const n = { ...prev }; Object.keys(v).forEach((k) => { if (k === 'agenda') { Object.keys(n).forEach((ek) => { if (ek.startsWith('agenda_') || ek === '_agenda') delete n[ek]; }); } }); return n; }); }} errors={errors} />}
 
                 {error && (
                     <div className="mt-4 flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
@@ -1149,6 +1242,8 @@ const CreateEventPage = () => {
                         {error}
                     </div>
                 )}
+
+
 
                 {/* Footer actions */}
                 <div className="flex items-center justify-between mt-6">
