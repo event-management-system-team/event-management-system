@@ -2,6 +2,7 @@ package com.eventmanagement.backend.service.organizer;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -30,8 +31,8 @@ public class ApplicationServiceOrganizer {
     @Autowired
     private final StaffApplicationRepository staffapplicationRepository;
     @Autowired
-    private EventStaffRepository eventStaffRepository;
-    private RecruitmentRepository recruitmentRepository;
+    private final EventStaffRepository eventStaffRepository;
+    private final RecruitmentRepository recruitmentRepository;
 
 
     @Transactional(readOnly = true)
@@ -39,11 +40,15 @@ public class ApplicationServiceOrganizer {
         List<StaffApplication> applications = staffapplicationRepository.findByRecruitment_RecruitmentId(recruitmentId);
 
         return applications.stream().map(app -> {
-            String coverLetter = null;
-            String resume = null;
+            String cvUrl = null;
+            Map<String, Object> customAnswers = null;
             if (app.getApplicationData() != null) {
-                coverLetter = (String) app.getApplicationData().get("coverLetter");
-                resume = (String) app.getApplicationData().get("resume");
+                cvUrl = (String) app.getApplicationData().get("cvUrl");
+                // Lấy tất cả field trừ cvUrl làm custom answers
+                customAnswers = app.getApplicationData().entrySet().stream()
+                        .filter(e -> !"cvUrl".equals(e.getKey()))
+                        .collect(java.util.stream.Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                if (customAnswers.isEmpty()) customAnswers = null;
             }
 
             return ApplicationResponseDTO.builder()
@@ -53,9 +58,9 @@ public class ApplicationServiceOrganizer {
                     .phone(app.getUser().getPhone())
                     .avatar(app.getUser().getAvatarUrl())
                     .position(app.getRecruitment().getPositionName())
-                    .resume(resume)
-                    .coverLetter(coverLetter)
-                    .status(app.getApplicationStatus() != null ? app.getApplicationStatus().name() : null) // Đã sửa thành getApplicationStatus()
+                    .cvUrl(cvUrl)
+                    .customAnswers(customAnswers)
+                    .status(app.getApplicationStatus() != null ? app.getApplicationStatus().name() : null)
                     .appliedAt(app.getAppliedAt())
                     .reviewedAt(app.getReviewedAt())
                     .createdAt(app.getCreatedAt())
@@ -64,6 +69,40 @@ public class ApplicationServiceOrganizer {
         }).collect(Collectors.toList());
 
     }
+
+    @Transactional(readOnly = true)
+    public List<ApplicationResponseDTO> getApplicationsByEvent(UUID eventId) {
+        List<StaffApplication> applications = staffapplicationRepository.findByRecruitment_Event_EventId(eventId);
+
+        return applications.stream().map(app -> {
+            String cvUrl = null;
+            Map<String, Object> customAnswers = null;
+            if (app.getApplicationData() != null) {
+                cvUrl = (String) app.getApplicationData().get("cvUrl");
+                customAnswers = app.getApplicationData().entrySet().stream()
+                        .filter(e -> !"cvUrl".equals(e.getKey()))
+                        .collect(java.util.stream.Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                if (customAnswers.isEmpty()) customAnswers = null;
+            }
+
+            return ApplicationResponseDTO.builder()
+                    .id(app.getApplicationId())
+                    .name(app.getUser().getFullName())
+                    .email(app.getUser().getEmail())
+                    .phone(app.getUser().getPhone())
+                    .avatar(app.getUser().getAvatarUrl())
+                    .position(app.getRecruitment().getPositionName())
+                    .cvUrl(cvUrl)
+                    .customAnswers(customAnswers)
+                    .status(app.getApplicationStatus() != null ? app.getApplicationStatus().name() : null)
+                    .appliedAt(app.getAppliedAt())
+                    .reviewedAt(app.getReviewedAt())
+                    .createdAt(app.getCreatedAt())
+                    .updatedAt(app.getUpdatedAt())
+                    .build();
+        }).collect(Collectors.toList());
+    }
+
 
 
     @Transactional
@@ -118,12 +157,15 @@ public class ApplicationServiceOrganizer {
         StaffApplication app = staffapplicationRepository.findByApplicationId(applicationId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn ứng tuyển này"));
 
-        String coverLetter = null;
-        String resume = null;
+        String cvUrl = null;
+        Map<String, Object> customAnswers = null;
 
         if (app.getApplicationData() != null) {
-            coverLetter = (String) app.getApplicationData().get("coverLetter");
-            resume = (String) app.getApplicationData().get("resume");
+            cvUrl = (String) app.getApplicationData().get("cvUrl");
+            customAnswers = app.getApplicationData().entrySet().stream()
+                    .filter(e -> !"cvUrl".equals(e.getKey()))
+                    .collect(java.util.stream.Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            if (customAnswers.isEmpty()) customAnswers = null;
         }
         return ApplicationResponseDTO.builder()
                 .id(app.getApplicationId())
@@ -132,8 +174,8 @@ public class ApplicationServiceOrganizer {
                 .phone(app.getUser().getPhone())
                 .avatar(app.getUser().getAvatarUrl())
                 .position(app.getRecruitment().getPositionName())
-                .resume(resume)
-                .coverLetter(coverLetter)
+                .cvUrl(cvUrl)
+                .customAnswers(customAnswers)
                 .status(app.getApplicationStatus() != null ? app.getApplicationStatus().name() : null)
                 .appliedAt(app.getAppliedAt())
                 .build();

@@ -14,6 +14,7 @@ import {
   BarChart3,
   BarChart2,
   UserCheck,
+  ClipboardList,
 } from "lucide-react";
 
 const extractEventId = (pathname) => {
@@ -26,26 +27,31 @@ const extractEventId = (pathname) => {
     /\/organizer\/recruitmentcreate\/([^/]+)/,
     /\/organizer\/recruitment-post\/([^/]+)/,
     /\/organizer\/edit-event\/([^/]+)/,
+    /\/organizer\/applications\/event\/([^/]+)/,
   ];
   for (const pattern of patterns) {
     const m = pathname.match(pattern);
-    if (m) return m[1];
+    if (m) {
+      sessionStorage.setItem("sidebar_eventId", m[1]);
+      return m[1];
+    }
   }
+  // Fallback: keep sidebar unlocked on sub-pages (e.g. /applications/:recruitmentId)
+  // that don't carry eventId in the URL
+  const subPagePatterns = [
+    /\/organizer\/applications\/([^/]+)/,
+    /\/organizer\/recruitments\/([^/]+)/,
+    /\/organizer\/feedback\/([^/]+)/,
+  ];
+  const isSubPage = subPagePatterns.some((p) => p.test(pathname));
+  if (isSubPage) {
+    return sessionStorage.getItem("sidebar_eventId") || null;
+  }
+  // On top-level pages (dashboard, my-events) clear the stored id
+  sessionStorage.removeItem("sidebar_eventId");
   return null;
 };
 
-// Trích xuất recruitmentId từ các URL liên quan
-const extractRecruitmentId = (pathname) => {
-  const patterns = [
-    /\/organizer\/recruitments\/([^/]+)/,
-    /\/organizer\/applications\/([^/]+)/,
-  ];
-  for (const pattern of patterns) {
-    const m = pathname.match(pattern);
-    if (m) return m[1];
-  }
-  return null;
-};
 
 // ── NavItem ────────────────────────────────────────────────────────────────
 const NavItem = ({ to, icon, label, isActive }) => (
@@ -83,7 +89,6 @@ const Sidebar = () => {
   const user = useSelector((state) => state.auth?.user);
 
   const eventId = extractEventId(location.pathname);
-  const recruitmentId = extractRecruitmentId(location.pathname);
 
   const handleLogout = async () => {
     await dispatch(logoutUser());
@@ -91,11 +96,11 @@ const Sidebar = () => {
   };
 
   // Active states
-  const isDashboardActive   = location.pathname.includes("/dashboard");
-  const isMyEventsActive    = location.pathname.includes("/my-events");
-  const isFeedbackActive    = location.pathname.includes("/feedback");
-  const isRecruitmentActive = location.pathname.includes("/recruitment");
-  const isStaffActive       = location.pathname.includes("/staff");
+  const isDashboardActive       = location.pathname.includes("/dashboard");
+  const isMyEventsActive        = location.pathname.includes("/my-events");
+  const isFeedbackActive        = location.pathname.includes("/feedback");
+  const isRecruitmentActive     = location.pathname.includes("/recruitment");
+  const isStaffActive           = location.pathname.includes("/staff");
 
   // Event-specific links — chỉ tạo khi có eventId
   const eventDashboardLink  = eventId ? `/organizer/events/${eventId}` : null;
@@ -103,12 +108,14 @@ const Sidebar = () => {
   const feedbackLink        = eventId ? `/organizer/feedback/feedbacklist/${eventId}` : null;
   const analyticsLink       = eventId ? `/organizer/feedback/analytics/${eventId}` : null;
   const recruitmentLink     = eventId ? `/organizer/recruitmentlist/${eventId}` : null;
+  const applicationsLink    = eventId ? `/organizer/applications/event/${eventId}` : null;
   const staffLink           = eventId ? `/organizer/events/${eventId}/staff` : null;
   
   // Active states
   const isEventDashboardActive  = eventId ? location.pathname === `/organizer/events/${eventId}` : false;
   const isAttendeesActive       = location.pathname.includes("/attendees");
   const isAnalyticsActive       = location.pathname.includes("/feedback/analytics");
+  const isApplicationsPageActive = location.pathname.includes("/applications");
 
   // User display — backend trả snake_case: full_name, avatar_url, email
   const displayName = user?.full_name || user?.fullName || user?.name || user?.email || "Organizer";
@@ -205,6 +212,12 @@ const Sidebar = () => {
           <NavItem to={recruitmentLink} icon={<Briefcase size={20} />} label="Recruitment" isActive={isRecruitmentActive} />
         ) : (
           <DisabledNavItem icon={<Briefcase size={20} />} label="Recruitment" />
+        )}
+
+        {applicationsLink ? (
+          <NavItem to={applicationsLink} icon={<ClipboardList size={20} />} label="Application List" isActive={isApplicationsPageActive} />
+        ) : (
+          <DisabledNavItem icon={<ClipboardList size={20} />} label="Application List" />
         )}
 
         {staffLink ? (

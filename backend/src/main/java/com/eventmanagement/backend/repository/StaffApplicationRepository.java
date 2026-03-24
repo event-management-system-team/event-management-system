@@ -17,6 +17,7 @@ public interface StaffApplicationRepository extends JpaRepository<StaffApplicati
     int countByRecruitment_RecruitmentIdAndApplicationStatus(UUID recruitmentId, ApplicationStatus status); // so luong ho so theo trang thai
     int countByRecruitment_RecruitmentId(UUID recruitmentId); 
     List<StaffApplication> findByRecruitment_RecruitmentId(UUID recruitmentId);
+    List<StaffApplication> findByRecruitment_Event_EventId(UUID eventId);
     Optional<StaffApplication> findByApplicationId(UUID applicationId);
 
     

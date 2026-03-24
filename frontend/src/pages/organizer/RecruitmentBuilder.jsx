@@ -153,6 +153,8 @@ const RecruitmentFormBuilder = () => {
         if (isActive) {
           setAppAlert({ type: 'success', message: "Recruitment form published successfully!" });
           setIsLocked(true);
+          // Tự navigate về bước 3 sau 1.2s để user thấy thông báo thành công
+          setTimeout(() => navigate(-1), 1200);
         } else {
           setAppAlert({ type: 'success', message: "Draft saved successfully!" });
         }

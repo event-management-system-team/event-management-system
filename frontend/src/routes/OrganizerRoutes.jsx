@@ -41,6 +41,7 @@ const OrganizerRoutes = () => {
                     <Route path="recruitmentlist/:eventId" element={<RecruitmentList />} />
                     <Route path="recruitmentcreate/:eventId" element={<RecruitmentBuilder />} />
                     <Route path="recruitment-post/:eventId" element={<CreateRecruitmentPage />} />
+                    <Route path="applications/event/:eventId" element={<ApplicationList />} />
                     <Route path="applications/:recruitmentId" element={<ApplicationList />} />
                     <Route path="recruitments/:recruitmentId" element={<RecruitmentDetail />} />
 

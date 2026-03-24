@@ -15,7 +15,7 @@ const RecruitmentDetail = () => {
   useEffect(() => {
     const fetchDetail = async () => {
       try {
-        const response = await axiosInstance.get(`event/recruitments/${recruitmentId}`);
+        const response = await axiosInstance.get(`recruitments/${recruitmentId}/detail`);
         if (response.status === 200) {
           setDetailData(response.data);
         }
@@ -33,7 +33,7 @@ const RecruitmentDetail = () => {
 
   // Truyền recruitmentId qua location.state để RecruitmentBuilder load đúng bài edit
   const handleEdit = () => {
-    navigate(`/organizer/recruitmentcreate/${detailData.eventId}`, {
+    navigate(`/organizer/recruitment-post/${detailData.eventId}`, {
       state: { recruitmentId }
     });
   };

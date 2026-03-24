@@ -422,21 +422,7 @@ const MyEventsPage = () => {
 
                                 {/* Actions */}
                                 <div className="col-span-1 flex items-center justify-end gap-1">
-<<<<<<< HEAD
-                                    {/* Nút Manage cho tất cả trạng thái */}
-                                    <button
-                                        className="text-sm text-[#7FA5A5] hover:text-[#5d8585] font-medium transition-colors cursor-pointer px-2"
-                                        onClick={() => navigate(`/organizer/events/${event.eventId}`)}
-                                        title="View Event Detail"
-                                    >
-                                        Manage
-                                    </button>
-
-                                    {/* Edit + Delete chỉ hiện khi PENDING hoặc DRAFT */}
-                                    {(event.status === 'PENDING' || event.status === 'DRAFT') && (
-=======
                                     {(event.status === 'PENDING' || event.status === 'DRAFT' || event.status === 'REJECTED') ? (
->>>>>>> develop
                                         <>
                                             <button
                                                 onClick={() => navigate(`/organizer/edit-event/${event.eventId}`)}
@@ -453,8 +439,6 @@ const MyEventsPage = () => {
                                                 <Trash2 size={15} />
                                             </button>
                                         </>
-<<<<<<< HEAD
-=======
                                     ) : (
                                         <button
                                             onClick={() => navigate(`/organizer/events/${event.eventId}`)}
@@ -462,7 +446,6 @@ const MyEventsPage = () => {
                                         >
                                             Manage
                                         </button>
->>>>>>> develop
                                     )}
                                 </div>
                             </div>

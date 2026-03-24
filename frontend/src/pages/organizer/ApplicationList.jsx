@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { 
   Search, Eye, X, Download, CheckCircle, Quote, FileText, Star, ArrowLeft
 } from 'lucide-react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../config/axios';
 import { message } from 'antd'; 
 
 const ApplicationList = () => {
-  const { recruitmentId } = useParams();
+  const { recruitmentId, eventId } = useParams();
   const navigate = useNavigate();
   
   const [applications, setApplications] = useState([]);
@@ -16,12 +16,17 @@ const ApplicationList = () => {
 
   useEffect(() => {
     fetchApplications();
-  }, [recruitmentId]);
+  }, [recruitmentId, eventId]);
 
   const fetchApplications = async () => {
     setIsLoading(true);
     try {
-      const response = await axiosInstance.get(`applications/recruitments/${recruitmentId}`);
+      let response;
+      if (eventId) {
+        response = await axiosInstance.get(`applications/events/${eventId}`);
+      } else {
+        response = await axiosInstance.get(`applications/recruitments/${recruitmentId}`);
+      }
       if (response.status === 200) {
         setApplications(response.data);
       }
@@ -135,7 +140,7 @@ const ApplicationList = () => {
                         </div>
                       </td>
                       <td className="px-4 lg:px-6 py-3 sm:py-4"><span className="text-xs sm:text-sm font-bold text-gray-700">{app.position}</span></td>
-                      <td className="px-4 lg:px-6 py-3 sm:py-4"><span className="text-xs sm:text-sm font-medium text-gray-500">{new Date(app.appliedDate).toLocaleDateString('en-GB')}</span></td>
+                      <td className="px-4 lg:px-6 py-3 sm:py-4"><span className="text-xs sm:text-sm font-medium text-gray-500">{new Date(app.appliedAt).toLocaleDateString('en-GB')}</span></td>
                       <td className="px-4 lg:px-6 py-3 sm:py-4">{getStatusBadge(app.status)}</td>
                       <td className="px-4 lg:px-6 py-3 sm:py-4">
                         <div className="flex items-center justify-center gap-3">
@@ -201,8 +206,11 @@ const ApplicationList = () => {
 
                 <div>
                   <h4 className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-gray-800 mb-3 sm:mb-4"><Quote size={16} className="text-[#2dd4bf]" /> Custom Answers</h4>
-                  <div className="bg-[#ecebe4]/50 border border-[#ecebe4] p-4 sm:p-5 rounded-xl sm:rounded-2xl text-xs sm:text-sm text-gray-600 leading-relaxed font-medium">
-                    Waiting for custom form integration...
+                  <div className="bg-[#ecebe4]/50 border border-[#ecebe4] p-4 sm:p-5 rounded-xl sm:rounded-2xl text-xs sm:text-sm text-gray-600 leading-relaxed font-medium min-h-[80px]">
+                    {selectedCandidate.coverLetter
+                      ? <p className="whitespace-pre-line">{selectedCandidate.coverLetter}</p>
+                      : <p className="text-gray-400 italic">No custom answers submitted.</p>
+                    }
                   </div>
                 </div>
               </div>
@@ -211,15 +219,36 @@ const ApplicationList = () => {
               <div className="w-full md:w-7/12 p-4 sm:p-6 lg:p-8 bg-[#f4f3ed] flex flex-col h-64 md:h-auto">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-4">
                   <div className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-gray-700"><FileText size={18} className="text-[#8c9db3]" /> Curriculum Vitae Preview</div>
-                  <button className="w-full sm:w-auto justify-center bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider shadow-sm transition-colors">
-                    <Download size={14} /> Download PDF
-                  </button>
+                  {selectedCandidate.resume ? (
+                    <a
+                      href={selectedCandidate.resume}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full sm:w-auto justify-center bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider shadow-sm transition-colors"
+                    >
+                      <Download size={14} /> Download PDF
+                    </a>
+                  ) : (
+                    <button disabled className="w-full sm:w-auto justify-center bg-gray-200 text-gray-400 px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider cursor-not-allowed">
+                      <Download size={14} /> Download PDF
+                    </button>
+                  )}
                 </div>
-                
-                <div className="flex-1 bg-white rounded-xl shadow-md border-2 border-dashed border-gray-300 flex items-center justify-center flex-col gap-3 sm:gap-4 text-gray-400 min-h-[200px] sm:min-h-[300px]">
-                     <FileText size={40} className="text-gray-300 sm:w-12 sm:h-12"/>
-                     <p className="font-bold text-xs sm:text-sm text-center px-4">Applicant hasn't uploaded a CV yet</p>
-                </div>
+
+                {selectedCandidate.resume ? (
+                  <div className="flex-1 bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 min-h-[200px] sm:min-h-[300px]">
+                    <iframe
+                      src={selectedCandidate.resume}
+                      className="w-full h-full min-h-[300px]"
+                      title="CV Preview"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex-1 bg-white rounded-xl shadow-md border-2 border-dashed border-gray-300 flex items-center justify-center flex-col gap-3 sm:gap-4 text-gray-400 min-h-[200px] sm:min-h-[300px]">
+                    <FileText size={40} className="text-gray-300 sm:w-12 sm:h-12"/>
+                    <p className="font-bold text-xs sm:text-sm text-center px-4">Applicant hasn't uploaded a CV yet</p>
+                  </div>
+                )}
               </div>
             </div>
 

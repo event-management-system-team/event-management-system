@@ -13,9 +13,9 @@ public class RecruitmentDetailDTO {
     private String eventName;
     private String positionName;
     private String description;
-    private String benefits; 
+    private String benefits;
     private Integer vacancy;
-    private String requirements; 
+    private String requirements;
     private LocalDateTime deadline;
     private String status;
 }

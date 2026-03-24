@@ -63,7 +63,7 @@ const Step1RoleDetails = ({ form, onChange, errors = {} }) => (
             <select
               value={form.eventId}
               onChange={(e) => onChange({ eventId: e.target.value })}
-              disabled={!!form.eventId && (form.eventOptions || []).length > 0 && form.eventId === form.eventId}
+              disabled={!!form.eventId}
               className={`w-full px-4 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 bg-white transition appearance-none ${
                 errors.eventId
                   ? "border-red-400 focus:ring-red-200"
