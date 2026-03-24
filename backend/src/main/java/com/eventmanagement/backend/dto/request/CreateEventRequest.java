@@ -70,6 +70,8 @@ public class CreateEventRequest {
         @NotBlank(message = "Session title is required")
         private String title;
 
+        private String date; // "YYYY-MM-DD", optional (null = event startDate)
+
         @NotBlank(message = "Start time is required")
         private String startTime;
 

@@ -94,19 +94,27 @@ const ResourceTab = ({ id, isResourceModalOpen, closeResourceModal, onLoading, o
         document.body.removeChild(link);
     };
 
-    const handleFilePreview = (file) => {
+    const handleFilePreview = (e, file) => {
+        e.preventDefault();
         if (!file?.fileUrl) return;
 
-        if (file.fileType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+        const officeTypes = [
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+            "application/msword", // .doc
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+            "application/vnd.ms-excel", // .xls
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
+            "application/vnd.ms-powerpoint" // .ppt
+        ];
+
+        if (officeTypes.includes(file.fileType)) {
             const officeViewer = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(file.fileUrl)}`;
-            // const officeViewer = `https://docs.google.com/gview?url=${encodeURIComponent(file.fileUrl)}&embedded=true`
             window.open(officeViewer, "_blank");
             return;
         }
 
         window.open(file.fileUrl, "_blank");
     };
-
     return (
         <>
             <TabsContent value="resources" className="space-y-4">
@@ -144,7 +152,7 @@ const ResourceTab = ({ id, isResourceModalOpen, closeResourceModal, onLoading, o
                                                 variant="ghost"
                                                 size="sm"
                                                 className="h-8 w-8 p-0"
-                                                onClick={() => handleFilePreview(file)}
+                                                onClick={(e) => handleFilePreview(e, file)}
                                             >
                                                 <Eye className="h-4 w-4 text-gray-500" />
                                             </Button>

@@ -128,4 +128,5 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
     void updateTotalCheckins(@Param("eventId") UUID eventId, @Param("checkedInCount") int checkedInCount);
 
     List<Event> findByStatus(@Param("status") EventStatus status);
+    
 }

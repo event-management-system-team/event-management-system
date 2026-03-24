@@ -1,6 +1,28 @@
 import { getFileTypeName, getTypeBadgeStyle } from '../../../../../utils/resource.utils'
 
 const ResourceCard = ({ resource, ActionIcon, IconComp, config }) => {
+    const handleFilePreview = (e, file) => {
+        e.preventDefault();
+        if (!file?.fileUrl) return;
+
+        const officeTypes = [
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+            "application/msword", // .doc
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+            "application/vnd.ms-excel", // .xls
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
+            "application/vnd.ms-powerpoint" // .ppt
+        ];
+
+        if (officeTypes.includes(file.fileType)) {
+            const officeViewer = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(file.fileUrl)}`;
+            window.open(officeViewer, "_blank");
+            return;
+        }
+
+        window.open(file.fileUrl, "_blank");
+    };
+
     return (
         <div className="group flex flex-col bg-white rounded-[24px] overflow-hidden shadow-sm hover:shadow-xl hover:shadow-[#2C3E50]/15 transition-all duration-300 border border-slate-100">
 
@@ -34,15 +56,13 @@ const ResourceCard = ({ resource, ActionIcon, IconComp, config }) => {
                     </div>
                 </div>
 
-                <a
-                    href={resource.fileUrl}
-                    target="_blank"
-                    rel="noreferrer"
+                <button
+                    onClick={(e) => handleFilePreview(e, resource)}
                     className="mt-4 w-full bg-slate-50 border border-slate-200 hover:bg-[#89A8B2] hover:border-[#89A8B2] hover:-translate-y-1 hover:shadow-md hover:shadow-[#89A8B2]/30 text-[#2C3E50] hover:text-white font-bold py-3.5 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group/btn"
                 >
                     <ActionIcon size={18} className="text-[#89A8B2] group-hover/btn:text-white transition-colors" />
                     {config.actionText}
-                </a>
+                </button>
             </div>
         </div>
     )
