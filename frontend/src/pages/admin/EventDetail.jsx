@@ -14,6 +14,7 @@ import { useAlert } from '../../hooks/useAlert.js';
 import { Popconfirm } from 'antd';
 import dayjs from "dayjs";
 import LoadingState from '../../components/common/LoadingState.jsx';
+import EmptyState from '../../components/common/EmptyState.jsx';
 
 export function EventDetail() {
     const { slug } = useParams();
@@ -199,7 +200,7 @@ export function EventDetail() {
     };
 
     if (loading) return <LoadingState />
-    if (error) return <div>Something went wrong: {error}</div>;
+    if (error) return <EmptyState className='h-[600px]' />
 
     return (
         <div className="flex h-screen bg-[#F1F0E8]">

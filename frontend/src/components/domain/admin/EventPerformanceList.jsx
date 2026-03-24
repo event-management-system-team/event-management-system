@@ -130,13 +130,13 @@ const EventPerformanceList = ({ events, searchTerm, status, category, date, sort
                             No event analytics data yet
                         </div>
                     ) : (
-                        processedEvents.map(event => {
+                        processedEvents.map((event, index) => {
                             const progress = ticketProgress(event.totalCapacity, event.ticketsSold)
                             const containData = ["ONGOING", "COMPLETED"].includes(event.status)
                             const attendanceRate = event.attendanceRate * 100
                             return (
                                 <div
-                                    key={event.eventId}
+                                    key={`${event.eventId}-${index}`}
                                     className="grid grid-cols-10 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-[#eef3f5]"
                                 >
                                     <div className="col-span-3 flex items-center gap-3">
