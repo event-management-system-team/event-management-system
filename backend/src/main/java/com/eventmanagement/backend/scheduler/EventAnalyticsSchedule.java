@@ -36,7 +36,6 @@ public class EventAnalyticsSchedule {
             int ticketsAndRegs = event.getRegisteredCount() != null ? event.getRegisteredCount() : 0;
             double revenue = orderRepository.sumRevenueByEventId(eventId);
 
-
             eventAnalyticsRepository.upsertDailyAnalytics(
                     eventId,
                     ticketsAndRegs,

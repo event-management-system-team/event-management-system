@@ -153,10 +153,12 @@ export function EventAnalytics() {
                             </p>
                         </div>
                         <div className="flex gap-2">
-                            <Button variant="outline" className="gap-2 h-12 rounded-full hover:cursor-pointer" onClick={handleExportExcel}>
-                                <Download className="h-4 w-4" />
-                                Export Excel Report
-                            </Button>
+                            {events.length > 0 && (
+                                <Button variant="outline" className="gap-2 h-12 rounded-full hover:cursor-pointer" onClick={handleExportExcel}>
+                                    <Download className="h-4 w-4" />
+                                    Export Excel Report
+                                </Button>
+                            )}
                         </div>
                     </div>
                 </header>
@@ -192,13 +194,12 @@ export function EventAnalytics() {
 
                 {/* Event Performance Table */}
                 <EventPerformanceList
+                    events={events}
                     searchTerm={searchTerm}
                     status={status}
                     category={category}
                     date={date}
                     sortOption={sortOption}
-                    onLoading={setLoading}
-                    onError={setError}
                     formatVND={formatVND}
                     formatNumber={formatNumber}
                 />
