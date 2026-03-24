@@ -21,6 +21,7 @@ export function AccountManagement() {
     const [summary, setSummary] = useState()
 
     const [loading, setLoading] = useState(true);
+    const [summaryLoading, setSummaryLoading] = useState(true);
     const [error, setError] = useState(null);
     const [status, setStatus] = useState(statusParam ? statusParam.toUpperCase() : "all");
     const [role, setRole] = useState(roleParam ? roleParam.toUpperCase() : "all");
@@ -33,14 +34,14 @@ export function AccountManagement() {
 
     const fetchSummary = async () => {
         try {
-            setLoading(true)
+            setSummaryLoading(true)
             const response = await adminService.getAccountSummary()
             setSummary(response.data)
         } catch (error) {
             setError("Cannot load sumary data");
             console.error(error)
         } finally {
-            setLoading(false)
+            setSummaryLoading(false)
         }
     }
 
@@ -68,16 +69,11 @@ export function AccountManagement() {
         fetchSummary()
     }
 
+    if (summaryLoading) return <LoadingState />
+    if (error) return <EmptyState className='h-[600px]' />
+
     return (
         <div className="flex h-screen bg-[#F1F0E8]">
-
-            {loading && (
-                <LoadingState />
-            )}
-
-            {error && (
-                <EmptyState className='h-[600px]' />
-            )}
 
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
