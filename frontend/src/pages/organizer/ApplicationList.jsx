@@ -1,18 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Search, Eye, X, Download, CheckCircle, Quote, FileText, Star 
+  Search, Eye, X, Download, CheckCircle, Quote, FileText, Star, Filter 
 } from 'lucide-react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import Sidebar from '../../components/layout/Sidebar'; 
 import axiosInstance from '../../config/axios';
 import { message } from 'antd'; 
 
 const ApplicationList = () => {
+  const navigate = useNavigate();
   const { recruitmentId } = useParams(); 
   
   const [applications, setApplications] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // States cho việc lọc dữ liệu
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [dateFilter, setDateFilter] = useState('');
 
   useEffect(() => {
     fetchApplications();
@@ -76,6 +82,23 @@ const ApplicationList = () => {
     }
   };
 
+  // Logic Lọc Dữ Liệu
+  const filteredApplications = applications.filter(app => {
+    // 1. Lọc theo tên hoặc email
+    const matchSearch = 
+      app.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.email?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    // 2. Lọc theo Status
+    const matchStatus = statusFilter === 'ALL' || app.status?.toUpperCase() === statusFilter;
+
+    // 3. Lọc theo Ngày nộp (Chỉ so sánh phần YYYY-MM-DD)
+    const appDate = app.appliedAt ? new Date(app.appliedAt).toISOString().split('T')[0] : '';
+    const matchDate = !dateFilter || appDate === dateFilter;
+
+    return matchSearch && matchStatus && matchDate;
+  });
+
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-[#ecebe4] font-sans">
       <Sidebar />
@@ -89,23 +112,60 @@ const ApplicationList = () => {
           <p className="text-xs sm:text-sm text-gray-500 font-medium">Review and manage potential staff members.</p>
         </div>
 
-        {/* Search & Actions - Responsive Stack */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between mb-6 lg:mb-8 gap-4 sm:gap-0">
-          <div className="w-full sm:max-w-xs lg:w-80">
-            <div className="bg-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-2 sm:gap-3 w-full">
-              <Search size={18} className="text-gray-400 shrink-0" />
-              <input type="text" placeholder="Search candidates..." className="w-full outline-none text-xs sm:text-sm font-medium text-gray-700 placeholder-gray-400 bg-transparent"/>
+        {/* Search & Actions - Filter Section */}
+        <div className="flex flex-col gap-4 mb-6 lg:mb-8">
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+            
+            <div className="flex flex-col sm:flex-row flex-1 gap-4">
+              {/* Search by Name/Email */}
+              <div className="bg-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-2 sm:gap-3 flex-1 min-w-[200px]">
+                <Search size={18} className="text-gray-400 shrink-0" />
+                <input 
+                  type="text" 
+                  placeholder="Search name or email..." 
+                  className="w-full outline-none text-xs sm:text-sm font-medium text-gray-700 placeholder-gray-400 bg-transparent"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+
+              {/* Status Filter */}
+              <div className="bg-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                <Filter size={18} className="text-gray-400 shrink-0" />
+                <select 
+                  className="w-full sm:w-auto outline-none text-xs sm:text-sm font-medium text-gray-700 bg-transparent cursor-pointer"
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                >
+                  <option value="ALL">All Statuses</option>
+                  <option value="PENDING">Pending</option>
+                  <option value="APPROVED">Approved</option>
+                  <option value="REJECTED">Rejected</option>
+                </select>
+              </div>
+
+              {/* Date Filter */}
+              <div className="bg-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                <input 
+                  type="date" 
+                  className="w-full sm:w-auto outline-none text-xs sm:text-sm font-medium text-gray-700 bg-transparent cursor-pointer"
+                  value={dateFilter}
+                  onChange={(e) => setDateFilter(e.target.value)}
+                />
+              </div>
             </div>
+
+            {/* Back Button */}
+            <button 
+              onClick={() => navigate(-1)} 
+              className="w-full lg:w-auto justify-center bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 text-xs sm:text-sm font-bold shadow-md transition-all shrink-0"
+            >
+               Back to Recruitments
+            </button>
           </div>
-          <Link 
-            to={`/organizer/recruitments`} 
-            className="w-full sm:w-auto justify-center bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 text-xs sm:text-sm font-bold shadow-md transition-all"
-          >
-             Back to Recruitments
-          </Link>
         </div>
 
-        {/* Table Container - Responsive Horizontal Scroll */}
+        {/* Table Container */}
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] border border-gray-100 overflow-hidden">
           <div className="overflow-x-auto w-full">
             <table className="w-full text-left border-collapse min-w-[800px]">
@@ -121,10 +181,22 @@ const ApplicationList = () => {
               <tbody className="divide-y divide-gray-50">
                 {isLoading ? (
                   <tr><td colSpan="5" className="text-center py-10 font-bold text-gray-400 text-sm">Loading candidates...</td></tr>
-                ) : applications.length === 0 ? (
-                  <tr><td colSpan="5" className="text-center py-10 font-bold text-gray-400 text-sm">No applications received yet.</td></tr>
+                ) : filteredApplications.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="text-center py-10">
+                      <p className="font-bold text-gray-400 text-sm">No applications found.</p>
+                      {(searchTerm || statusFilter !== 'ALL' || dateFilter) && (
+                        <button 
+                          onClick={() => { setSearchTerm(''); setStatusFilter('ALL'); setDateFilter(''); }}
+                          className="mt-2 text-[#2dd4bf] text-xs font-bold hover:underline"
+                        >
+                          Clear all filters
+                        </button>
+                      )}
+                    </td>
+                  </tr>
                 ) : (
-                  applications.map((app) => (
+                  filteredApplications.map((app) => (
                     <tr key={app.id} className="hover:bg-gray-50/50 transition-colors group">
                       <td className="px-6 lg:px-8 py-3 sm:py-4">
                         <div className="flex items-center gap-3 sm:gap-4">
@@ -136,7 +208,7 @@ const ApplicationList = () => {
                         </div>
                       </td>
                       <td className="px-4 lg:px-6 py-3 sm:py-4"><span className="text-xs sm:text-sm font-bold text-gray-700">{app.position}</span></td>
-                      <td className="px-4 lg:px-6 py-3 sm:py-4"><span className="text-xs sm:text-sm font-medium text-gray-500">{new Date(app.appliedDate).toLocaleDateString('en-GB')}</span></td>
+                      <td className="px-4 lg:px-6 py-3 sm:py-4"><span className="text-xs sm:text-sm font-medium text-gray-500">{new Date(app.appliedAt).toLocaleDateString('en-GB')}</span></td>
                       <td className="px-4 lg:px-6 py-3 sm:py-4">{getStatusBadge(app.status)}</td>
                       <td className="px-4 lg:px-6 py-3 sm:py-4">
                         <div className="flex items-center justify-center gap-3">
@@ -157,7 +229,7 @@ const ApplicationList = () => {
         </div>
       </div>
 
-      {/* MODAL - Candidate Details - Responsive */}
+      {/* MODAL - Candidate Details */}
       {selectedCandidate && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-3 sm:p-4">
           <div className="bg-white rounded-2xl sm:rounded-[2rem] w-full w-[95%] sm:max-w-5xl max-h-[95vh] sm:max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
@@ -177,7 +249,7 @@ const ApplicationList = () => {
               <button onClick={() => setSelectedCandidate(null)} className="p-1 sm:p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700 rounded-full transition-colors shrink-0"><X size={20} className="sm:w-6 sm:h-6" /></button>
             </div>
 
-            {/* Modal Body - Stacks on mobile, Side-by-side on desktop */}
+            {/* Modal Body */}
             <div className="flex-1 overflow-y-auto bg-[#f8f7f2] flex flex-col md:flex-row">
               
               {/* Left Column (Info) */}
@@ -224,7 +296,7 @@ const ApplicationList = () => {
               </div>
             </div>
 
-            {/* Modal Footer Actions - Stack on small screens */}
+            {/* Modal Footer Actions */}
             <div className="px-4 sm:px-8 py-4 sm:py-5 border-t border-gray-100 flex flex-col-reverse sm:flex-row justify-end items-stretch sm:items-center gap-3 sm:gap-4 bg-white shrink-0">
               {selectedCandidate.status === 'PENDING' && (
                 <>
