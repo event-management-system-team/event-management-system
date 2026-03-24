@@ -3,7 +3,8 @@ import { ArrowRight, Calendar, MapPin, Clock } from 'lucide-react'
 import { useNavigate } from 'react-router';
 import { useTranslation } from "react-i18next";
 
-const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage, formattedDeadline, totalAvailable, totalVacancy, deadlineDate, startDate, endDate }) => {
+const ApplySection = ({ eventSlug, active, location, daysLeft, filledPercentage, formattedDeadline, totalAvailable, totalVacancy, deadlineDate, startDate, endDate }) => {
+
     const navigate = useNavigate();
     const { t } = useTranslation();
 
@@ -11,7 +12,7 @@ const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage,
         <div className="bg-white rounded-2xl p-7 shadow-xl shadow-slate-200/50 border border-[#E5E1DA]/50">
             <div className="flex justify-between items-center mb-8">
                 <span className="bg-[#4ECDC4]/10 text-[#4ECDC4] text-[10px] font-extrabold px-3 py-1.5 rounded-full uppercase tracking-widest">
-                    {status}
+                    {active ? 'OPEN' : 'CLOSED'}
                 </span>
                 <span className="text-slate-400 text-xs font-medium">
                     {daysLeft > 0 ? daysLeft : 0} {t("days_left")}
@@ -39,14 +40,7 @@ const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage,
                     <div>
                         <p className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold mb-1">{t("event_duration")}</p>
                         <p className="text-[14px] font-bold text-slate-600 leading-relaxed">
-                            {(() => {
-                                const startStr = startDate ? new Date(startDate).toLocaleDateString('en-GB') : 'TBA';
-                                const endStr = endDate ? new Date(endDate).toLocaleDateString('en-GB') : 'TBA';
-
-                                if (startStr === 'TBA' && endStr === 'TBA') return 'TBA';
-                                if (startStr === endStr) return startStr;
-                                return `${startStr} - ${endStr}`;
-                            })()}
+                            {startDate ? new Date(startDate).toLocaleDateString('en-GB') : 'TBA'}
                         </p>
                     </div>
                 </div>
@@ -79,7 +73,7 @@ const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage,
 
 
             <button
-                disabled={totalAvailable <= 0 || status === 'CLOSED'}
+                disabled={totalAvailable <= 0 || !active}
                 className="w-full py-4 text-[15px] font-extrabold rounded-xl transition-all duration-300 flex items-center justify-center gap-3 group uppercase
                bg-primary text-white shadow-lg shadow-primary/30 
                hover:bg-primary/90 hover:shadow-primary/50 hover:-translate-y-1
@@ -88,7 +82,7 @@ const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage,
             >
                 {status === 'CLOSED' ? t("closed") : (totalAvailable <= 0 ? t("fully_booked") : t("apply_now"))}
 
-                {!(totalAvailable <= 0 || status === 'CLOSED') && (
+                {!(totalAvailable <= 0 || !active) && (
                     <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1.5" />
                 )}
             </button>

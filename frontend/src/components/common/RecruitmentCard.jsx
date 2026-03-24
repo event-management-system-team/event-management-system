@@ -2,8 +2,13 @@ import { Briefcase, MapPin } from "lucide-react";
 import { Link } from 'react-router-dom'
 import { useTranslation } from "react-i18next";
 
+<<<<<<< HEAD
 const RecruitmentCard = ({ positions = [], eventName, eventSlug, eventBannerUrl, deadline, createdAt, location, organizer, status }) => {
     const { t } = useTranslation();
+=======
+const RecruitmentCard = ({ positions = [], eventName, eventSlug, eventBannerUrl, deadline, createdAt, location, organizer, active }) => {
+
+>>>>>>> develop
     const isNew = (new Date() - new Date(createdAt)) / (1000 * 60 * 60 * 24) <= 3;
 
     const dateObj = deadline ? new Date(deadline) : null;
@@ -14,7 +19,7 @@ const RecruitmentCard = ({ positions = [], eventName, eventSlug, eventBannerUrl,
         <Link to={`/recruitments/${eventSlug}`} className="block">
             <div className="relative bg-white rounded-2xl flex items-stretch border border-gray-100 shadow-sm hover:shadow-lg hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 cursor-pointer group overflow-hidden h-28 sm:h-[150px]">
 
-                {status === 'CLOSED' ? (
+                {!active ? (
                     <span className="absolute top-0 right-0 bg-slate-500 text-white text-[9px] sm:text-[10px] font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-bl-xl z-20 shadow-sm tracking-widest uppercase">
                         {t("closed")}
                     </span>

@@ -11,6 +11,7 @@ import TicketSkeleton from "../../components/domain/payment-status/TicketSkeleto
 import OrderDetails from "../../components/domain/payment-status/OrderDetails";
 import SuccessActions from "../../components/domain/payment-status/SuccessActions";
 import { useTranslation } from "react-i18next";
+import { useExportTicket } from "../../hooks/useExportTicket";
 
 const PaymentSuccessPage = () => {
   const [searchParams] = useSearchParams();
@@ -18,6 +19,7 @@ const PaymentSuccessPage = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
+  const { multiRefs, isExporting, exportMultiple } = useExportTicket();
   const orderCode = searchParams.get("orderCode");
 
   useEffect(() => {
@@ -42,27 +44,29 @@ const PaymentSuccessPage = () => {
           <TicketSkeleton />
         ) : displayTickets.length > 0 ? (
           <div className="w-full space-y-6">
-            {displayTickets.map((ticket) => (
-              <TicketCard
-                key={ticket.ticketId}
-                event={{
-                  title: ticket.eventName,
-                  date: ticket.eventStartDate
-                    ? new Date(ticket.eventStartDate).toLocaleString("vi-VN", {
+            {displayTickets.map((ticket, index) => (
+              <div key={ticket.ticketId} ref={(el) => (multiRefs.current[index] = el)}>
+                <TicketCard
+                  event={{
+                    title: ticket.eventName,
+                    date: ticket.eventStartDate
+                      ? new Date(ticket.eventStartDate).toLocaleString("vi-VN", {
                         day: "2-digit",
                         month: "short",
                         year: "numeric",
                         hour: "2-digit",
                         minute: "2-digit",
                       })
-                    : "—",
-                  location: ticket.eventLocation || "—",
-                  tickets: `${ticket.ticketTypeName} × 1`,
-                  ticketId: ticket.ticketCode,
-                  image: ticket.eventBannerUrl || "",
-                  qrCode: ticket.qrCodeUrl || "",
-                }}
-              />
+                      : "—",
+                    location: ticket.eventLocation || "—",
+                    tickets: `${ticket.ticketTypeName} × 1`,
+                    ticketId: ticket.ticketCode,
+                    image: ticket.eventBannerUrl || "",
+                    qrCode: ticket.qrCodeUrl || "",
+                  }}
+                />
+              </div>
+
             ))}
           </div>
         ) : (
@@ -79,6 +83,8 @@ const PaymentSuccessPage = () => {
 
         <SuccessActions
           onGoMyTickets={() => navigate("/attendee/my-tickets")}
+          exportToImage={() => exportMultiple(displayTickets)}
+          isExporting={isExporting}
         />
       </main>
     </div>

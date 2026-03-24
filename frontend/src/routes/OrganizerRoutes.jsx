@@ -11,8 +11,10 @@ import EventAttendeesPage from "../pages/organizer/EventAttendeesPage";
 import FeedbackList from "../pages/organizer/FeedbackList";
 import FeedbackBuilder from "../pages/organizer/FeedbackBuilder";
 import FeedbackDetail from "../pages/organizer/FeedbackDetail";
+import FeedbackAnalytics from "../pages/organizer/FeedbackAnalytics";
 import RecruitmentList from "../pages/organizer/RecruitmentList";
 import RecruitmentBuilder from "../pages/organizer/RecruitmentBuilder";
+import CreateRecruitmentPage from "../pages/organizer/CreateRecruitmentPage";
 import ApplicationList from "../pages/organizer/ApplicationList";
 import RecruitmentDetail from "../pages/organizer/RecruitmentDetail";
 import StaffManagement from "../pages/organizer/StaffManagement";
@@ -37,10 +39,10 @@ const OrganizerRoutes = () => {
                     <Route path="feedback/feedbacklist/:eventId" element={<FeedbackList />} />
                     <Route path="feedback/createform/:eventId" element={<FeedbackBuilder />} />
                     <Route path="feedback/:feedbackId" element={<FeedbackDetail />} />
-
-                    {/* Recruitment */}
+                    <Route path="feedback/analytics/:eventId" element={<FeedbackAnalytics />} />
                     <Route path="recruitmentlist/:eventId" element={<RecruitmentList />} />
                     <Route path="recruitmentcreate/:eventId" element={<RecruitmentBuilder />} />
+                    <Route path="recruitment-post/:eventId" element={<CreateRecruitmentPage />} />
                     <Route path="applications/:recruitmentId" element={<ApplicationList />} />
                     <Route path="recruitments/:recruitmentId" element={<RecruitmentDetail />} />
 

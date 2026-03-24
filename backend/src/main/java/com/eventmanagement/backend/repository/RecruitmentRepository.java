@@ -2,6 +2,7 @@ package com.eventmanagement.backend.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -23,47 +24,36 @@ public interface RecruitmentRepository extends JpaRepository<Recruitment, UUID> 
 
     List<Recruitment> findByEvent_EventId(UUID eventId);
 
-
     @Query("SELECT e.eventSlug FROM Recruitment r JOIN r.event e " +
-            "WHERE r.status IN :statuses " +
             "GROUP BY e.eventSlug " +
             "ORDER BY MAX(r.createdAt) DESC")
-    List<String> findRecentEventWithOpenRecruitments(@Param("statuses") List<RecruitmentStatus> statuses,
-                                                     Pageable pageable);
-
+    List<String> findRecentEventWithRecruitments(Pageable pageable);
 
     @Query("SELECT r FROM Recruitment r JOIN FETCH r.event e " +
-            "WHERE r.event.eventSlug IN :eventSlugs AND r.status IN :statuses " +
+            "WHERE r.event.eventSlug IN :eventSlugs " +
             "ORDER BY r.status DESC, r.createdAt DESC")
-    List<Recruitment> findRecruitmentsByEventSlugs(@Param("eventSlugs") List<String> eventSlugs,
-                                                   @Param("statuses") List<RecruitmentStatus> statuses);
-
+    List<Recruitment> findRecruitmentsByEventSlugs(@Param("eventSlugs") List<String> eventSlugs);
 
     @Query("SELECT e.eventSlug FROM Recruitment r JOIN r.event e " +
-            "WHERE e.status IN :statuses " +
-            "AND (:keyword IS NULL OR :keyword = '' " +
+            "WHERE (:keyword IS NULL OR :keyword = '' " +
             "OR LOWER(r.positionName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "OR LOWER(e.eventName) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
-            "AND (:location IS NULL OR :location = '' OR LOWER(e.location) LIKE LOWER(CONCAT('%', :location, '%')))" +
+            "AND (:location IS NULL OR :location = '' OR LOWER(e.location) LIKE LOWER(CONCAT('%', :location, '%')))"
+            +
             "AND (CAST(:deadline AS TIMESTAMP ) IS NULL OR r.deadline <= :deadline)" +
-            "GROUP BY e.eventSlug, e.createdAt " +
-            "ORDER BY e.createdAt DESC")
-    Page<String> searchEventSlug(@Param("statuses") List<EventStatus> statuses,
-                                 @Param("keyword") String keyword,
+            "GROUP BY e.eventSlug " +
+            "ORDER BY MAX(r.createdAt) DESC")
+    Page<String> searchEventSlug(@Param("keyword") String keyword,
                                  @Param("location") String location,
                                  @Param("deadline") LocalDateTime deadline,
                                  Pageable pageable);
 
-
     @Query("SELECT r FROM Recruitment r JOIN FETCH r.event e " +
-            "WHERE r.event.eventSlug IN :eventSlugs AND r.status IN :statuses " +
-            "ORDER BY r.createdAt DESC"
-    )
-    List<Recruitment> searchRecruitments(@Param("statuses") List<RecruitmentStatus> statuses,
-                                         @Param("eventSlugs") List<String> eventSlugs);
+            "WHERE r.event.eventSlug IN :eventSlugs " +
+            "ORDER BY r.status DESC, r.createdAt DESC")
+    List<Recruitment> searchRecruitments(@Param("eventSlugs") List<String> eventSlugs);
 
     List<Recruitment> findByEvent_EventSlug(String eventSlug);
-
 
     @Modifying
     @Transactional
@@ -71,5 +61,4 @@ public interface RecruitmentRepository extends JpaRepository<Recruitment, UUID> 
             "AND r.deadline <= CURRENT_TIMESTAMP")
     int updateStatusToClosed();
 
-    List<Recruitment> findByStatusAndDeadlineBefore(RecruitmentStatus status, LocalDateTime deadline);
 }

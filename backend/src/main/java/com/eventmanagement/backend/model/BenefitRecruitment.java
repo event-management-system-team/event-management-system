@@ -1,5 +1,6 @@
 package com.eventmanagement.backend.model;
 
+import java.io.Serializable;
 
 import lombok.*;
 
@@ -8,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class BenefitRecruitment {
+public class BenefitRecruitment implements Serializable {
     private String icon;
     private String title;
     private String description;

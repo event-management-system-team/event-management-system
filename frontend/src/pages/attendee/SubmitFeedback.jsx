@@ -9,8 +9,9 @@ const npsEmojis = ['😡', '😠', '😞', '🙁', '😐', '🙂', '😊', '😀
 const SubmitFeedback = () => {
   const { eventId } = useParams();
 
-  // Static data state
+  // 1. KHAI BÁO BIẾN formTitle Ở ĐÂY NÀY BẠN
   const [eventInfo, setEventInfo] = useState({ name: 'Loading event...', date: '...' });
+  const [formTitle, setFormTitle] = useState('Post-Event Feedback'); 
   const [formSchema, setFormSchema] = useState([]);
   
   // Answer state
@@ -22,10 +23,10 @@ const SubmitFeedback = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isFormActive, setIsFormActive] = useState(true); 
-  const [isClosed, setIsClosed] = useState(false); // Quá hạn điền form (Deadline)
-  const [isNotYetEnded, setIsNotYetEnded] = useState(false); // MỚI: Sự kiện chưa kết thúc
+  const [isClosed, setIsClosed] = useState(false); 
+  const [isNotYetEnded, setIsNotYetEnded] = useState(false); 
 
-  // 1. FETCH DATA
+  // FETCH DATA
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -40,12 +41,10 @@ const SubmitFeedback = () => {
               date: eData.startDate ? new Date(eData.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Ongoing'
             });
 
-            // LOGIC MỚI: CHỈ MỞ FORM KHI SỰ KIỆN ĐÃ KẾT THÚC
             if (eData.endDate) {
               const eventEndTime = new Date(eData.endDate).getTime();
               const currentTime = new Date().getTime();
               
-              // Nếu thời gian hiện tại vẫn nhỏ hơn thời gian kết thúc sự kiện -> Khóa
               if (currentTime < eventEndTime) {
                 setIsNotYetEnded(true);
               }
@@ -60,24 +59,26 @@ const SubmitFeedback = () => {
         const formRes = await axiosInstance.get(`/events/${eventId}/forms?type=FEEDBACK`);
         const fData = formRes.data?.data || formRes.data;
 
-        // KIỂM TRA DEADLINE CỦA FORM (Nếu Organizer có cài đặt hạn chót điền form)
-        if (fData && fData.deadline) {
-          if (new Date().getTime() > new Date(fData.deadline).getTime()) {
-            setIsClosed(true);
-          }
-        }
-
-        // KIỂM TRA XEM FORM CÓ PHẢI LÀ BẢN DRAFT HAY CHƯA TẠO KHÔNG?
         if (!fData || fData.message === "Chưa có form" || fData.message === "No form found") {
            setIsFormActive(false); 
         } else {
+          // 2. LẤY FORM_NAME TỪ DATABASE GÁN VÀO ĐÂY
+          setFormTitle(fData.form_name || fData.formName || fData.title || fData.name || 'Post-Event Feedback');
+
+          // Check deadline
+          if (fData.deadline) {
+            if (new Date().getTime() > new Date(fData.deadline).getTime()) {
+              setIsClosed(true);
+            }
+          }
+
           const activeStatus = fData.active ?? fData.isActive ?? fData.is_active;
           const isActive = activeStatus === true || activeStatus === "true";
            
            if (!isActive) {
-             setIsFormActive(false); // Form đang là Draft -> Khóa
+             setIsFormActive(false); 
            } else {
-             setIsFormActive(true); // Form đã Public -> Mở
+             setIsFormActive(true); 
              
              if (fData.formSchema) {
                 let schema = fData.formSchema;
@@ -102,11 +103,21 @@ const SubmitFeedback = () => {
     if (eventId) fetchData();
   }, [eventId]);
 
-  const handleAnswerChange = (fieldId, value) => {
-    setAnswers(prev => ({ ...prev, [fieldId]: value }));
+  const handleAnswerChange = (fieldId, value, isCheckbox = false) => {
+    setAnswers(prev => {
+      if (isCheckbox) {
+        const currentValues = prev[fieldId] || [];
+        if (currentValues.includes(value)) {
+          return { ...prev, [fieldId]: currentValues.filter(v => v !== value) };
+        } else {
+          return { ...prev, [fieldId]: [...currentValues, value] };
+        }
+      }
+      return { ...prev, [fieldId]: value };
+    });
   };
 
-  // 2. SUBMIT DATA
+  // SUBMIT DATA
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (rating === 0) {
@@ -116,11 +127,19 @@ const SubmitFeedback = () => {
 
     setIsSubmitting(true);
     try {
-      const feedbackDataArray = formSchema.map(field => ({
-        field_id: field.field_id,
-        question: field.question,
-        answer: answers[field.field_id] || ''
-      }));
+      const feedbackDataArray = formSchema.map(field => {
+        let answerValue = answers[field.fieldId];
+        
+        if (Array.isArray(answerValue)) {
+          answerValue = answerValue.join(', ');
+        }
+
+        return {
+          fieldId: field.fieldId,
+          question: field.label, 
+          answer: answerValue || ''
+        };
+      });
 
       const payload = {
         rating: rating, 
@@ -143,7 +162,6 @@ const SubmitFeedback = () => {
 
   if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-[#f2ede6]"><Loader2 className="animate-spin text-[#849b9f]" size={40}/></div>;
   
-  // 1. SỰ KIỆN CHƯA KẾT THÚC
   if (isNotYetEnded) {
     return (
       <div className="min-h-screen bg-[#f2ede6] flex items-center justify-center p-6 font-sans">
@@ -161,7 +179,6 @@ const SubmitFeedback = () => {
     );
   }
 
-  // 2. FORM ĐÃ QUÁ HẠN ĐIỀN (Qua form deadline)
   if (isClosed) {
     return (
       <div className="min-h-screen bg-[#f2ede6] flex items-center justify-center p-6 font-sans">
@@ -179,7 +196,6 @@ const SubmitFeedback = () => {
     );
   }
 
-  // 3. FORM ĐANG LÀ DRAFT HOẶC CHƯA ĐƯỢC TẠO
   if (!isFormActive) {
     return (
       <div className="min-h-screen bg-[#f2ede6] flex items-center justify-center p-6 font-sans">
@@ -195,7 +211,6 @@ const SubmitFeedback = () => {
     );
   }
 
-  // 4. ĐÃ SUBMIT THÀNH CÔNG
   if (isSubmitted) {
     return (
       <div className="min-h-screen bg-[#f2ede6] flex items-center justify-center p-6 font-sans">
@@ -214,7 +229,7 @@ const SubmitFeedback = () => {
     const type = field.type ? field.type.toUpperCase() : 'TEXT';
 
     if (type.includes('RATING') || type.includes('STAR') || type.includes('NPS')) {
-      const currentScore = answers[field.field_id] || 0;
+      const currentScore = answers[field.fieldId] || 0;
       
       return (
         <div className="mt-6 mb-4">
@@ -229,7 +244,7 @@ const SubmitFeedback = () => {
                   type="button" 
                   onClick={() => {
                     setRating(score);
-                    handleAnswerChange(field.field_id, score); 
+                    handleAnswerChange(field.fieldId, score); 
                   }} 
                   className="flex-1 flex flex-col items-center gap-2 focus:outline-none group"
                 >
@@ -257,16 +272,41 @@ const SubmitFeedback = () => {
       );
     }
 
-    if (type.includes('MULTIPLE') || type.includes('RADIO') || type.includes('CHOICE')) {
+    if (type.includes('CHECKBOX') || type.includes('MULTIPLE')) {
       return (
         <div className="flex flex-wrap gap-3 mt-4">
           {field.options?.map((opt, i) => {
-            const isSelected = answers[field.field_id] === opt;
+            const currentAnswers = answers[field.fieldId] || [];
+            const isSelected = currentAnswers.includes(opt);
             return (
               <button 
                 key={i} 
                 type="button"
-                onClick={() => handleAnswerChange(field.field_id, opt)}
+                onClick={() => handleAnswerChange(field.fieldId, opt, true)} 
+                className={`px-5 py-3 rounded-2xl text-sm font-bold transition-all duration-200 ${
+                  isSelected 
+                  ? 'bg-[#849b9f] text-white shadow-md transform -translate-y-0.5' 
+                  : 'bg-[#f6f5f2] text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {opt}
+              </button>
+            )
+          })}
+        </div>
+      );
+    }
+
+    if (type.includes('RADIO') || type.includes('CHOICE')) {
+      return (
+        <div className="flex flex-wrap gap-3 mt-4">
+          {field.options?.map((opt, i) => {
+            const isSelected = answers[field.fieldId] === opt;
+            return (
+              <button 
+                key={i} 
+                type="button"
+                onClick={() => handleAnswerChange(field.fieldId, opt, false)}
                 className={`px-5 py-3 rounded-2xl text-sm font-bold transition-all duration-200 ${
                   isSelected 
                   ? 'bg-[#849b9f] text-white shadow-md transform -translate-y-0.5' 
@@ -287,8 +327,8 @@ const SubmitFeedback = () => {
           rows="4" 
           required={field.required} 
           placeholder={field.placeholder || "Tell us your thoughts..."} 
-          value={answers[field.field_id] || ''} 
-          onChange={(e) => handleAnswerChange(field.field_id, e.target.value)} 
+          value={answers[field.fieldId] || ''} 
+          onChange={(e) => handleAnswerChange(field.fieldId, e.target.value)} 
           className="w-full mt-4 bg-[#f6f5f2] border-transparent rounded-[20px] p-5 text-gray-800 font-medium outline-none focus:ring-2 focus:ring-[#849b9f] focus:bg-white transition-all resize-none placeholder-gray-400"
         ></textarea>
       );
@@ -299,8 +339,8 @@ const SubmitFeedback = () => {
         type="text" 
         required={field.required} 
         placeholder={field.placeholder || "Your answer..."} 
-        value={answers[field.field_id] || ''} 
-        onChange={(e) => handleAnswerChange(field.field_id, e.target.value)} 
+        value={answers[field.fieldId] || ''} 
+        onChange={(e) => handleAnswerChange(field.fieldId, e.target.value)} 
         className="w-full mt-4 bg-[#f6f5f2] border-transparent rounded-[20px] p-5 text-gray-800 font-medium outline-none focus:ring-2 focus:ring-[#849b9f] focus:bg-white transition-all placeholder-gray-400" 
       />
     );
@@ -318,8 +358,9 @@ const SubmitFeedback = () => {
           
           <div className="flex flex-col sm:flex-row justify-between items-start gap-6 border-b border-gray-100 pb-10 mb-10">
             <div>
-              <span className="text-[#849b9f] text-[11px] font-extrabold uppercase tracking-widest">Post-Event Feedback</span>
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-3 mb-4 tracking-tight leading-tight">{eventInfo.name}</h1>
+              <span className="text-[#849b9f] text-[11px] font-extrabold uppercase tracking-widest">{eventInfo.name}</span>
+              {/* 3. HIỂN THỊ formTitle TO RÕ RÀNG Ở ĐÂY */}
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-3 mb-4 tracking-tight leading-tight">{formTitle}</h1>
               <div className="flex items-center gap-2 text-sm font-bold text-gray-400">
                 <Calendar size={16} />
                 <span>{eventInfo.date}</span>
@@ -340,9 +381,9 @@ const SubmitFeedback = () => {
                 const isStarRating = field.type && (field.type.toUpperCase().includes('NPS') || field.type.toUpperCase().includes('STAR'));
                 
                 return (
-                  <div key={field.field_id} className={isStarRating ? "text-center" : ""}>
+                  <div key={field.fieldId} className={isStarRating ? "text-center" : ""}>
                     <label className={`block font-extrabold text-gray-800 ${isStarRating ? 'text-xl mb-2' : 'text-sm mb-3'}`}>
-                      {field.question} {field.required && <span className="text-red-500">*</span>}
+                      {field.label} {field.required && <span className="text-red-500">*</span>}
                     </label>
                     {renderInput(field)}
                   </div>

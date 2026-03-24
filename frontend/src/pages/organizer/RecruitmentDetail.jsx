@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
-  ArrowLeft, Calendar, Users, Briefcase, FileText, CheckCircle, Edit
+  ArrowLeft, Calendar, Users, Briefcase, FileText, CheckCircle
 } from 'lucide-react';
 import Sidebar from '../../components/layout/Sidebar';
 import axiosInstance from '../../config/axios';
@@ -58,13 +58,6 @@ const RecruitmentDetail = () => {
                 <Briefcase size={16} className="shrink-0"/> <span className="truncate">{detailData.eventName}</span>
               </p>
             </div>
-            
-            <Link 
-              to={`/organizer/recruitmentedit/${detailData.recruitmentId}`}
-              className="w-full sm:w-auto justify-center bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-5 py-2.5 rounded-lg flex items-center gap-2 text-sm font-bold shadow-sm transition-all"
-            >
-              <Edit size={16} /> Edit Post
-            </Link>
           </div>
         </div>
 

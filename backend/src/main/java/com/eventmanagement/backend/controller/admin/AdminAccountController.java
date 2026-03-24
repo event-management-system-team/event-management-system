@@ -72,4 +72,10 @@ public class AdminAccountController {
     public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
         return ResponseEntity.ok(userRepository.existsByEmail(email));
     }
+
+    @GetMapping("/check-phone")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Boolean> checkPhone(@RequestParam String phone) {
+        return ResponseEntity.ok(userRepository.existsByPhone(phone));
+    }
 }
