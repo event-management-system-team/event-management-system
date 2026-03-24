@@ -51,6 +51,11 @@ public class ApplicationServiceOrganizer {
                 if (customAnswers.isEmpty()) customAnswers = null;
             }
 
+            java.util.List<java.util.Map<String, Object>> formSchema =
+                    app.getRecruitment().getCustomForm() != null
+                    ? app.getRecruitment().getCustomForm().getFormSchema()
+                    : null;
+
             return ApplicationResponseDTO.builder()
                     .id(app.getApplicationId())
                     .name(app.getUser().getFullName())
@@ -60,6 +65,7 @@ public class ApplicationServiceOrganizer {
                     .position(app.getRecruitment().getPositionName())
                     .cvUrl(cvUrl)
                     .customAnswers(customAnswers)
+                    .formSchema(formSchema)
                     .status(app.getApplicationStatus() != null ? app.getApplicationStatus().name() : null)
                     .appliedAt(app.getAppliedAt())
                     .reviewedAt(app.getReviewedAt())
@@ -85,6 +91,11 @@ public class ApplicationServiceOrganizer {
                 if (customAnswers.isEmpty()) customAnswers = null;
             }
 
+            java.util.List<java.util.Map<String, Object>> formSchema =
+                    app.getRecruitment().getCustomForm() != null
+                    ? app.getRecruitment().getCustomForm().getFormSchema()
+                    : null;
+
             return ApplicationResponseDTO.builder()
                     .id(app.getApplicationId())
                     .name(app.getUser().getFullName())
@@ -94,6 +105,7 @@ public class ApplicationServiceOrganizer {
                     .position(app.getRecruitment().getPositionName())
                     .cvUrl(cvUrl)
                     .customAnswers(customAnswers)
+                    .formSchema(formSchema)
                     .status(app.getApplicationStatus() != null ? app.getApplicationStatus().name() : null)
                     .appliedAt(app.getAppliedAt())
                     .reviewedAt(app.getReviewedAt())
@@ -167,6 +179,11 @@ public class ApplicationServiceOrganizer {
                     .collect(java.util.stream.Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
             if (customAnswers.isEmpty()) customAnswers = null;
         }
+        java.util.List<java.util.Map<String, Object>> formSchema =
+                app.getRecruitment().getCustomForm() != null
+                ? app.getRecruitment().getCustomForm().getFormSchema()
+                : null;
+
         return ApplicationResponseDTO.builder()
                 .id(app.getApplicationId())
                 .name(app.getUser().getFullName())
@@ -176,6 +193,7 @@ public class ApplicationServiceOrganizer {
                 .position(app.getRecruitment().getPositionName())
                 .cvUrl(cvUrl)
                 .customAnswers(customAnswers)
+                .formSchema(formSchema)
                 .status(app.getApplicationStatus() != null ? app.getApplicationStatus().name() : null)
                 .appliedAt(app.getAppliedAt())
                 .build();
