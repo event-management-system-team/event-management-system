@@ -5,6 +5,7 @@ import { useAlert } from '../../hooks/useAlert.js';
 import { adminService } from '../../services/admin.service.js';
 import { Alert } from '../../components/common/Alert.jsx';
 import LoadingState from '../../components/common/LoadingState.jsx';
+import EmptyState from '../../components/common/EmptyState.jsx';
 import EventSummaryCard from '../../components/domain/admin/EventSummaryCard.jsx';
 import EventFilter from '../../components/domain/admin/EventFilter.jsx';
 import EventList from '../../components/domain/admin/EventList.jsx';
