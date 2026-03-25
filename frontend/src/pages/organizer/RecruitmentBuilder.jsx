@@ -4,7 +4,6 @@ import {
   FileText, Trash2, X, PlusCircle, Lock, Calendar, Clock,
   ChevronDown, ListChecks, Type as TypeIcon
 } from 'lucide-react';
-import Sidebar from '../../components/layout/Sidebar';
 import { useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../config/axios';
 import { Button } from 'antd';
@@ -180,7 +179,7 @@ const RecruitmentFormBuilder = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-[#f8f7f2] font-sans overflow-hidden">
+    <div className="flex flex-col h-screen bg-[#F1F0E8] font-sans overflow-hidden">
 
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         {/* HEADER */}
@@ -228,7 +227,7 @@ const RecruitmentFormBuilder = () => {
           </div>
 
           {/* CỘT 2: FORM CANVAS */}
-          <div className="w-full lg:flex-1 bg-[#ecebe4] p-4 sm:p-6 lg:p-8 lg:overflow-y-auto flex justify-center">
+          <div className="w-full lg:flex-1 bg-[#F1F0E8] p-4 sm:p-6 lg:p-8 lg:overflow-y-auto flex justify-center">
             <div className="w-full max-w-xl">
               <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden mb-6">
 

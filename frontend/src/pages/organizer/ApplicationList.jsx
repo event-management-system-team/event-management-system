@@ -182,7 +182,7 @@ const ApplicationList = () => {
             </div>
 
             {/* Modal Body - Stacks on mobile, Side-by-side on desktop */}
-            <div className="flex-1 overflow-y-auto bg-[#f8f7f2] flex flex-col md:flex-row">
+            <div className="flex-1 overflow-y-auto bg-[#F1F0E8] flex flex-col md:flex-row">
               
               {/* Left Column (Info) */}
               <div className="w-full md:w-5/12 p-4 sm:p-6 lg:p-8 border-b md:border-b-0 md:border-r border-gray-200">
@@ -221,7 +221,7 @@ const ApplicationList = () => {
                           );
                         })
                     ) : (
-                      <div className="bg-[#ecebe4]/50 border border-[#ecebe4] p-4 rounded-xl text-xs text-gray-400 italic">
+                      <div className="bg-[#F1F0E8]/50 border border-[#F1F0E8] p-4 rounded-xl text-xs text-gray-400 italic">
                         No form answers submitted.
                       </div>
                     )}

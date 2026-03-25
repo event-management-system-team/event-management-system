@@ -67,12 +67,12 @@ const RecruitmentList = () => {
   };
 
   if (isLoading) {
-    return <div className="flex min-h-screen bg-[#ecebe4] items-center justify-center font-bold text-gray-500 animate-pulse">Loading recruitment list...</div>;
+    return <div className="flex min-h-screen bg-[#F1F0E8] items-center justify-center font-bold text-gray-500 animate-pulse">Loading recruitment list...</div>;
   }
 
   if (isError || !dashboardData) {
     return (
-      <div className="flex min-h-screen bg-[#ecebe4] items-center justify-center flex-col gap-4">
+      <div className="flex min-h-screen bg-[#F1F0E8] items-center justify-center flex-col gap-4">
         <p className="font-bold text-red-500 text-lg">Failed to load data!</p>
         <button onClick={() => window.location.reload()} className="px-4 py-2 bg-white rounded-lg shadow-sm text-sm font-bold">Retry</button>
       </div>

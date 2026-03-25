@@ -72,7 +72,7 @@ const FeedbackList = () => {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen bg-[#f8f7f2] font-sans items-center justify-center">
+      <div className="flex min-h-screen bg-[#F1F0E8] font-sans items-center justify-center">
         <p className="text-gray-500 font-medium animate-pulse">
           Loading feedbacks...
         </p>
@@ -82,7 +82,7 @@ const FeedbackList = () => {
 
   if (isError) {
     return (
-      <div className="flex min-h-screen bg-[#f8f7f2] font-sans items-center justify-center">
+      <div className="flex min-h-screen bg-[#F1F0E8] font-sans items-center justify-center">
         <p className="text-red-500 font-medium">Error loading feedbacks</p>
       </div>
     );
@@ -307,7 +307,7 @@ const FeedbackList = () => {
                       </div>
                     </td>
                     <td className="px-4 lg:px-6 py-4 lg:py-5">
-                      <span className="inline-block text-[9px] sm:text-[10px] lg:text-[11px] font-bold uppercase italic tracking-wider text-[#8c9db3] bg-[#f8f7f2] px-2 sm:px-3 py-1 rounded-full border border-gray-100 whitespace-nowrap">
+                      <span className="inline-block text-[9px] sm:text-[10px] lg:text-[11px] font-bold uppercase italic tracking-wider text-[#8c9db3] bg-[#F1F0E8] px-2 sm:px-3 py-1 rounded-full border border-gray-100 whitespace-nowrap">
                         {item.ticketName || "General"}
                       </span>
                     </td>

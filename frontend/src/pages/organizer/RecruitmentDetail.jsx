@@ -28,8 +28,8 @@ const RecruitmentDetail = () => {
     if (recruitmentId) fetchDetail();
   }, [recruitmentId]);
 
-  if (isLoading) return <div className="flex h-screen items-center justify-center font-bold text-gray-500 bg-[#f8f7f2]">Loading Data...</div>;
-  if (!detailData) return <div className="flex h-screen items-center justify-center font-bold text-red-500 bg-[#f8f7f2]">Recruitment post not found!</div>;
+  if (isLoading) return <div className="flex h-screen items-center justify-center font-bold text-gray-500 bg-[#F1F0E8]">Loading Data...</div>;
+  if (!detailData) return <div className="flex h-screen items-center justify-center font-bold text-red-500 bg-[#F1F0E8]">Recruitment post not found!</div>;
 
   // Truyền recruitmentId qua location.state để RecruitmentBuilder load đúng bài edit
   const handleEdit = () => {
