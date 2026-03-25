@@ -123,16 +123,11 @@ export function EventAnalytics() {
         return Number(num).toFixed(2)
     }
 
+    if (loading) return <LoadingState />
+    if (error) return <EmptyState className='h-[600px]' />
+
     return (
         <div className="flex h-screen bg-[#F1F0E8]">
-
-            {loading && (
-                <LoadingState />
-            )}
-
-            {error && (
-                <EmptyState className='h-[600px]' />
-            )}
 
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
