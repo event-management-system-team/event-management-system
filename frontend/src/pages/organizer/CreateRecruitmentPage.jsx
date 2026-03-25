@@ -32,6 +32,7 @@ const CreateRecruitmentPage = () => {
     handleContinueStep2,
     handleSubmit,
     isEditMode,
+    eventStartDate,
     handleBack,
   } = useCreateRecruitment(preselectedEventId);
 
@@ -79,6 +80,7 @@ const CreateRecruitmentPage = () => {
                   form={form}
                   onChange={handleChange}
                   errors={errors}
+                  eventStartDate={eventStartDate}
                 />
               )}
               {step === 3 && (

@@ -143,6 +143,14 @@ const useCreateRecruitment = (preselectedEventId = "") => {
 
   const updateForm = (partial) => setForm((prev) => ({ ...prev, ...partial }));
 
+  // Lấy ngày bắt đầu sự kiện để giới hạn deadline
+  const selectedEvent = (form.eventOptions || []).find(
+    (ev) => ev.eventId === form.eventId,
+  );
+  const eventStartDate = selectedEvent?.startDate
+    ? new Date(selectedEvent.startDate)
+    : null;
+
   const buildPayload = (status = "OPEN") => ({
     positionName: form.positionName,
     description: form.description || null,
@@ -196,6 +204,10 @@ const useCreateRecruitment = (preselectedEventId = "") => {
 
   const handleContinueStep2 = () => {
     const e = validateStep2(form);
+    // Kiểm tra deadline phải trước ngày bắt đầu sự kiện
+    if (form.deadline && eventStartDate && form.deadline >= eventStartDate) {
+      e.deadline = "Deadline must be before the event start date";
+    }
     if (Object.keys(e).length > 0) {
       setErrors(e);
       return;
@@ -263,6 +275,7 @@ const useCreateRecruitment = (preselectedEventId = "") => {
     error,
     errors,
     isEditMode,
+    eventStartDate,
     updateForm,
     clearFieldError,
     handleSaveDraft,

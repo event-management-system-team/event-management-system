@@ -20,9 +20,18 @@ const PRESET_BENEFITS = [
   "Health Cover",
 ];
 
-const Step2Requirements = ({ form, onChange, errors = {} }) => {
+const Step2Requirements = ({ form, onChange, errors = {}, eventStartDate }) => {
   const [customReq, setCustomReq] = useState("");
   const [customBenefit, setCustomBenefit] = useState("");
+
+  // Deadline tối đa: trước ngày sự kiện bắt đầu 1 ngày
+  const maxDeadline = eventStartDate
+    ? (() => {
+        const d = new Date(eventStartDate);
+        d.setDate(d.getDate() - 1);
+        return d;
+      })()
+    : null;
 
   const toggleReq = (req) => {
     const list = form.requirements || [];
@@ -231,12 +240,15 @@ const Step2Requirements = ({ form, onChange, errors = {} }) => {
               dateFormat="dd/MM/yyyy"
               placeholderText="dd/mm/yyyy"
               minDate={new Date()}
+              maxDate={maxDeadline}
               className={inputCls(errors.deadline)}
               wrapperClassName="w-full"
             />
             <p className="mt-1.5 text-xs text-gray-400 flex items-center gap-1">
               <Clock size={11} />
-              Candidates cannot apply after this date
+              {maxDeadline
+                ? `Deadline must be before event start date (${maxDeadline.toLocaleDateString("en-GB")})`
+                : "Candidates cannot apply after this date"}
             </p>
             <FieldError msg={errors.deadline} />
           </section>

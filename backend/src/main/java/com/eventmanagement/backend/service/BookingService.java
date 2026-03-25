@@ -109,64 +109,117 @@ public class BookingService {
                 User user = userRepository.findById(userId)
                                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-                if (request.getTicketTypeId() == null) {
-                        if (request.getEventId() == null)
-                                throw new RuntimeException("eventId is required for free events.");
+                boolean isFreeEventOnly = request.getTickets().stream()
+                                .allMatch(t -> t.getTicketTypeId() == null);
 
-                        com.eventmanagement.backend.model.Event event = eventRepository
-                                        .findById(request.getEventId())
-                                        .orElseThrow(() -> new NotFoundException("Event not found"));
+                if (isFreeEventOnly) {
+                        return createFreeOrderWithoutTicketType(request, user);
+                }
 
-                        if (event.getEndDate().isBefore(LocalDateTime.now())) {
-                                throw new RuntimeException("Sự kiện đã kết thúc, không thể tạo đơn hàng.");
+                return createOrderWithTickets(request, user, userId);
+        }
+
+        private OrderResponse createFreeOrderWithoutTicketType(CreateOrderRequest request, User user) {
+                if (request.getEventId() == null)
+                        throw new RuntimeException("eventId is required for free events.");
+
+                com.eventmanagement.backend.model.Event event = eventRepository
+                                .findById(request.getEventId())
+                                .orElseThrow(() -> new NotFoundException("Event not found"));
+
+                if (event.getEndDate().isBefore(LocalDateTime.now())) {
+                        throw new RuntimeException("Sự kiện đã kết thúc, không thể tạo đơn hàng.");
+                }
+
+                // Tìm TicketType "Free Admission" đã tạo sẵn cho event
+                List<TicketType> freeTicketTypes = ticketTypeRepository
+                                .findByEvent_EventIdAndIsActiveTrue(event.getEventId());
+                TicketType freeTicketType = freeTicketTypes.isEmpty() ? null : freeTicketTypes.get(0);
+
+                Order order = Order.builder()
+                                .user(user).event(event)
+                                .orderCode(generateCode.generateOrderCode())
+                                .status(OrderStatus.PENDING)
+                                .paymentMethod(PaymentMethod.FREE)
+                                .totalAmount(BigDecimal.ZERO)
+                                .build();
+                orderRepository.save(order);
+
+                Map<String, Object> attendeeInfo = new HashMap<>();
+                attendeeInfo.put("name", request.getFullName());
+                attendeeInfo.put("email", request.getEmail());
+
+                int totalQty = request.getTickets().stream().mapToInt(CreateOrderRequest.TicketOrder::getQuantity).sum();
+                List<Ticket> tickets = new ArrayList<>();
+                for (int i = 0; i < totalQty; i++) {
+                        tickets.add(Ticket.builder()
+                                        .order(order).event(event).user(user)
+                                        .ticketType(freeTicketType)
+                                        .ticketCode(generateCode.generateTicketCode())
+                                        .status(TicketStatus.PENDING)
+                                        .price(BigDecimal.ZERO)
+                                        .attendeeInfo(attendeeInfo)
+                                        .build());
+                }
+                ticketRepository.saveAll(tickets);
+                confirmOrderInternal(order, tickets, TicketStatus.CONFIRMED); // free → CONFIRMED
+
+                log.info("[Booking] Free order confirmed: {}", order.getOrderCode());
+                return OrderResponse.from(order);
+        }
+
+        private OrderResponse createOrderWithTickets(CreateOrderRequest request, User user, UUID userId) {
+                BigDecimal total = BigDecimal.ZERO;
+                com.eventmanagement.backend.model.Event firstEvent = null;
+                List<Ticket> allTickets = new ArrayList<>();
+                List<String> reservationKeysToDelete = new ArrayList<>();
+
+                Map<String, Object> attendeeInfo = new HashMap<>();
+                attendeeInfo.put("name", request.getFullName());
+                attendeeInfo.put("email", request.getEmail());
+
+                for (CreateOrderRequest.TicketOrder ticketRequest : request.getTickets()) {
+                        if (ticketRequest.getTicketTypeId() == null) continue;
+
+                        String reservationKey = buildReservationKey(ticketRequest.getTicketTypeId(), userId);
+                        Object cached = redisTemplate.opsForValue().get(reservationKey);
+                        if (cached == null)
+                                throw new RuntimeException("Reservation has expired. Please select tickets again.");
+
+                        int reservedQty = ((Number) cached).intValue();
+                        if (reservedQty < ticketRequest.getQuantity())
+                                throw new RuntimeException("Ticket quantity is invalid. Please select tickets again.");
+
+                        TicketType ticketType = ticketTypeRepository.findById(ticketRequest.getTicketTypeId())
+                                        .orElseThrow(() -> new NotFoundException("Ticket type not found"));
+
+                        if (firstEvent == null) {
+                                firstEvent = ticketType.getEvent();
                         }
 
-                        Order order = Order.builder()
-                                        .user(user).event(event)
-                                        .orderCode(generateCode.generateOrderCode())
-                                        .status(OrderStatus.PENDING)
-                                        .paymentMethod(PaymentMethod.FREE)
-                                        .totalAmount(BigDecimal.ZERO)
-                                        .build();
-                        orderRepository.save(order);
+                        BigDecimal ticketTotal = ticketType.getPrice().multiply(BigDecimal.valueOf(ticketRequest.getQuantity()));
+                        total = total.add(ticketTotal);
+                        reservationKeysToDelete.add(reservationKey);
 
-                        Map<String, Object> attendeeInfo = new HashMap<>();
-                        attendeeInfo.put("name", request.getFullName());
-                        attendeeInfo.put("email", request.getEmail());
-
-                        List<Ticket> tickets = new ArrayList<>();
-                        for (int i = 0; i < request.getQuantity(); i++) {
-                                tickets.add(Ticket.builder()
-                                                .order(order).event(event).user(user)
+                        for (int i = 0; i < ticketRequest.getQuantity(); i++) {
+                                allTickets.add(Ticket.builder()
+                                                .event(ticketType.getEvent()).user(user)
+                                                .ticketType(ticketType)
                                                 .ticketCode(generateCode.generateTicketCode())
                                                 .status(TicketStatus.PENDING)
-                                                .price(BigDecimal.ZERO)
+                                                .price(ticketType.getPrice())
                                                 .attendeeInfo(attendeeInfo)
                                                 .build());
                         }
-                        ticketRepository.saveAll(tickets);
-                        confirmOrderInternal(order, tickets, TicketStatus.CONFIRMED); // free → CONFIRMED
-
-                        log.info("[Booking] Free order confirmed: {}", order.getOrderCode());
-                        return OrderResponse.from(order);
                 }
 
-                String reservationKey = buildReservationKey(request.getTicketTypeId(), userId);
-                Object cached = redisTemplate.opsForValue().get(reservationKey);
-                if (cached == null)
-                        throw new RuntimeException("Reservation has expired. Please select tickets again.");
-
-                int reservedQty = ((Number) cached).intValue();
-                if (reservedQty < request.getQuantity())
-                        throw new RuntimeException("Ticket quantity is invalid. Please select tickets again.");
-
-                TicketType ticketType = ticketTypeRepository.findById(request.getTicketTypeId())
-                                .orElseThrow(() -> new NotFoundException("Ticket type not found"));
-
-                BigDecimal total = ticketType.getPrice().multiply(BigDecimal.valueOf(request.getQuantity()));
+                if (firstEvent == null && request.getEventId() != null) {
+                        firstEvent = eventRepository.findById(request.getEventId())
+                                .orElseThrow(() -> new NotFoundException("Event not found"));
+                }
 
                 Order order = Order.builder()
-                                .user(user).event(ticketType.getEvent())
+                                .user(user).event(firstEvent)
                                 .orderCode(generateCode.generateOrderCode())
                                 .status(OrderStatus.PENDING)
                                 .totalAmount(total)
@@ -179,27 +232,15 @@ public class BookingService {
 
                 orderRepository.save(order);
 
-                Map<String, Object> attendeeInfo = new HashMap<>();
-                attendeeInfo.put("name", user.getFullName());
-                attendeeInfo.put("email", user.getEmail());
-
-                List<Ticket> tickets = new ArrayList<>();
-                for (int i = 0; i < request.getQuantity(); i++) {
-                        tickets.add(Ticket.builder()
-                                        .order(order).event(ticketType.getEvent()).user(user)
-                                        .ticketType(ticketType)
-                                        .ticketCode(generateCode.generateTicketCode())
-                                        .status(TicketStatus.PENDING)
-                                        .price(ticketType.getPrice())
-                                        .attendeeInfo(attendeeInfo)
-                                        .build());
+                for (Ticket t : allTickets) {
+                        t.setOrder(order);
                 }
-                ticketRepository.saveAll(tickets);
+                ticketRepository.saveAll(allTickets);
 
                 if (total.compareTo(BigDecimal.ZERO) == 0) {
-                        confirmOrderInternal(order, tickets, TicketStatus.CONFIRMED); // free (giá 0) → CONFIRMED
+                        confirmOrderInternal(order, allTickets, TicketStatus.CONFIRMED);
                 } else {
-                        redisTemplate.delete(reservationKey);
+                        reservationKeysToDelete.forEach(redisTemplate::delete);
                 }
 
                 return OrderResponse.from(order);
@@ -258,7 +299,7 @@ public class BookingService {
         /**
          * Xác nhận order thành công.
          * - ticketFinalStatus = CONFIRMED : vé miễn phí (không qua thanh toán)
-         * - ticketFinalStatus = PAID      : vé có phí (sau khi VNPay callback thành công)
+         * - ticketFinalStatus = PAID : vé có phí (sau khi VNPay callback thành công)
          */
         private void confirmOrderInternal(Order order, List<Ticket> tickets, TicketStatus ticketFinalStatus) {
                 order.setStatus(OrderStatus.PAID);
@@ -291,7 +332,8 @@ public class BookingService {
                         return;
 
                 expiredOrders.forEach(order -> {
-                        order.setStatus(OrderStatus.EXPIRED); // EXPIRED = hết giờ thanh toán (phân biệt CANCELLED thủ công)
+                        order.setStatus(OrderStatus.EXPIRED); // EXPIRED = hết giờ thanh toán (phân biệt CANCELLED thủ
+                                                              // công)
                         order.setCancelledAt(LocalDateTime.now());
                         orderRepository.save(order);
 
