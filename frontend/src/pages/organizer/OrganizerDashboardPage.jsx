@@ -46,13 +46,12 @@ const DONUT_COLORS = ['#1E293B', '#F97316', '#94A3B8'];
 const formatVND = (value) =>
     new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(value);
 
-const StatCard = ({ icon: Icon, label, value, loading }) => (
+const StatCard = ({ icon: Icon, label, value, loading, color, colorBg }) => (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-5 flex items-center gap-4">
         <div
-            className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
-            style={{ backgroundColor: ACCENT_LIGHT }}
+            className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 bg-${colorBg}`}
         >
-            <Icon size={22} style={{ color: ACCENT }} />
+            <Icon size={22} className={`text-${color}`}  />
         </div>
         <div>
             <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">
@@ -214,18 +213,24 @@ const OrganizerDashboardPage = () => {
                     label="Total Events"
                     value={stats.totalEvents}
                     loading={loading}
+                    color="blue-500"
+                    colorBg="blue-50"
                 />
                 <StatCard
                     icon={BookOpen}
                     label="Total Bookings"
                     value={totalBookings}
                     loading={loading}
+                    color="green-500"
+                    colorBg="green-50"
                 />
                 <StatCard
                     icon={Ticket}
                     label="Tickets Sold"
                     value={totalTicketsSold}
                     loading={loading}
+                    color="red-500"
+                    colorBg="red-50"
                 />
             </div>
 
