@@ -101,21 +101,21 @@ export default function StaffManagement() {
                         className="flex ml-7 gap-2 px-2 py-6 bg-white border-none rounded-xl shadow-sm w-fit">
                         <TabsTrigger
                             value="staff"
-                            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-mediumb text-gray-500 transition-all hover:text-gray-900 data-[state=active]:bg-[#7FA5A5] data-[state=active]:text-white data-[state=active]:shadow p-4.5 hover:cursor-pointer"
+                            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold text-gray-500 transition-all hover:text-gray-900 data-[state=active]:bg-[#7FA5A5] data-[state=active]:text-white data-[state=active]:shadow p-4.5 hover:cursor-pointer"
                         >
                             Staff
                         </TabsTrigger>
 
                         <TabsTrigger
                             value="schedule"
-                            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-gray-500       transition-all hover:text-gray-900 data-[state=active]:bg-[#7FA5A5] data-[state=active]:text-white  data-[state=active]:shadow p-4.5 hover:cursor-pointer"
+                            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold text-gray-500       transition-all hover:text-gray-900 data-[state=active]:bg-[#7FA5A5] data-[state=active]:text-white  data-[state=active]:shadow p-4.5 hover:cursor-pointer"
                         >
                             Work Schedule
                         </TabsTrigger>
 
                         <TabsTrigger
                             value="resources"
-                            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-gray-500    transition-all hover:text-gray-900 data-[state=active]:bg-[#7FA5A5] data-[state=active]:text-white  data-[state=active]:shadow p-4.5 hover:cursor-pointer"
+                            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold text-gray-500    transition-all hover:text-gray-900 data-[state=active]:bg-[#7FA5A5] data-[state=active]:text-white  data-[state=active]:shadow p-4.5 hover:cursor-pointer"
                         >
                             Resources
                         </TabsTrigger>

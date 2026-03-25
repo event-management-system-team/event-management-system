@@ -92,7 +92,7 @@ const StaffListTab = ({ id, onLoading, onError }) => {
                                         </Avatar>
 
                                         <div>
-                                            <div className="font-medium text-sm text-gray-900">
+                                            <div className="font-bold text-sm text-gray-900">
                                                 {staff.fullName}
                                             </div>
                                             <div className="text-xs text-gray-500">{staff.email}</div>
