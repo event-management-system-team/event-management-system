@@ -1,9 +1,5 @@
 package com.eventmanagement.backend.model;
 
-import com.eventmanagement.backend.constants.RecruitmentStatus;
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -12,6 +8,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import com.eventmanagement.backend.constants.RecruitmentStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,7 +23,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -74,6 +70,7 @@ public class Recruitment {
     @Column(columnDefinition = "TEXT")
     private String requirements;
 
+    @Column(name = "deadline")
     private LocalDateTime deadline;
 
     @Enumerated(EnumType.STRING)

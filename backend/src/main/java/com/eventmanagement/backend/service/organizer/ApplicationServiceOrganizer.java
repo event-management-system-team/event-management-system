@@ -134,6 +134,7 @@ public class ApplicationServiceOrganizer {
                 .position(app.getRecruitment().getPositionName())
                 .resume(resume)
                 .coverLetter(coverLetter)
+                .applicationData(app.getApplicationData())
                 .status(app.getApplicationStatus() != null ? app.getApplicationStatus().name() : null)
                 .appliedAt(app.getAppliedAt())
                 .build();

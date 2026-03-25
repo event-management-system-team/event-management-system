@@ -19,6 +19,9 @@ const FeedbackList = () => {
   const [ratingFilter, setRatingFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("");
   const [eventName, setEventName] = useState("Loading...");
+  
+  // NPS Emoji array từ 1-10
+  const npsEmojis = ['😡', '😠', '😞', '🙁', '😐', '🙂', '😊', '😀', '😁', '😍'];
 
   useEffect(() => {
     const checkEventStatus = async () => {
@@ -143,11 +146,12 @@ const FeedbackList = () => {
   }
 
   return (
-    <div className="p-10 w-full overflow-x-hidden">
+    // SỬA Ở ĐÂY: Đổi font-serif thành font-sans
+    <div className="p-10 w-full overflow-x-hidden font-sans">
       {/* --- HEADER --- */}
       <div className="flex justify-between items-end mb-8" ref={listTopRef}>
         <div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-900 tracking-tight mb-1 sm:mb-2">
+          <h1 className="text-lg sm:text-xl lg:text-2xl font-extrabold text-gray-900 tracking-tight mb-1 sm:mb-2">
             Attendee Feedback
           </h1>
           <p className="text-gray-500 font-medium italic text-xs sm:text-sm">
@@ -208,12 +212,17 @@ const FeedbackList = () => {
               onChange={handleRatingChange}
               className="outline-none text-xs sm:text-sm font-medium text-gray-600 bg-transparent cursor-pointer"
             >
-              <option value="all">All Ratings</option>
-              <option value="5">5 Stars</option>
-              <option value="4">4 Stars</option>
-              <option value="3">3 Stars</option>
-              <option value="2">2 Stars</option>
-              <option value="1">1 Star</option>
+              <option value="all">All NPS</option>
+              <option value="10">10 - Excellent 😍</option>
+              <option value="9">9 - Very Good 😁</option>
+              <option value="8">8 - Good 😀</option>
+              <option value="7">7 - Satisfied 😊</option>
+              <option value="6">6 - Okay 🙂</option>
+              <option value="5">5 - Neutral 😐</option>
+              <option value="4">4 - Poor 🙁</option>
+              <option value="3">3 - Bad 😞</option>
+              <option value="2">2 - Very Bad 😠</option>
+              <option value="1">1 - Terrible 😡</option>
             </select>
           </div>
 
@@ -306,19 +315,12 @@ const FeedbackList = () => {
                       </div>
                     </td>
                     <td className="px-4 lg:px-6 py-4 lg:py-5">
-                      <div className="flex gap-0.5 sm:gap-1 text-xs sm:text-sm">
-                        {[...Array(5)].map((_, i) => (
-                          <span
-                            key={i}
-                            className={`${
-                              i < item.rating
-                                ? "text-yellow-400"
-                                : "text-gray-200"
-                            } text-sm sm:text-base`}
-                          >
-                            ★
-                          </span>
-                        ))}
+                      <div className="flex items-center gap-2">
+                        <span className="text-base sm:text-lg font-bold text-blue-500">{item.rating}</span>
+                        <span className="text-base sm:text-lg">/ 10</span>
+                        {item.rating > 0 && item.rating <= 10 && (
+                          <span className="text-lg sm:text-xl ml-1">{npsEmojis[item.rating - 1]}</span>
+                        )}
                       </div>
                     </td>
                     <td className="px-4 lg:px-6 py-4 lg:py-5">

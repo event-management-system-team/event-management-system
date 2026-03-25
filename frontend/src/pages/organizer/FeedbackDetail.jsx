@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  ArrowLeft, Star, User, Ticket, Mail, Calendar, 
-  Download, Trash2, MessageSquare, ListIcon 
+  ArrowLeft, User, Ticket, Mail, Calendar, 
+  Download, Trash2, MessageSquare, ListIcon, ThumbsUp 
 } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import jsPDF from 'jspdf';
 import Sidebar from '../../components/layout/Sidebar'; 
 import axiosInstance from '../../config/axios';
 
@@ -45,9 +46,131 @@ const FeedbackDetail = () => {
 
   // Sửa lỗi chính tả an toàn: Bắt cả trường hợp Backend trả về 'feedbackRespone' hoặc 'feedbackResponse'
   const detailData = feedbackData.feedbackResponse?.detail || feedbackData.feedbackRespone?.detail || [];
-  const npsScoreItem = detailData.find(item => item.type === 'NPS');
-  const npsScore = npsScoreItem ? npsScoreItem.answer : '--';
   const overallRating = feedbackData.feedbackResponse?.overallRating || feedbackData.feedbackRespone?.overallRating || 0;
+  
+  // Array NPS emoji từ 1-10
+  const npsEmojis = ['😡', '😠', '😞', '🙁', '😐', '🙂', '😊', '😀', '😁', '😍'];
+  const npsEmoji = overallRating > 0 && overallRating <= 10 ? npsEmojis[overallRating - 1] : '';
+
+  const handleExportPDF = async () => {
+    try {
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      let yPosition = 15;
+
+      // ===== HEADER =====
+      pdf.setFontSize(18);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('FEEDBACK REPORT', 15, yPosition);
+      
+      yPosition += 8;
+      pdf.setFontSize(10);
+      pdf.setFont(undefined, 'normal');
+      pdf.text(`Response #${feedbackId}`, 15, yPosition);
+      yPosition += 5;
+      pdf.text(`Event: ${feedbackData?.eventName || 'N/A'}`, 15, yPosition);
+      yPosition += 5;
+      pdf.text(`Submitted: ${feedbackData?.submittedAt || 'N/A'}`, 15, yPosition);
+
+      // Separator
+      yPosition += 7;
+      pdf.setLineWidth(0.5);
+      pdf.line(15, yPosition, 195, yPosition);
+
+      // ===== ATTENDEE INFO SECTION =====
+      yPosition += 8;
+      pdf.setFontSize(12);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('ATTENDEE INFORMATION', 15, yPosition);
+      
+      yPosition += 7;
+      pdf.setFontSize(10);
+      pdf.setFont(undefined, 'normal');
+      const attendeeInfo = [
+        ['Full Name:', feedbackData.attendeeInfor?.fullName || 'N/A'],
+        ['Email:', feedbackData.attendeeInfor?.email || 'N/A'],
+        ['Phone:', feedbackData.attendeeInfor?.phoneNumber || 'N/A'],
+        ['Ticket Type:', feedbackData.attendeeInfor?.ticketType || 'ATTENDEE'],
+        ['Ticket Code:', feedbackData.attendeeInfor?.ticketCode || 'N/A'],
+      ];
+
+      attendeeInfo.forEach(([label, value]) => {
+        pdf.setFont(undefined, 'bold');
+        pdf.text(label, 15, yPosition);
+        pdf.setFont(undefined, 'normal');
+        const wrapped = pdf.splitTextToSize(String(value), 140);
+        pdf.text(wrapped, 50, yPosition);
+        yPosition += wrapped.length > 1 ? wrapped.length * 5 : 5;
+      });
+
+      // ===== RATINGS SECTION =====
+      yPosition += 5;
+      pdf.setFontSize(12);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('RATINGS & SCORES', 15, yPosition);
+
+      yPosition += 7;
+      pdf.setFontSize(10);
+      pdf.setFont(undefined, 'normal');
+      pdf.text(`NPS Score: ${overallRating}/10`, 15, yPosition);
+
+      // ===== FEEDBACK RESPONSES SECTION =====
+      yPosition += 10;
+      pdf.setFontSize(12);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('FEEDBACK RESPONSES', 15, yPosition);
+
+      yPosition += 7;
+      pdf.setFontSize(10);
+
+      detailData.forEach((item, index) => {
+        if (item.type === 'NPS') return;
+
+        // Check if we need a new page
+        if (yPosition > pageHeight - 30) {
+          pdf.addPage();
+          yPosition = 15;
+        }
+
+        // Question
+        pdf.setFont(undefined, 'bold');
+        const questionWrapped = pdf.splitTextToSize(
+          `Q${index + 1}: ${item.question || 'Feedback Question'}`,
+          170
+        );
+        pdf.text(questionWrapped, 15, yPosition);
+        yPosition += questionWrapped.length * 5;
+
+        // Answer
+        pdf.setFont(undefined, 'normal');
+        const answerWrapped = pdf.splitTextToSize(
+          item.answer || 'No response provided',
+          170
+        );
+        pdf.text(answerWrapped, 18, yPosition);
+        yPosition += answerWrapped.length * 5 + 3;
+      });
+
+      // ===== FOOTER =====
+      yPosition = pageHeight - 15;
+      pdf.setFontSize(8);
+      pdf.setFont(undefined, 'normal');
+      pdf.text(
+        `Generated on ${new Date().toLocaleString()}`,
+        15,
+        yPosition
+      );
+
+      // Download
+      const fileName = `Feedback_#${feedbackId}_${new Date().toISOString().slice(0, 10)}.pdf`;
+      pdf.save(fileName);
+      console.log('✅ PDF exported successfully:', fileName);
+      alert('PDF exported successfully!');
+    } catch (error) {
+      console.error('❌ Error exporting PDF:', error);
+      alert(`Failed to export PDF: ${error.message}`);
+    }
+  };
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-[#f8f7f2] font-sans">
@@ -74,7 +197,9 @@ const FeedbackDetail = () => {
             <button className="flex-1 sm:flex-none justify-center px-4 py-2.5 sm:py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-red-500 hover:bg-red-50 flex items-center gap-2 transition-all shadow-sm">
               <Trash2 size={16} /> <span className="hidden sm:inline">Delete</span>
             </button>
-            <button className="flex-1 sm:flex-none justify-center px-4 py-2.5 sm:py-2 bg-[#8c9db3] hover:bg-[#7a8ca3] text-white rounded-lg text-sm font-bold flex items-center gap-2 shadow-md transition-all">
+            <button 
+              onClick={handleExportPDF}
+              className="flex-1 sm:flex-none justify-center px-4 py-2.5 sm:py-2 bg-[#8c9db3] hover:bg-[#7a8ca3] text-white rounded-lg text-sm font-bold flex items-center gap-2 shadow-md transition-all">
               <Download size={16} /> Export<span className="hidden sm:inline"> PDF</span>
             </button>
           </div>
@@ -92,8 +217,8 @@ const FeedbackDetail = () => {
               <div className="flex flex-col items-center mb-6 text-center">
                 <img src={feedbackData.attendeeInfor?.avatar || '/default-avatar.png'} alt="Avatar" className="w-20 h-20 lg:w-24 lg:h-24 rounded-full object-cover border-4 border-[#f8f7f2] shadow-sm mb-4" />
                 <h2 className="text-base lg:text-lg font-bold text-gray-900">{feedbackData.attendeeInfor?.fullName}</h2>
-                <span className="bg-[#8c9db3]/10 text-[#8c9db3] text-[10px] lg:text-xs font-bold px-3 py-1 rounded-full mt-2 uppercase tracking-wide">
-                  {feedbackData.attendeeInfor?.ticketType || "ATTENDEE"}
+                <span className="inline-block text-[9px] sm:text-[10px] lg:text-[11px] font-bold uppercase italic tracking-wider text-[#8c9db3] bg-[#f8f7f2] px-2 sm:px-3 py-1 rounded-full border border-gray-100 mt-2 whitespace-nowrap">
+                  {feedbackData.attendeeInfor?.ticketName || "ATTENDEE"}
                 </span>
               </div>
 
@@ -107,12 +232,8 @@ const FeedbackDetail = () => {
                   <span className="text-gray-600 font-medium">{feedbackData.attendeeInfor?.phoneNumber || 'N/A'}</span>
                 </div>
                 <div className="flex items-center gap-3 text-xs sm:text-sm">
-                  <Ticket size={16} className="text-gray-400 shrink-0" />
-                  <span className="text-gray-600 font-medium">Code: {feedbackData.attendeeInfor?.ticketCode || 'N/A'}</span>
-                </div>
-                <div className="flex items-center gap-3 text-xs sm:text-sm">
                   <Calendar size={16} className="text-gray-400 shrink-0" />
-                  <span className="text-gray-600 font-medium">Submitted: {feedbackData?.submittedAt}</span>
+                  <span className="text-gray-600 font-medium">Submitted: {new Date(feedbackData?.submittedAt).toLocaleDateString()}</span>
                 </div>
               </div>
             </div>
@@ -124,25 +245,16 @@ const FeedbackDetail = () => {
               <h3 className="text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-6 lg:mb-8">Feedback Responses</h3>
 
               {/* KHU VỰC ĐIỂM SỐ RESPONSIVE */}
-              <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 mb-8 pb-6 lg:mb-10 lg:pb-8 border-b border-gray-100">
-                <div className="flex-1">
-                  <p className="text-xs sm:text-sm font-bold text-gray-500 mb-2 sm:mb-3">Overall Experience</p>
-                  <div className="flex gap-1 sm:gap-1.5">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={24} className={`sm:w-7 sm:h-7 lg:w-8 lg:h-8 ${i < overallRating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'}`} />
-                    ))}
-                  </div>
-                </div>
-                
-                {/* Đường kẻ ngăn cách: Dọc trên Desktop/Tablet, Ngang trên Mobile */}
-                <div className="hidden sm:block w-px bg-gray-100"></div>
-                <div className="block sm:hidden h-px w-full bg-gray-50"></div>
-
-                <div className="flex-1">
-                  <p className="text-xs sm:text-sm font-bold text-gray-500 mb-2 sm:mb-3">Net Promoter Score (NPS)</p>
+              <div className="mb-8 pb-6 lg:mb-10 lg:pb-8 border-b border-gray-100">
+                <div>
+                  <p className="text-xs sm:text-sm font-bold text-gray-500 mb-2 sm:mb-3 flex items-center gap-2">
+                    <ThumbsUp size={16} className="text-[#8c9db3]" />
+                    NPS Score
+                  </p>
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl sm:text-3xl font-extrabold text-green-500">{npsScore}</span>
+                    <span className="text-2xl sm:text-3xl font-extrabold text-blue-500">{overallRating}</span>
                     <span className="text-gray-400 font-medium text-xs sm:text-sm mt-1 sm:mt-2">/ 10</span>
+                    {npsEmoji && <span className="text-2xl sm:text-3xl ml-2">{npsEmoji}</span>}
                   </div>
                 </div>
               </div>

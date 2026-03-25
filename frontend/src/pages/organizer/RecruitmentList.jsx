@@ -16,6 +16,7 @@ const RecruitmentList = () => {
       try {
         const response = await axiosInstance.get(`recruitments/dashboards/${eventId}`);
         if (response.status === 200 && response.data) {
+          console.log("Dashboard data:", response.data);
           setDashboardData(response.data);
         }
       } catch (error) {
@@ -77,7 +78,7 @@ const RecruitmentList = () => {
     );
   }
 
-  // Kiểm tra sự kiện đã kết thúc chưa (Dựa trên eventEndDate từ Backend)
+  // Kiểm tra sự kiện đã kết thúc chưa
   const isEventEnded = dashboardData?.eventEndDate 
     ? new Date() > new Date(dashboardData.eventEndDate) 
     : false;
@@ -130,7 +131,20 @@ const RecruitmentList = () => {
         <div className="space-y-4">
           {dashboardData?.recentRecruitments?.length > 0 ? (
             dashboardData.recentRecruitments.map((job, index) => {
-              const ui = getStatusUI(job.status);
+              
+              // --- XỬ LÝ LOGIC TRẠNG THÁI TRÊN FRONTEND ---
+              const now = new Date();
+              const isPastDeadline = job.deadline ? now > new Date(job.deadline) : false;
+              
+              let currentStatus = 'OPEN'; // Mặc định là đang tuyển
+              
+              // Ép cứng thành CLOSED nếu sự kiện đã kết thúc HOẶC đã quá hạn deadline
+              if (isEventEnded || isPastDeadline) {
+                currentStatus = 'CLOSED';
+              }
+              // ---------------------------------------------
+
+              const ui = getStatusUI(currentStatus);
               const progressPercent = job.total > 0 ? Math.min((job.currentCount / job.total) * 100, 100) : 0;
               
               return (
@@ -174,22 +188,20 @@ const RecruitmentList = () => {
                     </div>
                   </div>
 
-                  {/* Cột 3: Nút bấm (Theo ảnh mẫu) */}
+                  {/* Cột 3: Nút bấm */}
                   <div className="w-full md:w-1/3 flex items-center justify-between md:justify-end gap-6 mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-none border-gray-50">
-                      {/* Nút application */}
+                    
+                    <Link 
+                      to={`/organizer/applications/${job.recruitmentId}`} 
+                      className="px-6 py-2.5 rounded-full text-xs lg:text-sm font-bold transition-all shadow-sm whitespace-nowrap bg-white text-[#4a9e9e] border border-[#4a9e9e] hover:bg-[#eaf5f5]"
+                    >
+                      Applications
+                    </Link>
 
-                  <Link 
-                    to={`/organizer/applications/${job.recruitmentId}`} 
-                    className="px-6 py-2.5 rounded-full text-xs lg:text-sm font-bold transition-all shadow-sm whitespace-nowrap bg-white text-[#4a9e9e] border border-[#4a9e9e] hover:bg-[#eaf5f5]"
-                  >
-                    Applications
-                  </Link>
-
-                  {/* nút view detail */}
                     <Link 
                       to={`/organizer/recruitments/${job.recruitmentId}`} 
                       className={`px-6 py-2.5 rounded-full text-xs lg:text-sm font-bold transition-all shadow-sm whitespace-nowrap`}
-                      onClick={(e) => !ui.isActive && job.status !== 'CLOSED' && e.preventDefault()}
+                      onClick={(e) => !ui.isActive && currentStatus !== 'CLOSED' && e.preventDefault()}
                     >
                       {ui.buttonText}
                     </Link>

@@ -84,15 +84,12 @@ const ApplicationList = () => {
 
   // Logic Lọc Dữ Liệu
   const filteredApplications = applications.filter(app => {
-    // 1. Lọc theo tên hoặc email
     const matchSearch = 
       app.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       app.email?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    // 2. Lọc theo Status
     const matchStatus = statusFilter === 'ALL' || app.status?.toUpperCase() === statusFilter;
 
-    // 3. Lọc theo Ngày nộp (Chỉ so sánh phần YYYY-MM-DD)
     const appDate = app.appliedAt ? new Date(app.appliedAt).toISOString().split('T')[0] : '';
     const matchDate = !dateFilter || appDate === dateFilter;
 
@@ -117,7 +114,6 @@ const ApplicationList = () => {
           <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
             
             <div className="flex flex-col sm:flex-row flex-1 gap-4">
-              {/* Search by Name/Email */}
               <div className="bg-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-2 sm:gap-3 flex-1 min-w-[200px]">
                 <Search size={18} className="text-gray-400 shrink-0" />
                 <input 
@@ -129,7 +125,6 @@ const ApplicationList = () => {
                 />
               </div>
 
-              {/* Status Filter */}
               <div className="bg-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
                 <Filter size={18} className="text-gray-400 shrink-0" />
                 <select 
@@ -144,7 +139,6 @@ const ApplicationList = () => {
                 </select>
               </div>
 
-              {/* Date Filter */}
               <div className="bg-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
                 <input 
                   type="date" 
@@ -155,7 +149,6 @@ const ApplicationList = () => {
               </div>
             </div>
 
-            {/* Back Button */}
             <button 
               onClick={() => navigate(-1)} 
               className="w-full lg:w-auto justify-center bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 text-xs sm:text-sm font-bold shadow-md transition-all shrink-0"
@@ -208,7 +201,7 @@ const ApplicationList = () => {
                         </div>
                       </td>
                       <td className="px-4 lg:px-6 py-3 sm:py-4"><span className="text-xs sm:text-sm font-bold text-gray-700">{app.position}</span></td>
-                      <td className="px-4 lg:px-6 py-3 sm:py-4"><span className="text-xs sm:text-sm font-medium text-gray-500">{new Date(app.appliedAt).toLocaleDateString('en-GB')}</span></td>
+                      <td className="px-4 lg:px-6 py-3 sm:py-4"><span className="text-xs sm:text-sm font-medium text-gray-500">{app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('en-GB') : 'N/A'}</span></td>
                       <td className="px-4 lg:px-6 py-3 sm:py-4">{getStatusBadge(app.status)}</td>
                       <td className="px-4 lg:px-6 py-3 sm:py-4">
                         <div className="flex items-center justify-center gap-3">
@@ -251,49 +244,96 @@ const ApplicationList = () => {
 
             {/* Modal Body */}
             <div className="flex-1 overflow-y-auto bg-[#f8f7f2] flex flex-col md:flex-row">
-              
-              {/* Left Column (Info) */}
-              <div className="w-full md:w-5/12 p-4 sm:p-6 lg:p-8 border-b md:border-b-0 md:border-r border-gray-200">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
-                  <div>
-                    <p className="text-[10px] font-bold text-[#8c9db3] uppercase tracking-widest mb-1 sm:mb-1.5">Email</p>
-                    <p className="text-xs sm:text-sm font-medium text-gray-800 break-all">{selectedCandidate.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-bold text-[#8c9db3] uppercase tracking-widest mb-1 sm:mb-1.5">Phone</p>
-                    <p className="text-xs sm:text-sm font-medium text-gray-800">{selectedCandidate.phone || 'N/A'}</p>
-                  </div>
-                </div>
-
-                <div className="mb-6 sm:mb-8">
-                  <h4 className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-gray-800 mb-3 sm:mb-4"><Star size={16} className="text-[#2dd4bf] fill-[#2dd4bf]" /> Key Skills</h4>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white border border-gray-200 rounded-full text-[10px] sm:text-xs font-bold text-gray-600 shadow-sm">Event Management</span>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-gray-800 mb-3 sm:mb-4"><Quote size={16} className="text-[#2dd4bf]" /> Custom Answers</h4>
-                  <div className="bg-[#ecebe4]/50 border border-[#ecebe4] p-4 sm:p-5 rounded-xl sm:rounded-2xl text-xs sm:text-sm text-gray-600 leading-relaxed font-medium">
-                    Waiting for custom form integration...
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column (CV) */}
-              <div className="w-full md:w-7/12 p-4 sm:p-6 lg:p-8 bg-[#f4f3ed] flex flex-col h-64 md:h-auto">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-4">
-                  <div className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-gray-700"><FileText size={18} className="text-[#8c9db3]" /> Curriculum Vitae Preview</div>
-                  <button className="w-full sm:w-auto justify-center bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider shadow-sm transition-colors">
-                    <Download size={14} /> Download PDF
-                  </button>
-                </div>
+              {(() => {
+                // Lấy trực tiếp Object từ DTO (Backend trả về)
+                const appData = selectedCandidate.applicationData || {};
                 
-                <div className="flex-1 bg-white rounded-xl shadow-md border-2 border-dashed border-gray-300 flex items-center justify-center flex-col gap-3 sm:gap-4 text-gray-400 min-h-[200px] sm:min-h-[300px]">
-                     <FileText size={40} className="text-gray-300 sm:w-12 sm:h-12"/>
-                     <p className="font-bold text-xs sm:text-sm text-center px-4">Applicant hasn't uploaded a CV yet</p>
-                </div>
-              </div>
+                const phone = appData.phone || selectedCandidate.phone || 'N/A';
+                const experience = appData.experience || "Chưa cập nhật kinh nghiệm.";
+                const cvLink = appData.cv_link || selectedCandidate.resume || null;
+
+                return (
+                  <>
+                    {/* Left Column (Info) */}
+                    <div className="w-full md:w-5/12 p-4 sm:p-6 lg:p-8 border-b md:border-b-0 md:border-r border-gray-200">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                        <div>
+                          <p className="text-[10px] font-bold text-[#8c9db3] uppercase tracking-widest mb-1 sm:mb-1.5">Email</p>
+                          <p className="text-xs sm:text-sm font-medium text-gray-800 break-all">{selectedCandidate.email}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-[#8c9db3] uppercase tracking-widest mb-1 sm:mb-1.5">Phone</p>
+                          <p className="text-xs sm:text-sm font-medium text-gray-800">{phone}</p>
+                        </div>
+                      </div>
+
+                      {/* Experience (Từ DB) */}
+                      <div className="mb-6 sm:mb-8">
+                        <h4 className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-gray-800 mb-3 sm:mb-4">
+                          <Star size={16} className="text-[#2dd4bf] fill-[#2dd4bf]" /> Experience / Skills
+                        </h4>
+                        <div className="bg-white border border-gray-200 p-3 sm:p-4 rounded-xl shadow-sm text-xs sm:text-sm font-medium text-gray-700 leading-relaxed">
+                          {experience}
+                        </div>
+                      </div>
+
+                      {/* Thông tin khác (Nếu có các field khác trong JSON) */}
+                      {Object.keys(appData).filter(k => !['phone', 'experience', 'cv_link'].includes(k)).length > 0 && (
+                        <div>
+                          <h4 className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-gray-800 mb-3 sm:mb-4">
+                            <Quote size={16} className="text-[#2dd4bf]" /> Other Answers
+                          </h4>
+                          <div className="bg-[#ecebe4]/50 border border-[#ecebe4] p-4 sm:p-5 rounded-xl sm:rounded-2xl text-xs sm:text-sm text-gray-600 leading-relaxed font-medium">
+                            {Object.entries(appData)
+                              .filter(([key]) => !['phone', 'experience', 'cv_link'].includes(key))
+                              .map(([key, value]) => (
+                                <div key={key} className="mb-2 last:mb-0">
+                                  <span className="font-bold capitalize">{key}:</span> {value}
+                                </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right Column (CV) */}
+                    <div className="w-full md:w-7/12 p-4 sm:p-6 lg:p-8 bg-[#f4f3ed] flex flex-col h-64 md:h-auto">
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-4">
+                        <div className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-gray-700">
+                          <FileText size={18} className="text-[#8c9db3]" /> Curriculum Vitae 
+                        </div>
+                        {cvLink && (
+                          <a 
+                            href={cvLink.startsWith('http') ? cvLink : `https://${cvLink}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="w-full sm:w-auto justify-center bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider shadow-sm transition-colors"
+                          >
+                            <Download size={14} /> Mở CV Link
+                          </a>
+                        )}
+                      </div>
+                      
+                      <div className="flex-1 bg-white rounded-xl shadow-md border-2 border-dashed border-gray-300 flex items-center justify-center flex-col gap-3 sm:gap-4 text-gray-400 min-h-[200px] sm:min-h-[300px]">
+                          {cvLink ? (
+                            <>
+                              <CheckCircle size={40} className="text-[#2dd4bf] sm:w-12 sm:h-12"/>
+                              <p className="font-bold text-xs sm:text-sm text-center px-4 text-gray-600">
+                                Ứng viên này đã nộp link CV (Google Drive/External link).
+                                <br/><span className="text-gray-400 text-[10px] mt-1 inline-block">Hãy click nút "Mở CV Link" ở góc trên để xem chi tiết.</span>
+                              </p>
+                            </>
+                          ) : (
+                            <>
+                              <FileText size={40} className="text-gray-300 sm:w-12 sm:h-12"/>
+                              <p className="font-bold text-xs sm:text-sm text-center px-4">Applicant hasn't uploaded a CV yet</p>
+                            </>
+                          )}
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
 
             {/* Modal Footer Actions */}
