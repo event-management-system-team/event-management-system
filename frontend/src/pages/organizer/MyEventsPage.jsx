@@ -15,6 +15,7 @@ import {
     Trash2,
 } from 'lucide-react';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
 import organizerService from '../../services/organizer.service';
 
 //số lượng sự kiện trên 1 trang
@@ -53,6 +54,7 @@ const MyEventsPage = () => {
     const { user } = useSelector((state) => state.auth);
     const organizerId = user?.user_id;
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const [events, setEvents] = useState([]);
     const [stats, setStats] = useState({ totalEvents: 0, activeCount: 0, upcomingCount: 0, completedCount: 0 });
@@ -67,10 +69,11 @@ const MyEventsPage = () => {
     const [deleting, setDeleting] = useState(false);
 
     const FILTER_TAGS = [
-        { key: 'all', label: 'Tất cả' },
-        { key: 'completed', label: 'Completed' },
-        { key: 'upcoming', label: 'Upcoming' },
-        { key: 'rejected', label: 'Rejected' },
+        { key: 'all', label: t('org_filter_all') },
+        { key: 'completed', label: t('org_filter_completed') },
+        { key: 'upcoming', label: t('org_filter_upcoming') },
+        { key: 'rejected', label: t('org_filter_rejected') },
+        { key: 'pending', label: t('org_pending') },
     ];
 
     const abortRef = useRef(null);
@@ -198,28 +201,28 @@ const MyEventsPage = () => {
 
     const statCards = [
         {
-            title: 'TOTAL EVENTS',
+            title: t('org_total_events'),
             value: stats.totalEvents,
             icon: Calendar,
             iconBg: 'bg-blue-50',
             iconColor: 'text-blue-500',
         },
         {
-            title: 'ACTIVE',
+            title: t('org_active'),
             value: stats.activeCount,
             icon: Zap,
             iconBg: 'bg-green-50',
             iconColor: 'text-green-500',
         },
         {
-            title: 'UPCOMING',
+            title: t('org_upcoming'),
             value: stats.upcomingCount,
             icon: CalendarClock,
             iconBg: 'bg-orange-50',
             iconColor: 'text-orange-500',
         },
         {
-            title: 'COMPLETED',
+            title: t('org_completed'),
             value: stats.completedCount,
             icon: CheckCircle2,
             iconBg: 'bg-gray-100',
@@ -241,10 +244,10 @@ const MyEventsPage = () => {
             <div className="flex items-start justify-between mb-8">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-                        My Events Management
+                        {t('org_my_events_title')}
                     </h1>
                     <p className="text-sm text-gray-500 mt-1">
-                        Overview of your current, upcoming and past event performances.
+                        {t('org_my_events_subtitle')}
                     </p>
                 </div>
                 <button
@@ -252,7 +255,7 @@ const MyEventsPage = () => {
                     className="flex items-center gap-2 bg-[#2d3a4f] hover:bg-[#1e293b] text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm"
                 >
                     <Plus size={18} />
-                    Create New Event
+                    {t('org_create_new_event')}
                 </button>
             </div>
 
@@ -286,12 +289,12 @@ const MyEventsPage = () => {
                 {/* Listings Header */}
                 <div className="px-6 pt-5 pb-4 border-b border-gray-100">
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-lg font-semibold text-gray-900">Event Listings</h2>
+                        <h2 className="text-lg font-semibold text-gray-900">{t('org_event_listings')}</h2>
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="Search events..."
+                                placeholder={t('org_search_events')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-full bg-white focus:outline-none focus:ring-2 focus:ring-[#7FA5A5]/30 focus:border-[#7FA5A5] w-56"
@@ -304,8 +307,8 @@ const MyEventsPage = () => {
                                 key={tag.key}
                                 onClick={() => setActiveFilter(tag.key)}
                                 className={`px-4 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer ${activeFilter === tag.key
-                                        ? 'bg-[#2d3a4f] text-white border-[#2d3a4f]'
-                                        : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                                    ? 'bg-[#2d3a4f] text-white border-[#2d3a4f]'
+                                    : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
                                     }`}
                             >
                                 {tag.label}
@@ -316,18 +319,18 @@ const MyEventsPage = () => {
 
                 {/* Table Header */}
                 <div className="grid grid-cols-12 gap-4 px-6 py-3 border-b border-gray-100 text-xs text-gray-400 uppercase tracking-wider font-medium">
-                    <div className="col-span-4">Event</div>
-                    <div className="col-span-2">Date</div>
-                    <div className="col-span-2">Status</div>
-                    <div className="col-span-3">Ticket Stats</div>
-                    <div className="col-span-1 text-right">Actions</div>
+                    <div className="col-span-4">{t('org_table_event')}</div>
+                    <div className="col-span-2">{t('org_table_date')}</div>
+                    <div className="col-span-2">{t('org_table_status')}</div>
+                    <div className="col-span-3">{t('org_table_ticket_stats')}</div>
+                    <div className="col-span-1 text-right">{t('org_table_actions')}</div>
                 </div>
 
                 {/* Loading State */}
                 {loading && (
                     <div className="px-6 py-16 text-center">
                         <div className="inline-block w-8 h-8 border-3 border-gray-200 border-t-[#7FA5A5] rounded-full animate-spin" />
-                        <p className="text-sm text-gray-400 mt-3">Loading events...</p>
+                        <p className="text-sm text-gray-400 mt-3">{t('org_loading_events')}</p>
                     </div>
                 )}
 
@@ -335,8 +338,8 @@ const MyEventsPage = () => {
                 {!loading && filteredEvents.length === 0 && (
                     <div className="px-6 py-16 text-center">
                         <Calendar className="mx-auto h-12 w-12 text-gray-300 mb-3" />
-                        <p className="text-gray-500 font-medium">No events found</p>
-                        <p className="text-sm text-gray-400 mt-1">Create your first event to get started.</p>
+                        <p className="text-gray-500 font-medium">{t('org_no_events_found')}</p>
+                        <p className="text-sm text-gray-400 mt-1">{t('org_create_first_event_start')}</p>
                     </div>
                 )}
 
@@ -374,7 +377,7 @@ const MyEventsPage = () => {
                                         <div className="flex items-center gap-1 mt-0.5">
                                             <MapPin size={12} className="text-gray-400 shrink-0" />
                                             <span className="text-xs text-gray-400 truncate">
-                                                {event.location || 'No location'}
+                                                {event.location || t('org_no_location')}
                                             </span>
                                         </div>
                                     </div>
@@ -443,7 +446,7 @@ const MyEventsPage = () => {
                                             onClick={() => navigate(`/organizer/events/${event.eventId}`)}
                                             className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-[#7FA5A5] hover:text-[#5d8585] hover:bg-[#7FA5A5]/10 font-medium rounded-lg cursor-pointer transition-colors"
                                         >
-                                            Manage
+                                            {t('org_manage')}
                                         </button>
                                     )}
                                 </div>
@@ -455,7 +458,7 @@ const MyEventsPage = () => {
                 {!loading && totalElements > 0 && (
                     <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
                         <p className="text-sm text-[#7FA5A5] font-medium">
-                            Showing {filteredEvents.length} of {totalElements} events
+                            {t('org_showing_of', { count: filteredEvents.length, total: totalElements })}
                         </p>
                         <div className="flex items-center gap-2">
                             <button
@@ -464,14 +467,14 @@ const MyEventsPage = () => {
                                 className="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                             >
                                 <ChevronLeft size={16} />
-                                Previous
+                                {t('org_previous')}
                             </button>
                             <button
                                 onClick={handleNext}
                                 disabled={currentPage >= totalPages - 1}
                                 className="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                             >
-                                Next
+                                {t('org_next')}
                                 <ChevronRight size={16} />
                             </button>
                         </div>
@@ -487,10 +490,10 @@ const MyEventsPage = () => {
                             <div className="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center">
                                 <Trash2 size={20} className="text-red-500" />
                             </div>
-                            <h3 className="text-lg font-bold text-gray-900">Delete Event</h3>
+                            <h3 className="text-lg font-bold text-gray-900">{t('org_delete_event')}</h3>
                         </div>
                         <p className="text-sm text-gray-500 mb-1">
-                            Are you sure you want to delete this event?
+                            {t('org_delete_confirm')}
                         </p>
                         <p className="text-sm font-medium text-gray-800 mb-5 truncate">
                             "{deleteTarget.eventName}"
@@ -501,14 +504,14 @@ const MyEventsPage = () => {
                                 disabled={deleting}
                                 className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
                             >
-                                Cancel
+                                {t('org_cancel')}
                             </button>
                             <button
                                 onClick={handleDeleteConfirm}
                                 disabled={deleting}
                                 className="px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg cursor-pointer transition-colors disabled:opacity-60"
                             >
-                                {deleting ? 'Deleting...' : 'Delete'}
+                                {deleting ? t('org_deleting') : t('org_delete')}
                             </button>
                         </div>
                     </div>

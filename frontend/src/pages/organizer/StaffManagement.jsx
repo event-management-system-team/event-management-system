@@ -2,6 +2,7 @@ import {
     Plus,
     Calendar1,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { useState } from "react";
 import { Button } from "../../components/domain/admin/Button.jsx";
@@ -17,6 +18,7 @@ import WorkScheduleTab from '../../components/domain/organizer/WorkScheduleTab.j
 export default function StaffManagement() {
 
     const { id } = useParams();
+    const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState('staff');
 
     const [loading, setLoading] = useState(true);
@@ -39,7 +41,7 @@ export default function StaffManagement() {
                         onClick={openResourceModal}
                     >
                         <Plus className="h-4 w-4" />
-                        Upload Resource
+                        {t('org_upload_resource')}
                     </Button>
                 )
             case "schedule":
@@ -50,7 +52,7 @@ export default function StaffManagement() {
                             onClick={openScheduleModal}
                         >
                             <Calendar1 className="h-4 w-4" />
-                            Create Schedule
+                            {t('org_create_schedule')}
                         </Button>
                     </div>
                 )
@@ -76,9 +78,9 @@ export default function StaffManagement() {
                 <header className="bg-[#F1F0E8] px-8 py-5 pt-8">
                     <div className="flex items-start justify-between">
                         <div>
-                            <h1 className="text-foreground text-2xl mb-1 font-semibold">Staff Management</h1>
+                            <h1 className="text-foreground text-2xl mb-1 font-semibold">{t('org_staff_management')}</h1>
                             <p className="text-gray-500 text-sm">
-                                Oversee and manage system organizer accounts.
+                                {t('org_staff_subtitle')}
                             </p>
                         </div>
                         <div className="flex items-center gap-3">
@@ -95,21 +97,21 @@ export default function StaffManagement() {
                             value="staff"
                             className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-mediumb text-gray-500 transition-all hover:text-gray-900 data-[state=active]:bg-[#7FA5A5] data-[state=active]:text-white data-[state=active]:shadow p-4.5 hover:cursor-pointer"
                         >
-                            Staff
+                            {t('org_tab_staff')}
                         </TabsTrigger>
 
                         <TabsTrigger
                             value="schedule"
                             className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-gray-500       transition-all hover:text-gray-900 data-[state=active]:bg-[#7FA5A5] data-[state=active]:text-white  data-[state=active]:shadow p-4.5 hover:cursor-pointer"
                         >
-                            Work Schedule
+                            {t('org_tab_work_schedule')}
                         </TabsTrigger>
 
                         <TabsTrigger
                             value="resources"
                             className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-gray-500    transition-all hover:text-gray-900 data-[state=active]:bg-[#7FA5A5] data-[state=active]:text-white  data-[state=active]:shadow p-4.5 hover:cursor-pointer"
                         >
-                            Resources
+                            {t('org_tab_resources')}
                         </TabsTrigger>
                     </TabsList>
 

@@ -21,6 +21,7 @@ import {
     ResponsiveContainer,
 } from 'recharts';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
 import organizerService from '../../services/organizer.service';
 
 const ACCENT = '#2d3a4f';
@@ -75,10 +76,11 @@ const AttendeeRow = ({ attendee, index }) => {
     const status = rawStatus === 'checked_in' || rawStatus === 'checked-in' || rawStatus === 'checkedin' ? 'checked-in' : rawStatus;
     const colors = statusColors[status] || statusColors.registered;
 
+    const { t } = useTranslation();
     const statusLabel = {
-        'checked-in': 'Checked In',
-        'registered': 'Registered',
-        'cancelled': 'Cancelled',
+        'checked-in': t('org_checked_in'),
+        'registered': t('org_status_registered'),
+        'cancelled': t('org_status_cancelled'),
     };
 
     return (
@@ -91,7 +93,7 @@ const AttendeeRow = ({ attendee, index }) => {
                 />
                 <div>
                     <p className="text-sm font-semibold text-gray-900">{attendee.fullName}</p>
-                    <p className="text-xs text-gray-400">{attendee.ticketType || 'General Admission'}</p>
+                    <p className="text-xs text-gray-400">{attendee.ticketType || t('org_general_admission')}</p>
                 </div>
             </div>
             <div className="flex items-center gap-3">
@@ -117,7 +119,7 @@ const DonutCenter = ({ sold, total }) => (
             {sold?.toLocaleString() || 0}
         </tspan>
         <tspan x="50%" dy="22" fontSize="11" fill="#9CA3AF">
-            TICKETS
+            {window.__i18n_tickets_label || 'TICKETS'}
         </tspan>
     </text>
 );
@@ -125,6 +127,8 @@ const DonutCenter = ({ sold, total }) => (
 const EventDetailDashboard = () => {
     const { eventId } = useParams();
     const navigate = useNavigate();
+    const { t } = useTranslation();
+    window.__i18n_tickets_label = t('org_tickets_label');
 
     const [event, setEvent] = useState(null);
     const [attendees, setAttendees] = useState([]);
@@ -233,17 +237,17 @@ const EventDetailDashboard = () => {
                     >
                         <ArrowLeft size={20} className="text-gray-600" />
                     </button>
-                    <h1 className="text-xl font-bold text-gray-900">Event Not Found</h1>
+                    <h1 className="text-xl font-bold text-gray-900">{t('org_event_not_found')}</h1>
                 </div>
                 <div className="bg-[#fafaf8] rounded-2xl border border-gray-100 p-12 text-center">
                     <Calendar className="mx-auto h-16 w-16 text-gray-300 mb-4" />
-                    <p className="text-gray-500 font-medium text-lg">Event not found</p>
-                    <p className="text-sm text-gray-400 mt-2">The event you're looking for doesn't exist or has been removed.</p>
+                    <p className="text-gray-500 font-medium text-lg">{t('org_event_not_found')}</p>
+                    <p className="text-sm text-gray-400 mt-2">{t('org_event_not_found_desc')}</p>
                     <button
                         onClick={() => navigate('/organizer/my-events')}
                         className="mt-6 px-6 py-2.5 bg-[#2d3a4f] text-white text-sm font-medium rounded-lg hover:bg-[#1e293b] transition-colors"
                     >
-                        Back to My Events
+                        {t('org_back_to_my_events')}
                     </button>
                 </div>
             </div>
@@ -263,7 +267,7 @@ const EventDetailDashboard = () => {
                 <div className="flex-1">
                     <div className="flex items-center gap-3">
                         <h1 className="text-xl font-bold text-gray-900">
-                            {loading ? 'Loading...' : event?.eventName || 'Event Not Found'}
+                            {loading ? t('org_loading') : event?.eventName || t('org_event_not_found')}
                         </h1>
                         {event?.status && (
                             <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${event.status === 'APPROVED' ? 'bg-green-50 text-green-700' :
@@ -286,7 +290,7 @@ const EventDetailDashboard = () => {
                         <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
                             <span className="flex items-center gap-1">
                                 <MapPin size={14} />
-                                {event.location || 'No location'}
+                                {event.location || t('org_no_location')}
                             </span>
                             <span className="flex items-center gap-1">
                                 <Calendar size={14} />
@@ -302,9 +306,9 @@ const EventDetailDashboard = () => {
                 {isFreeEvent ? (
                     <StatCard
                         icon={Ticket}
-                        label="Event Type"
-                        value="Free Event"
-                        subText="No ticket fees"
+                        label={t('org_event_type')}
+                        value={t('org_free_event')}
+                        subText={t('org_no_ticket_fees')}
                         iconBg="bg-green-50"
                         iconColor="text-green-600"
                         loading={loading}
@@ -312,9 +316,9 @@ const EventDetailDashboard = () => {
                 ) : (
                     <StatCard
                         icon={DollarSign}
-                        label="Total Revenue"
+                        label={t('org_total_revenue')}
                         value={formatVND(revenue)}
-                        subText="From ticket sales"
+                        subText={t('org_from_ticket_sales')}
                         iconBg="bg-green-50"
                         iconColor="text-green-600"
                         loading={loading}
@@ -322,27 +326,27 @@ const EventDetailDashboard = () => {
                 )}
                 <StatCard
                     icon={Ticket}
-                    label="Tickets Sold"
+                    label={t('org_tickets_sold')}
                     value={`${ticketStats.sold.toLocaleString()} / ${ticketStats.total.toLocaleString()}`}
-                    subText={`${soldPercent}% of capacity reached`}
+                    subText={t('org_capacity_reached', { percent: soldPercent })}
                     iconBg="bg-red-50"
                     iconColor="text-red-500"
                     loading={loading}
                 />
                 <StatCard
                     icon={Users}
-                    label="Registered"
+                    label={t('org_registered')}
                     value={ticketStats.registeredCount?.toLocaleString() || '0'}
-                    subText="Total registrations"
+                    subText={t('org_total_registrations')}
                     iconBg="bg-blue-50"
                     iconColor="text-blue-500"
                     loading={loading}
                 />
                 <StatCard
                     icon={Star}
-                    label="Capacity"
+                    label={t('org_capacity')}
                     value={(event?.totalCapacity || 0).toLocaleString()}
-                    subText="Maximum attendees"
+                    subText={t('org_maximum_attendees')}
                     iconBg="bg-yellow-50"
                     iconColor="text-yellow-500"
                     loading={loading}
@@ -354,25 +358,25 @@ const EventDetailDashboard = () => {
                 {/* Attendee List */}
                 <div className="col-span-5 bg-[#fafaf8] rounded-2xl border border-gray-100 p-6">
                     <div className="flex items-center justify-between mb-5">
-                        <h2 className="text-lg font-bold text-gray-900">Attendee List</h2>
+                        <h2 className="text-lg font-bold text-gray-900">{t('org_attendee_list')}</h2>
                         <button
                             onClick={() => navigate(`/organizer/events/${eventId}/attendees`)}
                             className="px-4 py-2 bg-[#2d3a4f] text-white text-sm font-medium rounded-lg hover:bg-[#1e293b] transition-colors"
                         >
-                            View All Attendees
+                            {t('org_view_all_attendees')}
                         </button>
                     </div>
 
                     {loading ? (
                         <div className="py-12 text-center">
                             <div className="inline-block w-8 h-8 border-3 border-gray-200 border-t-[#2d3a4f] rounded-full animate-spin" />
-                            <p className="text-sm text-gray-400 mt-3">Loading attendees...</p>
+                            <p className="text-sm text-gray-400 mt-3">{t('org_loading_attendees')}</p>
                         </div>
                     ) : attendees.length === 0 ? (
                         <div className="py-12 text-center">
                             <Users className="mx-auto h-12 w-12 text-gray-300 mb-3" />
-                            <p className="text-gray-500 font-medium">No attendees yet</p>
-                            <p className="text-sm text-gray-400 mt-1">Attendees will appear here once registered.</p>
+                            <p className="text-gray-500 font-medium">{t('org_no_attendees_yet')}</p>
+                            <p className="text-sm text-gray-400 mt-1">{t('org_attendees_appear')}</p>
                         </div>
                     ) : (
                         <div className="space-y-1">
@@ -387,7 +391,7 @@ const EventDetailDashboard = () => {
                             onClick={() => navigate(`/organizer/events/${eventId}/attendees`)}
                             className="mt-5 text-sm text-[#7FA5A5] hover:text-[#5d8585] font-medium transition-colors w-full text-center"
                         >
-                            VIEW ALL {ticketStats.registeredCount.toLocaleString()} ATTENDEES
+                            {t('org_view_all_attendees_count', { count: ticketStats.registeredCount.toLocaleString() })}
                         </button>
                     )}
                 </div>
@@ -395,7 +399,7 @@ const EventDetailDashboard = () => {
                 {/* Ticket Sales & Entry */}
                 <div className="col-span-7 bg-[#fafaf8] rounded-2xl border border-gray-100 p-6">
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-lg font-bold text-gray-900">Ticket Sales & Entry</h2>
+                        <h2 className="text-lg font-bold text-gray-900">{t('org_ticket_sales_entry')}</h2>
                         <button className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
                             <MoreVertical size={18} className="text-gray-400" />
                         </button>
@@ -448,14 +452,14 @@ const EventDetailDashboard = () => {
                         {/* Live Check-in Progress */}
                         <div className="flex-1">
                             <div className="bg-white rounded-xl border border-gray-100 p-5">
-                                <h3 className="text-sm font-semibold text-gray-900 mb-4">Live Check-in Progress</h3>
+                                <h3 className="text-sm font-semibold text-gray-900 mb-4">{t('org_live_checkin')}</h3>
 
                                 <div className="flex items-center justify-between mb-2">
                                     <span className="text-2xl font-bold text-gray-900">
                                         {ticketStats.checkedIn.toLocaleString()}
                                     </span>
                                     <span className="text-sm text-gray-500">
-                                        / {ticketStats.total.toLocaleString()} checked-in
+                                        / {ticketStats.total.toLocaleString()} {t('org_checked_in_suffix')}
                                     </span>
                                 </div>
 
@@ -471,10 +475,10 @@ const EventDetailDashboard = () => {
                                 <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                                     <div className="flex items-center gap-2">
                                         <UserCheck size={16} className="text-green-500" />
-                                        <span className="text-sm font-medium text-gray-700">CURRENT ATTENDANCE</span>
+                                        <span className="text-sm font-medium text-gray-700">{t('org_current_attendance')}</span>
                                     </div>
                                     <span className="px-3 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-lg">
-                                        {capacityPercent}% CAPACITY
+                                        {t('org_capacity_percent', { percent: capacityPercent })}
                                     </span>
                                 </div>
                             </div>

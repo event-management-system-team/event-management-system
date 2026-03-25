@@ -3,15 +3,16 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Users, Search, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
+import { useTranslation } from 'react-i18next';
 import organizerService from '../../services/organizer.service';
 
 const PAGE_SIZE = 10;
 
-const statusConfig = {
-    'checked-in': { bg: 'bg-green-50', text: 'text-green-700', dot: 'bg-green-500', label: 'Checked In' },
-    'registered': { bg: 'bg-blue-50', text: 'text-blue-700', dot: 'bg-blue-500', label: 'Registered' },
-    'cancelled': { bg: 'bg-red-50', text: 'text-red-600', dot: 'bg-red-500', label: 'Cancelled' },
-};
+const getStatusConfig = (t) => ({
+    'checked-in': { bg: 'bg-green-50', text: 'text-green-700', dot: 'bg-green-500', label: t('org_checked_in') },
+    'registered': { bg: 'bg-blue-50', text: 'text-blue-700', dot: 'bg-blue-500', label: t('org_status_registered') },
+    'cancelled': { bg: 'bg-red-50', text: 'text-red-600', dot: 'bg-red-500', label: t('org_status_cancelled') },
+});
 
 const normalizeStatus = (raw = '') => {
     const s = raw.toLowerCase().replace(/_/g, '-');
@@ -21,6 +22,8 @@ const normalizeStatus = (raw = '') => {
 };
 
 const StatusBadge = ({ raw }) => {
+    const { t } = useTranslation();
+    const statusConfig = getStatusConfig(t);
     const key = normalizeStatus(raw);
     const cfg = statusConfig[key] || statusConfig.registered;
     return (
@@ -42,6 +45,7 @@ const Avatar = ({ name, url }) => (
 const EventAttendeesPage = () => {
     const { eventId } = useParams();
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const [event, setEvent] = useState(null);
     const [attendees, setAttendees] = useState([]);
@@ -96,11 +100,11 @@ const EventAttendeesPage = () => {
             });
 
             // ── Màu sắc theme ──
-            const PRIMARY   = '2D3A4F'; // dark navy
+            const PRIMARY = '2D3A4F'; // dark navy
             const PRIMARY_L = 'E8EDF3'; // light navy tint
-            const SUCCESS   = '16A34A'; // green for checked-in
-            const INFO      = '1D4ED8'; // blue for registered
-            const DANGER    = 'DC2626'; // red for cancelled
+            const SUCCESS = '16A34A'; // green for checked-in
+            const INFO = '1D4ED8'; // blue for registered
+            const DANGER = 'DC2626'; // red for cancelled
 
             // ── Row 1: Title ──
             ws.mergeCells('A1:E1');
@@ -123,11 +127,11 @@ const EventAttendeesPage = () => {
 
             // ── Row 4: Header ──
             const HEADER_DEF = [
-                { key: 'no',     header: 'No.',         width: 7  },
-                { key: 'name',   header: 'Full Name',   width: 28 },
-                { key: 'email',  header: 'Email',       width: 34 },
+                { key: 'no', header: 'No.', width: 7 },
+                { key: 'name', header: 'Full Name', width: 28 },
+                { key: 'email', header: 'Email', width: 34 },
                 { key: 'ticket', header: 'Ticket Type', width: 18 },
-                { key: 'status', header: 'Status',      width: 16 },
+                { key: 'status', header: 'Status', width: 16 },
             ];
 
             ws.columns = HEADER_DEF.map(c => ({ key: c.key, width: c.width }));
@@ -140,10 +144,10 @@ const EventAttendeesPage = () => {
                 cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: PRIMARY } };
                 cell.alignment = { vertical: 'middle', horizontal: 'center' };
                 cell.border = {
-                    top:    { style: 'thin', color: { argb: '475569' } },
+                    top: { style: 'thin', color: { argb: '475569' } },
                     bottom: { style: 'thin', color: { argb: '475569' } },
-                    left:   { style: 'thin', color: { argb: '475569' } },
-                    right:  { style: 'thin', color: { argb: '475569' } },
+                    left: { style: 'thin', color: { argb: '475569' } },
+                    right: { style: 'thin', color: { argb: '475569' } },
                 };
             });
             headerRow.height = 26;
@@ -157,10 +161,10 @@ const EventAttendeesPage = () => {
                 const rowBg = idx % 2 === 0 ? 'FFFFFF' : PRIMARY_L;
 
                 const row = ws.addRow({
-                    no:     idx + 1,
-                    name:   a.fullName  || '',
-                    email:  a.email     || '',
-                    ticket: a.ticketType || 'General',
+                    no: idx + 1,
+                    name: a.fullName || '',
+                    email: a.email || '',
+                    ticket: a.ticketType || t('org_general'),
                     status: statusLabel,
                 });
 
@@ -178,10 +182,10 @@ const EventAttendeesPage = () => {
                         horizontal: colNum === 1 ? 'center' : colNum === 5 ? 'center' : 'left',
                     };
                     cell.border = {
-                        top:    { style: 'hair', color: { argb: 'E5E7EB' } },
+                        top: { style: 'hair', color: { argb: 'E5E7EB' } },
                         bottom: { style: 'hair', color: { argb: 'E5E7EB' } },
-                        left:   { style: 'hair', color: { argb: 'E5E7EB' } },
-                        right:  { style: 'hair', color: { argb: 'E5E7EB' } },
+                        left: { style: 'hair', color: { argb: 'E5E7EB' } },
+                        right: { style: 'hair', color: { argb: 'E5E7EB' } },
                     };
                 });
                 row.commit();
@@ -226,9 +230,9 @@ const EventAttendeesPage = () => {
                     <ArrowLeft size={20} className="text-gray-600" />
                 </button>
                 <div className="flex-1">
-                    <h1 className="text-2xl font-bold text-gray-900">Attendee Management</h1>
+                    <h1 className="text-2xl font-bold text-gray-900">{t('org_attendee_management')}</h1>
                     <p className="text-sm text-gray-500 mt-0.5">
-                        {loading ? '...' : `${totalElements} Attendees for ${event?.eventName || '…'}`}
+                        {loading ? '...' : t('org_attendees_for', { count: totalElements, name: event?.eventName || '…' })}
                     </p>
                 </div>
 
@@ -239,7 +243,7 @@ const EventAttendeesPage = () => {
                     className="flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-100 hover:border-gray-400 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer"
                 >
                     <Download size={16} className={exporting ? 'animate-bounce' : ''} />
-                    {exporting ? 'Exporting…' : 'Export List'}
+                    {exporting ? t('org_exporting') : t('org_export_list')}
                 </button>
             </div>
 
@@ -251,7 +255,7 @@ const EventAttendeesPage = () => {
                     <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
                         type="text"
-                        placeholder="Search by name or email…"
+                        placeholder={t('org_search_name_email')}
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2d3a4f]/20 focus:border-[#2d3a4f] transition-colors"
@@ -263,10 +267,10 @@ const EventAttendeesPage = () => {
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-gray-100">
-                                <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Attendee</th>
-                                <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Email</th>
-                                <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Ticket Type</th>
-                                <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Status</th>
+                                <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">{t('org_table_attendee')}</th>
+                                <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">{t('org_table_email')}</th>
+                                <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">{t('org_table_ticket_type')}</th>
+                                <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">{t('org_table_status')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -274,15 +278,15 @@ const EventAttendeesPage = () => {
                                 <tr>
                                     <td colSpan={4} className="py-16 text-center">
                                         <div className="inline-block w-8 h-8 border-2 border-gray-200 border-t-[#2d3a4f] rounded-full animate-spin" />
-                                        <p className="text-sm text-gray-400 mt-3">Loading attendees…</p>
+                                        <p className="text-sm text-gray-400 mt-3">{t('org_loading_attendees')}</p>
                                     </td>
                                 </tr>
                             ) : filtered.length === 0 ? (
                                 <tr>
                                     <td colSpan={4} className="py-16 text-center">
                                         <Users className="mx-auto h-12 w-12 text-gray-300 mb-3" />
-                                        <p className="text-gray-500 font-medium">No attendees found</p>
-                                        {search && <p className="text-sm text-gray-400 mt-1">Try a different search term.</p>}
+                                        <p className="text-gray-500 font-medium">{t('org_no_attendees_found')}</p>
+                                        {search && <p className="text-sm text-gray-400 mt-1">{t('org_try_different_search')}</p>}
                                     </td>
                                 </tr>
                             ) : (
@@ -312,7 +316,7 @@ const EventAttendeesPage = () => {
                                                 </span>
                                             ) : (
                                                 <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
-                                                    General
+                                                    {t('org_general')}
                                                 </span>
                                             )}
                                         </td>
@@ -332,7 +336,7 @@ const EventAttendeesPage = () => {
                 {!loading && totalElements > 0 && (
                     <div className="flex items-center justify-between mt-5 pt-4 border-t border-gray-100">
                         <p className="text-sm text-gray-500">
-                            Showing {currentPage * PAGE_SIZE + 1} to {Math.min((currentPage + 1) * PAGE_SIZE, totalElements)} of {totalElements} attendees
+                            {t('org_showing_attendees', { from: currentPage * PAGE_SIZE + 1, to: Math.min((currentPage + 1) * PAGE_SIZE, totalElements), total: totalElements })}
                         </p>
                         <div className="flex items-center gap-1">
                             <button

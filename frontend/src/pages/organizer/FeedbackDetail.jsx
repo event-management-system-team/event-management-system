@@ -4,6 +4,7 @@ import {
   Download, Trash2, MessageSquare, ListIcon 
 } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Sidebar from '../../components/layout/Sidebar'; 
 import axiosInstance from '../../config/axios';
 
@@ -13,6 +14,7 @@ const FeedbackDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchFeedbackDetail = async () => {
@@ -37,10 +39,10 @@ const FeedbackDetail = () => {
   }, [feedbackId]);
 
   if (isLoading) {
-    return <div className="flex min-h-screen items-center justify-center bg-[#f8f7f2] font-sans text-gray-500 font-medium">Loading feedback details...</div>;
+    return <div className="flex min-h-screen items-center justify-center bg-[#f8f7f2] font-sans text-gray-500 font-medium">{t('org_loading_feedback_detail')}</div>;
   }
   if (isError || !feedbackData) {
-    return <div className="flex min-h-screen items-center justify-center bg-[#f8f7f2] font-sans text-red-500 font-medium">Error loading feedback detail</div>;
+    return <div className="flex min-h-screen items-center justify-center bg-[#f8f7f2] font-sans text-red-500 font-medium">{t('org_error_feedback_detail')}</div>;
   }
 
   // Sửa lỗi chính tả an toàn: Bắt cả trường hợp Backend trả về 'feedbackRespone' hoặc 'feedbackResponse'
@@ -65,17 +67,17 @@ const FeedbackDetail = () => {
               <ArrowLeft size={20} />
             </button>
             <div>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-900 tracking-tight leading-tight">Feedback Detail</h1>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-900 tracking-tight leading-tight">{t('org_feedback_detail')}</h1>
               <p className="text-gray-500 font-medium text-xs sm:text-sm mt-1">Response #{feedbackId || '001'} • {feedbackData?.eventName}</p>
             </div>
           </div>
           
           <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <button className="flex-1 sm:flex-none justify-center px-4 py-2.5 sm:py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-red-500 hover:bg-red-50 flex items-center gap-2 transition-all shadow-sm">
-              <Trash2 size={16} /> <span className="hidden sm:inline">Delete</span>
+              <Trash2 size={16} /> <span className="hidden sm:inline">{t('org_delete')}</span>
             </button>
             <button className="flex-1 sm:flex-none justify-center px-4 py-2.5 sm:py-2 bg-[#8c9db3] hover:bg-[#7a8ca3] text-white rounded-lg text-sm font-bold flex items-center gap-2 shadow-md transition-all">
-              <Download size={16} /> Export<span className="hidden sm:inline"> PDF</span>
+              <Download size={16} /> {t('org_export')}<span className="hidden sm:inline"> PDF</span>
             </button>
           </div>
         </div>
@@ -87,7 +89,7 @@ const FeedbackDetail = () => {
           {/* CỘT TRÁI: THÔNG TIN KHÁN GIẢ */}
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-white rounded-xl lg:rounded-2xl p-5 lg:p-6 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] border border-gray-100">
-              <h3 className="text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-5 lg:mb-6">Attendee Profile</h3>
+              <h3 className="text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-5 lg:mb-6">{t('org_attendee_profile')}</h3>
               
               <div className="flex flex-col items-center mb-6 text-center">
                 <img src={feedbackData.attendeeInfor?.avatar || '/default-avatar.png'} alt="Avatar" className="w-20 h-20 lg:w-24 lg:h-24 rounded-full object-cover border-4 border-[#f8f7f2] shadow-sm mb-4" />
@@ -112,7 +114,7 @@ const FeedbackDetail = () => {
                 </div>
                 <div className="flex items-center gap-3 text-xs sm:text-sm">
                   <Calendar size={16} className="text-gray-400 shrink-0" />
-                  <span className="text-gray-600 font-medium">Submitted: {feedbackData?.submittedAt}</span>
+                  <span className="text-gray-600 font-medium">{t('org_submitted')} {feedbackData?.submittedAt}</span>
                 </div>
               </div>
             </div>
@@ -121,12 +123,12 @@ const FeedbackDetail = () => {
           {/* CỘT PHẢI: NỘI DUNG FEEDBACK */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl lg:rounded-2xl p-5 sm:p-6 lg:p-8 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] border border-gray-100 h-full">
-              <h3 className="text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-6 lg:mb-8">Feedback Responses</h3>
+              <h3 className="text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-6 lg:mb-8">{t('org_feedback_responses')}</h3>
 
               {/* KHU VỰC ĐIỂM SỐ RESPONSIVE */}
               <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 mb-8 pb-6 lg:mb-10 lg:pb-8 border-b border-gray-100">
                 <div className="flex-1">
-                  <p className="text-xs sm:text-sm font-bold text-gray-500 mb-2 sm:mb-3">Overall Experience</p>
+                  <p className="text-xs sm:text-sm font-bold text-gray-500 mb-2 sm:mb-3">{t('org_overall_experience')}</p>
                   <div className="flex gap-1 sm:gap-1.5">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} size={24} className={`sm:w-7 sm:h-7 lg:w-8 lg:h-8 ${i < overallRating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'}`} />
@@ -139,7 +141,7 @@ const FeedbackDetail = () => {
                 <div className="block sm:hidden h-px w-full bg-gray-50"></div>
 
                 <div className="flex-1">
-                  <p className="text-xs sm:text-sm font-bold text-gray-500 mb-2 sm:mb-3">Net Promoter Score (NPS)</p>
+                  <p className="text-xs sm:text-sm font-bold text-gray-500 mb-2 sm:mb-3">{t('org_nps')}</p>
                   <div className="flex items-center gap-2">
                     <span className="text-2xl sm:text-3xl font-extrabold text-green-500">{npsScore}</span>
                     <span className="text-gray-400 font-medium text-xs sm:text-sm mt-1 sm:mt-2">/ 10</span>

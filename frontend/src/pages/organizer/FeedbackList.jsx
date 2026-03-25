@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useTranslation } from 'react-i18next';
 import { Eye, Search, Plus, Lock, Filter, Calendar } from "lucide-react";
 import { useFeedbacks } from "../../hooks/useFeedback";
 import { Link, useParams } from "react-router-dom";
@@ -6,6 +7,7 @@ import { Pagination } from "antd";
 import axiosInstance from "../../config/axios";
 
 const FeedbackList = () => {
+  const { t } = useTranslation();
   const { eventId } = useParams();
   const { data: feedbacks, isLoading, isError } = useFeedbacks(eventId);
 
@@ -128,7 +130,7 @@ const FeedbackList = () => {
     return (
       <div className="flex min-h-screen bg-[#f8f7f2] font-sans items-center justify-center">
         <p className="text-gray-500 font-medium animate-pulse">
-          Loading feedbacks...
+          {t('org_loading_feedbacks')}
         </p>
       </div>
     );
@@ -137,7 +139,7 @@ const FeedbackList = () => {
   if (isError) {
     return (
       <div className="flex min-h-screen bg-[#f8f7f2] font-sans items-center justify-center">
-        <p className="text-red-500 font-medium">Error loading feedbacks</p>
+        <p className="text-red-500 font-medium">{t('org_error_loading_feedbacks')}</p>
       </div>
     );
   }
@@ -148,10 +150,10 @@ const FeedbackList = () => {
       <div className="flex justify-between items-end mb-8" ref={listTopRef}>
         <div>
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-900 tracking-tight mb-1 sm:mb-2">
-            Attendee Feedback
+            {t('org_attendee_feedback')}
           </h1>
           <p className="text-gray-500 font-medium italic text-xs sm:text-sm">
-            Showing all responses for{" "}
+            {t('org_showing_responses_for')}{" "}
             <span className="text-gray-800 not-italic font-bold">
               {eventName}
             </span>
@@ -169,7 +171,7 @@ const FeedbackList = () => {
                 strokeWidth={2.5}
                 className="sm:w-[18px] sm:h-[18px]"
               />{" "}
-              <span className="whitespace-nowrap">Create Form</span>
+              <span className="whitespace-nowrap">{t('org_create_form')}</span>
             </Link>
           ) : (
             <div className="flex-1 sm:flex-none justify-center bg-red-50 text-red-600 border border-red-100 px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 text-xs sm:text-sm font-bold shadow-sm cursor-not-allowed">
@@ -178,7 +180,7 @@ const FeedbackList = () => {
                 strokeWidth={2.5}
                 className="sm:w-[18px] sm:h-[18px]"
               />{" "}
-              <span className="whitespace-nowrap">Event Ended</span>
+              <span className="whitespace-nowrap">{t('org_event_ended')}</span>
             </div>
           )}
         </div>
@@ -193,7 +195,7 @@ const FeedbackList = () => {
             type="text"
             value={searchTerm}
             onChange={handleSearchChange}
-            placeholder="Search by name or email..."
+            placeholder={t('org_search_name_email_fb')}
             className="w-full outline-none text-gray-700 placeholder-gray-400 text-xs sm:text-sm font-medium h-full bg-transparent"
           />
         </div>
@@ -208,12 +210,12 @@ const FeedbackList = () => {
               onChange={handleRatingChange}
               className="outline-none text-xs sm:text-sm font-medium text-gray-600 bg-transparent cursor-pointer"
             >
-              <option value="all">All Ratings</option>
-              <option value="5">5 Stars</option>
-              <option value="4">4 Stars</option>
-              <option value="3">3 Stars</option>
-              <option value="2">2 Stars</option>
-              <option value="1">1 Star</option>
+              <option value="all">{t('org_all_ratings')}</option>
+              <option value="5">{t('org_x_stars', { count: 5 })}</option>
+              <option value="4">{t('org_x_stars', { count: 4 })}</option>
+              <option value="3">{t('org_x_stars', { count: 3 })}</option>
+              <option value="2">{t('org_x_stars', { count: 2 })}</option>
+              <option value="1">{t('org_1_star')}</option>
             </select>
           </div>
 
@@ -246,19 +248,19 @@ const FeedbackList = () => {
             <thead className="bg-white">
               <tr className="border-b border-gray-100">
                 <th className="px-6 lg:px-8 py-4 lg:py-6 text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest text-left whitespace-nowrap">
-                  Date & Time
+                  {t('org_table_date_time')}
                 </th>
                 <th className="px-4 lg:px-6 py-4 lg:py-6 text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest text-left">
-                  Attendee
+                  {t('org_table_attendee')}
                 </th>
                 <th className="px-4 lg:px-6 py-4 lg:py-6 text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest text-left">
-                  Rating
+                  {t('org_table_rating')}
                 </th>
                 <th className="px-4 lg:px-6 py-4 lg:py-6 text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest text-left">
-                  Ticket
+                  {t('org_table_ticket')}
                 </th>
                 <th className="px-4 lg:px-6 py-4 lg:py-6 text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest text-center">
-                  Action
+                  {t('org_table_action')}
                 </th>
               </tr>
             </thead>
@@ -268,10 +270,10 @@ const FeedbackList = () => {
                   <td colSpan="5" className="text-center py-16 sm:py-20">
                     <div className="flex flex-col items-center justify-center">
                       <p className="text-gray-400 font-medium text-base sm:text-lg">
-                        No feedbacks found.
+                        {t('org_no_feedbacks_found')}
                       </p>
                       <p className="text-gray-300 text-xs sm:text-sm mt-1">
-                        Try adjusting your search or filters.
+                        {t('org_try_adjusting')}
                       </p>
                     </div>
                   </td>
@@ -344,7 +346,7 @@ const FeedbackList = () => {
         {/* --- CẬP NHẬT: Đổi tổng số response thành số lượng đã lọc --- */}
         <div className="px-8 py-6 border-t border-gray-50 flex flex-col sm:flex-row justify-between items-center gap-4 bg-gray-50/50">
           <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest">
-            Total Responses:{" "}
+            {t('org_total_responses')}{" "}
             <span className="text-gray-700">{filteredFeedbacks.length}</span>
           </p>
           {filteredFeedbacks.length > itemsPerPage && (

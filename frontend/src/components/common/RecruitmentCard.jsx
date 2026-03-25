@@ -2,13 +2,8 @@ import { Briefcase, MapPin } from "lucide-react";
 import { Link } from 'react-router-dom'
 import { useTranslation } from "react-i18next";
 
-<<<<<<< HEAD
-const RecruitmentCard = ({ positions = [], eventName, eventSlug, eventBannerUrl, deadline, createdAt, location, organizer, status }) => {
-    const { t } = useTranslation();
-=======
 const RecruitmentCard = ({ positions = [], eventName, eventSlug, eventBannerUrl, deadline, createdAt, location, organizer, active }) => {
-
->>>>>>> develop
+    const { t } = useTranslation();
     const isNew = (new Date() - new Date(createdAt)) / (1000 * 60 * 60 * 24) <= 3;
 
     const dateObj = deadline ? new Date(deadline) : null;

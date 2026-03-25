@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useLocation, useParams, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { useTranslation } from "react-i18next";
 import { logoutUser } from "../../store/slices/auth.slice";
 import {
   LayoutDashboard,
@@ -10,6 +11,7 @@ import {
   MessageSquare,
   Settings,
   LogOut,
+  Globe,
 } from "lucide-react";
 
 const NavItem = ({ to, icon, label, isActive }) => {
@@ -36,6 +38,12 @@ const Sidebar = () => {
   const { eventId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
+
+  const currentLang = i18n.language;
+  const toggleLanguage = () => {
+    i18n.changeLanguage(currentLang === 'vi' ? 'en' : 'vi');
+  };
 
   //navavigate ve trang login
   const handleLogout = async () => {
@@ -91,43 +99,55 @@ const Sidebar = () => {
       {/* 3. Phần Menu chính (tự cuộn nếu quá dài) */}
       <nav className="flex-1 px-4 overflow-y-auto scrollbar-hide space-y-1">
         <p className="px-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3 mt-1">
-          Main Menu
+          {t('org_dashboard')}
         </p>
 
         <NavItem
           to="/organizer/dashboard"
           icon={<LayoutDashboard size={20} />}
-          label="Dashboard"
+          label={t('org_dashboard')}
           isActive={isDashboardActive}
         />
         <NavItem
           to="/organizer/my-events"
           icon={<CalendarDays size={20} />}
-          label="My Events"
+          label={t('org_event_management')}
           isActive={isMyEventsActive}
         />
         <NavItem
           to="/organizer/staff"
           icon={<Users size={20} />}
-          label="Staff Management"
+          label={t('org_staff_management')}
           isActive={isStaffActive}
         />
         <NavItem
           to="/organizer/applications"
           icon={<FileText size={20} />}
-          label="Applications"
+          label={t('org_applications')}
           isActive={isAppActive}
         />
         <NavItem
           to={feedbackLink}
           icon={<MessageSquare size={20} />}
-          label="Feedback & Rating"
+          label={t('org_feedback_reviews')}
           isActive={isFeedbackActive}
         />
       </nav>
 
       <div className="p-4 mt-auto border-t border-gray-700/50 bg-[#1a2333]">
         <div className="space-y-1">
+          {/* Language Toggle */}
+          <button
+            onClick={toggleLanguage}
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors cursor-pointer"
+          >
+            <Globe size={18} />
+            <span className="flex-1 text-left">{currentLang === 'vi' ? 'Tiếng Việt' : 'English'}</span>
+            <span className="text-[10px] font-bold bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full uppercase">
+              {currentLang === 'vi' ? 'VI' : 'EN'}
+            </span>
+          </button>
+
           <Link
             to="/profile"
             className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
