@@ -262,7 +262,7 @@ const EventDetailDashboard = () => {
                 </button>
                 <div className="flex-1">
                     <div className="flex items-center gap-3">
-                        <h1 className="text-xl font-bold text-gray-900">
+                        <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
                             {loading ? 'Loading...' : event?.eventName || 'Event Not Found'}
                         </h1>
                         {event?.status && (

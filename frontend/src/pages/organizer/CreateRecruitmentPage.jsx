@@ -57,14 +57,6 @@ const CreateRecruitmentPage = () => {
             />
 
             <main className="flex-1 max-w-3xl w-full mx-auto py-10 px-4">
-              <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">
-                  {isEditMode ? "Edit Recruitment Post" : "Create Recruitment Posting"}
-                </h1>
-                <p className="text-sm text-gray-400 mt-1">
-                  Set up your new job opening in just a few steps.
-                </p>
-              </div>
 
               <StepIndicator currentStep={step} />
 

@@ -232,12 +232,12 @@ const MyEventsPage = () => {
             {/* Header */}
             <div className="flex items-start justify-between mb-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                    <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
                         My Events Management
                     </h1>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-gray-500 text-sm mt-1">
                         Overview of your current, upcoming and past event performances.
-                    </p>
+                    </p>    
                 </div>
                 <button
                     onClick={() => navigate('/organizer/create-event')}

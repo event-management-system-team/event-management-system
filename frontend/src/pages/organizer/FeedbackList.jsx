@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Eye, Search, Filter, Calendar, Plus, Lock } from "lucide-react";
 import { useFeedbacks } from "../../hooks/useFeedback";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { Pagination } from "antd";
 import axiosInstance from "../../config/axios";
 
+import { ArrowLeft } from "lucide-react";
+
 const FeedbackList = () => {
   const { eventId } = useParams();
+  const navigate = useNavigate();
   const { data: feedbacks, isLoading, isError } = useFeedbacks(eventId);
 
   // STATE: Quản lý trạng thái kết thúc và tên event
@@ -128,9 +131,15 @@ const FeedbackList = () => {
       {/* --- HEADER --- */}
       <div className="flex justify-between items-end mb-8" ref={listTopRef}>
         <div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-900 tracking-tight mb-1 sm:mb-2">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-4 text-gray-400 hover:text-gray-700 text-sm font-medium mb-3 transition-colors group"
+          >
+            <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
+          <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
             Attendee Feedback
           </h1>
+          </button>
           <p className="text-gray-500 font-medium italic text-xs sm:text-sm">
             Showing all responses for{" "}
             <span className="text-gray-800 not-italic font-bold">

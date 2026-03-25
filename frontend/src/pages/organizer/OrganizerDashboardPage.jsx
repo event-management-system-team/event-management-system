@@ -199,10 +199,10 @@ const OrganizerDashboardPage = () => {
         <div className="p-8 min-h-screen">
             {/* Header */}
             <div className="mb-8">
-                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
                     Dashboard
                 </h1>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-gray-500 text-sm mt-1">
                     Welcome back! Here's an overview of your events.
                 </p>
             </div>

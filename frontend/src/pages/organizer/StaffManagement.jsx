@@ -1,8 +1,9 @@
 import {
     Plus,
     Calendar1,
+    ArrowLeft,
 } from 'lucide-react';
-import { useParams } from 'react-router';
+import { useParams, useNavigate } from 'react-router';
 import { useState } from "react";
 import { Button } from "../../components/domain/admin/Button.jsx";
 import { Tabs, TabsList, TabsTrigger } from "../../components/domain/admin/Tabs.jsx";
@@ -17,6 +18,7 @@ import WorkScheduleTab from '../../components/domain/organizer/WorkScheduleTab.j
 export default function StaffManagement() {
 
     const { eventId } = useParams();
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('staff');
 
     const [loading, setLoading] = useState(true);
@@ -76,8 +78,14 @@ export default function StaffManagement() {
                 <header className="bg-[#F1F0E8] px-8 py-5 pt-8">
                     <div className="flex items-start justify-between">
                         <div>
-                            <h1 className="text-foreground text-2xl mb-1 font-semibold">Staff Management</h1>
-                            <p className="text-gray-500 text-sm">
+                            <button
+                                onClick={() => navigate(-1)}
+                                className="flex items-center gap-4 text-gray-400 hover:text-gray-700 text-sm font-medium mb-3 transition-colors group"
+                            >
+                                <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
+                            <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">Staff Management</h1>
+                            </button>
+                            <p className="text-gray-500 text-sm mt-1">
                                 Oversee and manage system organizer accounts.
                             </p>
                         </div>

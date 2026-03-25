@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Clock, Lock } from 'lucide-react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../config/axios';
+
+import { ArrowLeft } from 'lucide-react';
 
 const RecruitmentList = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const { eventId } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -96,8 +99,14 @@ const RecruitmentList = () => {
         {/* HEADER */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 sm:gap-0 mb-6 lg:mb-8">
           <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-900 tracking-tight mb-1 sm:mb-2">My Recruitments</h1>
-            <p className="text-gray-500 font-medium text-xs sm:text-sm">Manage staff postings and review incoming applications.</p>
+            <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-4 text-gray-400 hover:text-gray-700 text-sm font-medium mb-3 transition-colors group"
+          >
+            <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
+            <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">My Recruitments</h1>
+            </button>
+            <p className="text-gray-500 text-sm mt-1">Manage staff postings and review incoming applications.</p>
           </div>
           
           {!isEventEnded ? (

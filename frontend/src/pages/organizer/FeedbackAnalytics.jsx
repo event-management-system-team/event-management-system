@@ -1,14 +1,16 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useFeedbackAnalytics } from "../../hooks/useFeedbackAnalytics";
 import axiosInstance from "../../config/axios";
 
+import { ArrowLeft } from "lucide-react";
 import StatCards from "../../components/domain/feedback-analytic/StatCards";
 import RatingBarChart from "../../components/domain/feedback-analytic/RatingBarChart";
 import ReviewsList from "../../components/domain/feedback-analytic/ReviewsList";
 
 export default function AnalyticsPage() {
   const { eventId } = useParams();
+  const navigate = useNavigate();
   const { analytics, isLoading, isError } = useFeedbackAnalytics(eventId);
   const [eventName, setEventName] = useState("");
 
@@ -26,9 +28,15 @@ export default function AnalyticsPage() {
     <div className="p-4 md:p-8 lg:p-10 w-full space-y-4 md:space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
+             <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-4 text-gray-400 hover:text-gray-700 text-sm font-medium mb-3 transition-colors group"
+          >
+            <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
             <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
               Feedback & Reviews
             </h1>
+            </button>
             <p className="text-gray-500 text-sm mt-1">
               Analytic Dashboard for{" "}
               <span className="text-[#89A8B2] font-semibold">
