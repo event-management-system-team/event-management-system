@@ -241,7 +241,7 @@ const MyEventsPage = () => {
                 </div>
                 <button
                     onClick={() => navigate('/organizer/create-event')}
-                    className="flex items-center gap-2 bg-[#2d3a4f] hover:bg-[#1e293b] text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm"
+                    className="flex items-center gap-2 bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-colors shadow-sm"
                 >
                     <Plus size={18} />
                     Create New Event
@@ -308,11 +308,11 @@ const MyEventsPage = () => {
 
                 {/* Table Header */}
                 <div className="grid grid-cols-12 gap-4 px-6 py-3 border-b border-gray-100 text-xs text-gray-400 uppercase tracking-wider font-medium">
-                    <div className="col-span-4">Event</div>
-                    <div className="col-span-2">Date</div>
-                    <div className="col-span-2">Status</div>
-                    <div className="col-span-3">Ticket Stats</div>
-                    <div className="col-span-1 text-right">Actions</div>
+                    <div className="col-span-4 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Event</div>
+                    <div className="col-span-2 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Date</div>
+                    <div className="col-span-2 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Status</div>
+                    <div className="col-span-3 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Ticket Stats</div>
+                    <div className="col-span-1 text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Actions</div>
                 </div>
 
                 {/* Loading State */}
@@ -360,7 +360,7 @@ const MyEventsPage = () => {
                                         )}
                                     </div>
                                     <div className="min-w-0">
-                                        <p className="text-sm font-medium text-gray-900 truncate">
+                                        <p className="text-sm font-bold text-gray-900 truncate">
                                             {event.eventName}
                                         </p>
                                         <div className="flex items-center gap-1 mt-0.5">
@@ -442,7 +442,7 @@ const MyEventsPage = () => {
                                     ) : (
                                         <button
                                             onClick={() => navigate(`/organizer/events/${event.eventId}`)}
-                                            className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-[#7FA5A5] hover:text-[#5d8585] hover:bg-[#7FA5A5]/10 font-medium rounded-lg cursor-pointer transition-colors"
+                                            className="flex items-center gap-1.5 px-2.5 py-1.5 text-md text-[#7FA5A5] hover:text-[#5d8585] hover:bg-[#7FA5A5]/10 rounded-lg cursor-pointer transition-colors font-bold"
                                         >
                                             Manage
                                         </button>

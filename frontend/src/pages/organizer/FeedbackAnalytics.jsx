@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useFeedbackAnalytics } from "../../hooks/useFeedbackAnalytics";
 import axiosInstance from "../../config/axios";
 
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import StatCards from "../../components/domain/feedback-analytic/StatCards";
 import RatingBarChart from "../../components/domain/feedback-analytic/RatingBarChart";
 import ReviewsList from "../../components/domain/feedback-analytic/ReviewsList";
@@ -47,15 +47,20 @@ export default function AnalyticsPage() {
           <div className="flex gap-2">
             <Link
               to={`/organizer/feedback/feedbacklist/${eventId}`}
-              className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-semibold hover:bg-gray-50 shadow-sm"
+              className="flex-1 sm:flex-none justify-center bg-white text-[#8c9db3] px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 text-xs sm:text-sm font-bold shadow-md transition-all active:scale-95"
             >
-              View All Feedback
+              < span className="whitespace-nowrap">View All Feedback</span>
             </Link>
             <Link
               to={`/organizer/feedback/createform/${eventId}`}
-              className="px-5 py-2 bg-[#89A8B2] text-white rounded-full text-sm font-bold hover:opacity-90 shadow-md"
+              className="flex-1 sm:flex-none justify-center bg-[#8c9db3] hover:bg-[#7a8ca3] text-white border border-red-100 px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 text-xs sm:text-sm font-bold shadow-sm cursor-not-allowed"
             >
-              + Create Feedback Form
+              <Plus
+                size={16}
+                strokeWidth={2.5} 
+                className="sm:w-[18px] sm:h-[18px]"
+              />{" "}
+              <span className="whitespace-nowrap">Create Feedback Form</span>
             </Link>
           </div>
         </div>
