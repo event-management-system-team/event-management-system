@@ -17,6 +17,8 @@ public class TicketResponse {
 
     private UUID ticketId;
 
+    private UUID eventId;
+
     private String ticketCode;
 
     private String qrCodeUrl;
@@ -46,6 +48,7 @@ public class TicketResponse {
     public static TicketResponse from(Ticket ticket) {
         return TicketResponse.builder()
                 .ticketId(ticket.getTicketId())
+                .eventId(ticket.getEvent().getEventId())
                 .ticketCode(ticket.getTicketCode())
                 .qrCodeUrl(ticket.getQrCodeUrl())
                 .status(ticket.getStatus())
