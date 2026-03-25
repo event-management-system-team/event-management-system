@@ -189,12 +189,17 @@ const FeedbackList = () => {
               onChange={handleRatingChange}
               className="outline-none text-xs sm:text-sm font-medium text-gray-600 bg-transparent cursor-pointer"
             >
-              <option value="all">All Ratings</option>
-              <option value="5">5 Stars</option>
-              <option value="4">4 Stars</option>
-              <option value="3">3 Stars</option>
-              <option value="2">2 Stars</option>
-              <option value="1">1 Star</option>
+              <option value="all">All Scores</option>
+              <option value="10">10 / 10</option>
+              <option value="9">9 / 10</option>
+              <option value="8">8 / 10</option>
+              <option value="7">7 / 10</option>
+              <option value="6">6 / 10</option>
+              <option value="5">5 / 10</option>
+              <option value="4">4 / 10</option>
+              <option value="3">3 / 10</option>
+              <option value="2">2 / 10</option>
+              <option value="1">1 / 10</option>
             </select>
           </div>
 
@@ -233,7 +238,7 @@ const FeedbackList = () => {
                   Attendee
                 </th>
                 <th className="px-4 lg:px-6 py-4 lg:py-6 text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest text-left">
-                  Rating
+                  Score
                 </th>
                 <th className="px-4 lg:px-6 py-4 lg:py-6 text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest text-left">
                   Ticket
@@ -287,19 +292,9 @@ const FeedbackList = () => {
                       </div>
                     </td>
                     <td className="px-4 lg:px-6 py-4 lg:py-5">
-                      <div className="flex gap-0.5 sm:gap-1 text-xs sm:text-sm">
-                        {[...Array(5)].map((_, i) => (
-                          <span
-                            key={i}
-                            className={`${
-                              i < item.rating
-                                ? "text-yellow-400"
-                                : "text-gray-200"
-                            } text-sm sm:text-base`}
-                          >
-                            ★
-                          </span>
-                        ))}
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm sm:text-base font-extrabold text-[#8c9db3]">{item.rating}</span>
+                        <span className="text-[10px] sm:text-xs text-gray-400 font-medium">/ 10</span>
                       </div>
                     </td>
                     <td className="px-4 lg:px-6 py-4 lg:py-5">
