@@ -5,13 +5,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.eventmanagement.backend.constants.RecruitmentStatus;
-import com.eventmanagement.backend.repository.RecruitmentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eventmanagement.backend.constants.ApplicationStatus;
+import com.eventmanagement.backend.constants.RecruitmentStatus;
 import com.eventmanagement.backend.dto.response.organizer.ApplicationResponseDTO;
 import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.model.EventStaff;
@@ -19,6 +17,7 @@ import com.eventmanagement.backend.model.Recruitment;
 import com.eventmanagement.backend.model.StaffApplication;
 import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.repository.EventStaffRepository;
+import com.eventmanagement.backend.repository.RecruitmentRepository;
 import com.eventmanagement.backend.repository.StaffApplicationRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -27,11 +26,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ApplicationServiceOrganizer {
 
-    @Autowired
     private final StaffApplicationRepository staffapplicationRepository;
-    @Autowired
-    private EventStaffRepository eventStaffRepository;
-    private RecruitmentRepository recruitmentRepository;
+    private final EventStaffRepository eventStaffRepository;
+    private final RecruitmentRepository recruitmentRepository;
 
 
     @Transactional(readOnly = true)

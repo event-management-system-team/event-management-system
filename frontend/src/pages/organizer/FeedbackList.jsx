@@ -9,7 +9,6 @@ const FeedbackList = () => {
   const { eventId } = useParams();
   const { data: feedbacks, isLoading, isError } = useFeedbacks(eventId);
 
-  const [isEventEnded, setIsEventEnded] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const listTopRef = useRef(null);
@@ -33,12 +32,6 @@ const FeedbackList = () => {
           // --- THÊM DÒNG NÀY ---
           // Thay .name bằng .title hoặc .eventName tùy thuộc vào cấu trúc Backend của bạn trả về
           setEventName(eventData.name || eventData.title || eventData.eventName || "Unknown Event");
-
-          if (eventData.endDate) {
-            const isEnded =
-              new Date().getTime() > new Date(eventData.endDate).getTime();
-            setIsEventEnded(isEnded);
-          }
         }
       } catch (error) {
         console.error("Lỗi khi kiểm tra thời gian sự kiện:", error);
@@ -163,28 +156,17 @@ const FeedbackList = () => {
         </div>
 
         <div className="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 w-full lg:w-auto">
-          {!isEventEnded ? (
-            <Link
-              to={`/organizer/feedback/createform/${eventId}`}
-              className="flex-1 sm:flex-none justify-center bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 text-xs sm:text-sm font-bold shadow-md transition-all active:scale-95"
-            >
-              <Plus
-                size={16}
-                strokeWidth={2.5}
-                className="sm:w-[18px] sm:h-[18px]"
-              />{" "}
-              <span className="whitespace-nowrap">Create Form</span>
-            </Link>
-          ) : (
-            <div className="flex-1 sm:flex-none justify-center bg-red-50 text-red-600 border border-red-100 px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 text-xs sm:text-sm font-bold shadow-sm cursor-not-allowed">
-              <Lock
-                size={16}
-                strokeWidth={2.5}
-                className="sm:w-[18px] sm:h-[18px]"
-              />{" "}
-              <span className="whitespace-nowrap">Event Ended</span>
-            </div>
-          )}
+          <Link
+            to={`/organizer/feedback/createform/${eventId}`}
+            className="flex-1 sm:flex-none justify-center bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 text-xs sm:text-sm font-bold shadow-md transition-all active:scale-95"
+          >
+            <Plus
+              size={16}
+              strokeWidth={2.5}
+              className="sm:w-[18px] sm:h-[18px]"
+            />{" "}
+            <span className="whitespace-nowrap">Create Form</span>
+          </Link>
         </div>
       </div>
 

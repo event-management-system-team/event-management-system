@@ -7,13 +7,17 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import Sidebar from '../../components/layout/Sidebar'; 
 import axiosInstance from '../../config/axios';
+import { Alert } from '../../components/common/Alert';
+import { useAlert } from '../../hooks/useAlert';
 
 const FeedbackDetail = () => {
   const { feedbackId } = useParams();
   const [feedbackData, setFeedbackData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
+  const { alert, showAlert, closeAlert } = useAlert();
 
   useEffect(() => {
     const fetchFeedbackDetail = async () => {
@@ -165,10 +169,32 @@ const FeedbackDetail = () => {
       const fileName = `Feedback_#${feedbackId}_${new Date().toISOString().slice(0, 10)}.pdf`;
       pdf.save(fileName);
       console.log('✅ PDF exported successfully:', fileName);
-      alert('PDF exported successfully!');
+      showAlert('success', 'PDF exported successfully!');
     } catch (error) {
       console.error('❌ Error exporting PDF:', error);
-      alert(`Failed to export PDF: ${error.message}`);
+      showAlert('error', `Failed to export PDF: ${error.message}`);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this feedback? This action cannot be undone.')) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const response = await axiosInstance.delete(`/feedbacks/${feedbackId}`);
+      if (response.status === 200) {
+        showAlert('success', 'Feedback deleted successfully!');
+        setTimeout(() => {
+          navigate(-1); // Navigate back to feedback list
+        }, 1500);
+      }
+    } catch (error) {
+      console.error('Error deleting feedback:', error);
+      showAlert('error', `Failed to delete feedback: ${error.response?.data?.message || error.message}`);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -178,6 +204,7 @@ const FeedbackDetail = () => {
 
       {/* THÊM lg:h-screen lg:overflow-y-auto ĐỂ THANH CUỘN ĐỘC LẬP VỚI SIDEBAR NẾU CẦN */}
       <div className="flex-1 p-4 sm:p-6 lg:p-10 w-full overflow-x-hidden">
+        <Alert type={alert.type} message={alert.message} onClose={closeAlert} />
         
         {/* --- HEADER RESPONSIVE --- */}
         {/* Xếp dọc trên mobile, xếp ngang trên tablet/desktop */}
@@ -194,8 +221,11 @@ const FeedbackDetail = () => {
           </div>
           
           <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-            <button className="flex-1 sm:flex-none justify-center px-4 py-2.5 sm:py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-red-500 hover:bg-red-50 flex items-center gap-2 transition-all shadow-sm">
-              <Trash2 size={16} /> <span className="hidden sm:inline">Delete</span>
+            <button 
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className={`flex-1 sm:flex-none justify-center px-4 py-2.5 sm:py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-red-500 hover:bg-red-50 flex items-center gap-2 transition-all shadow-sm ${isDeleting ? 'opacity-50 cursor-not-allowed' : ''}`}>
+              <Trash2 size={16} /> <span className="hidden sm:inline">{isDeleting ? 'Deleting...' : 'Delete'}</span>
             </button>
             <button 
               onClick={handleExportPDF}
