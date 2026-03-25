@@ -204,11 +204,11 @@ const ApplicationList = () => {
                   <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
                     {selectedCandidate.customAnswers && Object.keys(selectedCandidate.customAnswers).length > 0 ? (
                       Object.entries(selectedCandidate.customAnswers)
-                        .filter(([key]) => !key.toLowerCase().includes('agreetoterms') && !key.toLowerCase().includes('agree'))
+                        .filter(([key]) => !key.toLowerCase().includes('agreetoterms') && !key.toLowerCase().includes('agree') && key !== 'cvUrl')
                         .map(([key, value]) => {
                           // Tìm label từ formSchema
                           const schemaField = selectedCandidate.formSchema?.find(
-                            (f) => f.id === key || f.name === key
+                            (f) => f.fieldId === key || f.id === key || f.name === key || f.label === key
                           );
                           const label = schemaField?.label || schemaField?.title || key;
                           return (
