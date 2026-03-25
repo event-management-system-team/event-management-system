@@ -3,6 +3,7 @@ import { Button } from "../../components/domain/admin/Button.jsx";
 import { adminService } from '../../services/admin.service.js';
 import dayjs from "dayjs";
 import LoadingState from '../../components/common/LoadingState.jsx';
+import EmptyState from '../../components/common/EmptyState.jsx';
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import GlobalAnalyticsCard from '../../components/domain/admin/GlobalAnalyticsCard.jsx';
@@ -127,7 +128,7 @@ export function EventAnalytics() {
     if (error) return <EmptyState className='h-[600px]' />
 
     return (
-        <div className="flex h-screen bg-[#F1F0E8]">
+        <div className="flex flex-col flex-1 bg-[#F1F0E8]">
 
             {/* Main Content */}
             <main className="flex-1 overflow-auto">

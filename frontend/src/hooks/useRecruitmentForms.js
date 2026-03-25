@@ -13,7 +13,10 @@ const useRecruitmentForms = (eventId) => {
     recruitmentService
       .getFormsByEvent(eventId, "RECRUITMENT")
       .then((res) => {
-        if (!cancelled) setForms(res.data || []);
+        if (!cancelled) {
+          // Backend trả về một form object (hoặc null nếu chưa có form)
+          setForms(res && res.formId ? [res] : []);
+        }
       })
       .catch((err) => {
         if (!cancelled) setError(err?.message || "Failed to load forms");

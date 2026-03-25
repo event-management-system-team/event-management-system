@@ -74,16 +74,16 @@ public class ApplicationControllerTest {
         ApplicationResponseDTO mockDetail = ApplicationResponseDTO.builder()
                 .name("Tran Van D")
                 .email("tranvand@test.com")
-                .resume("cv_link.pdf")
+                .cvUrl("cv_link.pdf")
                 .build();
 
         when(applicationServiceOrganizer.getApplicationDetail(applicationId)).thenReturn(mockDetail);
 
-        mockMvc.perform(get("/api/applications/" + applicationId) // Sửa đường dẫn nếu cần
+        mockMvc.perform(get("/api/applications/" + applicationId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Tran Van D"))
-                .andExpect(jsonPath("$.resume").value("cv_link.pdf"));
+                .andExpect(jsonPath("$.cvUrl").value("cv_link.pdf"));
     }
 
     @Test

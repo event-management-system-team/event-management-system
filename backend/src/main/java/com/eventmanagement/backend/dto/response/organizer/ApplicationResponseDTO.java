@@ -1,6 +1,8 @@
 package com.eventmanagement.backend.dto.response.organizer;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -24,8 +26,9 @@ public class ApplicationResponseDTO {
     //recruitment
     private String position;
     //application
-    private String resume;
-    private String coverLetter;
+    private String cvUrl;
+    private Map<String, Object> customAnswers;
+    private List<Map<String, Object>> formSchema; // schema để map question ID → label
     private String status; 
     // dinh dang lai ngay gio
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

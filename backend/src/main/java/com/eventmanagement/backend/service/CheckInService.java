@@ -51,7 +51,8 @@ public class CheckInService {
         if (ticket.getStatus() == TicketStatus.CHECKED_IN) {
             throw new BadRequestException("The ticket has been used!!");
         }
-        if (ticket.getStatus() != TicketStatus.PAID) {
+        // Chấp nhận cả CONFIRMED (vé miễn phí) và PAID (vé có phí)
+        if (ticket.getStatus() != TicketStatus.CONFIRMED && ticket.getStatus() != TicketStatus.PAID) {
             throw new NotFoundException("Ticket code invalid or does not exist!");
         }
 
@@ -99,7 +100,8 @@ public class CheckInService {
                 .customerName(ticket.getUser().getFullName())
                 .avatarUrl(ticket.getUser().getAvatarUrl())
                 .email(ticket.getUser().getEmail())
-                .ticketType(ticket.getTicketType().getTicketName())
+                // ticketType có thể null với vé miễn phí
+                .ticketType(ticket.getTicketType() != null ? ticket.getTicketType().getTicketName() : "Free Ticket")
                 .ticketCode(ticket.getTicketCode())
                 .scannedBy(staff != null ? staff.getFullName() : null)
                 .checkInTime(checkIn != null ? checkIn.getCheckinTime() : null)

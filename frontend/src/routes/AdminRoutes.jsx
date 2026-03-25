@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import ProtectedRoute from "../components/common/ProtectedRoute";
 
 import { AdminDashboard } from "../pages/admin/AdminDashboard.jsx";
@@ -17,6 +17,7 @@ const AdminRoutes = () => {
 
           {/* Dashboard */}
           <Route index element={<AdminDashboard />} />
+          <Route path="dashboard" element={<Navigate to="/admin" replace />} />
 
           {/* Account Management */}
           <Route path="accounts" element={<AccountManagement />} />

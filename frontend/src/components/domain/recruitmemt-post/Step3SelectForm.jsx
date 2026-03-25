@@ -1,18 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FileText, Plus, Search, Info } from "lucide-react";
 import { FieldError } from "./RecruitmentShared";
 import useRecruitmentForms from "../../../hooks/useRecruitmentForms";
-import { useNavigate, useParams } from "react-router";
 
 const Step3SelectForm = ({ form, onChange, errors = {} }) => {
-
   const navigate = useNavigate();
-  const { eventId } = useParams(); // Lấy eventId từ URL hiện tại
-
-  const handleCreateForm = () => {
-    // Chuyển hướng đến trang tạo form với ID tương ứng
-    navigate(`/organizer/recruitmentcreate/${eventId}`);
-  };
   const [search, setSearch] = useState("");
 
   // Load forms thực từ API theo eventId
@@ -34,7 +27,7 @@ const Step3SelectForm = ({ form, onChange, errors = {} }) => {
           </h2>
           <button
             type="button"
-            onClick={handleCreateForm}
+            onClick={() => navigate(`/organizer/recruitmentcreate/${form.eventId}`)}
             className="flex items-center gap-1.5 text-xs font-semibold text-[#4a9e9e] hover:text-[#3d8f8f] transition"
           >
             <Plus size={13} />

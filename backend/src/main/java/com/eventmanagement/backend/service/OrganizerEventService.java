@@ -1,6 +1,7 @@
 package com.eventmanagement.backend.service;
 
 import com.eventmanagement.backend.constants.EventStatus;
+import com.eventmanagement.backend.constants.TicketStatus;
 import com.eventmanagement.backend.dto.request.CreateEventRequest;
 import com.eventmanagement.backend.dto.response.organizer.AttendeeResponse;
 import com.eventmanagement.backend.dto.response.organizer.CreateEventResponse;
@@ -12,12 +13,12 @@ import com.eventmanagement.backend.exception.UnauthorizedException;
 import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.model.EventAgenda;
 import com.eventmanagement.backend.model.EventCategory;
-import com.eventmanagement.backend.model.EventRegistration;
+import com.eventmanagement.backend.model.Ticket;
 import com.eventmanagement.backend.model.TicketType;
 import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.repository.EventCategoryRepository;
-import com.eventmanagement.backend.repository.EventRegistrationRepository;
 import com.eventmanagement.backend.repository.EventRepository;
+import com.eventmanagement.backend.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -46,7 +47,7 @@ public class OrganizerEventService {
 
     private final EventRepository eventRepository;
     private final EventCategoryRepository eventCategoryRepository;
-    private final EventRegistrationRepository eventRegistrationRepository;
+    private final TicketRepository ticketRepository;
     private final CloudinaryService cloudinaryService;
 
     // create event for organizer that support cover image
@@ -502,30 +503,42 @@ public class OrganizerEventService {
 
     /**
      * Lấy danh sách attendees của một event có phân trang
+     * Query từ bảng tickets (CONFIRMED, PAID, CHECKED_IN) thay vì event_registrations
      */
     public Page<AttendeeResponse> getEventAttendees(UUID eventId, int page, int size) {
-        Event event = eventRepository.findById(eventId)
+        eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found: " + eventId));
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<EventRegistration> registrations = eventRegistrationRepository.findByEventIdWithUserAndTicket(eventId, pageable);
+        List<TicketStatus> validStatuses = List.of(
+                TicketStatus.CONFIRMED, TicketStatus.PAID, TicketStatus.CHECKED_IN);
 
-        return registrations.map(this::mapToAttendeeResponse);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Ticket> tickets = ticketRepository.findAttendeeTicketsByEventId(eventId, validStatuses, pageable);
+
+        return tickets.map(this::mapToAttendeeResponse);
     }
 
-    private AttendeeResponse mapToAttendeeResponse(EventRegistration registration) {
-        User user = registration.getUser();
-        TicketType ticketType = registration.getTicketType();
+    private AttendeeResponse mapToAttendeeResponse(Ticket ticket) {
+        User user = ticket.getUser();
+        TicketType ticketType = ticket.getTicketType();
+
+        // Map ticket status sang attendee status hiển thị
+        String status;
+        if (ticket.getStatus() == TicketStatus.CHECKED_IN) {
+            status = "checked-in";
+        } else {
+            status = "registered";
+        }
 
         return AttendeeResponse.builder()
-                .id(registration.getRegistrationId())
+                .id(ticket.getTicketId())
                 .fullName(user != null ? user.getFullName() : "Unknown")
                 .email(user != null ? user.getEmail() : null)
                 .avatarUrl(user != null ? user.getAvatarUrl() : null)
                 .ticketType(ticketType != null ? ticketType.getTicketName() : "General Admission")
-                .status(registration.getStatus())
-                .registrationDate(registration.getRegistrationDate())
-                .checkInTime(registration.getCheckInTime())
+                .status(status)
+                .registrationDate(ticket.getCreatedAt())
+                .checkInTime(ticket.getCheckIn() != null ? ticket.getCheckIn().getCheckinTime() : null)
                 .build();
     }
 }

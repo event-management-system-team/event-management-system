@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  ArrowLeft, Star, User, Ticket, Mail, Calendar, 
+  ArrowLeft, User, Ticket, Mail, Calendar, 
   Download, Trash2, MessageSquare, ListIcon 
 } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
@@ -90,7 +90,13 @@ const FeedbackDetail = () => {
               <h3 className="text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-5 lg:mb-6">Attendee Profile</h3>
               
               <div className="flex flex-col items-center mb-6 text-center">
-                <img src={feedbackData.attendeeInfor?.avatar || '/default-avatar.png'} alt="Avatar" className="w-20 h-20 lg:w-24 lg:h-24 rounded-full object-cover border-4 border-[#f8f7f2] shadow-sm mb-4" />
+                {feedbackData.attendeeInfor?.avatar ? (
+                  <img src={feedbackData.attendeeInfor.avatar} alt="Avatar" className="w-20 h-20 lg:w-24 lg:h-24 rounded-full object-cover border-4 border-[#f8f7f2] shadow-sm mb-4" />
+                ) : (
+                  <div className="w-20 h-20 lg:w-24 lg:h-24 rounded-full bg-gradient-to-br from-[#8c9db3] to-[#6b7d94] flex items-center justify-center border-4 border-[#f8f7f2] shadow-sm mb-4">
+                    <User size={32} className="text-white" />
+                  </div>
+                )}
                 <h2 className="text-base lg:text-lg font-bold text-gray-900">{feedbackData.attendeeInfor?.fullName}</h2>
                 <span className="bg-[#8c9db3]/10 text-[#8c9db3] text-[10px] lg:text-xs font-bold px-3 py-1 rounded-full mt-2 uppercase tracking-wide">
                   {feedbackData.attendeeInfor?.ticketType || "ATTENDEE"}
@@ -123,25 +129,12 @@ const FeedbackDetail = () => {
             <div className="bg-white rounded-xl lg:rounded-2xl p-5 sm:p-6 lg:p-8 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] border border-gray-100 h-full">
               <h3 className="text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-6 lg:mb-8">Feedback Responses</h3>
 
-              {/* KHU VỰC ĐIỂM SỐ RESPONSIVE */}
+              {/* KHU VỰC ĐIỂM SỐ */}
               <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 mb-8 pb-6 lg:mb-10 lg:pb-8 border-b border-gray-100">
                 <div className="flex-1">
-                  <p className="text-xs sm:text-sm font-bold text-gray-500 mb-2 sm:mb-3">Overall Experience</p>
-                  <div className="flex gap-1 sm:gap-1.5">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={24} className={`sm:w-7 sm:h-7 lg:w-8 lg:h-8 ${i < overallRating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'}`} />
-                    ))}
-                  </div>
-                </div>
-                
-                {/* Đường kẻ ngăn cách: Dọc trên Desktop/Tablet, Ngang trên Mobile */}
-                <div className="hidden sm:block w-px bg-gray-100"></div>
-                <div className="block sm:hidden h-px w-full bg-gray-50"></div>
-
-                <div className="flex-1">
-                  <p className="text-xs sm:text-sm font-bold text-gray-500 mb-2 sm:mb-3">Net Promoter Score (NPS)</p>
+                  <p className="text-xs sm:text-sm font-bold text-gray-500 mb-2 sm:mb-3">Overall Score</p>
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl sm:text-3xl font-extrabold text-green-500">{npsScore}</span>
+                    <span className="text-2xl sm:text-3xl font-extrabold text-[#8c9db3]">{overallRating || npsScore}</span>
                     <span className="text-gray-400 font-medium text-xs sm:text-sm mt-1 sm:mt-2">/ 10</span>
                   </div>
                 </div>

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Form, message } from 'antd';
 import recruitmentService from '../services/recruitment.service'
 
-export const useApplicationForm = (recruitmentList, userProfile, eventSlug) => {
+export const useApplicationForm = (recruitmentList, userProfile, eventSlug, formSchema) => {
 
     const [form] = Form.useForm();
     const [selectedRole, setSelectedRole] = useState('');
@@ -20,10 +20,16 @@ export const useApplicationForm = (recruitmentList, userProfile, eventSlug) => {
             formData.append('recruitmentId', selectedRole);
             formData.append('userId', userProfile.userId);
 
-            const cvFile = values.cv?.[0]?.originFileObj;
+            const fileUploadField = formSchema?.find(f => f.type === 'fileUpload');
+            const fileUploadId = fileUploadField?.fieldId;
+
+            const cvFile = fileUploadId ? values[fileUploadId]?.[0]?.originFileObj : null;
             if (cvFile) { formData.append('files', cvFile); }
 
-            const { cv, ...answersOnlyText } = values;
+            const answersOnlyText = { ...values };
+            if (fileUploadId) {
+                delete answersOnlyText[fileUploadId];
+            }
             formData.append('answers', JSON.stringify(answersOnlyText));
 
             const responseData = await recruitmentService.postApplicationForm(eventSlug, formData);

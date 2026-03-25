@@ -1,36 +1,34 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import { Eye, Search, Plus, Lock, Filter, Calendar } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { Eye, Search, Filter, Calendar, Plus, Lock } from "lucide-react";
 import { useFeedbacks } from "../../hooks/useFeedback";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { Pagination } from "antd";
 import axiosInstance from "../../config/axios";
 
+import { ArrowLeft } from "lucide-react";
+
 const FeedbackList = () => {
   const { eventId } = useParams();
+  const navigate = useNavigate();
   const { data: feedbacks, isLoading, isError } = useFeedbacks(eventId);
 
+  // STATE: Quản lý trạng thái kết thúc và tên event
   const [isEventEnded, setIsEventEnded] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  const listTopRef = useRef(null);
+  const [eventName, setEventName] = useState("");
 
-  // --- STATE MỚI: Quản lý các bộ lọc ---
-  const [searchTerm, setSearchTerm] = useState("");
-  const [ratingFilter, setRatingFilter] = useState("all");
-  const [dateFilter, setDateFilter] = useState("");
-  const [eventName, setEventName] = useState("Loading...");
-
+  // EFFECT: Gọi API lấy chi tiết Event để check endDate và lấy tên event
   useEffect(() => {
     const checkEventStatus = async () => {
       try {
-        const response = await axiosInstance.get(`/events/ids/${eventId}`);
+        const response = await axiosInstance.get(`/organizer/events/${eventId}`);
         const eventData = response.data?.data || response.data;
 
         if (eventData) {
-          // --- THÊM DÒNG NÀY ---
-          // Thay .name bằng .title hoặc .eventName tùy thuộc vào cấu trúc Backend của bạn trả về
-          setEventName(eventData.name || eventData.title || eventData.eventName || "Unknown Event");
-
+          // Lấy tên event
+          if (eventData.eventName || eventData.name) {
+            setEventName(eventData.eventName || eventData.name);
+          }
+          // Check nếu event đã kết thúc
           if (eventData.endDate) {
             const isEnded =
               new Date().getTime() > new Date(eventData.endDate).getTime();
@@ -48,80 +46,28 @@ const FeedbackList = () => {
     }
   }, [eventId]);
 
-  const feedbackItems = feedbacks?.feedbacks || [];
 
-  // --- LOGIC MỚI: Xử lý tìm kiếm và lọc dữ liệu ---
-  const filteredFeedbacks = useMemo(() => {
-    let result = feedbackItems;
+  // STATE: Filter & Search
+  const [searchTerm, setSearchTerm] = useState("");
+  const [ratingFilter, setRatingFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("");
 
-    // 1. Tìm kiếm theo tên hoặc email
-    if (searchTerm.trim() !== "") {
-      const lowerCaseSearch = searchTerm.toLowerCase();
-      result = result.filter(
-        (item) =>
-          item.userName?.toLowerCase().includes(lowerCaseSearch) ||
-          item.userEmail?.toLowerCase().includes(lowerCaseSearch)
-      );
-    }
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const listTopRef = useRef(null);
 
-    // 2. Lọc theo số sao (Rating)
-    if (ratingFilter !== "all") {
-      result = result.filter((item) => item.rating === Number(ratingFilter));
-    }
-
-    // 3. Lọc theo ngày (Date)
-    if (dateFilter) {
-      result = result.filter((item) => {
-        const dateObj = new Date(item.createdAt);
-        // Định dạng ngày về YYYY-MM-DD để so sánh chuẩn xác với input date
-        const yyyy = dateObj.getFullYear();
-        const mm = String(dateObj.getMonth() + 1).padStart(2, "0");
-        const dd = String(dateObj.getDate()).padStart(2, "0");
-        const formattedItemDate = `${yyyy}-${mm}-${dd}`;
-        
-        return formattedItemDate === dateFilter;
-      });
-    }
-
-    return result;
-  }, [feedbackItems, searchTerm, ratingFilter, dateFilter]);
-
-  // Cập nhật lại số phân trang dựa trên danh sách đã lọc
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredFeedbacks.slice(indexOfFirstItem, indexOfLastItem);
-
-  // --- LOGIC MỚI: Reset trang về 1 khi người dùng thay đổi bộ lọc ---
+  // HANDLERS
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
   };
-
   const handleRatingChange = (e) => {
     setRatingFilter(e.target.value);
     setCurrentPage(1);
   };
-
   const handleDateChange = (e) => {
     setDateFilter(e.target.value);
     setCurrentPage(1);
-  };
-
-  const onChangePage = (page) => {
-    setCurrentPage(page);
-
-    if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
-    }
-
-    setTimeout(() => {
-      if (listTopRef.current) {
-        listTopRef.current.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
-    }, 100);
   };
 
   if (isLoading) {
@@ -142,18 +88,62 @@ const FeedbackList = () => {
     );
   }
 
+  const resolvedEventName = eventName || feedbacks?.eventName || "Event";
+  const feedbackItems = feedbacks?.feedbacks || [];
+
+  // COMPUTE: filteredFeedbacks
+  const filteredFeedbacks = feedbackItems.filter((item) => {
+    const matchesSearch =
+      !searchTerm ||
+      item.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.userEmail?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRating =
+      ratingFilter === "all" || item.rating === Number(ratingFilter);
+    const matchesDate =
+      !dateFilter ||
+      new Date(item.createdAt).toLocaleDateString("en-CA") === dateFilter;
+    return matchesSearch && matchesRating && matchesDate;
+  });
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredFeedbacks.slice(indexOfFirstItem, indexOfLastItem);
+
+  const onChangePage = (page) => {
+    setCurrentPage(page);
+
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
+    setTimeout(() => {
+      if (listTopRef.current) {
+        listTopRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    }, 100);
+  };
+
   return (
     <div className="p-10 w-full overflow-x-hidden">
       {/* --- HEADER --- */}
       <div className="flex justify-between items-end mb-8" ref={listTopRef}>
         <div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-900 tracking-tight mb-1 sm:mb-2">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-4 text-gray-400 hover:text-gray-700 text-sm font-medium mb-3 transition-colors group"
+          >
+            <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
+          <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
             Attendee Feedback
           </h1>
+          </button>
           <p className="text-gray-500 font-medium italic text-xs sm:text-sm">
             Showing all responses for{" "}
             <span className="text-gray-800 not-italic font-bold">
-              {eventName}
+              {resolvedEventName}
             </span>
           </p>
         </div>
@@ -208,12 +198,17 @@ const FeedbackList = () => {
               onChange={handleRatingChange}
               className="outline-none text-xs sm:text-sm font-medium text-gray-600 bg-transparent cursor-pointer"
             >
-              <option value="all">All Ratings</option>
-              <option value="5">5 Stars</option>
-              <option value="4">4 Stars</option>
-              <option value="3">3 Stars</option>
-              <option value="2">2 Stars</option>
-              <option value="1">1 Star</option>
+              <option value="all">All Scores</option>
+              <option value="10">10 / 10</option>
+              <option value="9">9 / 10</option>
+              <option value="8">8 / 10</option>
+              <option value="7">7 / 10</option>
+              <option value="6">6 / 10</option>
+              <option value="5">5 / 10</option>
+              <option value="4">4 / 10</option>
+              <option value="3">3 / 10</option>
+              <option value="2">2 / 10</option>
+              <option value="1">1 / 10</option>
             </select>
           </div>
 
@@ -252,7 +247,7 @@ const FeedbackList = () => {
                   Attendee
                 </th>
                 <th className="px-4 lg:px-6 py-4 lg:py-6 text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest text-left">
-                  Rating
+                  Score
                 </th>
                 <th className="px-4 lg:px-6 py-4 lg:py-6 text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest text-left">
                   Ticket
@@ -306,19 +301,9 @@ const FeedbackList = () => {
                       </div>
                     </td>
                     <td className="px-4 lg:px-6 py-4 lg:py-5">
-                      <div className="flex gap-0.5 sm:gap-1 text-xs sm:text-sm">
-                        {[...Array(5)].map((_, i) => (
-                          <span
-                            key={i}
-                            className={`${
-                              i < item.rating
-                                ? "text-yellow-400"
-                                : "text-gray-200"
-                            } text-sm sm:text-base`}
-                          >
-                            ★
-                          </span>
-                        ))}
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm sm:text-base font-extrabold text-[#8c9db3]">{item.rating}</span>
+                        <span className="text-[10px] sm:text-xs text-gray-400 font-medium">/ 10</span>
                       </div>
                     </td>
                     <td className="px-4 lg:px-6 py-4 lg:py-5">
