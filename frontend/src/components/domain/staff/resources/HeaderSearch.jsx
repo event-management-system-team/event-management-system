@@ -20,7 +20,7 @@ const HeaderSearch = ({ searchQuery, setSearchQuery, eventName }) => {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="flex w-full min-w-0 flex-1 border-none bg-transparent focus:outline-none focus:ring-0 px-4 text-base font-medium placeholder:text-slate-400 text-[#2C3E50]"
-                        placeholder="Search document, material,..."
+                        placeholder={t('staff_search_resource')}
                     />
                 </div>
             </div>

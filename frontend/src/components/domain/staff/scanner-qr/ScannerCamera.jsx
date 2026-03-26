@@ -37,7 +37,7 @@ const ScannerCamera = ({ onVerifyQR, onScanQR, isCheckingIn }) => {
                             const verifyAsync = async () => {
                                 try {
                                     if (onVerifyQR) {
-                                        message.loading({ content: 'Verifying ticket...', key: 'verify_qr', duration: 0 });
+                                        message.loading({ content: t('staff_verifying_ticket'), key: 'verify_qr', duration: 0 });
                                         const ticket = await onVerifyQR(scannedCode);
                                         message.destroy('verify_qr');
                                         setScannedTicket(ticket);
@@ -50,7 +50,7 @@ const ScannerCamera = ({ onVerifyQR, onScanQR, isCheckingIn }) => {
                                     }
                                 } catch (error) {
                                     message.destroy('verify_qr');
-                                    message.error(error.message || "Ticket verification failed!");
+                                    message.error(error.message || t('staff_verify_failed'));
                                     setTimeout(() => {
                                         coolDownRef.current = false;
                                     }, 2000);
@@ -61,7 +61,7 @@ const ScannerCamera = ({ onVerifyQR, onScanQR, isCheckingIn }) => {
                         }
                     }}
                     onError={(error) => {
-                        message.error("Camera Error: " + error?.message);
+                        message.error(t('staff_camera_error') + ": " + error?.message);
                     }}
                     formats={['qr_code']}
                     constraints={{

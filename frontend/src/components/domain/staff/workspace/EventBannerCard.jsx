@@ -25,7 +25,7 @@ const EventBannerCard = ({ eventInfo }) => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
                 <div className="absolute bottom-6 left-6 right-6">
                     <div className="px-3 py-1.5 bg-white/20 backdrop-blur-md rounded-xl w-fit border border-white/30 text-white text-[10px] font-bold uppercase tracking-wider mb-2">
-                        Ongoing Event
+                        {t('staff_ongoing_event')}
                     </div>
                     <h2 className="text-xl 2xl:text-2xl font-black text-white leading-tight">{eventInfo.eventName}</h2>
                 </div>
@@ -48,7 +48,7 @@ const EventBannerCard = ({ eventInfo }) => {
                                 <Clock size={20} />
                             </div>
                             <div>
-                                <p className="text-[10px] 2xl:text-xs font-bold text-gray-400 uppercase tracking-wider">Date & Time</p>
+                                <p className="text-[10px] 2xl:text-xs font-bold text-gray-400 uppercase tracking-wider">{t('staff_date_time')}</p>
                                 <p className="text-sm 2xl:text-base font-bold text-[#2C3E50]">
                                     {formatTime(eventInfo.startDate)} - {formatDate(eventInfo.startDate)}
 

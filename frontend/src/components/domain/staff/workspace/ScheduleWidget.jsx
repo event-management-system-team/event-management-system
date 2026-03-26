@@ -22,7 +22,7 @@ const ScheduleWidget = ({ schedules }) => {
         const day = date.getDate().toString().padStart(2, '0');
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
 
-        const dateStr = isToday ? 'TODAY' : `${day}/${month}`;
+        const dateStr = isToday ? t('staff_today') : `${day}/${month}`;
 
         return `${timeStr} - ${dateStr}`;
     };
@@ -41,7 +41,7 @@ const ScheduleWidget = ({ schedules }) => {
 
             <div className="space-y-3 relative before:absolute before:inset-y-0 before:left-3.5 before:w-0.5 before:bg-gray-100">
                 {schedules.length === 0 && (
-                    <EmptyState message='You have no upcoming shifts' />
+                    <EmptyState message={t('staff_no_shifts')} />
                 )}
 
                 {schedules.map((schedule, index) => {

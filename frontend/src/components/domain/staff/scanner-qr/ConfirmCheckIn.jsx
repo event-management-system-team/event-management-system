@@ -56,7 +56,7 @@ const ConfirmCheckIn = ({ isOpen, onClose, onConfirm, ticketInfo, isLoading }) =
                     disabled={isLoading}
                     className="flex-1 px-2 py-1.5 rounded-md font-semibold text-xs text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors disabled:opacity-50"
                 >
-                    Cancel
+                    {t('staff_cancel')}
                 </button>
                 <button
                     onClick={onConfirm}
@@ -66,7 +66,7 @@ const ConfirmCheckIn = ({ isOpen, onClose, onConfirm, ticketInfo, isLoading }) =
                     {isLoading ? (
                         <div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
                     ) : (
-                        'Check In'
+                        t('staff_check_in')
                     )}
                 </button>
             </div>

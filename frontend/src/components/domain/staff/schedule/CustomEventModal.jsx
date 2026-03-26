@@ -1,7 +1,9 @@
 import { Clock, BadgeCent } from 'lucide-react';
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const CustomEventModal = ({ calendarEvent }) => {
+    const { t } = useTranslation();
     const startTime = String(calendarEvent.start).substring(11, 16);
     const endTime = String(calendarEvent.end).substring(11, 16);
     const modalRef = useRef(null);
@@ -56,7 +58,7 @@ const CustomEventModal = ({ calendarEvent }) => {
                     <div className="p-1.5 bg-red-50 rounded-md text-red-600">
                         <BadgeCent size={16} />
                     </div>
-                    <span className="font-medium">{calendarEvent.location || 'Not yet'}</span>
+                    <span className="font-medium">{calendarEvent.location || t('staff_not_yet')}</span>
                 </div>
             </div>
         </div>

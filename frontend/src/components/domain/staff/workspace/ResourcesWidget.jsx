@@ -8,12 +8,12 @@ const ResourcesWidget = ({ resources = [] }) => {
     const { t } = useTranslation();
 
     const getFileTypeName = (fileType) => {
-        if (!fileType) return 'Document';
-        if (fileType.includes('pdf')) return 'PDF Document';
-        if (fileType.includes('spreadsheet') || fileType.includes('excel') || fileType.includes('xlsx')) return 'Excel Spreadsheet';
-        if (fileType.includes('video')) return 'Video File';
-        if (fileType.includes('image')) return 'Image File';
-        return 'Document';
+        if (!fileType) return t('staff_document');
+        if (fileType.includes('pdf')) return t('staff_pdf_document');
+        if (fileType.includes('spreadsheet') || fileType.includes('excel') || fileType.includes('xlsx')) return t('staff_excel_spreadsheet');
+        if (fileType.includes('video')) return t('staff_video_file');
+        if (fileType.includes('image')) return t('staff_image_file');
+        return t('staff_document');
     };
 
     return (
@@ -32,7 +32,7 @@ const ResourcesWidget = ({ resources = [] }) => {
             <div className="space-y-3 flex-1">
                 {resources.length === 0 && (
                     <div className="pl-4 text-sm text-gray-500 italic">
-                        Not yet resources
+                        {t('staff_no_resources')}
                     </div>
                 )}
 

@@ -1,6 +1,9 @@
 import { getResourceConfig } from '../../../../../utils/resource.utils'
 import ResourceCard from './ResourceCard';
+import { useTranslation } from 'react-i18next';
+
 const MainContent = ({ filteredResources }) => {
+    const { t } = useTranslation();
 
 
 
@@ -8,7 +11,7 @@ const MainContent = ({ filteredResources }) => {
         <>
             <div className="text-right px-2 border-b border-slate-200/80 mb-8 pb-3">
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-[0.15em]">
-                    {filteredResources.length} Resources
+                    {t('staff_resources_count', { count: filteredResources.length })}
                 </span>
             </div>
 
