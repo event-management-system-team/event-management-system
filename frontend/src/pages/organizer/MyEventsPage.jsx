@@ -30,23 +30,23 @@ const STATUS_STYLES = {
     Pending: { dotColor: 'bg-blue-400', textColor: 'text-blue-600', bgColor: 'bg-blue-50' },
 };
 
-const getEventDisplayStatus = (status, startDate) => {
+const getEventDisplayStatus = (status, startDate, t) => {
     switch (status) {
         case 'APPROVED':
-            if (dayjs(startDate).isAfter(dayjs())) return { label: 'Upcoming', ...STATUS_STYLES.Upcoming };
-            return { label: 'Active', ...STATUS_STYLES.Active };
+            if (dayjs(startDate).isAfter(dayjs())) return { key: 'upcoming', label: t('org_status_upcoming'), ...STATUS_STYLES.Upcoming };
+            return { key: 'active', label: t('org_status_active'), ...STATUS_STYLES.Active };
         case 'ONGOING':
-            return { label: 'Active', ...STATUS_STYLES.Active };
+            return { key: 'active', label: t('org_status_active'), ...STATUS_STYLES.Active };
         case 'COMPLETED':
-            return { label: 'Completed', ...STATUS_STYLES.Completed };
+            return { key: 'completed', label: t('org_status_completed'), ...STATUS_STYLES.Completed };
         case 'REJECTED':
-            return { label: 'Rejected', ...STATUS_STYLES.Rejected };
+            return { key: 'rejected', label: t('org_status_rejected'), ...STATUS_STYLES.Rejected };
         case 'PENDING':
-            return { label: 'Pending', ...STATUS_STYLES.Pending };
+            return { key: 'pending', label: t('org_status_pending'), ...STATUS_STYLES.Pending };
         case 'DRAFT':
-            return { label: 'Draft', ...STATUS_STYLES.Draft };
+            return { key: 'draft', label: t('org_status_draft'), ...STATUS_STYLES.Draft };
         default:
-            return { label: status, ...STATUS_STYLES.Draft };
+            return { key: status?.toLowerCase(), label: status, ...STATUS_STYLES.Draft };
     }
 };
 
@@ -122,8 +122,8 @@ const MyEventsPage = () => {
         // Filter by status tag
         if (activeFilter !== 'all') {
             result = result.filter((e) => {
-                const display = getEventDisplayStatus(e.status, e.startDate);
-                return display.label.toLowerCase() === activeFilter;
+                const display = getEventDisplayStatus(e.status, e.startDate, t);
+                return display.key === activeFilter;
             });
         }
 
@@ -139,9 +139,9 @@ const MyEventsPage = () => {
         }
 
         return result;
-    }, [events, searchTerm, activeFilter]);
+    }, [events, searchTerm, activeFilter, t]);
 
-    const getStatusDisplay = (status, startDate) => getEventDisplayStatus(status, startDate);
+    const getStatusDisplay = (status, startDate) => getEventDisplayStatus(status, startDate, t);
 
     const getTicketProgress = (sold, total) => {
         if (!total || total <= 0) return 0;
@@ -184,7 +184,7 @@ const MyEventsPage = () => {
             fetchEvents(currentPage);
             fetchStats();
         } catch (err) {
-            const msg = err.response?.data?.message || 'Failed to delete event.';
+            const msg = err.response?.data?.message || t('org_delete_failed');
             setError(msg);
         } finally {
             setDeleting(false);
@@ -235,11 +235,11 @@ const MyEventsPage = () => {
             {/* Header */}
             <div className="flex items-start justify-between mb-8">
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
-                        My Events Management
+                    <h1 className="font-sans text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
+                        {t('org_my_events')}
                     </h1>
                     <p className="text-gray-500 text-sm mt-1">
-                        Overview of your current, upcoming and past event performances.
+                        {t('org_my_events_desc')}
                     </p>
                 </div>
                 <button
@@ -311,11 +311,11 @@ const MyEventsPage = () => {
 
                 {/* Table Header */}
                 <div className="grid grid-cols-12 gap-4 px-6 py-3 border-b border-gray-100 text-xs text-gray-400 uppercase tracking-wider font-medium">
-                    <div className="col-span-4 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Event</div>
-                    <div className="col-span-2 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Date</div>
-                    <div className="col-span-2 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Status</div>
-                    <div className="col-span-3 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Ticket Stats</div>
-                    <div className="col-span-1 text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Actions</div>
+                    <div className="col-span-4 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">{t('org_tbl_event')}</div>
+                    <div className="col-span-2 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">{t('org_tbl_date')}</div>
+                    <div className="col-span-2 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">{t('org_tbl_status')}</div>
+                    <div className="col-span-3 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">{t('org_tbl_ticket_stats')}</div>
+                    <div className="col-span-1 text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">{t('org_tbl_actions')}</div>
                 </div>
 
                 {/* Loading State */}
@@ -430,14 +430,14 @@ const MyEventsPage = () => {
                                             <button
                                                 onClick={() => navigate(`/organizer/edit-event/${event.eventId}`)}
                                                 className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-amber-600 hover:text-amber-700 hover:bg-amber-50 font-medium rounded-lg cursor-pointer transition-colors"
-                                                title="Edit Event"
+                                                title={t('org_edit_event')}
                                             >
                                                 <Pencil size={15} />
                                             </button>
                                             <button
                                                 onClick={() => setDeleteTarget(event)}
                                                 className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-red-400 hover:text-red-600 hover:bg-red-50 font-medium rounded-lg cursor-pointer transition-colors"
-                                                title="Delete Event"
+                                                title={t('org_delete_event_tooltip')}
                                             >
                                                 <Trash2 size={15} />
                                             </button>
