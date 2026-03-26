@@ -1,20 +1,24 @@
-import { BarChart3, CalendarCog, LayoutDashboard, Menu, UserCircle, X } from 'lucide-react'
+import { BarChart3, CalendarCog, Globe, LayoutDashboard, Menu, UserCircle, X } from 'lucide-react'
 import { NavLink } from 'react-router';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Logo from '../../common/Logo';
 import AdminDropdown from './AdminDropdown';
 
 const MenuSidebar = () => {
 
     const [isOpen, setIsOpen] = useState(false);
+    const { t, i18n } = useTranslation();
 
     const toggleSidebar = () => setIsOpen(!isOpen);
+    const currentLang = i18n.language;
+    const toggleLanguage = () => i18n.changeLanguage(currentLang === 'vi' ? 'en' : 'vi');
 
     const navItems = [
-        { title: 'Dashboard', icon: LayoutDashboard, path: '/admin', end: true },
-        { title: 'Accounts', icon: UserCircle, path: '/admin/accounts', end: true },
-        { title: 'Events', icon: CalendarCog, path: '/admin/events', end: true },
-        { title: 'Event Analytics', icon: BarChart3, path: '/admin/analytics', end: true },
+        { title: t('admin_dashboard'), icon: LayoutDashboard, path: '/admin', end: true },
+        { title: t('admin_accounts'), icon: UserCircle, path: '/admin/accounts', end: true },
+        { title: t('admin_events'), icon: CalendarCog, path: '/admin/events', end: true },
+        { title: t('admin_event_analytics'), icon: BarChart3, path: '/admin/analytics', end: true },
     ];
 
     return (
@@ -80,6 +84,20 @@ const MenuSidebar = () => {
                                 )
                             })}
                         </nav>
+                    </div>
+
+                    {/* Language Toggle */}
+                    <div className="px-5">
+                        <button
+                            onClick={toggleLanguage}
+                            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                        >
+                            <Globe size={18} />
+                            <span className="flex-1 text-left">{currentLang === 'vi' ? 'Tiếng Việt' : 'English'}</span>
+                            <span className="text-[10px] font-bold bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full uppercase">
+                                {currentLang === 'vi' ? 'VI' : 'EN'}
+                            </span>
+                        </button>
                     </div>
 
                     <AdminDropdown

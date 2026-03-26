@@ -9,6 +9,7 @@ import {
     CalendarOutlined
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
 
@@ -18,6 +19,7 @@ const PopUpInfoTicket = ({
     ticketData,
     onCheckIn
 }) => {
+    const { t } = useTranslation();
     if (!ticketData) return null;
 
     const isCheckedIn = ticketData.status === 'CHECKED_IN';
@@ -25,7 +27,7 @@ const PopUpInfoTicket = ({
 
     return (
         <Modal
-            title={<div className="text-xl font-extrabold text-[#2C3E50] border-b border-slate-100 pb-4 mb-2">Ticket Information</div>}
+            title={<div className="text-xl font-extrabold text-[#2C3E50] border-b border-slate-100 pb-4 mb-2">{t('staff_ticket_info')}</div>}
             open={isVisible}
             onCancel={onClose}
             footer={null}
@@ -61,7 +63,7 @@ const PopUpInfoTicket = ({
                             <UserOutlined className="text-xl" />
                         </div>
                         <div className="flex flex-col">
-                            <Text className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Attendee Name</Text>
+                            <Text className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">{t('staff_attendee_name')}</Text>
                             <Text className="text-base font-extrabold text-[#2C3E50] leading-tight">{ticketData.customerName}</Text>
                         </div>
                     </div>
@@ -71,7 +73,7 @@ const PopUpInfoTicket = ({
                             <MailOutlined className="text-xl" />
                         </div>
                         <div className="flex flex-col">
-                            <Text className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Email Address</Text>
+                            <Text className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">{t('staff_email_address')}</Text>
                             <Text className="text-sm font-bold text-[#2C3E50] leading-tight truncate">{ticketData.email}</Text>
                         </div>
                     </div>
@@ -81,7 +83,7 @@ const PopUpInfoTicket = ({
                     <div className="bg-[#89A8B2]/5 p-3.5 rounded-2xl border border-[#89A8B2]/20 flex flex-col gap-1 items-start">
                         <div className="flex items-center gap-1.5 text-slate-500 mb-1">
                             <TagOutlined className="text-[#89A8B2]" />
-                            <Text className="text-[10px] font-bold uppercase tracking-wider">Ticket Type</Text>
+                            <Text className="text-[10px] font-bold uppercase tracking-wider">{t('staff_ticket_type')}</Text>
                         </div>
                         <Text className="font-extrabold text-[#89A8B2] text-sm">{ticketData.ticketType}</Text>
                     </div>
@@ -89,7 +91,7 @@ const PopUpInfoTicket = ({
                     <div className="bg-white p-3.5 rounded-2xl border border-slate-200 flex flex-col gap-1 items-start">
                         <div className="flex items-center gap-1.5 text-slate-500 mb-1">
                             <BarcodeOutlined className="text-slate-400" />
-                            <Text className="text-[10px] font-bold uppercase tracking-wider">Ticket Code</Text>
+                            <Text className="text-[10px] font-bold uppercase tracking-wider">{t('staff_ticket_code')}</Text>
                         </div>
                         <Text className="font-extrabold text-[#2C3E50] tracking-wider text-sm">{ticketData.ticketCode}</Text>
                     </div>

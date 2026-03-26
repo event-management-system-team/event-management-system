@@ -3,8 +3,10 @@ import { Input } from "./Input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./Select";
 import { DatePicker, Space } from "antd";
 import { Card, CardContent, CardHeader, CardTitle } from "./Card";
+import { useTranslation } from 'react-i18next';
 
 const AnalyticsFilter = ({ categories, searchTerm, onSearchChange, status, setStatus, category, setCategory, setDate, sortOption, setSortOption }) => {
+    const { t } = useTranslation();
 
     return (
         <div className="px-8 pb-6">
@@ -18,7 +20,7 @@ const AnalyticsFilter = ({ categories, searchTerm, onSearchChange, status, setSt
                                 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                             <Input
                                 type="text"
-                                placeholder="Search by event name..."
+                                placeholder={t('adc_search_event_name')}
                                 value={searchTerm}
                                 onChange={onSearchChange}
                                 className="pl-9 pr-4 py-2 w-full border-gray-300"
@@ -35,7 +37,7 @@ const AnalyticsFilter = ({ categories, searchTerm, onSearchChange, status, setSt
                                     <SelectValue placeholder="Category" />
                                 </SelectTrigger>
                                 <SelectContent className='border border-gray-200'>
-                                    <SelectItem value="all">All Category</SelectItem>
+                                    <SelectItem value="all">{t('adc_all_category')}</SelectItem>
                                     {categories?.map(c => (
                                         <SelectItem
                                             key={c.categoryId}
@@ -58,11 +60,11 @@ const AnalyticsFilter = ({ categories, searchTerm, onSearchChange, status, setSt
                                     <SelectValue placeholder="Status" />
                                 </SelectTrigger>
                                 <SelectContent className='border border-gray-200'>
-                                    <SelectItem value="all">All Status</SelectItem>
-                                    <SelectItem value="PENDING">Pending</SelectItem>
-                                    <SelectItem value="APPROVED">Approved</SelectItem>
-                                    <SelectItem value="COMPLETED">Completed</SelectItem>
-                                    <SelectItem value="REJECTED">Rejected</SelectItem>
+                                    <SelectItem value="all">{t('adc_all_status')}</SelectItem>
+                                    <SelectItem value="PENDING">{t('adc_pending_status')}</SelectItem>
+                                    <SelectItem value="APPROVED">{t('adc_approved')}</SelectItem>
+                                    <SelectItem value="COMPLETED">{t('adc_completed_status')}</SelectItem>
+                                    <SelectItem value="REJECTED">{t('adc_rejected')}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -74,6 +76,7 @@ const AnalyticsFilter = ({ categories, searchTerm, onSearchChange, status, setSt
                                     size="large"
                                     style={{ height: 36, backgroundColor: '#f7f7f7' }}
                                     onChange={setDate}
+                                    placeholder={t('adc_select_date')}
                                 />
                             </Space>
                         </div>
@@ -89,8 +92,8 @@ const AnalyticsFilter = ({ categories, searchTerm, onSearchChange, status, setSt
                                     <SelectValue placeholder="Sort by" />
                                 </SelectTrigger>
                                 <SelectContent className='border border-gray-200'>
-                                    <SelectItem value="newest">Newest</SelectItem>
-                                    <SelectItem value="oldest">Oldest</SelectItem>
+                                    <SelectItem value="newest">{t('adc_newest')}</SelectItem>
+                                    <SelectItem value="oldest">{t('adc_oldest')}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>

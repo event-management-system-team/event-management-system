@@ -1,9 +1,11 @@
 import { ExternalLink, FileText, FolderOpen } from 'lucide-react'
 import { Link, useParams } from 'react-router';
+import { useTranslation } from 'react-i18next';
 
 const ResourcesWidget = ({ resources = [] }) => {
 
     const { eventSlug } = useParams();
+    const { t } = useTranslation();
 
     const getFileTypeName = (fileType) => {
         if (!fileType) return 'Document';
@@ -18,7 +20,7 @@ const ResourcesWidget = ({ resources = [] }) => {
         <div className="w-full lg:w-1/2 bg-white rounded-[40px] p-6 2xl:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col z-10">
 
             <div className="flex justify-between items-center mb-5 shrink-0">
-                <h3 className="text-xl 2xl:text-2xl font-black text-[#2C3E50]">Resources</h3>
+                <h3 className="text-xl 2xl:text-2xl font-black text-[#2C3E50]">{t('staff_resources')}</h3>
                 <Link
                     to={`/staff/${eventSlug}/resource`}
                     className="size-10 2xl:size-12 rounded-2xl bg-[#89A8B2]/10 text-[#89A8B2] flex items-center justify-center hover:bg-[#89A8B2]/20 transition-colors cursor-pointer"

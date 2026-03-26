@@ -11,8 +11,10 @@ import AccountSummaryCard from '../../components/domain/admin/AccountSummaryCard
 import EmptyState from '../../components/common/EmptyState.jsx';
 import AccountFilter from '../../components/domain/admin/AccountFilter.jsx';
 import AccountList from '../../components/domain/admin/AccountList.jsx';
+import { useTranslation } from 'react-i18next';
 
 export function AccountManagement() {
+    const { t } = useTranslation();
 
     const [searchParams] = useSearchParams()
     const roleParam = searchParams.get("role")
@@ -81,17 +83,17 @@ export function AccountManagement() {
                 <header className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-5">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <span>Dashboard</span>
+                            <span>{t('admin_dashboard')}</span>
                             <ChevronRight className="h-4 w-4" />
-                            <span>Account Management</span>
+                            <span>{t('ad_account_management')}</span>
                         </div>
 
                     </div>
                     <div className="flex items-start justify-between">
                         <div>
-                            <h1 className="text-foreground text-2xl mb-1 font-semibold">Account Management</h1>
+                            <h1 className="text-foreground text-2xl mb-1 font-semibold">{t('ad_account_management')}</h1>
                             <p className="text-gray-500 text-sm">
-                                Oversee and manage system organizer accounts.
+                                {t('ad_manage_accounts_desc')}
                             </p>
                         </div>
                         <Button
@@ -99,7 +101,7 @@ export function AccountManagement() {
                             onClick={openModal}
                         >
                             <Plus className="h-4 w-4" />
-                            Create Organizer Account
+                            {t('ad_create_organizer')}
                         </Button>
                     </div>
                 </header>

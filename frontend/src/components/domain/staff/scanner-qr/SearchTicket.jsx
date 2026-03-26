@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Search, CheckCircle2, AlertCircle, UserCheck } from 'lucide-react';
 import PopUpInfoTicket from './PopUpInfoTicket';
+import { useTranslation } from 'react-i18next';
 
 const SearchTicket = ({ tickets, searchKeyword, handleSearch, onCheckIn, isCheckingIn }) => {
+    const { t } = useTranslation();
     const [keyword, setKeyword] = useState(searchKeyword);
     const [selectedTicket, setSelectedTicket] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -68,7 +70,7 @@ const SearchTicket = ({ tickets, searchKeyword, handleSearch, onCheckIn, isCheck
     return (
         <div className="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 flex flex-col flex-1 min-h-[300px] lg:min-h-0 transition-all">
             <div className="flex items-center justify-between mb-4 px-1 shrink-0">
-                <h2 className="text-[#2C3E50] text-base font-extrabold tracking-tight">Attendee List</h2>
+                <h2 className="text-[#2C3E50] text-base font-extrabold tracking-tight">{t('staff_attendee_list')}</h2>
                 <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md">
                     {tickets.length} Results
                 </span>

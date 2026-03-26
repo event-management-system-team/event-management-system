@@ -10,8 +10,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Popconfirm } from "antd";
 import { adminService } from "../../../services/admin.service";
 import dayjs from "dayjs";
+import { useTranslation } from 'react-i18next';
 
 const AccountList = ({ searchTerm, status, role, date, sortOption, onLoading, onError, showAlert, onBan, refreshKey }) => {
+    const { t } = useTranslation();
     const [accounts, setAccounts] = useState([])
     const [originalAccounts, setOriginalAccounts] = useState([])
     const [currentPage, setCurrentPage] = useState(0);
@@ -190,18 +192,18 @@ const AccountList = ({ searchTerm, status, role, date, sortOption, onLoading, on
                     {/* Table Header */}
                     <div
                         className="grid grid-cols-11 gap-4 px-6 py-3 border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wide items-center">
-                        <div className="col-span-4 ml-5">Account</div>
-                        <div className="col-span-2">Phone Number</div>
-                        <div className="col-span-1">Role</div>
-                        <div className="col-span-2">Joined Date</div>
-                        <div className="col-span-1">Status</div>
-                        <div className="col-span-1 text-right">Actions</div>
+                        <div className="col-span-4 ml-5">{t('adc_account_col')}</div>
+                        <div className="col-span-2">{t('adc_phone_col')}</div>
+                        <div className="col-span-1">{t('adc_role_col')}</div>
+                        <div className="col-span-2">{t('adc_joined_date')}</div>
+                        <div className="col-span-1">{t('adc_status')}</div>
+                        <div className="col-span-1 text-right">{t('adc_actions')}</div>
                     </div>
 
                     {/* Account Rows */}
                     {!paginatedAccounts || paginatedAccounts.length === 0 ? (
                         <div className="flex items-center justify-center flex-1 text-sm text-gray-400 mt-15">
-                            No account data yet
+                            {t('adc_no_account')}
                         </div>
                     ) : (
                         paginatedAccounts.map(account => (
@@ -265,7 +267,7 @@ const AccountList = ({ searchTerm, status, role, date, sortOption, onLoading, on
                                             <Link to={`/admin/accounts/account-detail/${account.userId}`}>
                                                 <DropdownMenuItem>
                                                     <UserCircle className="mr-2 h-4 w-4" />
-                                                    View account details
+                                                    {t('adc_view_details')}
                                                 </DropdownMenuItem>
                                             </Link>
 
@@ -273,34 +275,34 @@ const AccountList = ({ searchTerm, status, role, date, sortOption, onLoading, on
                                                 <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
                                                     {account.status === "BANNED" ? (
                                                         <Popconfirm
-                                                            title="Activate account"
-                                                            description="Are you sure to activate this account?"
+                                                            title={t('adc_activate_account')}
+                                                            description={t('ad_activate_confirm')}
                                                             onConfirm={() => handleToggleBan(account)}
-                                                            okText="Yes"
-                                                            cancelText="No"
+                                                            okText={t('ad_yes')}
+                                                            cancelText={t('ad_no')}
                                                         >
                                                             <div
                                                                 className="flex items-center gap-2 w-full"
                                                                 onClick={(e) => e.stopPropagation()}
                                                             >
                                                                 <CheckCircle className="mr-2 h-4 w-4" />
-                                                                Activate account
+                                                                {t('adc_activate_account')}
                                                             </div>
                                                         </Popconfirm>
                                                     ) : (
                                                         <Popconfirm
-                                                            title="Ban account"
-                                                            description="Are you sure to ban this account?"
+                                                            title={t('adc_ban_account')}
+                                                            description={t('ad_ban_confirm')}
                                                             onConfirm={() => handleToggleBan(account)}
-                                                            okText="Yes"
-                                                            cancelText="No"
+                                                            okText={t('ad_yes')}
+                                                            cancelText={t('ad_no')}
                                                         >
                                                             <div
                                                                 className="flex items-center gap-2 w-full"
                                                                 onClick={(e) => e.stopPropagation()}
                                                             >
                                                                 <UserX className="mr-2 h-4 w-4" />
-                                                                Ban account
+                                                                {t('adc_ban_account')}
                                                             </div>
                                                         </Popconfirm>
                                                     )}
@@ -317,9 +319,9 @@ const AccountList = ({ searchTerm, status, role, date, sortOption, onLoading, on
                     <div className="px-6 py-4 flex items-center justify-between text-sm text-gray-600">
                         <div>
                             {isSearching ? (
-                                <>Showing {processedAccounts.length} search results</>
+                                <>{t('adc_showing_search', { count: processedAccounts.length })}</>
                             ) : (
-                                <>Showing {totalItems === 0 ? 0 : startItem}–{Math.min((currentPage + 1) * pageSize, totalItems)} of {totalItems} accounts</>
+                                <>{t('adc_showing_accounts', { start: totalItems === 0 ? 0 : startItem, end: Math.min((currentPage + 1) * pageSize, totalItems), total: totalItems })}</>
                             )}
                         </div>
 

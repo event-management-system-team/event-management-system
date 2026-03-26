@@ -3,8 +3,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "../admin/Avatar";
 import { Badge } from "../admin/Badge";
 import { Card, CardContent } from "../admin/Card";
 import dayjs from "dayjs";
+import { useTranslation } from 'react-i18next';
 
 const EventPerformanceList = ({ events, searchTerm, status, category, date, sortOption, formatVND, formatNumber }) => {
+    const { t } = useTranslation();
     // const [events, setEvents] = useState([])
 
     // const fetchData = async () => {
@@ -116,18 +118,18 @@ const EventPerformanceList = ({ events, searchTerm, status, category, date, sort
                     {/* Table Header */}
                     <div
                         className="grid grid-cols-10 gap-4 px-6 py-3 border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wide items-center">
-                        <div className="col-span-3">Event</div>
-                        <div className="col-span-2">Date & Time</div>
-                        <div className="col-span-2">Tickets Sold</div>
-                        <div className="col-span-1 text-center">Revenue</div>
-                        <div className="col-span-1 text-center">Attendance</div>
-                        <div className="col-span-1 text-center">Status</div>
+                        <div className="col-span-3">{t('adc_event_col')}</div>
+                        <div className="col-span-2">{t('adc_date_time')}</div>
+                        <div className="col-span-2">{t('adc_tickets_sold')}</div>
+                        <div className="col-span-1 text-center">{t('adc_revenue_col')}</div>
+                        <div className="col-span-1 text-center">{t('adc_attendance_col')}</div>
+                        <div className="col-span-1 text-center">{t('adc_status')}</div>
                     </div>
 
                     {/* Event Rows */}
                     {!processedEvents || processedEvents?.length === 0 ? (
                         <div className="flex items-center justify-center flex-1 text-sm text-gray-400 mt-15 mb-15">
-                            No event analytics data yet
+                            {t('adc_no_analytics')}
                         </div>
                     ) : (
                         processedEvents.map((event, index) => {
@@ -221,7 +223,7 @@ const EventPerformanceList = ({ events, searchTerm, status, category, date, sort
 
                     {processedEvents?.length !== 0 && (
                         <div className="px-6 py-4 flex items-center justify-between text-sm text-gray-600">
-                            Showing {processedEvents.length} events
+                            {t('adc_showing_events_count', { count: processedEvents.length })}
                         </div>
                     )}
                 </CardContent>

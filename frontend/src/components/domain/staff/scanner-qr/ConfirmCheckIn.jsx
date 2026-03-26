@@ -1,8 +1,10 @@
 import React from 'react';
 import { Modal } from 'antd';
 import { User, Ticket, QrCode } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const ConfirmCheckIn = ({ isOpen, onClose, onConfirm, ticketInfo, isLoading }) => {
+    const { t } = useTranslation();
     if (!ticketInfo) return null;
 
     return (
@@ -19,7 +21,7 @@ const ConfirmCheckIn = ({ isOpen, onClose, onConfirm, ticketInfo, isLoading }) =
             }}
         >
             <div className="text-center mb-3 mt-0.5">
-                <h3 className="text-[15px] font-bold text-[#2C3E50]">Confirm</h3>
+                <h3 className="text-[15px] font-bold text-[#2C3E50]">{t('staff_confirm')}</h3>
             </div>
             <div className="bg-[#F8FAFC] rounded-lg p-2 mb-4 border border-slate-100 flex flex-col gap-2">
                 <div className="flex items-center gap-2">

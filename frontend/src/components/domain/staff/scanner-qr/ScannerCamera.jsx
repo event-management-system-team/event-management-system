@@ -3,8 +3,10 @@ import { ScanLine } from 'lucide-react';
 import ConfirmCheckIn from './ConfirmCheckIn';
 import { Scanner } from '@yudiel/react-qr-scanner';
 import { message } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 const ScannerCamera = ({ onVerifyQR, onScanQR, isCheckingIn }) => {
+    const { t } = useTranslation();
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [scannedTicket, setScannedTicket] = useState(null);
     const coolDownRef = useRef(false);
@@ -14,11 +16,11 @@ const ScannerCamera = ({ onVerifyQR, onScanQR, isCheckingIn }) => {
             <div className="flex items-center justify-between mb-3 px-1 shrink-0">
                 <div className="flex items-center gap-2">
                     <ScanLine className="text-[#89A8B2]" size={22} />
-                    <h2 className="text-[#2C3E50] text-base font-extrabold tracking-tight">Ticket Scanner</h2>
+                    <h2 className="text-[#2C3E50] text-base font-extrabold tracking-tight">{t('staff_ticket_scanner')}</h2>
                 </div>
                 <div className="flex items-center gap-1.5 bg-green-50 px-2 py-1 rounded-md border border-green-100">
                     <span className="animate-pulse size-1.5 rounded-full bg-green-500"></span>
-                    <span className="text-[10px] font-bold text-green-700 uppercase tracking-wide">Camera Active</span>
+                    <span className="text-[10px] font-bold text-green-700 uppercase tracking-wide">{t('staff_camera_active')}</span>
                 </div>
             </div>
 

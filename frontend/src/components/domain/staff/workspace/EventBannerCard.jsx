@@ -1,7 +1,9 @@
 import { Bell, Clock, Map, MapPin } from 'lucide-react'
 import React from 'react'
+import { useTranslation } from 'react-i18next';
 
 const EventBannerCard = ({ eventInfo }) => {
+    const { t } = useTranslation();
 
 
     const formatDate = (dateString) => {
@@ -37,7 +39,7 @@ const EventBannerCard = ({ eventInfo }) => {
                                 <MapPin size={20} />
                             </div>
                             <div>
-                                <p className="text-[10px] 2xl:text-xs font-bold text-gray-400 uppercase tracking-wider">Location</p>
+                                <p className="text-[10px] 2xl:text-xs font-bold text-gray-400 uppercase tracking-wider">{t('staff_location')}</p>
                                 <p className="text-sm 2xl:text-base font-bold text-[#2C3E50]">{eventInfo.location}</p>
                             </div>
                         </div>
@@ -74,7 +76,7 @@ const EventBannerCard = ({ eventInfo }) => {
                         className="flex items-center justify-center gap-2 px-5 py-2 2xl:px-6 2xl:py-3 bg-[#2C3E50] hover:bg-[#1a252f] text-white rounded-xl 2xl:rounded-2xl text-xs 2xl:text-sm font-bold transition-colors shadow-md"
                     >
                         <Map size={16} />
-                        <span>View Map</span>
+                        <span>{t('staff_view_map')}</span>
                     </a>
                 </div>
             </div>

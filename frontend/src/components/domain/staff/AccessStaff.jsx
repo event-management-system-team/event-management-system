@@ -5,9 +5,11 @@ import { Outlet, useParams } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import { Button, Result } from 'antd';
 import staffService from '../../../services/staff.service';
+import { useTranslation } from 'react-i18next';
 
 const AccessStaff = () => {
     const { eventSlug } = useParams();
+    const { t } = useTranslation();
 
     const { data, isLoading, isError, error } = useQuery({
         queryKey: ['workspace', eventSlug],
@@ -26,14 +28,14 @@ const AccessStaff = () => {
                 <div className="w-full max-w-lg rounded-2xl bg-white p-6  border-t-4 transition-all">
                     <Result
                         status="error"
-                        title={<span className="text-2xl font-extrabold text-[#800020]">Access Failed</span>}
+                        title={<span className="text-2xl font-extrabold text-[#800020]">{t('staff_access_failed')}</span>}
                         subTitle={<span className="text-base font-medium text-red-600">{errorMessage}</span>}
                         extra={[
                             <Button type="primary" key="console" onClick={() => window.history.back()} className="...">
-                                Go Back
+                                {t('staff_go_back')}
                             </Button>,
                             <Button key="try-again" onClick={() => window.location.reload()} className="...">
-                                Try Again
+                                {t('staff_try_again')}
                             </Button>,
                         ]}
                     />

@@ -128,23 +128,6 @@ const FeedbackList = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredFeedbacks.slice(indexOfFirstItem, indexOfLastItem);
 
-  const onChangePage = (page) => {
-    setCurrentPage(page);
-
-    if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
-    }
-
-    setTimeout(() => {
-      if (listTopRef.current) {
-        listTopRef.current.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
-    }, 100);
-  };
-
   return (
     <div className="p-10 w-full overflow-x-hidden">
       {/* --- HEADER --- */}

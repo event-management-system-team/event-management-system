@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import { logoutUser } from "../../store/slices/auth.slice";
 import {
   LayoutDashboard,
@@ -15,6 +16,7 @@ import {
   BarChart2,
   UserCheck,
   ClipboardList,
+  Globe,
 } from "lucide-react";
 
 const extractEventId = (pathname) => {
@@ -69,10 +71,10 @@ const NavItem = ({ to, icon, label, isActive }) => (
 );
 
 // ── DisabledNavItem (event tools khi chưa chọn event) ─────────────────────
-const DisabledNavItem = ({ icon, label }) => (
+const DisabledNavItem = ({ icon, label, tooltip }) => (
   <div
     className="flex items-center gap-3 px-4 py-3 mb-1 rounded-xl font-medium text-gray-600 cursor-not-allowed select-none"
-    title="Hãy vào một Event trước để dùng tính năng này"
+    title={tooltip}
   >
     <span className="text-gray-600">{icon}</span>
     <span>{label}</span>
@@ -142,7 +144,7 @@ const Sidebar = () => {
             Event<span className="text-blue-400">Hub</span>
           </h1>
           <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
-            Organizer
+            {t("sb_organizer_label")}
           </p>
         </div>
       </div>
@@ -156,14 +158,14 @@ const Sidebar = () => {
         />
         <div className="overflow-hidden">
           <h3 className="text-white text-sm font-bold truncate">{displayName}</h3>
-          <p className="text-[11px] text-gray-400 truncate">Organizer</p>
+          <p className="text-[11px] text-gray-400 truncate">{t("sb_organizer_label")}</p>
         </div>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 px-4 overflow-y-auto scrollbar-hide space-y-1">
         <p className="px-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3 mt-1">
-          Main Menu
+          {t("sb_main_menu")}
         </p>
         <NavItem
           to="/organizer/dashboard"
@@ -180,54 +182,54 @@ const Sidebar = () => {
 
         {/* ── Event Tools ── */}
         <p className="px-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 mt-5">
-          Event Tools
+          {t("sb_event_tools")}
           {!eventId && (
             <span className="ml-1 normal-case text-gray-700 font-normal text-[9px]">
-              — chọn event trước
+              {t("sb_select_event_first")}
             </span>
           )}
         </p>
 
         {eventDashboardLink ? (
-          <NavItem to={eventDashboardLink} icon={<BarChart3 size={20} />} label="Event Dashboard" isActive={isEventDashboardActive} />
+          <NavItem to={eventDashboardLink} icon={<BarChart3 size={20} />} label={t("sb_event_dashboard")} isActive={isEventDashboardActive} />
         ) : (
-          <DisabledNavItem icon={<BarChart3 size={20} />} label="Event Dashboard" />
+          <DisabledNavItem icon={<BarChart3 size={20} />} label={t("sb_event_dashboard")} tooltip={t("sb_select_event_tooltip")} />
         )}
 
         {attendeesLink ? (
-          <NavItem to={attendeesLink} icon={<UserCheck size={20} />} label="Attendees" isActive={isAttendeesActive} />
+          <NavItem to={attendeesLink} icon={<UserCheck size={20} />} label={t("sb_attendees")} isActive={isAttendeesActive} />
         ) : (
-          <DisabledNavItem icon={<UserCheck size={20} />} label="Attendees" />
+          <DisabledNavItem icon={<UserCheck size={20} />} label={t("sb_attendees")} tooltip={t("sb_select_event_tooltip")} />
         )}
 
         {feedbackLink ? (
-          <NavItem to={feedbackLink} icon={<MessageSquare size={20} />} label="Feedback" isActive={isFeedbackActive && !isAnalyticsActive} />
+          <NavItem to={feedbackLink} icon={<MessageSquare size={20} />} label={t("sb_feedback")} isActive={isFeedbackActive && !isAnalyticsActive} />
         ) : (
-          <DisabledNavItem icon={<MessageSquare size={20} />} label="Feedback" />
+          <DisabledNavItem icon={<MessageSquare size={20} />} label={t("sb_feedback")} tooltip={t("sb_select_event_tooltip")} />
         )}
 
         {analyticsLink ? (
-          <NavItem to={analyticsLink} icon={<BarChart2 size={20} />} label="Feedback Analytics" isActive={isAnalyticsActive} />
+          <NavItem to={analyticsLink} icon={<BarChart2 size={20} />} label={t("sb_feedback_analytics")} isActive={isAnalyticsActive} />
         ) : (
-          <DisabledNavItem icon={<BarChart2 size={20} />} label="Feedback Analytics" />
+          <DisabledNavItem icon={<BarChart2 size={20} />} label={t("sb_feedback_analytics")} tooltip={t("sb_select_event_tooltip")} />
         )}
 
         {recruitmentLink ? (
-          <NavItem to={recruitmentLink} icon={<Briefcase size={20} />} label="Recruitment" isActive={isRecruitmentActive} />
+          <NavItem to={recruitmentLink} icon={<Briefcase size={20} />} label={t("sb_recruitment")} isActive={isRecruitmentActive} />
         ) : (
-          <DisabledNavItem icon={<Briefcase size={20} />} label="Recruitment" />
+          <DisabledNavItem icon={<Briefcase size={20} />} label={t("sb_recruitment")} tooltip={t("sb_select_event_tooltip")} />
         )}
 
         {applicationsLink ? (
-          <NavItem to={applicationsLink} icon={<ClipboardList size={20} />} label="Application List" isActive={isApplicationsPageActive} />
+          <NavItem to={applicationsLink} icon={<ClipboardList size={20} />} label={t("sb_application_list")} isActive={isApplicationsPageActive} />
         ) : (
-          <DisabledNavItem icon={<ClipboardList size={20} />} label="Application List" />
+          <DisabledNavItem icon={<ClipboardList size={20} />} label={t("sb_application_list")} tooltip={t("sb_select_event_tooltip")} />
         )}
 
         {staffLink ? (
-          <NavItem to={staffLink} icon={<Users size={20} />} label="Staff Management" isActive={isStaffActive} />
+          <NavItem to={staffLink} icon={<Users size={20} />} label={t("sb_staff_management")} isActive={isStaffActive} />
         ) : (
-          <DisabledNavItem icon={<Users size={20} />} label="Staff Management" />
+          <DisabledNavItem icon={<Users size={20} />} label={t("sb_staff_management")} tooltip={t("sb_select_event_tooltip")} />
         )}
       </nav>
 
@@ -251,14 +253,14 @@ const Sidebar = () => {
             className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
           >
             <Settings size={18} />
-            <span>Settings</span>
+            <span>{t("sb_settings")}</span>
           </Link>
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors cursor-pointer"
           >
             <LogOut size={18} />
-            <span>Log Out</span>
+            <span>{t("sb_log_out")}</span>
           </button>
         </div>
       </div>

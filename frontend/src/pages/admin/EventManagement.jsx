@@ -9,8 +9,10 @@ import EmptyState from '../../components/common/EmptyState.jsx';
 import EventSummaryCard from '../../components/domain/admin/EventSummaryCard.jsx';
 import EventFilter from '../../components/domain/admin/EventFilter.jsx';
 import EventList from '../../components/domain/admin/EventList.jsx';
+import { useTranslation } from 'react-i18next';
 
 export function EventManagement() {
+    const { t } = useTranslation();
 
     const [searchParams] = useSearchParams()
     const statusParam = searchParams.get("status")
@@ -69,18 +71,18 @@ export function EventManagement() {
                 <header className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-5">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <span>Dashboard</span>
+                            <span>{t('admin_dashboard')}</span>
                             <ChevronRight className="h-4 w-4" />
-                            <span>Event Management</span>
+                            <span>{t('ad_event_management')}</span>
                         </div>
                     </div>
                     <div className="flex items-start justify-between">
                         <div>
                             <h1 className="text-foreground text-2xl mb-1 font-semibold">
-                                Event Management
+                                {t('ad_event_management')}
                             </h1>
                             <p className="text-gray-500 text-sm">
-                                Manage and oversee all platform-wide events and requests.
+                                {t('ad_manage_events_desc')}
                             </p>
                         </div>
                     </div>

@@ -11,8 +11,10 @@ import EventChart from '../../components/domain/admin/EventChart.jsx';
 import AnalyticsFilter from '../../components/domain/admin/AnalyticsFilter.jsx';
 import EventPerformanceList from '../../components/domain/admin/EventPerformanceList.jsx';
 import { ChevronRight, Download } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export function EventAnalytics() {
+    const { t } = useTranslation();
     const [events, setEvents] = useState([])
     const [summary, setSummary] = useState()
     const [monthlySales, setMonthlySales] = useState([])
@@ -136,23 +138,23 @@ export function EventAnalytics() {
                 <header className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-5">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <span>Dashboard</span>
+                            <span>{t('admin_dashboard')}</span>
                             <ChevronRight className="h-4 w-4" />
-                            <span>Event Analytics</span>
+                            <span>{t('admin_event_analytics')}</span>
                         </div>
                     </div>
                     <div className="flex items-start justify-between">
                         <div>
-                            <h1 className="text-foreground text-2xl mb-1 font-semibold">Event Analytics</h1>
+                            <h1 className="text-foreground text-2xl mb-1 font-semibold">{t('admin_event_analytics')}</h1>
                             <p className="text-gray-500 text-sm">
-                                Comprehensive performance metrics and insights across all events
+                                {t('ad_analytics_desc')}
                             </p>
                         </div>
                         <div className="flex gap-2">
                             {events.length > 0 && (
                                 <Button variant="outline" className="gap-2 h-12 rounded-full hover:cursor-pointer" onClick={handleExportExcel}>
                                     <Download className="h-4 w-4" />
-                                    Export Excel Report
+                                    {t('ad_export_excel')}
                                 </Button>
                             )}
                         </div>

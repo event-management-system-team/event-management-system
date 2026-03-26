@@ -1,25 +1,27 @@
 import { CheckCircle, Users, UserX } from "lucide-react";
 import { Card, CardContent } from "../admin/Card";
+import { useTranslation } from 'react-i18next';
 
 const AccountSummaryCard = ({ summary }) => {
+    const { t } = useTranslation();
 
     const summaryMetrics = (summary) => [
         {
-            title: "TOTAL ACCOUNTS",
+            title: t('adc_total_accounts'),
             value: summary?.totalAccounts ?? 0,
             icon: Users,
             iconBg: "bg-blue-100",
             iconColor: "text-blue-600"
         },
         {
-            title: "ACTIVE",
+            title: t('adc_active'),
             value: summary?.activeAccounts ?? 0,
             icon: CheckCircle,
             iconBg: "bg-green-100",
             iconColor: "text-green-600"
         },
         {
-            title: "BANNED",
+            title: t('adc_banned'),
             value: summary?.bannedAccounts ?? 0,
             icon: UserX,
             iconBg: "bg-red-100",

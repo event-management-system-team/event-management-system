@@ -3,14 +3,16 @@ import { Input } from "./Input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./Select";
 import { DatePicker, Space } from "antd";
 import { Card, CardContent, CardHeader, CardTitle } from "./Card";
+import { useTranslation } from 'react-i18next';
 
 const EventFilter = ({ categories, searchTerm, onSearchChange, status, setStatus, category, setCategory, priceType, setPriceType, setDate, sortOption, setSortOption }) => {
+    const { t } = useTranslation();
 
     return (
         <div className="px-8 pb-6">
             <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                 <CardHeader className="border-b border-gray-100">
-                    <CardTitle className="text-lg font-semibold">Filter Events</CardTitle>
+                    <CardTitle className="text-lg font-semibold">{t('adc_filter_events')}</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
                     <div className="grid grid-cols-7 gap-4 items-end">
@@ -18,14 +20,14 @@ const EventFilter = ({ categories, searchTerm, onSearchChange, status, setStatus
                         {/* Search Input */}
                         <div className="col-span-2">
                             <label className="text-sm text-gray-600 mb-2 block">
-                                Search
+                                {t('adc_search')}
                             </label>
                             <div className="relative">
                                 <Search
                                     className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                                 <Input
                                     type="text"
-                                    placeholder="Event name, location, organization..."
+                                    placeholder={t('adc_search_event_placeholder')}
                                     value={searchTerm}
                                     onChange={onSearchChange}
                                     className="pl-9 pr-4 py-2 w-full border-gray-300"
@@ -36,7 +38,7 @@ const EventFilter = ({ categories, searchTerm, onSearchChange, status, setStatus
                         {/* Status Dropdown */}
                         <div className="col-span-1">
                             <label className="text-sm text-gray-600 mb-2 block">
-                                Status
+                                {t('adc_status')}
                             </label>
                             <Select
                                 value={status}
@@ -46,12 +48,12 @@ const EventFilter = ({ categories, searchTerm, onSearchChange, status, setStatus
                                     <SelectValue placeholder="Status" />
                                 </SelectTrigger>
                                 <SelectContent className='border border-gray-200'>
-                                    <SelectItem value="all">All Status</SelectItem>
-                                    <SelectItem value="PENDING">Pending</SelectItem>
-                                    <SelectItem value="APPROVED">Approved</SelectItem>
-                                    <SelectItem value="ONGOING">Ongoing</SelectItem>
-                                    <SelectItem value="COMPLETED">Completed</SelectItem>
-                                    <SelectItem value="REJECTED">Rejected</SelectItem>
+                                    <SelectItem value="all">{t('adc_all_status')}</SelectItem>
+                                    <SelectItem value="PENDING">{t('adc_pending_status')}</SelectItem>
+                                    <SelectItem value="APPROVED">{t('adc_approved')}</SelectItem>
+                                    <SelectItem value="ONGOING">{t('adc_ongoing')}</SelectItem>
+                                    <SelectItem value="COMPLETED">{t('adc_completed_status')}</SelectItem>
+                                    <SelectItem value="REJECTED">{t('adc_rejected')}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -59,7 +61,7 @@ const EventFilter = ({ categories, searchTerm, onSearchChange, status, setStatus
                         {/* Category Dropdown */}
                         <div className="col-span-1">
                             <label className="text-sm text-gray-600 mb-2 block">
-                                Category
+                                {t('adc_category')}
                             </label>
                             <Select
                                 value={category}
@@ -69,7 +71,7 @@ const EventFilter = ({ categories, searchTerm, onSearchChange, status, setStatus
                                     <SelectValue placeholder="Category" />
                                 </SelectTrigger>
                                 <SelectContent className='border border-gray-200'>
-                                    <SelectItem value="all">All Category</SelectItem>
+                                    <SelectItem value="all">{t('adc_all_category')}</SelectItem>
                                     {categories?.map(c => (
                                         <SelectItem
                                             key={c.categoryId}
@@ -85,7 +87,7 @@ const EventFilter = ({ categories, searchTerm, onSearchChange, status, setStatus
                         {/* Price Type Dropdown */}
                         <div className="col-span-1">
                             <label className="text-sm text-gray-600 mb-2 block">
-                                Price Type
+                                {t('adc_price_type')}
                             </label>
                             <Select
                                 value={priceType}
@@ -95,9 +97,9 @@ const EventFilter = ({ categories, searchTerm, onSearchChange, status, setStatus
                                     <SelectValue placeholder="Price Type" />
                                 </SelectTrigger>
                                 <SelectContent className='border border-gray-200'>
-                                    <SelectItem value="all">All Type</SelectItem>
-                                    <SelectItem value="free">Free</SelectItem>
-                                    <SelectItem value="paid">Paid</SelectItem>
+                                    <SelectItem value="all">{t('adc_all_type')}</SelectItem>
+                                    <SelectItem value="free">{t('adc_free')}</SelectItem>
+                                    <SelectItem value="paid">{t('adc_paid')}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -105,13 +107,14 @@ const EventFilter = ({ categories, searchTerm, onSearchChange, status, setStatus
                         {/* Date Picker */}
                         <div className="col-span-1">
                             <label className="text-sm text-gray-600 mb-2 block">
-                                Created Date
+                                {t('adc_created_date')}
                             </label>
                             <Space vertical className=''>
                                 <DatePicker
                                     size="large"
                                     style={{ height: 36, backgroundColor: '#f7f7f7' }}
                                     onChange={setDate}
+                                    placeholder={t('adc_select_date')}
                                 />
                             </Space>
                         </div>
@@ -119,7 +122,7 @@ const EventFilter = ({ categories, searchTerm, onSearchChange, status, setStatus
                         {/* Sort Dropdown */}
                         <div className="col-span-1">
                             <label className="text-sm text-gray-600 mb-2 block">
-                                Sort by
+                                {t('adc_sort_by')}
                             </label>
                             <Select
                                 value={sortOption}
@@ -130,8 +133,8 @@ const EventFilter = ({ categories, searchTerm, onSearchChange, status, setStatus
                                     <SelectValue placeholder="Sort by" />
                                 </SelectTrigger>
                                 <SelectContent className='border border-gray-200'>
-                                    <SelectItem value="newest">Newest</SelectItem>
-                                    <SelectItem value="oldest">Oldest</SelectItem>
+                                    <SelectItem value="newest">{t('adc_newest')}</SelectItem>
+                                    <SelectItem value="oldest">{t('adc_oldest')}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>

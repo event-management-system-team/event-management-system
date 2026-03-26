@@ -257,7 +257,7 @@ const EventDetailDashboard = () => {
     return (
         <div className="p-8 min-h-screen bg-[#f5f5f0]">
             {/* Header */}
-            <div className="flex items-center gap-4 mb-6">
+            <div className="font-sans flex items-center gap-4 mb-6">
                 <button
                     onClick={() => navigate(-1)}
                     className="p-2 hover:bg-gray-200 rounded-lg transition-colors"

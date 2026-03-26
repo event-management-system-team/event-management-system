@@ -9,11 +9,13 @@ import staffService from '../../services/staff.service'
 import LoadingState from '../../components/common/LoadingState';
 import EmptyState from '../../components/common/EmptyState';
 import { useCheckInWebSocket } from '../../hooks/useCheckInWebSocket';
+import { useTranslation } from 'react-i18next';
 
 const ScanQRPage = () => {
 
     const { data } = useOutletContext();
     const { eventSlug } = useParams();
+    const { t } = useTranslation();
 
     const [searchParams, setSearchParams] = useSearchParams();
     const queryClient = useQueryClient();
@@ -38,12 +40,12 @@ const ScanQRPage = () => {
     const checkInMutation = useMutation({
         mutationFn: (request) => staffService.checkInAttendee(eventSlug, request),
         onSuccess: (response) => {
-            message.success(`Check-in successful for: ${response.customerName}`);
+            message.success(t('staff_checkin_success', { name: response.customerName }));
 
             queryClient.invalidateQueries({ queryKey: ['event', 'tickets', eventSlug] });
         },
         onError: (error) => {
-            message.error(error.response?.data?.message || 'Check-in failed!')
+            message.error(error.response?.data?.message || t('staff_checkin_failed'))
         }
     });
 
@@ -66,10 +68,10 @@ const ScanQRPage = () => {
         const data = await staffService.searchEventTickets(eventSlug, ticketCode);
         const ticket = data.find(t => t.ticketCode === ticketCode) || data[0];
         if (!ticket) {
-            throw new Error("Invalid or non-existent ticket code!");
+            throw new Error(t('staff_invalid_ticket'));
         }
         if (ticket.status === 'CHECKED_IN') {
-            throw new Error("This ticket has already been checked in!");
+            throw new Error(t('staff_already_checked_in'));
         }
         return ticket;
     };
