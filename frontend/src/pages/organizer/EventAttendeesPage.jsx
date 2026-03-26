@@ -230,7 +230,7 @@ const EventAttendeesPage = () => {
                     <ArrowLeft size={20} className="text-gray-600" />
                 </button>
                 <div className="flex-1">
-                    <h1 className="text-2xl font-bold text-gray-900">{t('org_attendee_management')}</h1>
+                    <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">Attendee Management</h1>
                     <p className="text-sm text-gray-500 mt-0.5">
                         {loading ? '...' : t('org_attendees_for', { count: totalElements, name: event?.eventName || '…' })}
                     </p>

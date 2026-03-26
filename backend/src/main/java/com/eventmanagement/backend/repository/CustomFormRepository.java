@@ -25,6 +25,17 @@ public interface CustomFormRepository extends JpaRepository<CustomForm, UUID> {
 
     List<CustomForm> findByEvent_EventIdAndFormTypeAndIsActiveTrue(UUID eventId, FormType formType);
 
+    @Query(value = """
+                SELECT f.form_id, f.form_name, f.form_type::text, f.form_schema::text, 
+                       f.is_active, f.created_at, f.updated_at, f.deadline
+                FROM custom_forms f 
+                WHERE f.event_id = :eventId AND f.form_type::text = :formType
+                LIMIT 1
+            """, nativeQuery = true)
+    List<Object[]> findRawFormByEventIdAndType(
+            @org.springframework.data.repository.query.Param("eventId") UUID eventId,
+            @org.springframework.data.repository.query.Param("formType") String formType);
+
     @Modifying
     @Transactional
     @Query(value = """

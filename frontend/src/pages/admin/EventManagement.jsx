@@ -60,7 +60,7 @@ export function EventManagement() {
     if (error) return <EmptyState className='h-[600px]' />
 
     return (
-        <div className="flex h-screen bg-[#F1F0E8]">
+        <div className="flex flex-col flex-1 bg-[#F1F0E8]">
 
             {/* Main Content */}
             <main className="flex-1 overflow-auto">

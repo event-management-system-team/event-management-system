@@ -41,7 +41,7 @@ const RecruitmentSuccessScreen = ({ form }) => {
         </div>
 
         <button
-          onClick={() => navigate("/organizer/recruitments")}
+          onClick={() => navigate(`/organizer/recruitmentlist/${form.eventId}`)}
           className="flex items-center gap-2 bg-[#2d3a4f] hover:bg-[#1e293b] text-white px-7 py-2.5 rounded-full text-sm font-medium transition-colors shadow-sm"
         >
           <ArrowLeft size={16} />

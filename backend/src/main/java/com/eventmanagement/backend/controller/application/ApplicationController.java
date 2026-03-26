@@ -50,6 +50,13 @@ public class ApplicationController {
         return ResponseEntity.ok(applications);
     }
 
+    @GetMapping("/events/{eventId}")
+    public ResponseEntity<List<ApplicationResponseDTO>> getApplicationsByEvent(
+            @PathVariable UUID eventId) {
+        List<ApplicationResponseDTO> applications = applicationServiceOrganizer.getApplicationsByEvent(eventId);
+        return ResponseEntity.ok(applications);
+    }
+
     @GetMapping("/{applicationId}")
     public ResponseEntity<ApplicationResponseDTO> getApplicationDetail(@PathVariable UUID applicationId) {
         ApplicationResponseDTO detail = applicationServiceOrganizer.getApplicationDetail(applicationId);

@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
     CalendarDays,
@@ -48,13 +47,12 @@ const DONUT_COLORS = ['#1E293B', '#F97316', '#94A3B8'];
 const formatVND = (value) =>
     new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(value);
 
-const StatCard = ({ icon: Icon, label, value, loading }) => (
+const StatCard = ({ icon: Icon, label, value, loading, color, colorBg }) => (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-5 flex items-center gap-4">
         <div
-            className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
-            style={{ backgroundColor: ACCENT_LIGHT }}
+            className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 bg-${colorBg}`}
         >
-            <Icon size={22} style={{ color: ACCENT }} />
+            <Icon size={22} className={`text-${color}`} />
         </div>
         <div>
             <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">
@@ -103,8 +101,6 @@ const CustomBarTooltip = ({ active, payload, label }) => {
 };
 
 const OrganizerDashboardPage = () => {
-    const { user } = useSelector((state) => state.auth);
-    const organizerId = user?.user_id;
     const navigate = useNavigate();
     const { t } = useTranslation();
 
@@ -118,12 +114,11 @@ const OrganizerDashboardPage = () => {
     const [loading, setLoading] = useState(true);
 
     const fetchData = useCallback(async () => {
-        if (!organizerId) return;
         setLoading(true);
         try {
             const [statsData, eventsData] = await Promise.all([
-                organizerService.getMyEventStats(organizerId),
-                organizerService.getMyEvents(organizerId, 0, 20),
+                organizerService.getMyEventStats(),
+                organizerService.getMyEvents(0, 20),
             ]);
             setStats(statsData);
             setEvents(eventsData.content || []);
@@ -132,7 +127,7 @@ const OrganizerDashboardPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [organizerId]);
+    }, []);
 
     useEffect(() => {
         fetchData();
@@ -220,18 +215,24 @@ const OrganizerDashboardPage = () => {
                     label={t('org_total_events')}
                     value={stats.totalEvents}
                     loading={loading}
+                    color="blue-500"
+                    colorBg="blue-50"
                 />
                 <StatCard
                     icon={BookOpen}
                     label={t('org_total_bookings')}
                     value={totalBookings}
                     loading={loading}
+                    color="green-500"
+                    colorBg="green-50"
                 />
                 <StatCard
                     icon={Ticket}
                     label={t('org_tickets_sold')}
                     value={totalTicketsSold}
                     loading={loading}
+                    color="red-500"
+                    colorBg="red-50"
                 />
             </div>
 

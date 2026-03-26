@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  ArrowLeft, Star, User, Ticket, Mail, Calendar, 
-  Download, Trash2, MessageSquare, ListIcon 
+import {
+  ArrowLeft, User, Ticket, Mail, Calendar,
+  Download, Trash2, MessageSquare, ListIcon
 } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import Sidebar from '../../components/layout/Sidebar'; 
+import Sidebar from '../../components/layout/Sidebar';
 import axiosInstance from '../../config/axios';
 
 const FeedbackDetail = () => {
@@ -22,7 +22,7 @@ const FeedbackDetail = () => {
       setIsError(false);
       try {
         const response = await axiosInstance.get(`/feedbacks/${feedbackId}`);
-        if(response.status === 200 && response.data) {
+        if (response.status === 200 && response.data) {
           console.log("🔥 JSON BACKEND TRẢ VỀ:", response.data);
           setFeedbackData(response.data);
         } else {
@@ -57,7 +57,7 @@ const FeedbackDetail = () => {
 
       {/* THÊM lg:h-screen lg:overflow-y-auto ĐỂ THANH CUỘN ĐỘC LẬP VỚI SIDEBAR NẾU CẦN */}
       <div className="flex-1 p-4 sm:p-6 lg:p-10 w-full overflow-x-hidden">
-        
+
         {/* --- HEADER RESPONSIVE --- */}
         {/* Xếp dọc trên mobile, xếp ngang trên tablet/desktop */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-0 mb-6 lg:mb-8">
@@ -71,7 +71,7 @@ const FeedbackDetail = () => {
               <p className="text-gray-500 font-medium text-xs sm:text-sm mt-1">Response #{feedbackId || '001'} • {feedbackData?.eventName}</p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <button className="flex-1 sm:flex-none justify-center px-4 py-2.5 sm:py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-red-500 hover:bg-red-50 flex items-center gap-2 transition-all shadow-sm">
               <Trash2 size={16} /> <span className="hidden sm:inline">{t('org_delete')}</span>
@@ -85,14 +85,20 @@ const FeedbackDetail = () => {
         {/* --- MAIN CONTENT GRID RESPONSIVE --- */}
         {/* Mobile: 1 cột | Desktop: 3 cột */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-          
+
           {/* CỘT TRÁI: THÔNG TIN KHÁN GIẢ */}
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-white rounded-xl lg:rounded-2xl p-5 lg:p-6 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] border border-gray-100">
               <h3 className="text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-5 lg:mb-6">{t('org_attendee_profile')}</h3>
-              
+
               <div className="flex flex-col items-center mb-6 text-center">
-                <img src={feedbackData.attendeeInfor?.avatar || '/default-avatar.png'} alt="Avatar" className="w-20 h-20 lg:w-24 lg:h-24 rounded-full object-cover border-4 border-[#f8f7f2] shadow-sm mb-4" />
+                {feedbackData.attendeeInfor?.avatar ? (
+                  <img src={feedbackData.attendeeInfor.avatar} alt="Avatar" className="w-20 h-20 lg:w-24 lg:h-24 rounded-full object-cover border-4 border-[#f8f7f2] shadow-sm mb-4" />
+                ) : (
+                  <div className="w-20 h-20 lg:w-24 lg:h-24 rounded-full bg-gradient-to-br from-[#8c9db3] to-[#6b7d94] flex items-center justify-center border-4 border-[#f8f7f2] shadow-sm mb-4">
+                    <User size={32} className="text-white" />
+                  </div>
+                )}
                 <h2 className="text-base lg:text-lg font-bold text-gray-900">{feedbackData.attendeeInfor?.fullName}</h2>
                 <span className="bg-[#8c9db3]/10 text-[#8c9db3] text-[10px] lg:text-xs font-bold px-3 py-1 rounded-full mt-2 uppercase tracking-wide">
                   {feedbackData.attendeeInfor?.ticketType || "ATTENDEE"}
@@ -125,25 +131,12 @@ const FeedbackDetail = () => {
             <div className="bg-white rounded-xl lg:rounded-2xl p-5 sm:p-6 lg:p-8 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] border border-gray-100 h-full">
               <h3 className="text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-6 lg:mb-8">{t('org_feedback_responses')}</h3>
 
-              {/* KHU VỰC ĐIỂM SỐ RESPONSIVE */}
+              {/* KHU VỰC ĐIỂM SỐ */}
               <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 mb-8 pb-6 lg:mb-10 lg:pb-8 border-b border-gray-100">
                 <div className="flex-1">
-                  <p className="text-xs sm:text-sm font-bold text-gray-500 mb-2 sm:mb-3">{t('org_overall_experience')}</p>
-                  <div className="flex gap-1 sm:gap-1.5">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={24} className={`sm:w-7 sm:h-7 lg:w-8 lg:h-8 ${i < overallRating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'}`} />
-                    ))}
-                  </div>
-                </div>
-                
-                {/* Đường kẻ ngăn cách: Dọc trên Desktop/Tablet, Ngang trên Mobile */}
-                <div className="hidden sm:block w-px bg-gray-100"></div>
-                <div className="block sm:hidden h-px w-full bg-gray-50"></div>
-
-                <div className="flex-1">
-                  <p className="text-xs sm:text-sm font-bold text-gray-500 mb-2 sm:mb-3">{t('org_nps')}</p>
+                  <p className="text-xs sm:text-sm font-bold text-gray-500 mb-2 sm:mb-3">Overall Score</p>
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl sm:text-3xl font-extrabold text-green-500">{npsScore}</span>
+                    <span className="text-2xl sm:text-3xl font-extrabold text-[#8c9db3]">{overallRating || npsScore}</span>
                     <span className="text-gray-400 font-medium text-xs sm:text-sm mt-1 sm:mt-2">/ 10</span>
                   </div>
                 </div>
@@ -152,12 +145,12 @@ const FeedbackDetail = () => {
               {/* CÁC CÂU HỎI TEXT */}
               <div className="space-y-6 lg:space-y-8">
                 {detailData.map((item, index) => {
-                  if(item.type === 'NPS') return null;
+                  if (item.type === 'NPS') return null;
                   return (
                     <div key={index} >
                       <h4 className="font-bold text-gray-800 text-sm sm:text-base flex items-start gap-2 mb-2 sm:mb-3 leading-snug">
                         {item.type === 'OPEN_COMMENT' ? <MessageSquare size={16} className="text-[#8c9db3] mt-0.5 shrink-0 sm:w-[18px] sm:h-[18px]" /> : <ListIcon size={16} className="text-[#8c9db3] mt-0.5 shrink-0 sm:w-[18px] sm:h-[18px]" />}
-                        { item.question || `Câu hỏi đánh giá #${index + 1}` }
+                        {item.question || `Câu hỏi đánh giá #${index + 1}`}
                       </h4>
                       <div className="bg-[#f8fbff] border border-[#8c9db3]/30 rounded-lg lg:rounded-xl p-4 lg:p-5 text-sm sm:text-base text-gray-700 leading-relaxed font-medium shadow-sm relative break-words">
                         {item.answer || <span className="text-gray-400 italic">Khán giả không trả lời câu hỏi này.</span>}

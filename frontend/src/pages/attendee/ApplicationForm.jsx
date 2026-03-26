@@ -29,7 +29,7 @@ const ApplicationFormPage = () => {
         queryFn: () => profileService.getMyProfile(),
     });
 
-    const { form, selectedRole, setSelectedRole, selectedPosition, isSubmitting, isFull, handleSubmit } = useApplicationForm(applicationForm?.recruitments, userProfile, eventSlug);
+    const { form, selectedRole, setSelectedRole, selectedPosition, isSubmitting, isFull, handleSubmit } = useApplicationForm(applicationForm?.recruitments, userProfile, eventSlug, applicationForm?.formSchema);
 
     if (isLoading || isProfileLoading) {
         return <LoadingState />;

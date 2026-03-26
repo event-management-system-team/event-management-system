@@ -266,16 +266,16 @@ const EventDetailDashboard = () => {
                 </button>
                 <div className="flex-1">
                     <div className="flex items-center gap-3">
-                        <h1 className="text-xl font-bold text-gray-900">
-                            {loading ? t('org_loading') : event?.eventName || t('org_event_not_found')}
+                        <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
+                            {loading ? 'Loading...' : event?.eventName || 'Event Not Found'}
                         </h1>
                         {event?.status && (
                             <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${event.status === 'APPROVED' ? 'bg-green-50 text-green-700' :
-                                    event.status === 'ONGOING' ? 'bg-blue-50 text-blue-700' :
-                                        event.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700' :
-                                            event.status === 'COMPLETED' ? 'bg-gray-100 text-gray-600' :
-                                                event.status === 'DRAFT' ? 'bg-orange-50 text-orange-600' :
-                                                    'bg-gray-100 text-gray-600'
+                                event.status === 'ONGOING' ? 'bg-blue-50 text-blue-700' :
+                                    event.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700' :
+                                        event.status === 'COMPLETED' ? 'bg-gray-100 text-gray-600' :
+                                            event.status === 'DRAFT' ? 'bg-orange-50 text-orange-600' :
+                                                'bg-gray-100 text-gray-600'
                                 }`}>
                                 {event.status}
                             </span>

@@ -34,6 +34,7 @@ const MyTicketsPage = () => {
         response.forEach((ticket) => {
           if (!groups[ticket.orderCode]) {
             groups[ticket.orderCode] = {
+              eventId: ticket.eventId,
               orderCode: ticket.orderCode,
               startDate: ticket.eventStartDate,
               eventName: ticket.eventName,
@@ -63,9 +64,11 @@ const MyTicketsPage = () => {
     setCurrentPage(1);
   }, [filter]);
 
-  const filteredGroups = ticketGroups.filter(
-    (group) => filter === "All" || group.status === filter.toUpperCase(),
-  );
+  const filteredGroups = ticketGroups.filter((group) => {
+    if (filter === "All") return true;
+    if (filter === "Confirmed") return group.status === "CONFIRMED" || group.status === "PAID";
+    return group.status === filter.replace("-", "_").toUpperCase();
+  });
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -106,15 +109,14 @@ const MyTicketsPage = () => {
       </div>
 
       <div className="bg-white p-1 rounded-full flex gap-2 mb-10 w-fit border border-gray-200 shadow-sm overflow-x-auto">
-        {tabs.map((tab) => (
+        {["All", "Confirmed", "Pending", "Checked-in", "Cancelled"].map((tab) => (
           <button
             key={tab.key}
             onClick={() => setFilter(tab.key)}
-            className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${
-              filter === tab.key
+            className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${filter === tab.key
                 ? "bg-[#8aa8b2] text-white shadow-md shadow-[#8aa8b2]/20"
                 : "text-gray-600 hover:bg-gray-100"
-            }`}
+              }`}
           >
             {tab.label}
           </button>

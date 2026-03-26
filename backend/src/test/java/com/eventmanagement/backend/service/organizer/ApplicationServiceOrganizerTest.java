@@ -77,8 +77,8 @@ public class ApplicationServiceOrganizerTest {
     @Test
     void testGetApplications_WithFullData_Success() {
         Map<String, Object> applicationData = new HashMap<>();
-        applicationData.put("resume", "https://link-to-cv.com/cv.pdf");
-        applicationData.put("coverLetter", "Tôi rất mong muốn được làm công việc này.");
+        applicationData.put("cvUrl", "https://link-to-cv.com/cv.pdf");
+        applicationData.put("question1", "Tôi rất mong muốn được làm công việc này.");
         mockApplication.setApplicationData(applicationData);
 
         when(staffapplicationRepository.findByRecruitment_RecruitmentId(recruitmentId))
@@ -93,8 +93,9 @@ public class ApplicationServiceOrganizerTest {
         assertEquals("Quản lý sự kiện", dto.getPosition());
         assertEquals("PENDING", dto.getStatus());
 
-        assertEquals("https://link-to-cv.com/cv.pdf", dto.getResume());
-        assertEquals("Tôi rất mong muốn được làm công việc này.", dto.getCoverLetter());
+        assertEquals("https://link-to-cv.com/cv.pdf", dto.getCvUrl());
+        assertNotNull(dto.getCustomAnswers());
+        assertEquals("Tôi rất mong muốn được làm công việc này.", dto.getCustomAnswers().get("question1"));
     }
 
     @Test
@@ -106,8 +107,8 @@ public class ApplicationServiceOrganizerTest {
         List<ApplicationResponseDTO> result = applicationServiceOrganizer.getApplicationsByRecruitment(recruitmentId);
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertNull(result.get(0).getResume());
-        assertNull(result.get(0).getCoverLetter());
+        assertNull(result.get(0).getCvUrl());
+        assertNull(result.get(0).getCustomAnswers());
     }
 
 
@@ -117,7 +118,7 @@ public class ApplicationServiceOrganizerTest {
         mockApplication.setApplicationId(appId);
 
         Map<String, Object> appData = new HashMap<>();
-        appData.put("resume", "my-cv.pdf");
+        appData.put("cvUrl", "my-cv.pdf");
         mockApplication.setApplicationData(appData);
 
         when(staffapplicationRepository.findByApplicationId(appId)).thenReturn(java.util.Optional.of(mockApplication));
@@ -126,7 +127,7 @@ public class ApplicationServiceOrganizerTest {
 
         assertNotNull(result);
         assertEquals("Le Thi C", result.getName());
-        assertEquals("my-cv.pdf", result.getResume());
+        assertEquals("my-cv.pdf", result.getCvUrl());
     }
 
 
