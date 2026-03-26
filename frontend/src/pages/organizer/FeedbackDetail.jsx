@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   ArrowLeft, User, Ticket, Mail, Calendar, 
-<<<<<<< HEAD
   Download, Trash2, MessageSquare, ListIcon, ThumbsUp 
-=======
-  Download, Trash2, MessageSquare, ListIcon 
->>>>>>> cfafbc0499de6ff06dac24595784ba3922f6659a
 } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
@@ -284,7 +280,6 @@ const FeedbackDetail = () => {
             <div className="bg-white rounded-xl lg:rounded-2xl p-5 sm:p-6 lg:p-8 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] border border-gray-100 h-full">
               <h3 className="text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-6 lg:mb-8">Feedback Responses</h3>
 
-<<<<<<< HEAD
               {/* KHU VỰC ĐIỂM SỐ RESPONSIVE */}
               <div className="mb-8 pb-6 lg:mb-10 lg:pb-8 border-b border-gray-100">
                 <div>
@@ -294,14 +289,6 @@ const FeedbackDetail = () => {
                   </p>
                   <div className="flex items-center gap-2">
                     <span className="text-2xl sm:text-3xl font-extrabold text-blue-500">{overallRating}</span>
-=======
-              {/* KHU VỰC ĐIỂM SỐ */}
-              <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 mb-8 pb-6 lg:mb-10 lg:pb-8 border-b border-gray-100">
-                <div className="flex-1">
-                  <p className="text-xs sm:text-sm font-bold text-gray-500 mb-2 sm:mb-3">Overall Score</p>
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl sm:text-3xl font-extrabold text-[#8c9db3]">{overallRating || npsScore}</span>
->>>>>>> cfafbc0499de6ff06dac24595784ba3922f6659a
                     <span className="text-gray-400 font-medium text-xs sm:text-sm mt-1 sm:mt-2">/ 10</span>
                     {npsEmoji && <span className="text-2xl sm:text-3xl ml-2">{npsEmoji}</span>}
                   </div>

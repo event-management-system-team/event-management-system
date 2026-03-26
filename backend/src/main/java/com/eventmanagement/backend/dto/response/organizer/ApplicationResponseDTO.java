@@ -1,10 +1,7 @@
 package com.eventmanagement.backend.dto.response.organizer;
 
 import java.time.LocalDateTime;
-<<<<<<< HEAD
-=======
 import java.util.List;
->>>>>>> cfafbc0499de6ff06dac24595784ba3922f6659a
 import java.util.Map;
 import java.util.UUID;
 

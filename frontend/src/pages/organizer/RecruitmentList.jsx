@@ -196,21 +196,6 @@ const RecruitmentList = () => {
                   </div>
 
                   {/* Cột 3: Nút bấm */}
-<<<<<<< HEAD
-                  <div className="w-full md:w-1/3 flex items-center justify-between md:justify-end gap-6 mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-none border-gray-50">
-                    
-                    <Link 
-                      to={`/organizer/applications/${job.recruitmentId}`} 
-                      className="px-6 py-2.5 rounded-full text-xs lg:text-sm font-bold transition-all shadow-sm whitespace-nowrap bg-white text-[#4a9e9e] border border-[#4a9e9e] hover:bg-[#eaf5f5]"
-                    >
-                      Applications
-                    </Link>
-
-                    <Link 
-                      to={`/organizer/recruitments/${job.recruitmentId}`} 
-                      className={`px-6 py-2.5 rounded-full text-xs lg:text-sm font-bold transition-all shadow-sm whitespace-nowrap`}
-                      onClick={(e) => !ui.isActive && currentStatus !== 'CLOSED' && e.preventDefault()}
-=======
                   <div className="w-full md:w-1/3 flex items-center justify-end gap-3 mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-none border-gray-50">
                     {/* Nút Applications */}
                     <Link
@@ -229,7 +214,6 @@ const RecruitmentList = () => {
                     <Link
                       to={`/organizer/recruitments/${job.recruitmentId}`}
                       className="px-6 py-2.5 rounded-full text-xs lg:text-sm font-bold transition-all shadow-sm whitespace-nowrap bg-[#111827] text-white hover:bg-gray-800"
->>>>>>> cfafbc0499de6ff06dac24595784ba3922f6659a
                     >
                       {ui.buttonText}
                     </Link>
