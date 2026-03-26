@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Clock, Lock } from 'lucide-react';
+import { Plus, Clock, Lock, ArrowLeft } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import axiosInstance from '../../config/axios';
 
-import { ArrowLeft } from 'lucide-react';
-
 const RecruitmentList = () => {
+  const { t } = useTranslation();
   const [dashboardData, setDashboardData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -37,29 +37,29 @@ const RecruitmentList = () => {
       case 'OPEN':
         return { 
           color: 'bg-teal-400', 
-          text: 'Recruiting', 
-          buttonText: 'View Detail', 
+          text: t('org_recr_recruiting'), 
+          buttonText: t('org_recr_view_detail'), 
           isActive: true 
         };
       case 'CLOSED':
         return { 
           color: 'bg-red-400', 
-          text: 'Closed', 
-          buttonText: 'View Detail', 
+          text: t('org_recr_closed'), 
+          buttonText: t('org_recr_view_detail'), 
           isActive: true  // Organizer vẫn cần xem detail dù đã closed
         };
       default:
         return { 
           color: 'bg-gray-400', 
-          text: status || 'Unknown', 
-          buttonText: 'View Detail', 
+          text: status || t('org_recr_unknown'), 
+          buttonText: t('org_recr_view_detail'), 
           isActive: true 
         };
     }
   };
 
   const formatDeadline = (dateString) => {
-    if (!dateString) return "No deadline";
+    if (!dateString) return t('org_no_deadline');
     const d = new Date(dateString);
     return d.toLocaleString('vi-VN', { 
       hour: '2-digit', minute: '2-digit', 
@@ -68,14 +68,14 @@ const RecruitmentList = () => {
   };
 
   if (isLoading) {
-    return <div className="flex min-h-screen bg-[#ecebe4] items-center justify-center font-bold text-gray-500 animate-pulse">Loading recruitment list...</div>;
+    return <div className="flex min-h-screen bg-[#ecebe4] items-center justify-center font-bold text-gray-500 animate-pulse">{t('org_loading_recruitment')}</div>;
   }
 
   if (isError || !dashboardData) {
     return (
       <div className="flex min-h-screen bg-[#ecebe4] items-center justify-center flex-col gap-4">
-        <p className="font-bold text-red-500 text-lg">Failed to load data!</p>
-        <button onClick={() => window.location.reload()} className="px-4 py-2 bg-white rounded-lg shadow-sm text-sm font-bold">Retry</button>
+        <p className="font-bold text-red-500 text-lg">{t('org_failed_load')}</p>
+        <button onClick={() => window.location.reload()} className="px-4 py-2 bg-white rounded-lg shadow-sm text-sm font-bold">{t('org_retry')}</button>
       </div>
     );
   }
@@ -86,10 +86,10 @@ const RecruitmentList = () => {
     : false;
 
   const statsList = [
-    { title: "ACTIVE ROLES", value: dashboardData?.stats?.activeRoles || 0, color: "border-[#60a5fa]" },
-    { title: "TOTAL APPLICANTS", value: dashboardData?.stats?.totalApplications || 0, color: "border-[#34d399]" },
-    { title: "PENDING REVIEW", value: dashboardData?.stats?.pendingReviews || 0, color: "border-[#fb923c]" },
-    { title: "HIRED STAFF", value: dashboardData?.stats?.hiredStaff || 0, color: "border-gray-300" }
+    { title: t('org_recr_active_roles'), value: dashboardData?.stats?.activeRoles || 0, color: "border-[#60a5fa]" },
+    { title: t('org_recr_total_applicants'), value: dashboardData?.stats?.totalApplications || 0, color: "border-[#34d399]" },
+    { title: t('org_recr_pending_review'), value: dashboardData?.stats?.pendingReviews || 0, color: "border-[#fb923c]" },
+    { title: t('org_recr_hired_staff'), value: dashboardData?.stats?.hiredStaff || 0, color: "border-gray-300" }
   ];
 
   return (
@@ -105,9 +105,9 @@ const RecruitmentList = () => {
             className="flex items-center gap-4 text-gray-400 hover:text-gray-700 text-sm font-medium mb-3 transition-colors group"
           >
             <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
-            <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">My Recruitments</h1>
+            <h1 className="font-sans text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">{t('org_recr_title')}</h1>
             </button>
-            <p className="text-gray-500 text-sm mt-1">Manage staff postings and review incoming applications.</p>
+            <p className="text-gray-500 text-sm mt-1">{t('org_recr_subtitle')}</p>
           </div>
           
           {!isEventEnded ? (
@@ -115,11 +115,11 @@ const RecruitmentList = () => {
               to={`/organizer/recruitment-post/${eventId}`} 
               className="w-full sm:w-auto justify-center bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-5 py-2.5 rounded-lg flex items-center gap-2 text-sm font-bold shadow-md transition-all active:scale-95"
             >
-              <Plus size={18} strokeWidth={2.5} /> Create Recruitment
+              <Plus size={18} strokeWidth={2.5} /> {t('org_recr_create')}
             </Link>
           ) : (
             <div className="w-full sm:w-auto px-5 py-2.5 bg-red-50 text-red-600 border border-red-100 rounded-lg flex items-center gap-2 text-sm font-bold cursor-not-allowed shadow-sm">
-              <Lock size={18} /> Event Ended
+              <Lock size={18} /> {t('org_recr_event_ended')}
             </div>
           )}
         </div>
@@ -163,14 +163,14 @@ const RecruitmentList = () => {
                       <h3 className="font-extrabold text-gray-900 text-base lg:text-lg ">{job.title}</h3>
                       {job.isNew && (
                         <span className="bg-orange-100 text-orange-600 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                          {job.newCount} NEW
+                          {job.newCount} {t('org_recr_new')}
                         </span>
                       )}
                     </div>
                     
                     <div className="w-full sm:max-w-xs">
                       <div className="flex justify-between text-[11px] font-bold text-gray-400 mb-1.5">
-                        <span className="uppercase tracking-widest">Hiring Progress</span>
+                        <span className="uppercase tracking-widest">{t('org_recr_hiring_progress')}</span>
                         <span className="text-gray-600">{job.currentCount} / {job.total}</span>
                       </div>
                       <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
@@ -191,7 +191,7 @@ const RecruitmentList = () => {
                     
                     <div className="flex items-center gap-1.5 text-[11px] lg:text-xs font-medium text-gray-400">
                       <Clock size={14} className="shrink-0" />
-                      <span className="truncate">Deadline: <span className="text-gray-500 font-semibold">{formatDeadline(job.deadline)}</span></span>
+                      <span className="truncate">{t('org_deadline_label')} <span className="text-gray-500 font-semibold">{formatDeadline(job.deadline)}</span></span>
                     </div>
                   </div>
 
@@ -202,7 +202,7 @@ const RecruitmentList = () => {
                       to={`/organizer/applications/${job.recruitmentId}`}
                       className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs lg:text-sm font-bold bg-orange-50 text-orange-600 hover:bg-orange-100 transition-all shadow-sm whitespace-nowrap"
                     >
-                      Applications
+                      {t('org_recr_applications')}
                       {job.newCount > 0 && (
                         <span className="bg-orange-500 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                           {job.newCount}
@@ -224,8 +224,8 @@ const RecruitmentList = () => {
             })
           ) : (
              <div className="text-center p-16 bg-white rounded-2xl border-2 border-dashed border-gray-100">
-                <p className="text-gray-400 font-bold mb-2">No recruitment roles found.</p>
-                <p className="text-gray-300 text-sm">Click "Create Recruitment" to post your first job!</p>
+                <p className="text-gray-400 font-bold mb-2">{t('org_recr_no_roles')}</p>
+                <p className="text-gray-300 text-sm">{t('org_recr_click_create')}</p>
              </div>
           )}
         </div>

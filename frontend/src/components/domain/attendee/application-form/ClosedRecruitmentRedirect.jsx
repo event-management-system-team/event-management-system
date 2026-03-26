@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { MoveLeft, XCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const ClosedRecruitmentRedirect = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     return (
         <div className="min-h-screen bg-[#F1F0E8] flex items-center justify-center p-4">
@@ -11,10 +13,10 @@ const ClosedRecruitmentRedirect = () => {
                     <XCircle strokeWidth={2.5} className="w-10 h-10 text-red-500" />
                 </div>
 
-                <h2 className="text-2xl font-black text-slate-800 mb-3 tracking-tight">Recruitment Closed</h2>
+                <h2 className="text-2xl font-black text-slate-800 mb-3 tracking-tight">{t('app_recruitment_closed')}</h2>
 
                 <p className="text-slate-500 mb-8 font-medium leading-relaxed">
-                    We're sorry, but the application period for this position has already ended. Thank you for your interest!
+                    {t('app_recruitment_closed_desc')}
                 </p>
 
                 <button
@@ -22,7 +24,7 @@ const ClosedRecruitmentRedirect = () => {
                     className="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 group shadow-md"
                 >
                     <MoveLeft strokeWidth={2.5} className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                    Go Back
+                    {t('app_go_back')}
                 </button>
             </div>
         </div>

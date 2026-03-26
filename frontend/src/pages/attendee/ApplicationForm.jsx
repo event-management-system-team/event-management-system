@@ -4,14 +4,17 @@ import { useApplicationForm } from '../../hooks/useApplicationForm';
 import { Upload as UploadIcon, ChevronRight } from 'lucide-react';
 import { Form, Input, Select, Upload, Radio, Checkbox } from 'antd'
 import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next';
 import recruitmentService from '../../services/recruitment.service'
 import LoadingState from '../../components/common/LoadingState'
 import EmptyState from '../../components/common/EmptyState'
 import { useParams, useNavigate } from 'react-router-dom';
 import profileService from '../../services/profile.service'
 import ClosedRecruitmentRedirect from '../../components/domain/attendee/application-form/ClosedRecruitmentRedirect';
+
 const ApplicationFormPage = () => {
     const { eventSlug } = useParams();
+    const { t } = useTranslation();
 
     const { data: applicationForm, isLoading, isError } = useQuery({
         queryKey: ['recruitments', eventSlug, 'applicationForm'],
@@ -62,7 +65,7 @@ const ApplicationFormPage = () => {
                 <Form.Item
                     name={fieldId}
                     label={label}
-                    rules={[{ required, message: 'Please fill out this field!' }]}
+                    rules={[{ required, message: t('app_fill_field') }]}
                     className="m-0"
                 >
                     <Input
@@ -80,7 +83,7 @@ const ApplicationFormPage = () => {
                 <Form.Item
                     name={fieldId}
                     label={label}
-                    rules={[{ required, message: 'Please fill out this field!' }]}
+                    rules={[{ required, message: t('app_fill_field') }]}
                     className="m-0"
                 >
                     <Input.TextArea
@@ -99,7 +102,7 @@ const ApplicationFormPage = () => {
                 <Form.Item
                     name={fieldId}
                     label={label}
-                    rules={[{ required, message: 'Please select an option!' }]}
+                    rules={[{ required, message: t('app_select_option') }]}
                     className="m-0"
                 >
                     <Radio.Group>
@@ -117,7 +120,7 @@ const ApplicationFormPage = () => {
                 <Form.Item
                     name={fieldId}
                     label={label}
-                    rules={[{ required, message: 'Please select at least one option!' }]}
+                    rules={[{ required, message: t('app_select_checkbox') }]}
                     className="m-0"
                 >
                     <Checkbox.Group>
@@ -135,12 +138,12 @@ const ApplicationFormPage = () => {
                 <Form.Item
                     name={fieldId}
                     label={label}
-                    rules={[{ required, message: 'Please select an item in the list!' }]}
+                    rules={[{ required, message: t('app_select_list') }]}
                     className="m-0"
                 >
                     <Select
                         size="large"
-                        placeholder="-- Select an option --"
+                        placeholder={t('app_select_placeholder')}
                         className="w-full h-12 [&_.ant-select-selector]:rounded-[16px] [&_.ant-select-selector]:border-[#d8ddde]"
                     >
                         {options?.map((opt, idx) => (
@@ -159,7 +162,7 @@ const ApplicationFormPage = () => {
                     label={label}
                     valuePropName="fileList"
                     getValueFromEvent={normFile}
-                    rules={[{ required, message: 'Please upload file!' }]}
+                    rules={[{ required, message: t('app_upload_file') }]}
                     className="m-0"
                 >
                     <Upload.Dragger
@@ -173,10 +176,10 @@ const ApplicationFormPage = () => {
                             <UploadIcon className="text-[#4ECDC4] w-8 h-8 mb-1 transition-transform group-hover:scale-110" />
                         </p>
                         <p className="ant-upload-text font-bold text-slate-500!">
-                            Click to upload or drag & drop
+                            {t('app_click_upload')}
                         </p>
                         <div className="mt-3 px-3 py-1 bg-white/60 rounded-full text-[10px] uppercase tracking-wider font-bold text-[#6a777c] inline-block">
-                            Max file size: {field.maxSize || '5MB'}
+                            {t('app_max_file_size')} {field.maxSize || '5MB'}
                         </div>
                     </Upload.Dragger>
                 </Form.Item>
@@ -196,12 +199,12 @@ const ApplicationFormPage = () => {
                     <div>
                         {/* Breadcrumb */}
                         <div className="flex items-center gap-2 mb-4 text-[#6a777c] text-sm font-medium">
-                            <span className="hover:text-[#89A8B2] cursor-pointer transition-colors">Recruitment</span>
+                            <span className="hover:text-[#89A8B2] cursor-pointer transition-colors">{t('app_breadcrumb_recruitment')}</span>
                             <ChevronRight size={14} />
-                            <span className="text-[#89A8B2]">Application</span>
+                            <span className="text-[#89A8B2]">{t('app_breadcrumb_application')}</span>
                         </div>
 
-                        <h1 className="text-3xl md:text-4xl font-black tracking-tight mb-1">Staff Application</h1>
+                        <h1 className="text-3xl md:text-4xl font-black tracking-tight mb-1">{t('app_staff_application')}</h1>
                         <p className="text-[#89A8B2] font-semibold text-lg">{eventName}</p>
                     </div>
 
