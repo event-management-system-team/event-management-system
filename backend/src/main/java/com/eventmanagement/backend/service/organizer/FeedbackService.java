@@ -261,4 +261,11 @@ public EventResponse getEventById(UUID eventId) {
                 System.out.println("Event ID: " + event.getEventId());
     return response;
 }
+
+@Transactional
+public void deleteFeedback(UUID feedbackId) {
+    Feedback feedback = feedbackRepository.findById(feedbackId)
+            .orElseThrow(() -> new RuntimeException("Feedback not found"));
+    feedbackRepository.delete(feedback);
+}
 }

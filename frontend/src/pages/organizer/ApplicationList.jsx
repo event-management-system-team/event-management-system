@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Search, Eye, X, Download, CheckCircle, Quote, FileText, Star, ArrowLeft
+  Search, Eye, X, Download, CheckCircle, Quote, FileText, Star, ArrowLeft,Filter
 } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../config/axios';
@@ -13,6 +13,11 @@ const ApplicationList = () => {
   const [applications, setApplications] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // States cho việc lọc dữ liệu
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [dateFilter, setDateFilter] = useState('');
 
   useEffect(() => {
     fetchApplications();
@@ -81,6 +86,20 @@ const ApplicationList = () => {
     }
   };
 
+  // Logic Lọc Dữ Liệu
+  const filteredApplications = applications.filter(app => {
+    const matchSearch = 
+      app.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.email?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchStatus = statusFilter === 'ALL' || app.status?.toUpperCase() === statusFilter;
+
+    const appDate = app.appliedAt ? new Date(app.appliedAt).toISOString().split('T')[0] : '';
+    const matchDate = !dateFilter || appDate === dateFilter;
+
+    return matchSearch && matchStatus && matchDate;
+  });
+
   return (
     <div className="flex flex-col min-h-screen w-full">
 
@@ -99,17 +118,56 @@ const ApplicationList = () => {
           <p className="text-gray-500 text-sm mt-1">Review and manage potential staff members.</p>
         </div>
 
-        {/* Search */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between mb-6 lg:mb-8 gap-4 sm:gap-0">
-          <div className="w-full sm:max-w-xs lg:w-80">
-            <div className="bg-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-2 sm:gap-3 w-full">
-              <Search size={18} className="text-gray-400 shrink-0" />
-              <input type="text" placeholder="Search candidates..." className="w-full outline-none text-xs sm:text-sm font-medium text-gray-700 placeholder-gray-400 bg-transparent"/>
+        {/* Search & Actions - Filter Section */}
+        <div className="flex flex-col gap-4 mb-6 lg:mb-8">
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+            
+            <div className="flex flex-col sm:flex-row flex-1 gap-4">
+              <div className="bg-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-2 sm:gap-3 flex-1 min-w-[200px]">
+                <Search size={18} className="text-gray-400 shrink-0" />
+                <input 
+                  type="text" 
+                  placeholder="Search name or email..." 
+                  className="w-full outline-none text-xs sm:text-sm font-medium text-gray-700 placeholder-gray-400 bg-transparent"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+
+              <div className="bg-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                <Filter size={18} className="text-gray-400 shrink-0" />
+                <select 
+                  className="w-full sm:w-auto outline-none text-xs sm:text-sm font-medium text-gray-700 bg-transparent cursor-pointer"
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                >
+                  <option value="ALL">All Statuses</option>
+                  <option value="PENDING">Pending</option>
+                  <option value="APPROVED">Approved</option>
+                  <option value="REJECTED">Rejected</option>
+                </select>
+              </div>
+
+              <div className="bg-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                <input 
+                  type="date" 
+                  className="w-full sm:w-auto outline-none text-xs sm:text-sm font-medium text-gray-700 bg-transparent cursor-pointer"
+                  value={dateFilter}
+                  onChange={(e) => setDateFilter(e.target.value)}
+                />
+              </div>
             </div>
+
+            <button 
+              onClick={() => navigate(-1)} 
+              className="w-full lg:w-auto justify-center bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 text-xs sm:text-sm font-bold shadow-md transition-all shrink-0"
+            >
+               Back to Recruitments
+            </button>
           </div>
         </div>
 
-        {/* Table Container - Responsive Horizontal Scroll */}
+        {/* Table Container */}
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] border border-gray-100 overflow-hidden">
           <div className="overflow-x-auto w-full">
             <table className="w-full text-left border-collapse min-w-[800px]">
@@ -125,10 +183,22 @@ const ApplicationList = () => {
               <tbody className="divide-y divide-gray-50">
                 {isLoading ? (
                   <tr><td colSpan="5" className="text-center py-10 font-bold text-gray-400 text-sm">Loading candidates...</td></tr>
-                ) : applications.length === 0 ? (
-                  <tr><td colSpan="5" className="text-center py-10 font-bold text-gray-400 text-sm">No applications received yet.</td></tr>
+                ) : filteredApplications.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="text-center py-10">
+                      <p className="font-bold text-gray-400 text-sm">No applications found.</p>
+                      {(searchTerm || statusFilter !== 'ALL' || dateFilter) && (
+                        <button 
+                          onClick={() => { setSearchTerm(''); setStatusFilter('ALL'); setDateFilter(''); }}
+                          className="mt-2 text-[#2dd4bf] text-xs font-bold hover:underline"
+                        >
+                          Clear all filters
+                        </button>
+                      )}
+                    </td>
+                  </tr>
                 ) : (
-                  applications.map((app) => (
+                  filteredApplications.map((app) => (
                     <tr key={app.id} className="hover:bg-gray-50/50 transition-colors group">
                       <td className="px-6 lg:px-8 py-3 sm:py-4">
                         <div className="flex items-center gap-3 sm:gap-4">
@@ -140,7 +210,7 @@ const ApplicationList = () => {
                         </div>
                       </td>
                       <td className="px-4 lg:px-6 py-3 sm:py-4"><span className="text-xs sm:text-sm font-bold text-gray-700">{app.position}</span></td>
-                      <td className="px-4 lg:px-6 py-3 sm:py-4"><span className="text-xs sm:text-sm font-medium text-gray-500">{new Date(app.appliedAt).toLocaleDateString('en-GB')}</span></td>
+                      <td className="px-4 lg:px-6 py-3 sm:py-4"><span className="text-xs sm:text-sm font-medium text-gray-500">{app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('en-GB') : 'N/A'}</span></td>
                       <td className="px-4 lg:px-6 py-3 sm:py-4">{getStatusBadge(app.status)}</td>
                       <td className="px-4 lg:px-6 py-3 sm:py-4">
                         <div className="flex items-center justify-center gap-3">
@@ -161,7 +231,7 @@ const ApplicationList = () => {
         </div>
       </div>
 
-      {/* MODAL - Candidate Details - Responsive */}
+      {/* MODAL - Candidate Details */}
       {selectedCandidate && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-3 sm:p-4">
           <div className="bg-white rounded-2xl sm:rounded-[2rem] w-full w-[95%] sm:max-w-5xl max-h-[95vh] sm:max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
@@ -181,92 +251,101 @@ const ApplicationList = () => {
               <button onClick={() => setSelectedCandidate(null)} className="p-1 sm:p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700 rounded-full transition-colors shrink-0"><X size={20} className="sm:w-6 sm:h-6" /></button>
             </div>
 
-            {/* Modal Body - Stacks on mobile, Side-by-side on desktop */}
+            {/* Modal Body */}
             <div className="flex-1 overflow-y-auto bg-[#f8f7f2] flex flex-col md:flex-row">
-              
-              {/* Left Column (Info) */}
-              <div className="w-full md:w-5/12 p-4 sm:p-6 lg:p-8 border-b md:border-b-0 md:border-r border-gray-200">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
-                  <div>
-                    <p className="text-[10px] font-bold text-[#8c9db3] uppercase tracking-widest mb-1 sm:mb-1.5">Email</p>
-                    <p className="text-xs sm:text-sm font-medium text-gray-800 break-all">{selectedCandidate.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-bold text-[#8c9db3] uppercase tracking-widest mb-1 sm:mb-1.5">Phone</p>
-                    <p className="text-xs sm:text-sm font-medium text-gray-800">{selectedCandidate.phone || 'N/A'}</p>
-                  </div>
-                </div>
+              {(() => {
+                // Lấy trực tiếp Object từ DTO (Backend trả về)
+                const appData = selectedCandidate.applicationData || {};
+                
+                const phone = appData.phone || selectedCandidate.phone || 'N/A';
+                const experience = appData.experience || "Chưa cập nhật kinh nghiệm.";
+                const cvLink = appData.cv_link || selectedCandidate.resume || null;
 
-                {/* Key Skills — removed hardcode; show applied position instead */}
-
-                <div>
-                  <h4 className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-gray-800 mb-3 sm:mb-4"><Quote size={16} className="text-[#2dd4bf]" /> Form Answers</h4>
-                  <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
-                    {selectedCandidate.customAnswers && Object.keys(selectedCandidate.customAnswers).length > 0 ? (
-                      Object.entries(selectedCandidate.customAnswers)
-                        .filter(([key]) => !key.toLowerCase().includes('agreetoterms') && !key.toLowerCase().includes('agree') && key !== 'cvUrl')
-                        .map(([key, value]) => {
-                          // Tìm label từ formSchema
-                          const schemaField = selectedCandidate.formSchema?.find(
-                            (f) => f.fieldId === key || f.id === key || f.name === key || f.label === key
-                          );
-                          const label = schemaField?.label || schemaField?.title || key;
-                          return (
-                            <div key={key} className="bg-white rounded-xl border border-gray-100 p-3 sm:p-4 shadow-sm">
-                              <p className="text-[10px] font-bold text-[#8c9db3] uppercase tracking-widest mb-1">{label}</p>
-                              <p className="text-xs sm:text-sm text-gray-800 font-medium whitespace-pre-line">
-                                {Array.isArray(value) ? value.join(', ') : String(value)}
-                              </p>
-                            </div>
-                          );
-                        })
-                    ) : (
-                      <div className="bg-[#ecebe4]/50 border border-[#ecebe4] p-4 rounded-xl text-xs text-gray-400 italic">
-                        No form answers submitted.
+                return (
+                  <>
+                    {/* Left Column (Info) */}
+                    <div className="w-full md:w-5/12 p-4 sm:p-6 lg:p-8 border-b md:border-b-0 md:border-r border-gray-200">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                        <div>
+                          <p className="text-[10px] font-bold text-[#8c9db3] uppercase tracking-widest mb-1 sm:mb-1.5">Email</p>
+                          <p className="text-xs sm:text-sm font-medium text-gray-800 break-all">{selectedCandidate.email}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-[#8c9db3] uppercase tracking-widest mb-1 sm:mb-1.5">Phone</p>
+                          <p className="text-xs sm:text-sm font-medium text-gray-800">{phone}</p>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                </div>
-              </div>
 
-              {/* Right Column (CV) */}
-              <div className="w-full md:w-7/12 p-4 sm:p-6 lg:p-8 bg-[#f4f3ed] flex flex-col h-64 md:h-auto">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-4">
-                  <div className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-gray-700"><FileText size={18} className="text-[#8c9db3]" /> Curriculum Vitae Preview</div>
-                  {selectedCandidate.cvUrl ? (
-                    <a
-                      href={selectedCandidate.cvUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full sm:w-auto justify-center bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider shadow-sm transition-colors"
-                    >
-                      <Download size={14} /> Download PDF
-                    </a>
-                  ) : (
-                    <button disabled className="w-full sm:w-auto justify-center bg-gray-200 text-gray-400 px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider cursor-not-allowed">
-                      <Download size={14} /> Download PDF
-                    </button>
-                  )}
-                </div>
+                      {/* Experience (Từ DB) */}
+                      <div className="mb-6 sm:mb-8">
+                        <h4 className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-gray-800 mb-3 sm:mb-4">
+                          <Star size={16} className="text-[#2dd4bf] fill-[#2dd4bf]" /> Experience / Skills
+                        </h4>
+                        <div className="bg-white border border-gray-200 p-3 sm:p-4 rounded-xl shadow-sm text-xs sm:text-sm font-medium text-gray-700 leading-relaxed">
+                          {experience}
+                        </div>
+                      </div>
 
-                {selectedCandidate.cvUrl ? (
-                  <div className="flex-1 bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 min-h-[200px] sm:min-h-[300px]">
-                    <iframe
-                      src={selectedCandidate.cvUrl}
-                      className="w-full h-full min-h-[300px]"
-                      title="CV Preview"
-                    />
-                  </div>
-                ) : (
-                  <div className="flex-1 bg-white rounded-xl shadow-md border-2 border-dashed border-gray-300 flex items-center justify-center flex-col gap-3 sm:gap-4 text-gray-400 min-h-[200px] sm:min-h-[300px]">
-                    <FileText size={40} className="text-gray-300 sm:w-12 sm:h-12"/>
-                    <p className="font-bold text-xs sm:text-sm text-center px-4">Applicant hasn't uploaded a CV yet</p>
-                  </div>
-                )}
-              </div>
+                      {/* Thông tin khác (Nếu có các field khác trong JSON) */}
+                      {Object.keys(appData).filter(k => !['phone', 'experience', 'cv_link'].includes(k)).length > 0 && (
+                        <div>
+                          <h4 className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-gray-800 mb-3 sm:mb-4">
+                            <Quote size={16} className="text-[#2dd4bf]" /> Other Answers
+                          </h4>
+                          <div className="bg-[#ecebe4]/50 border border-[#ecebe4] p-4 sm:p-5 rounded-xl sm:rounded-2xl text-xs sm:text-sm text-gray-600 leading-relaxed font-medium">
+                            {Object.entries(appData)
+                              .filter(([key]) => !['phone', 'experience', 'cv_link'].includes(key))
+                              .map(([key, value]) => (
+                                <div key={key} className="mb-2 last:mb-0">
+                                  <span className="font-bold capitalize">{key}:</span> {value}
+                                </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right Column (CV) */}
+                    <div className="w-full md:w-7/12 p-4 sm:p-6 lg:p-8 bg-[#f4f3ed] flex flex-col h-64 md:h-auto">
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-4">
+                        <div className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-gray-700">
+                          <FileText size={18} className="text-[#8c9db3]" /> Curriculum Vitae 
+                        </div>
+                        {cvLink && (
+                          <a 
+                            href={cvLink.startsWith('http') ? cvLink : `https://${cvLink}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="w-full sm:w-auto justify-center bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider shadow-sm transition-colors"
+                          >
+                            <Download size={14} /> Mở CV Link
+                          </a>
+                        )}
+                      </div>
+                      
+                      <div className="flex-1 bg-white rounded-xl shadow-md border-2 border-dashed border-gray-300 flex items-center justify-center flex-col gap-3 sm:gap-4 text-gray-400 min-h-[200px] sm:min-h-[300px]">
+                          {cvLink ? (
+                            <>
+                              <CheckCircle size={40} className="text-[#2dd4bf] sm:w-12 sm:h-12"/>
+                              <p className="font-bold text-xs sm:text-sm text-center px-4 text-gray-600">
+                                Ứng viên này đã nộp link CV (Google Drive/External link).
+                                <br/><span className="text-gray-400 text-[10px] mt-1 inline-block">Hãy click nút "Mở CV Link" ở góc trên để xem chi tiết.</span>
+                              </p>
+                            </>
+                          ) : (
+                            <>
+                              <FileText size={40} className="text-gray-300 sm:w-12 sm:h-12"/>
+                              <p className="font-bold text-xs sm:text-sm text-center px-4">Applicant hasn't uploaded a CV yet</p>
+                            </>
+                          )}
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
 
-            {/* Modal Footer Actions - Stack on small screens */}
+            {/* Modal Footer Actions */}
             <div className="px-4 sm:px-8 py-4 sm:py-5 border-t border-gray-100 flex flex-col-reverse sm:flex-row justify-end items-stretch sm:items-center gap-3 sm:gap-4 bg-white shrink-0">
               {selectedCandidate.status === 'PENDING' && (
                 <>
