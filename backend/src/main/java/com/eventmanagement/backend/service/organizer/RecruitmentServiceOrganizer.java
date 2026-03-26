@@ -135,6 +135,12 @@ public class RecruitmentServiceOrganizer {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event không tồn tại"));
 
+        // Kiểm tra: mỗi event chỉ được 1 recruitment post
+        List<Recruitment> existing = recruitmentRepository.findByEvent_EventId(eventId);
+        if (!existing.isEmpty()) {
+            throw new RuntimeException("Sự kiện này đã có bài tuyển dụng. Mỗi sự kiện chỉ được tạo 1 bài tuyển dụng.");
+        }
+
         CustomForm customForm = null;
         if (request.getFormId() != null) {
             customForm = customFormRepository.findById(request.getFormId())
@@ -149,7 +155,10 @@ public class RecruitmentServiceOrganizer {
         List<BenefitRecruitment> benefitRecruitments = null;
         if (request.getBenefits() != null) {
             benefitRecruitments = request.getBenefits().stream()
-                    .map(b -> BenefitRecruitment.builder().title(b).build())
+                    .map(b -> BenefitRecruitment.builder()
+                            .title(b)
+                            .icon(mapBenefitIcon(b))
+                            .build())
                     .collect(java.util.stream.Collectors.toList());
         }
 
@@ -265,5 +274,18 @@ public class RecruitmentServiceOrganizer {
                 }
             }
         }
+    }
+
+    private String mapBenefitIcon(String benefitTitle) {
+        if (benefitTitle == null) return "gift";
+        String lower = benefitTitle.toLowerCase();
+        if (lower.contains("certificate") || lower.contains("award")) return "award";
+        if (lower.contains("lunch") || lower.contains("food") || lower.contains("meal") || lower.contains("coffee")) return "coffee";
+        if (lower.contains("stipend") || lower.contains("salary") || lower.contains("pay") || lower.contains("money")) return "star";
+        if (lower.contains("remote") || lower.contains("work") || lower.contains("job")) return "briefcase";
+        if (lower.contains("health") || lower.contains("insurance") || lower.contains("medical")) return "heart";
+        if (lower.contains("training") || lower.contains("learn") || lower.contains("course") || lower.contains("book")) return "book";
+        if (lower.contains("security") || lower.contains("safety") || lower.contains("protect")) return "shield";
+        return "gift";
     }
 }

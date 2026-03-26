@@ -97,6 +97,7 @@ const RecruitmentList = () => {
     { title: "PENDING REVIEW", value: dashboardData?.stats?.pendingReviews || 0, color: "border-[#fb923c]" },
     { title: "HIRED STAFF", value: dashboardData?.stats?.hiredStaff || 0, color: "border-gray-300" }
   ];
+  const hasRecruitments = (dashboardData?.recentRecruitments?.length || 0) > 0;
 
   return (
     <div className="flex flex-col min-h-screen w-full">
@@ -116,18 +117,18 @@ const RecruitmentList = () => {
             <p className="text-gray-500 text-sm mt-1">Manage staff postings and review incoming applications.</p>
           </div>
           
-          {!isEventEnded ? (
+          {isEventEnded ? (
+            <div className="w-full sm:w-auto px-5 py-2.5 bg-red-50 text-red-600 border border-red-100 rounded-lg flex items-center gap-2 text-sm font-bold cursor-not-allowed shadow-sm">
+              <Lock size={18} /> Event Ended
+            </div>
+          ) : !hasRecruitments ? (
             <Link 
               to={`/organizer/recruitment-post/${eventId}`} 
               className="w-full sm:w-auto justify-center bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-5 py-2.5 rounded-lg flex items-center gap-2 text-sm font-bold shadow-md transition-all active:scale-95"
             >
               <Plus size={18} strokeWidth={2.5} /> Create Recruitment
             </Link>
-          ) : (
-            <div className="w-full sm:w-auto px-5 py-2.5 bg-red-50 text-red-600 border border-red-100 rounded-lg flex items-center gap-2 text-sm font-bold cursor-not-allowed shadow-sm">
-              <Lock size={18} /> Event Ended
-            </div>
-          )}
+          ) : null}
         </div>
 
         {/* STATS */}
