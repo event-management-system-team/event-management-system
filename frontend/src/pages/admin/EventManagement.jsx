@@ -5,6 +5,7 @@ import { useAlert } from '../../hooks/useAlert.js';
 import { adminService } from '../../services/admin.service.js';
 import { Alert } from '../../components/common/Alert.jsx';
 import LoadingState from '../../components/common/LoadingState.jsx';
+import EmptyState from '../../components/common/EmptyState.jsx';
 import EventSummaryCard from '../../components/domain/admin/EventSummaryCard.jsx';
 import EventFilter from '../../components/domain/admin/EventFilter.jsx';
 import EventList from '../../components/domain/admin/EventList.jsx';
@@ -17,6 +18,7 @@ export function EventManagement() {
     const [summary, setSummary] = useState()
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [summaryLoading, setSummaryLoading] = useState(true);
     const [error, setError] = useState(null);
     const [status, setStatus] = useState(statusParam ? statusParam.toUpperCase() : "all");
     const [category, setCategory] = useState("all");
@@ -28,7 +30,7 @@ export function EventManagement() {
 
     const fetchData = async () => {
         try {
-            setLoading(true)
+            setSummaryLoading(true)
 
             const [summaryRes, categoryRes] = await Promise.all([
                 adminService.getEventSummary(),
@@ -42,7 +44,7 @@ export function EventManagement() {
             setError("Cannot load events data")
             console.error(error)
         } finally {
-            setLoading(false)
+            setSummaryLoading(false)
         }
     }
 
@@ -54,16 +56,11 @@ export function EventManagement() {
         setSearchTerm(e.target.value)
     }
 
+    if (summaryLoading) return <LoadingState />
+    if (error) return <EmptyState className='h-[600px]' />
+
     return (
-        <div className="flex h-screen bg-[#F1F0E8]">
-
-            {loading && (
-                <LoadingState />
-            )}
-
-            {error && (
-                <EmptyState className='h-[600px]' />
-            )}
+        <div className="flex flex-col flex-1 bg-[#F1F0E8]">
 
             {/* Main Content */}
             <main className="flex-1 overflow-auto">

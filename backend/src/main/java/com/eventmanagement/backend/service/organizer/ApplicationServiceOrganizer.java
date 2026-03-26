@@ -2,6 +2,7 @@ package com.eventmanagement.backend.service.organizer;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -36,12 +37,21 @@ public class ApplicationServiceOrganizer {
         List<StaffApplication> applications = staffapplicationRepository.findByRecruitment_RecruitmentId(recruitmentId);
 
         return applications.stream().map(app -> {
-            String coverLetter = null;
-            String resume = null;
+            String cvUrl = null;
+            Map<String, Object> customAnswers = null;
             if (app.getApplicationData() != null) {
-                coverLetter = (String) app.getApplicationData().get("coverLetter");
-                resume = (String) app.getApplicationData().get("resume");
+                cvUrl = (String) app.getApplicationData().get("cvUrl");
+                // Lấy tất cả field trừ cvUrl làm custom answers
+                customAnswers = app.getApplicationData().entrySet().stream()
+                        .filter(e -> !"cvUrl".equals(e.getKey()))
+                        .collect(java.util.stream.Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                if (customAnswers.isEmpty()) customAnswers = null;
             }
+
+            java.util.List<java.util.Map<String, Object>> formSchema =
+                    app.getRecruitment().getCustomForm() != null
+                    ? app.getRecruitment().getCustomForm().getFormSchema()
+                    : null;
 
             return ApplicationResponseDTO.builder()
                     .id(app.getApplicationId())
@@ -50,9 +60,10 @@ public class ApplicationServiceOrganizer {
                     .phone(app.getUser().getPhone())
                     .avatar(app.getUser().getAvatarUrl())
                     .position(app.getRecruitment().getPositionName())
-                    .resume(resume)
-                    .coverLetter(coverLetter)
-                    .status(app.getApplicationStatus() != null ? app.getApplicationStatus().name() : null) // Đã sửa thành getApplicationStatus()
+                    .cvUrl(cvUrl)
+                    .customAnswers(customAnswers)
+                    .formSchema(formSchema)
+                    .status(app.getApplicationStatus() != null ? app.getApplicationStatus().name() : null)
                     .appliedAt(app.getAppliedAt())
                     .reviewedAt(app.getReviewedAt())
                     .createdAt(app.getCreatedAt())
@@ -61,6 +72,46 @@ public class ApplicationServiceOrganizer {
         }).collect(Collectors.toList());
 
     }
+
+    @Transactional(readOnly = true)
+    public List<ApplicationResponseDTO> getApplicationsByEvent(UUID eventId) {
+        List<StaffApplication> applications = staffapplicationRepository.findByRecruitment_Event_EventId(eventId);
+
+        return applications.stream().map(app -> {
+            String cvUrl = null;
+            Map<String, Object> customAnswers = null;
+            if (app.getApplicationData() != null) {
+                cvUrl = (String) app.getApplicationData().get("cvUrl");
+                customAnswers = app.getApplicationData().entrySet().stream()
+                        .filter(e -> !"cvUrl".equals(e.getKey()))
+                        .collect(java.util.stream.Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                if (customAnswers.isEmpty()) customAnswers = null;
+            }
+
+            java.util.List<java.util.Map<String, Object>> formSchema =
+                    app.getRecruitment().getCustomForm() != null
+                    ? app.getRecruitment().getCustomForm().getFormSchema()
+                    : null;
+
+            return ApplicationResponseDTO.builder()
+                    .id(app.getApplicationId())
+                    .name(app.getUser().getFullName())
+                    .email(app.getUser().getEmail())
+                    .phone(app.getUser().getPhone())
+                    .avatar(app.getUser().getAvatarUrl())
+                    .position(app.getRecruitment().getPositionName())
+                    .cvUrl(cvUrl)
+                    .customAnswers(customAnswers)
+                    .formSchema(formSchema)
+                    .status(app.getApplicationStatus() != null ? app.getApplicationStatus().name() : null)
+                    .appliedAt(app.getAppliedAt())
+                    .reviewedAt(app.getReviewedAt())
+                    .createdAt(app.getCreatedAt())
+                    .updatedAt(app.getUpdatedAt())
+                    .build();
+        }).collect(Collectors.toList());
+    }
+
 
 
     @Transactional
@@ -115,13 +166,21 @@ public class ApplicationServiceOrganizer {
         StaffApplication app = staffapplicationRepository.findByApplicationId(applicationId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn ứng tuyển này"));
 
-        String coverLetter = null;
-        String resume = null;
+        String cvUrl = null;
+        Map<String, Object> customAnswers = null;
 
         if (app.getApplicationData() != null) {
-            coverLetter = (String) app.getApplicationData().get("coverLetter");
-            resume = (String) app.getApplicationData().get("resume");
+            cvUrl = (String) app.getApplicationData().get("cvUrl");
+            customAnswers = app.getApplicationData().entrySet().stream()
+                    .filter(e -> !"cvUrl".equals(e.getKey()))
+                    .collect(java.util.stream.Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            if (customAnswers.isEmpty()) customAnswers = null;
         }
+        java.util.List<java.util.Map<String, Object>> formSchema =
+                app.getRecruitment().getCustomForm() != null
+                ? app.getRecruitment().getCustomForm().getFormSchema()
+                : null;
+
         return ApplicationResponseDTO.builder()
                 .id(app.getApplicationId())
                 .name(app.getUser().getFullName())
@@ -129,9 +188,9 @@ public class ApplicationServiceOrganizer {
                 .phone(app.getUser().getPhone())
                 .avatar(app.getUser().getAvatarUrl())
                 .position(app.getRecruitment().getPositionName())
-                .resume(resume)
-                .coverLetter(coverLetter)
-                .applicationData(app.getApplicationData())
+                .cvUrl(cvUrl)
+                .customAnswers(customAnswers)
+                .formSchema(formSchema)
                 .status(app.getApplicationStatus() != null ? app.getApplicationStatus().name() : null)
                 .appliedAt(app.getAppliedAt())
                 .build();

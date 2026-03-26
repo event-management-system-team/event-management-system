@@ -71,8 +71,16 @@ public class FeedbackService {
         if (event == null)
             throw new RuntimeException("Bài đánh giá này không thuộc sự kiện nào (Event is null)!");
 
-        CustomForm form = customFormRepository.findByEvent_EventId(event.getEventId()).orElse(null);
-        List<Map<String, Object>> formSchema = (form != null) ? form.getFormSchema() : null;
+        CustomForm form = null;
+        List<Map<String, Object>> formSchema = null;
+        try {
+            form = customFormRepository.findByEvent_EventIdAndFormType(event.getEventId(), com.eventmanagement.backend.constants.FormType.FEEDBACK).orElse(null);
+            formSchema = (form != null) ? form.getFormSchema() : null;
+        } catch (Exception e) {
+            // formSchema deserialization may fail for seed data with {"fields": [...]} format
+            System.err.println("[FeedbackService] Could not load form schema for event " + event.getEventId() + ": " + e.getMessage());
+            formSchema = null;
+        }
 
         List<Map<String, Object>> enrichedDetails = new ArrayList<>();
 

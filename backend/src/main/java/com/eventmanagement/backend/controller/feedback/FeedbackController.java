@@ -127,22 +127,56 @@ public class FeedbackController {
             @PathVariable("eventId") UUID eventId,
             @RequestParam(value = "type", defaultValue = "FEEDBACK") String typeStr) {
         try {
-            // Chuyển String thành Enum trước khi đưa xuống Service
             FormType type = FormType.valueOf(typeStr.toUpperCase());
-
-            CustomForm form = customFormService.getFormByType(eventId, type); // Hoặc truyền type tùy logic Service bạn
-                                                                              // đang viết
-
+            CustomForm form = customFormService.getFormByType(eventId, type);
             if (form == null) {
-                // Nếu chưa có form, trả về 204 No Content hoặc 200 kèm object rỗng để React
-                // khỏi lỗi
-                return ResponseEntity.ok(Map.of("message", "Chưa có form nào được tạo"));
+                // Try native query fallback (form might exist but entity deserialization failed silently)
+                return tryNativeQueryFallback(eventId, typeStr);
             }
             return ResponseEntity.ok(form);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Loại form không hợp lệ (formType)");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống: " + e.getMessage());
+            // Entity deserialization failed - try native query fallback
+            System.err.println("[FeedbackController] Entity deserialization failed for eventId=" + eventId + ", type=" + typeStr + ": " + e.getMessage());
+            return tryNativeQueryFallback(eventId, typeStr);
+        }
+    }
+
+    private ResponseEntity<?> tryNativeQueryFallback(UUID eventId, String typeStr) {
+        try {
+            List<Object[]> rawList = customFormRepository.findRawFormByEventIdAndType(eventId, typeStr.toUpperCase());
+            if (!rawList.isEmpty()) {
+                Object[] row = rawList.get(0);
+                Map<String, Object> result = new HashMap<>();
+                result.put("formId", row[0] != null ? row[0].toString() : null);
+                result.put("formName", row[1] != null ? row[1].toString() : null);
+                result.put("formType", row[2] != null ? row[2].toString() : null);
+                String rawSchema = row[3] != null ? row[3].toString() : null;
+                if (rawSchema != null) {
+                    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                    Object parsedSchema = mapper.readValue(rawSchema, Object.class);
+                    // If schema is {"fields": [...]}, extract the fields array
+                    if (parsedSchema instanceof java.util.Map) {
+                        @SuppressWarnings("unchecked")
+                        java.util.Map<String, Object> schemaMap = (java.util.Map<String, Object>) parsedSchema;
+                        if (schemaMap.containsKey("fields")) {
+                            parsedSchema = schemaMap.get("fields");
+                        }
+                    }
+                    result.put("formSchema", parsedSchema);
+                }
+                result.put("active", row[4] != null ? (Boolean) row[4] : false);
+                result.put("createdAt", row[5] != null ? row[5].toString() : null);
+                result.put("updatedAt", row[6] != null ? row[6].toString() : null);
+                result.put("deadline", row[7] != null ? row[7].toString() : null);
+                return ResponseEntity.ok(result);
+            }
+            return ResponseEntity.ok(Map.of("message", "Chưa có form nào được tạo"));
+        } catch (Exception fallbackEx) {
+            System.err.println("[FeedbackController] Native query fallback also failed: " + fallbackEx.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi hệ thống: " + fallbackEx.getMessage());
         }
     }
 

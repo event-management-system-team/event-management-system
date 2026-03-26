@@ -59,7 +59,7 @@ const SubmitFeedback = () => {
         const formRes = await axiosInstance.get(`/events/${eventId}/forms?type=FEEDBACK`);
         const fData = formRes.data?.data || formRes.data;
 
-        if (!fData || fData.message === "Chưa có form" || fData.message === "No form found") {
+        if (!fData || (fData.message && (fData.message.includes("Chưa có form") || fData.message.includes("No form")))) {
            setIsFormActive(false); 
         } else {
           // 2. LẤY FORM_NAME TỪ DATABASE GÁN VÀO ĐÂY
@@ -80,13 +80,26 @@ const SubmitFeedback = () => {
            } else {
              setIsFormActive(true); 
              
-             if (fData.formSchema) {
+              if (fData.formSchema) {
                 let schema = fData.formSchema;
                 if (typeof schema === 'string') schema = JSON.parse(schema);
 
-                if (schema.length > 0 && schema[0].type === 'Form_description') {
-                  setFormSchema(schema.slice(1));
-                } else {
+                // Handle both formats: direct array [...] or object {"fields": [...]}
+                if (!Array.isArray(schema) && schema.fields) {
+                  schema = schema.fields;
+                }
+
+                if (Array.isArray(schema)) {
+                  if (schema.length > 0 && schema[0].type === 'Form_description') {
+                    schema = schema.slice(1);
+                  }
+
+                  // Normalize: ensure every field has fieldId (seed data uses "id")
+                  schema = schema.map(field => ({
+                    ...field,
+                    fieldId: field.fieldId || field.id || `field_${Math.random()}`
+                  }));
+
                   setFormSchema(schema);
                 }
              }
@@ -164,7 +177,7 @@ const SubmitFeedback = () => {
   
   if (isNotYetEnded) {
     return (
-      <div className="min-h-screen bg-[#f2ede6] flex items-center justify-center p-6 font-sans">
+      <div className="min-h-screen flex items-center justify-center p-6 font-sans">
         <div className="bg-white rounded-[32px] shadow-sm max-w-md w-full p-12 text-center">
           <div className="w-20 h-20 bg-blue-50 text-blue-400 rounded-full flex items-center justify-center mx-auto mb-6">
             <Info size={40} />
@@ -181,7 +194,7 @@ const SubmitFeedback = () => {
 
   if (isClosed) {
     return (
-      <div className="min-h-screen bg-[#f2ede6] flex items-center justify-center p-6 font-sans">
+      <div className="min-h-screen flex items-center justify-center p-6 font-sans">
         <div className="bg-white rounded-[32px] shadow-sm max-w-md w-full p-12 text-center">
           <div className="w-20 h-20 bg-orange-50 text-orange-400 rounded-full flex items-center justify-center mx-auto mb-6">
             <Clock size={40} />
@@ -198,7 +211,7 @@ const SubmitFeedback = () => {
 
   if (!isFormActive) {
     return (
-      <div className="min-h-screen bg-[#f2ede6] flex items-center justify-center p-6 font-sans">
+      <div className="min-h-screen flex items-center justify-center p-6 font-sans">
         <div className="bg-white rounded-[32px] shadow-sm max-w-md w-full p-12 text-center">
           <div className="w-20 h-20 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-6">
             <Lock size={40} />
@@ -213,7 +226,7 @@ const SubmitFeedback = () => {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-[#f2ede6] flex items-center justify-center p-6 font-sans">
+      <div className="min-h-screen flex items-center justify-center p-6 font-sans">
         <div className="bg-white rounded-[32px] shadow-sm max-w-md w-full p-12 text-center">
           <div className="w-20 h-20 bg-[#eef5f3] text-[#849b9f] rounded-full flex items-center justify-center mx-auto mb-6"><CheckCircle2 size={40} /></div>
           <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Thank you!</h2>
@@ -347,7 +360,7 @@ const SubmitFeedback = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f2ede6] py-12 px-4 sm:px-6 font-sans">
+    <div className="min-h-screen py-12 px-4 sm:px-6 font-sans">
       <div className="max-w-3xl mx-auto">
         
         <Link to="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-gray-800 font-bold text-sm mb-8 transition-colors">

@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Clock, Lock } from 'lucide-react';
-import { Link, useParams } from 'react-router-dom';
-import Sidebar from '../../components/layout/Sidebar'; 
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../config/axios';
+
+import { ArrowLeft } from 'lucide-react';
 
 const RecruitmentList = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const { eventId } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -44,14 +46,14 @@ const RecruitmentList = () => {
           color: 'bg-red-400', 
           text: 'Closed', 
           buttonText: 'View Detail', 
-          isActive: false 
+          isActive: true  // Organizer vẫn cần xem detail dù đã closed
         };
       default:
         return { 
           color: 'bg-gray-400', 
           text: status || 'Unknown', 
           buttonText: 'View Detail', 
-          isActive: false 
+          isActive: true 
         };
     }
   };
@@ -91,16 +93,21 @@ const RecruitmentList = () => {
   ];
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-[#ecebe4] font-sans w-full">
-      <Sidebar />
+    <div className="flex flex-col min-h-screen w-full">
 
       <div className="flex-1 p-4 sm:p-6 lg:p-10 w-full overflow-x-hidden"> 
         
         {/* HEADER */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 sm:gap-0 mb-6 lg:mb-8">
           <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-900 tracking-tight mb-1 sm:mb-2">My Recruitments</h1>
-            <p className="text-gray-500 font-medium text-xs sm:text-sm">Manage staff postings and review incoming applications.</p>
+            <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-4 text-gray-400 hover:text-gray-700 text-sm font-medium mb-3 transition-colors group"
+          >
+            <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
+            <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">My Recruitments</h1>
+            </button>
+            <p className="text-gray-500 text-sm mt-1">Manage staff postings and review incoming applications.</p>
           </div>
           
           {!isEventEnded ? (
@@ -189,6 +196,7 @@ const RecruitmentList = () => {
                   </div>
 
                   {/* Cột 3: Nút bấm */}
+<<<<<<< HEAD
                   <div className="w-full md:w-1/3 flex items-center justify-between md:justify-end gap-6 mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-none border-gray-50">
                     
                     <Link 
@@ -202,6 +210,26 @@ const RecruitmentList = () => {
                       to={`/organizer/recruitments/${job.recruitmentId}`} 
                       className={`px-6 py-2.5 rounded-full text-xs lg:text-sm font-bold transition-all shadow-sm whitespace-nowrap`}
                       onClick={(e) => !ui.isActive && currentStatus !== 'CLOSED' && e.preventDefault()}
+=======
+                  <div className="w-full md:w-1/3 flex items-center justify-end gap-3 mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-none border-gray-50">
+                    {/* Nút Applications */}
+                    <Link
+                      to={`/organizer/applications/${job.recruitmentId}`}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs lg:text-sm font-bold bg-orange-50 text-orange-600 hover:bg-orange-100 transition-all shadow-sm whitespace-nowrap"
+                    >
+                      Applications
+                      {job.newCount > 0 && (
+                        <span className="bg-orange-500 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                          {job.newCount}
+                        </span>
+                      )}
+                    </Link>
+
+                    {/* Nút View Detail */}
+                    <Link
+                      to={`/organizer/recruitments/${job.recruitmentId}`}
+                      className="px-6 py-2.5 rounded-full text-xs lg:text-sm font-bold transition-all shadow-sm whitespace-nowrap bg-[#111827] text-white hover:bg-gray-800"
+>>>>>>> cfafbc0499de6ff06dac24595784ba3922f6659a
                     >
                       {ui.buttonText}
                     </Link>

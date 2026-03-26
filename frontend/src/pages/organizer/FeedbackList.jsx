@@ -1,14 +1,18 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import { Eye, Search, Plus, Lock, Filter, Calendar } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { Eye, Search, Filter, Calendar, Plus, Lock } from "lucide-react";
 import { useFeedbacks } from "../../hooks/useFeedback";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { Pagination } from "antd";
 import axiosInstance from "../../config/axios";
 
+import { ArrowLeft } from "lucide-react";
+
 const FeedbackList = () => {
   const { eventId } = useParams();
+  const navigate = useNavigate();
   const { data: feedbacks, isLoading, isError } = useFeedbacks(eventId);
 
+<<<<<<< HEAD
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const listTopRef = useRef(null);
@@ -21,17 +25,36 @@ const FeedbackList = () => {
   
   // NPS Emoji array từ 1-10
   const npsEmojis = ['😡', '😠', '😞', '🙁', '😐', '🙂', '😊', '😀', '😁', '😍'];
+=======
+  // STATE: Quản lý trạng thái kết thúc và tên event
+  const [isEventEnded, setIsEventEnded] = useState(false);
+  const [eventName, setEventName] = useState("");
+>>>>>>> cfafbc0499de6ff06dac24595784ba3922f6659a
 
+  // EFFECT: Gọi API lấy chi tiết Event để check endDate và lấy tên event
   useEffect(() => {
     const checkEventStatus = async () => {
       try {
-        const response = await axiosInstance.get(`/events/ids/${eventId}`);
+        const response = await axiosInstance.get(`/organizer/events/${eventId}`);
         const eventData = response.data?.data || response.data;
 
         if (eventData) {
+<<<<<<< HEAD
           // --- THÊM DÒNG NÀY ---
           // Thay .name bằng .title hoặc .eventName tùy thuộc vào cấu trúc Backend của bạn trả về
           setEventName(eventData.name || eventData.title || eventData.eventName || "Unknown Event");
+=======
+          // Lấy tên event
+          if (eventData.eventName || eventData.name) {
+            setEventName(eventData.eventName || eventData.name);
+          }
+          // Check nếu event đã kết thúc
+          if (eventData.endDate) {
+            const isEnded =
+              new Date().getTime() > new Date(eventData.endDate).getTime();
+            setIsEventEnded(isEnded);
+          }
+>>>>>>> cfafbc0499de6ff06dac24595784ba3922f6659a
         }
       } catch (error) {
         console.error("Lỗi khi kiểm tra thời gian sự kiện:", error);
@@ -44,80 +67,28 @@ const FeedbackList = () => {
     }
   }, [eventId]);
 
-  const feedbackItems = feedbacks?.feedbacks || [];
 
-  // --- LOGIC MỚI: Xử lý tìm kiếm và lọc dữ liệu ---
-  const filteredFeedbacks = useMemo(() => {
-    let result = feedbackItems;
+  // STATE: Filter & Search
+  const [searchTerm, setSearchTerm] = useState("");
+  const [ratingFilter, setRatingFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("");
 
-    // 1. Tìm kiếm theo tên hoặc email
-    if (searchTerm.trim() !== "") {
-      const lowerCaseSearch = searchTerm.toLowerCase();
-      result = result.filter(
-        (item) =>
-          item.userName?.toLowerCase().includes(lowerCaseSearch) ||
-          item.userEmail?.toLowerCase().includes(lowerCaseSearch)
-      );
-    }
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const listTopRef = useRef(null);
 
-    // 2. Lọc theo số sao (Rating)
-    if (ratingFilter !== "all") {
-      result = result.filter((item) => item.rating === Number(ratingFilter));
-    }
-
-    // 3. Lọc theo ngày (Date)
-    if (dateFilter) {
-      result = result.filter((item) => {
-        const dateObj = new Date(item.createdAt);
-        // Định dạng ngày về YYYY-MM-DD để so sánh chuẩn xác với input date
-        const yyyy = dateObj.getFullYear();
-        const mm = String(dateObj.getMonth() + 1).padStart(2, "0");
-        const dd = String(dateObj.getDate()).padStart(2, "0");
-        const formattedItemDate = `${yyyy}-${mm}-${dd}`;
-        
-        return formattedItemDate === dateFilter;
-      });
-    }
-
-    return result;
-  }, [feedbackItems, searchTerm, ratingFilter, dateFilter]);
-
-  // Cập nhật lại số phân trang dựa trên danh sách đã lọc
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredFeedbacks.slice(indexOfFirstItem, indexOfLastItem);
-
-  // --- LOGIC MỚI: Reset trang về 1 khi người dùng thay đổi bộ lọc ---
+  // HANDLERS
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
   };
-
   const handleRatingChange = (e) => {
     setRatingFilter(e.target.value);
     setCurrentPage(1);
   };
-
   const handleDateChange = (e) => {
     setDateFilter(e.target.value);
     setCurrentPage(1);
-  };
-
-  const onChangePage = (page) => {
-    setCurrentPage(page);
-
-    if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
-    }
-
-    setTimeout(() => {
-      if (listTopRef.current) {
-        listTopRef.current.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
-    }, 100);
   };
 
   if (isLoading) {
@@ -138,19 +109,67 @@ const FeedbackList = () => {
     );
   }
 
+  const resolvedEventName = eventName || feedbacks?.eventName || "Event";
+  const feedbackItems = feedbacks?.feedbacks || [];
+
+  // COMPUTE: filteredFeedbacks
+  const filteredFeedbacks = feedbackItems.filter((item) => {
+    const matchesSearch =
+      !searchTerm ||
+      item.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.userEmail?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRating =
+      ratingFilter === "all" || item.rating === Number(ratingFilter);
+    const matchesDate =
+      !dateFilter ||
+      new Date(item.createdAt).toLocaleDateString("en-CA") === dateFilter;
+    return matchesSearch && matchesRating && matchesDate;
+  });
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredFeedbacks.slice(indexOfFirstItem, indexOfLastItem);
+
+  const onChangePage = (page) => {
+    setCurrentPage(page);
+
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
+    setTimeout(() => {
+      if (listTopRef.current) {
+        listTopRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    }, 100);
+  };
+
   return (
     // SỬA Ở ĐÂY: Đổi font-serif thành font-sans
     <div className="p-10 w-full overflow-x-hidden font-sans">
       {/* --- HEADER --- */}
       <div className="flex justify-between items-end mb-8" ref={listTopRef}>
         <div>
+<<<<<<< HEAD
           <h1 className="text-lg sm:text-xl lg:text-2xl font-extrabold text-gray-900 tracking-tight mb-1 sm:mb-2">
+=======
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-4 text-gray-400 hover:text-gray-700 text-sm font-medium mb-3 transition-colors group"
+          >
+            <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
+          <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
+>>>>>>> cfafbc0499de6ff06dac24595784ba3922f6659a
             Attendee Feedback
           </h1>
+          </button>
           <p className="text-gray-500 font-medium italic text-xs sm:text-sm">
             Showing all responses for{" "}
             <span className="text-gray-800 not-italic font-bold">
-              {eventName}
+              {resolvedEventName}
             </span>
           </p>
         </div>
@@ -194,6 +213,7 @@ const FeedbackList = () => {
               onChange={handleRatingChange}
               className="outline-none text-xs sm:text-sm font-medium text-gray-600 bg-transparent cursor-pointer"
             >
+<<<<<<< HEAD
               <option value="all">All NPS</option>
               <option value="10">10 - Excellent 😍</option>
               <option value="9">9 - Very Good 😁</option>
@@ -205,6 +225,19 @@ const FeedbackList = () => {
               <option value="3">3 - Bad 😞</option>
               <option value="2">2 - Very Bad 😠</option>
               <option value="1">1 - Terrible 😡</option>
+=======
+              <option value="all">All Scores</option>
+              <option value="10">10 / 10</option>
+              <option value="9">9 / 10</option>
+              <option value="8">8 / 10</option>
+              <option value="7">7 / 10</option>
+              <option value="6">6 / 10</option>
+              <option value="5">5 / 10</option>
+              <option value="4">4 / 10</option>
+              <option value="3">3 / 10</option>
+              <option value="2">2 / 10</option>
+              <option value="1">1 / 10</option>
+>>>>>>> cfafbc0499de6ff06dac24595784ba3922f6659a
             </select>
           </div>
 
@@ -243,7 +276,7 @@ const FeedbackList = () => {
                   Attendee
                 </th>
                 <th className="px-4 lg:px-6 py-4 lg:py-6 text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest text-left">
-                  Rating
+                  Score
                 </th>
                 <th className="px-4 lg:px-6 py-4 lg:py-6 text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest text-left">
                   Ticket
@@ -297,12 +330,18 @@ const FeedbackList = () => {
                       </div>
                     </td>
                     <td className="px-4 lg:px-6 py-4 lg:py-5">
+<<<<<<< HEAD
                       <div className="flex items-center gap-2">
                         <span className="text-base sm:text-lg font-bold text-blue-500">{item.rating}</span>
                         <span className="text-base sm:text-lg">/ 10</span>
                         {item.rating > 0 && item.rating <= 10 && (
                           <span className="text-lg sm:text-xl ml-1">{npsEmojis[item.rating - 1]}</span>
                         )}
+=======
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm sm:text-base font-extrabold text-[#8c9db3]">{item.rating}</span>
+                        <span className="text-[10px] sm:text-xs text-gray-400 font-medium">/ 10</span>
+>>>>>>> cfafbc0499de6ff06dac24595784ba3922f6659a
                       </div>
                     </td>
                     <td className="px-4 lg:px-6 py-4 lg:py-5">

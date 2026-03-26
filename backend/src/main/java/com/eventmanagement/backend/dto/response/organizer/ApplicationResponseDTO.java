@@ -1,6 +1,10 @@
 package com.eventmanagement.backend.dto.response.organizer;
 
 import java.time.LocalDateTime;
+<<<<<<< HEAD
+=======
+import java.util.List;
+>>>>>>> cfafbc0499de6ff06dac24595784ba3922f6659a
 import java.util.Map;
 import java.util.UUID;
 
@@ -25,8 +29,9 @@ public class ApplicationResponseDTO {
     //recruitment
     private String position;
     //application
-    private String resume;
-    private String coverLetter;
+    private String cvUrl;
+    private Map<String, Object> customAnswers;
+    private List<Map<String, Object>> formSchema; // schema để map question ID → label
     private String status; 
     private Map<String, Object> applicationData;
     // dinh dang lai ngay gio

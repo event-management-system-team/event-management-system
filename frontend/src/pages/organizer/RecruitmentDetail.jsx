@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
-  ArrowLeft, Calendar, Users, Briefcase, FileText, CheckCircle
+  ArrowLeft, Calendar, Users, Briefcase, FileText, CheckCircle, Edit, ClipboardList
 } from 'lucide-react';
-import Sidebar from '../../components/layout/Sidebar';
 import axiosInstance from '../../config/axios';
 
 const RecruitmentDetail = () => {
@@ -16,7 +15,7 @@ const RecruitmentDetail = () => {
   useEffect(() => {
     const fetchDetail = async () => {
       try {
-        const response = await axiosInstance.get(`event/recruitments/${recruitmentId}`);
+        const response = await axiosInstance.get(`recruitments/${recruitmentId}/detail`);
         if (response.status === 200) {
           setDetailData(response.data);
         }
@@ -32,9 +31,15 @@ const RecruitmentDetail = () => {
   if (isLoading) return <div className="flex h-screen items-center justify-center font-bold text-gray-500 bg-[#f8f7f2]">Loading Data...</div>;
   if (!detailData) return <div className="flex h-screen items-center justify-center font-bold text-red-500 bg-[#f8f7f2]">Recruitment post not found!</div>;
 
+  // Truyền recruitmentId qua location.state để RecruitmentBuilder load đúng bài edit
+  const handleEdit = () => {
+    navigate(`/organizer/recruitment-post/${detailData.eventId}`, {
+      state: { recruitmentId }
+    });
+  };
+
   return (
-    <div className="flex flex-col lg:flex-row h-screen bg-[#ecebe4] font-sans overflow-hidden">
-      <Sidebar />
+    <div className="flex flex-col h-screen w-full overflow-hidden">
 
       <div className="flex-1 flex flex-col overflow-y-auto">
         
@@ -56,6 +61,26 @@ const RecruitmentDetail = () => {
               <p className="text-sm sm:text-base text-gray-500 font-medium flex items-center gap-2">
                 <Briefcase size={16} className="shrink-0"/> <span className="truncate">{detailData.eventName}</span>
               </p>
+            </div>
+            
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+              {/* View Applications */}
+              <Link
+                to={`/organizer/applications/${recruitmentId}`}
+                className="w-full sm:w-auto justify-center flex items-center gap-2 bg-orange-50 border border-orange-200 text-orange-600 hover:bg-orange-100 px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm transition-all"
+              >
+                <ClipboardList size={16} /> View Applications
+              </Link>
+
+              {/* Edit Post — chỉ hiện khi status OPEN */}
+              {detailData.status === 'OPEN' && (
+                <button
+                  onClick={handleEdit}
+                  className="w-full sm:w-auto justify-center flex items-center gap-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm transition-all"
+                >
+                  <Edit size={16} /> Edit Post
+                </button>
+              )}
             </div>
           </div>
         </div>
