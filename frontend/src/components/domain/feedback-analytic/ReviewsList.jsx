@@ -1,17 +1,19 @@
 import { useState } from "react";
 import { useFeedbackReviews } from "../../../hooks/useFeedbackReviews";
+import { useTranslation } from 'react-i18next';
 import { Pagination } from "antd";
 
 export default function ReviewsList({ eventId }) {
   const [page, setPage] = useState(0);
   const { reviews, totalPages, totalElements, isLoading, isError } =
     useFeedbackReviews(eventId, page);
+  const { t } = useTranslation();
 
   return (
     <div className="bg-[#f7f7f7] rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
       <div className="px-4 md:px-6 py-4 border-b border-gray-100 flex justify-between items-center">
         <h3 className="text-base font-bold">
-          Recent Attendee Reviews
+          {t('org_recent_reviews')}
           {totalElements > 0 && (
             <span className="ml-2 text-sm font-normal text-gray-400">
               ({totalElements})
@@ -38,7 +40,7 @@ export default function ReviewsList({ eventId }) {
       {/* Error */}
       {isError && (
         <p className="p-8 text-center text-sm text-red-400">
-          Something went wrong!
+          {t('org_something_wrong')}
         </p>
       )}
 
@@ -47,7 +49,7 @@ export default function ReviewsList({ eventId }) {
         <div className="divide-y divide-gray-100">
           {reviews.length === 0 && (
             <p className="p-8 text-center text-sm text-gray-400">
-              No reviews yet.
+              {t('org_no_reviews_yet')}
             </p>
           )}
           {reviews.map((review) => (

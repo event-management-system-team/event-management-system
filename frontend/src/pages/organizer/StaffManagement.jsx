@@ -85,10 +85,10 @@ export default function StaffManagement() {
                                 className="flex items-center gap-4 text-gray-400 hover:text-gray-700 text-sm font-medium mb-3 transition-colors group"
                             >
                                 <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
-                                <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">Staff Management</h1>
+                                <h1 className="font-sans text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">{t('org_staff_management')}</h1>
                             </button>
                             <p className="text-gray-500 text-sm mt-1">
-                                Oversee and manage system organizer accounts.
+                                {t('org_staff_management_desc')}
                             </p>
                         </div>
                         <div className="flex items-center gap-3">

@@ -7,6 +7,7 @@ import { Checkbox } from "../admin/Checkbox"
 import { useEffect, useState } from "react"
 import { cn } from "../admin/utils"
 import organizerService from "../../../services/organizer.service"
+import { useTranslation } from 'react-i18next'
 import { SmileOutlined } from '@ant-design/icons';
 import { Space, TimePicker, DatePicker } from 'antd';
 import dayjs from 'dayjs';
@@ -20,6 +21,7 @@ dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Ho_Chi_Minh");
 
 export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAlert }) {
+    const { t } = useTranslation();
     const [roles, setRoles] = useState([])
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [selectedDate, setSelectedDate] = useState(null)
@@ -105,9 +107,9 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
     const validateScheduleName = (scheduleName = "") => {
         const value = scheduleName.trim();
         if (!value) {
-            return "Schedule name is required";
+            return t('org_sch_name_required');
         } else if (value.length > 100) {
-            return "Schedule name must be no more than 100 characters";
+            return t('org_sch_name_max');
         }
         return null;
     }
@@ -115,7 +117,7 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
     const validateDescription = (description = "") => {
         const value = description.trim();
         if (value.length > 255) {
-            return "Description must be no more than 255 characters";
+            return t('org_res_desc_max');
         }
         return null;
     }
@@ -123,20 +125,20 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
     const validateLocation = (location = "") => {
         const value = location.trim();
         if (!value) {
-            return "Location is required";
+            return t('org_sch_location_required');
         } else if (value.length > 100) {
-            return "Location must be no more than 100 characters";
+            return t('org_sch_location_max');
         }
         return null;
     }
 
     const validateTime = (startTime, endTime) => {
         if (!startTime || !endTime) {
-            return "Start time and end time are required"
+            return t('org_sch_time_required')
         }
 
         if (startTime === endTime) {
-            return "Start time and end time cannot be the same"
+            return t('org_sch_time_same')
         }
 
         return null
@@ -278,7 +280,7 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
 
         const isValid = await validateForm();
         if (!isValid) {
-            onAlert("error", "Please fix the validation errors before submitting");
+            onAlert("error", t('org_res_fix_errors'));
             return;
         }
 
@@ -293,7 +295,7 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
             }
 
             const response = await organizerService.createSchedule(eventId, data)
-            onAlert("success", "Created schedule successfully")
+            onAlert("success", t('org_sch_created_success'))
 
             resetForm()
 
@@ -302,7 +304,7 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
                 onClose();
             }, 500);
         } catch (error) {
-            const msg = error.response?.data?.message || "Failed to create schedule. Please try again";
+            const msg = error.response?.data?.message || t('org_sch_create_failed');
             onAlert("error", msg)
         } finally {
             setIsSubmitting(false);
@@ -324,10 +326,10 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
                 <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-start justify-between z-10">
                     <div>
                         <h2 className="text-xl font-semibold text-gray-900">
-                            Create Schedule
+                            {t('org_sch_create_title')}
                         </h2>
                         <p className="text-sm text-gray-500 mt-1">
-                            Create a new schedule block for this event
+                            {t('org_sch_create_desc')}
                         </p>
                     </div>
                     <button
@@ -343,7 +345,7 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
                     {/* Section 1: Schedule Information */}
                     <div className="bg-gray-50 rounded-lg p-6">
                         <h3 className="text-base font-semibold text-gray-900 mb-4">
-                            Schedule Information
+                            {t('org_sch_info')}
                         </h3>
                         <div className="space-y-4">
                             <div>
@@ -351,12 +353,12 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
                                     htmlFor="scheduleName"
                                     className="text-sm font-medium text-gray-700 mb-1.5 block"
                                 >
-                                    Schedule Name <span className="text-red-500">*</span>
+                                    {t('org_sch_name')} <span className="text-red-500">*</span>
                                 </Label>
                                 <Input
                                     id="scheduleName"
                                     type="text"
-                                    placeholder="e.g. Morning Setup Crew"
+                                    placeholder={t('org_sch_name_placeholder')}
                                     value={formData.scheduleName}
                                     onChange={(e) => {
                                         const value = e.target.value;
@@ -385,11 +387,11 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
                                     htmlFor="description"
                                     className="text-sm font-medium text-gray-700 mb-1.5 block"
                                 >
-                                    Description
+                                    {t('org_res_description')}
                                 </Label>
                                 <Textarea
                                     id="description"
-                                    placeholder="Optional description of this schedule"
+                                    placeholder={t('org_sch_desc_placeholder')}
                                     value={formData.description}
                                     onChange={(e) => {
                                         const value = e.target.value;
@@ -415,14 +417,14 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
                                     htmlFor="location"
                                     className="text-sm font-medium text-gray-700 mb-1.5 block"
                                 >
-                                    Location <span className="text-red-500">*</span>
+                                    {t('org_sch_location')} <span className="text-red-500">*</span>
                                 </Label>
                                 <div className="relative">
                                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                                     <Input
                                         id="location"
                                         type="text"
-                                        placeholder="e.g. Main Entrance"
+                                        placeholder={t('org_sch_location_placeholder')}
                                         value={formData.location}
                                         onChange={(e) => {
                                             const value = e.target.value;
@@ -452,7 +454,7 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
                     {/* Section 2: Date & Time Selection */}
                     <div className="bg-gray-50 rounded-lg p-6">
                         <h3 className="text-base font-semibold text-gray-900 mb-4">
-                            Date & Time Selection
+                            {t('org_sch_date_time')}
                         </h3>
                         <div className="grid grid-cols-1 lg:grid-cols-2">
                             <div>
@@ -460,7 +462,7 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
                                     htmlFor="date"
                                     className="text-sm font-medium text-gray-700 mb-1.5 block"
                                 >
-                                    Select Date <span className="text-red-500">*</span>
+                                    {t('org_sch_select_date')} <span className="text-red-500">*</span>
                                 </Label>
 
                                 <Space vertical>
@@ -484,7 +486,7 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
                                     htmlFor="startTime"
                                     className="text-sm font-medium text-gray-700 mb-1.5 block"
                                 >
-                                    Start Time - End Time <span className="text-red-500">*</span>
+                                    {t('org_sch_start_end_time')} <span className="text-red-500">*</span>
                                 </Label>
 
                                 <Space vertical size={12}>
@@ -512,7 +514,7 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
                     <div className="bg-gray-50 rounded-lg p-6">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-base font-semibold text-gray-900">
-                                Assign Staff Roles
+                                {t('org_sch_assign_roles')}
                             </h3>
                             {selectedRoles.length > 0 && (
                                 <div className="text-sm">
@@ -520,7 +522,7 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
                                         {selectedRoles.length}
                                     </span>
                                     <span className="text-gray-500 ml-1">
-                                        role{selectedRoles.length !== 1 ? "s" : ""} selected
+                                        {t('org_sch_roles_selected', { count: selectedRoles.length })}
                                     </span>
                                 </div>
                             )}
@@ -538,10 +540,10 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
                                                 />
                                             </th>
                                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                                Role Name
+                                                {t('org_sch_role_name')}
                                             </th>
                                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                                Staff Count
+                                                {t('org_sch_staff_count')}
                                             </th>
                                         </tr>
                                     </thead>
@@ -571,7 +573,7 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
                                                     </td>
                                                     <td className="px-4 py-3">
                                                         <span className="text-sm text-gray-600">
-                                                            {role.staffCount} staff
+                                                            {role.staffCount} {t('org_sch_staff')}
                                                         </span>
                                                     </td>
                                                 </tr>
@@ -586,7 +588,7 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
                         {selectedRoles.length === 0 && (
                             <div className="mt-3 flex items-start gap-2 text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-3">
                                 <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                                <p>Select at least one role to create this schedule.</p>
+                                <p>{t('org_sch_select_role_hint')}</p>
                             </div>
                         )}
                     </div>
@@ -595,14 +597,14 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
                 {/* Footer */}
                 <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex items-center justify-end gap-3">
                     <Button variant="outline" onClick={onClose} className="px-6">
-                        Cancel
+                        {t('org_cancel')}
                     </Button>
                     <Button
                         onClick={handleSubmit}
                         disabled={!isFormValid || isSubmitting}
                         className="px-6 bg-[#7FA5A5] hover:bg-[#6D9393] text-white disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        Create Schedule
+                        {t('org_sch_create_btn')}
                     </Button>
                 </div>
             </div>

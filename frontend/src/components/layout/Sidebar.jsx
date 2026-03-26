@@ -9,7 +9,7 @@ import {
   Users,
   MessageSquare,
   Briefcase,
-
+  LogOut,
   Lock,
   BarChart3,
   BarChart2,

@@ -20,8 +20,10 @@ import {
 import { useState, useRef } from "react"
 import { cn } from "../admin/utils"
 import organizerService from "../../../services/organizer.service"
+import { useTranslation } from 'react-i18next'
 
 export function CreateResourceModal({ eventId, isOpen, onClose, onAlert, onCreated }) {
+    const { t } = useTranslation();
 
     const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -42,9 +44,9 @@ export function CreateResourceModal({ eventId, isOpen, onClose, onAlert, onCreat
     const validateResourceName = (resourceName = "") => {
         const value = resourceName.trim();
         if (!value) {
-            return "Resource name is required";
+            return t('org_res_name_required');
         } else if (value.length > 100) {
-            return "Resource name must be no more than 100 characters";
+            return t('org_res_name_max');
         }
         return null;
     }
@@ -52,7 +54,7 @@ export function CreateResourceModal({ eventId, isOpen, onClose, onAlert, onCreat
     const validateDescription = (description = "") => {
         const value = description.trim();
         if (value.length > 255) {
-            return "Description must be no more than 255 characters";
+            return t('org_res_desc_max');
         }
         return null;
     }
@@ -117,12 +119,12 @@ export function CreateResourceModal({ eventId, isOpen, onClose, onAlert, onCreat
         ]
 
         if (!allowedTypes.includes(file.type)) {
-            setErrors(prev => ({ ...prev, file: "Unsupported file type" }))
+            setErrors(prev => ({ ...prev, file: t('org_res_unsupported_type') }))
             return
         }
 
         if (file.size > 10 * 1024 * 1024) {
-            setErrors(prev => ({ ...prev, file: "File must be < 10MB" }))
+            setErrors(prev => ({ ...prev, file: t('org_res_file_size') }))
             return
         }
 
@@ -175,7 +177,7 @@ export function CreateResourceModal({ eventId, isOpen, onClose, onAlert, onCreat
 
         const isValid = validateForm();
         if (!isValid) {
-            onAlert("error", "Please fix the validation errors before submitting");
+            onAlert("error", t('org_res_fix_errors'));
             return;
         }
 
@@ -188,7 +190,7 @@ export function CreateResourceModal({ eventId, isOpen, onClose, onAlert, onCreat
             }
 
             const res = await organizerService.createResource(eventId, payload, uploadedFile)
-            onAlert("success", "Created resource successfully")
+            onAlert("success", t('org_res_created_success'))
 
             // reset form
             setFormData({
@@ -202,7 +204,7 @@ export function CreateResourceModal({ eventId, isOpen, onClose, onAlert, onCreat
             onClose();
 
         } catch (err) {
-            const msg = err.response?.data?.message || "Failed to create resource. Please try again";
+            const msg = err.response?.data?.message || t('org_res_create_failed');
             onAlert("error", msg)
         } finally {
             setIsSubmitting(false)
@@ -230,10 +232,10 @@ export function CreateResourceModal({ eventId, isOpen, onClose, onAlert, onCreat
                 <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-start justify-between z-10">
                     <div>
                         <h2 className="text-xl font-semibold text-gray-900">
-                            Upload New Resource
+                            {t('org_res_upload_title')}
                         </h2>
                         <p className="text-sm text-gray-500 mt-1">
-                            Add a new resource for staff members
+                            {t('org_res_upload_desc')}
                         </p>
                     </div>
                     <button
@@ -258,7 +260,7 @@ export function CreateResourceModal({ eventId, isOpen, onClose, onAlert, onCreat
                             <Input
                                 id="resourceName"
                                 type="text"
-                                placeholder="e.g. Staff Safety Guidelines"
+                                placeholder={t('org_res_name_placeholder')}
                                 value={formData.resourceName}
                                 onChange={(e) => {
                                     const value = e.target.value;
@@ -287,11 +289,11 @@ export function CreateResourceModal({ eventId, isOpen, onClose, onAlert, onCreat
                                 htmlFor="description"
                                 className="text-sm font-medium text-gray-700 mb-1.5 block"
                             >
-                                Description
+                                {t('org_res_description')}
                             </Label>
                             <Textarea
                                 id="description"
-                                placeholder="Brief description of this resource (optional)"
+                                placeholder={t('org_res_desc_placeholder')}
                                 value={formData.description}
                                 onChange={(e) => {
                                     const value = e.target.value;
@@ -317,7 +319,7 @@ export function CreateResourceModal({ eventId, isOpen, onClose, onAlert, onCreat
                                 htmlFor="resourceType"
                                 className="text-sm font-medium text-gray-700 mb-1.5 block"
                             >
-                                Resource Type <span className="text-red-500">*</span>
+                                {t('org_res_type')} <span className="text-red-500">*</span>
                             </Label>
                             <Select
                                 value={formData.resourceType}
@@ -331,12 +333,12 @@ export function CreateResourceModal({ eventId, isOpen, onClose, onAlert, onCreat
                                         errors.resourceType && "border-red-500"
                                     )}
                                 >
-                                    <SelectValue placeholder="Select resource type" />
+                                    <SelectValue placeholder={t('org_res_select_type')} />
                                 </SelectTrigger>
                                 <SelectContent className="border border-gray-200">
-                                    <SelectItem value="DOCUMENT">Document</SelectItem>
-                                    <SelectItem value="GUIDE">Guide</SelectItem>
-                                    <SelectItem value="MATERIAL">Material</SelectItem>
+                                    <SelectItem value="DOCUMENT">{t('org_res_document')}</SelectItem>
+                                    <SelectItem value="GUIDE">{t('org_res_guide')}</SelectItem>
+                                    <SelectItem value="MATERIAL">{t('org_res_material')}</SelectItem>
                                 </SelectContent>
                             </Select>
                             {errors.resourceType && (
@@ -351,7 +353,7 @@ export function CreateResourceModal({ eventId, isOpen, onClose, onAlert, onCreat
                     {/* File Upload Section */}
                     <div>
                         <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                            Upload File <span className="text-red-500">*</span>
+                            {t('org_res_upload_file')} <span className="text-red-500">*</span>
                         </Label>
 
                         {!uploadedFile ? (
@@ -376,10 +378,10 @@ export function CreateResourceModal({ eventId, isOpen, onClose, onAlert, onCreat
                                         <Upload className="h-6 w-6 text-gray-400" />
                                     </div>
                                     <p className="text-sm font-medium text-gray-900 mb-1">
-                                        Click to upload or drag and drop
+                                        {t('org_res_click_upload')}
                                     </p>
                                     <p className="text-xs text-gray-500">
-                                        PDF, DOCX, XLSX, JPG, PNG up to 10MB
+                                        {t('org_res_file_formats')}
                                     </p>
                                 </div>
                             </div>
@@ -399,7 +401,7 @@ export function CreateResourceModal({ eventId, isOpen, onClose, onAlert, onCreat
                                                 <span>•</span>
                                                 <span className="text-green-600 flex items-center gap-1">
                                                     <CheckCircle className="h-3 w-3" />
-                                                    Ready to upload
+                                                    {t('org_res_ready')}
                                                 </span>
                                             </div>
                                         </div>
@@ -429,7 +431,7 @@ export function CreateResourceModal({ eventId, isOpen, onClose, onAlert, onCreat
                         <p className="text-xs text-blue-700 flex items-start gap-2">
                             <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
                             <span>
-                                Only one file can be uploaded per resource.
+                                {t('org_res_one_file_note')}
                             </span>
                         </p>
                     </div>
@@ -438,14 +440,14 @@ export function CreateResourceModal({ eventId, isOpen, onClose, onAlert, onCreat
                 {/* Footer */}
                 <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex items-center justify-end gap-3">
                     <Button variant="outline" onClick={onClose} className="px-6">
-                        Cancel
+                        {t('org_cancel')}
                     </Button>
                     <Button
                         onClick={handleCreateResource}
                         disabled={!isFormValid() || isSubmitting}
                         className="px-6 bg-[#7FA5A5] hover:bg-[#6D9393] text-white disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        Upload
+                        {t('org_upload')}
                     </Button>
                 </div>
             </div>

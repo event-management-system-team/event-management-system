@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import organizerService from "../../../services/organizer.service";
 import { Card, CardContent } from "../admin/Card";
 import { TabsContent } from "../admin/Tabs";
+import { useTranslation } from 'react-i18next';
 import { CreateResourceModal } from "./CreateResourceModal";
 import { Eye, Download, FileText, ImageIcon, } from "lucide-react";
 import { Button } from "../admin/Button.jsx";
 
 const ResourceTab = ({ id, isResourceModalOpen, closeResourceModal, onLoading, onError, showAlert }) => {
+    const { t } = useTranslation();
 
     const [resources, setResources] = useState([])
 
@@ -19,7 +21,7 @@ const ResourceTab = ({ id, isResourceModalOpen, closeResourceModal, onLoading, o
 
             setResources(response.data)
         } catch (error) {
-            onError("Cannot load resources");
+            onError(t('org_res_load_error'));
             console.error(error)
         } finally {
             onLoading(false);
@@ -135,7 +137,7 @@ const ResourceTab = ({ id, isResourceModalOpen, closeResourceModal, onLoading, o
                                                     {file.resourceName}
                                                 </p>
                                                 <p className="text-xs text-gray-500">
-                                                    Uploaded {formatDate(file.createdAt)} • {formatFileSize(file.fileSize)}
+                                                    {t('org_res_uploaded')} {formatDate(file.createdAt)} • {formatFileSize(file.fileSize)}
                                                 </p>
                                             </div>
                                         </div>
@@ -165,11 +167,11 @@ const ResourceTab = ({ id, isResourceModalOpen, closeResourceModal, onLoading, o
                                     </div>
 
                                     <p className="text-base font-medium text-gray-700">
-                                        No resources yet
+                                        {t('org_res_no_resources')}
                                     </p>
 
                                     <p className="text-sm text-gray-500 mt-3">
-                                        Uploaded files will appear here.
+                                        {t('org_res_uploaded_files_appear')}
                                     </p>
                                 </div>
                             )}

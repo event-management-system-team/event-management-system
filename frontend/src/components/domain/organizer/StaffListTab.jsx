@@ -5,8 +5,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "../admin/Avatar";
 import { Badge } from "../admin/Badge";
 import { Card, CardContent } from "../admin/Card";
 import { TabsContent } from "../admin/Tabs";
+import { useTranslation } from 'react-i18next';
 
 const StaffListTab = ({ id, onLoading, onError }) => {
+    const { t } = useTranslation();
 
     const [staffs, setStaffs] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
@@ -66,15 +68,15 @@ const StaffListTab = ({ id, onLoading, onError }) => {
                         {/* Table Header */}
                         <div
                             className="grid grid-cols-12 gap-4 px-6 py-3 border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wide items-center">
-                            <div className="col-span-5 ml-5">Staff Member</div>
-                            <div className="col-span-4 text-center">Phone Number</div>
-                            <div className="col-span-3 text-center">Position</div>
+                            <div className="col-span-5 ml-5">{t('org_staff_member')}</div>
+                            <div className="col-span-4 text-center">{t('org_phone_number')}</div>
+                            <div className="col-span-3 text-center">{t('org_position')}</div>
                         </div>
 
                         {/* Account Rows */}
                         {staffs.length === 0 ? (
                             <div className="flex items-center justify-center flex-1 text-sm text-gray-400 mt-15">
-                                No staff data yet
+                                {t('org_no_staff_data')}
                             </div>
                         ) : (
                             staffs.map(staff => (
@@ -113,7 +115,7 @@ const StaffListTab = ({ id, onLoading, onError }) => {
                         {/* Footer with Pagination */}
                         <div className="px-6 py-4 flex items-center justify-between text-sm text-gray-600">
                             <div>
-                                Showing {totalItems === 0 ? 0 : startItem}–{Math.min((currentPage + 1) * pageSize, totalItems)} of {totalItems} results
+                                {t('org_showing_results', { start: totalItems === 0 ? 0 : startItem, end: Math.min((currentPage + 1) * pageSize, totalItems), total: totalItems })}
                             </div>
 
                             <AccountsPagination
