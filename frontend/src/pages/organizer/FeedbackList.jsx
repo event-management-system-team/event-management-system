@@ -159,7 +159,7 @@ const FeedbackList = () => {
                 strokeWidth={2.5}
                 className="sm:w-[18px] sm:h-[18px]"
               />{" "}
-              <span className="whitespace-nowrap">Create Form</span>
+              <span className="whitespace-nowrap">Create Feedback Form</span>
             </Link>
           ) : (
             <div className="flex-1 sm:flex-none justify-center bg-red-50 text-red-600 border border-red-100 px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 text-xs sm:text-sm font-bold shadow-sm cursor-not-allowed">

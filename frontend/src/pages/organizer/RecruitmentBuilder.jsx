@@ -152,10 +152,12 @@ const RecruitmentFormBuilder = () => {
         if (isActive) {
           setAppAlert({ type: 'success', message: "Recruitment form published successfully!" });
           setIsLocked(true);
-          // Tự navigate về bước 3 sau 1.2s để user thấy thông báo thành công
-          setTimeout(() => navigate(-1), 1200);
+          // Navigate về trang tạo recruitment post (Step 3 sẽ restore từ sessionStorage)
+          setTimeout(() => navigate(`/organizer/recruitment-post/${eventId}`), 1200);
         } else {
           setAppAlert({ type: 'success', message: "Draft saved successfully!" });
+          // Navigate về trang tạo recruitment post sau khi save draft
+          setTimeout(() => navigate(`/organizer/recruitment-post/${eventId}`), 1200);
         }
       }
     } catch (error) {
@@ -185,7 +187,7 @@ const RecruitmentFormBuilder = () => {
         {/* HEADER */}
         <header className="min-h-[64px] bg-white border-b border-gray-100 flex flex-wrap lg:flex-nowrap items-center justify-between px-4 lg:px-6 py-3 lg:py-0 shrink-0 z-10 shadow-sm gap-3 lg:gap-0">
           <div className="flex items-center gap-3 lg:gap-4 w-full lg:w-auto">
-            <Button onClick={() => navigate(-1)} className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-500 hover:text-gray-900 font-bold transition-colors border-none sm:border-solid shadow-none sm:shadow-sm px-2 sm:px-4">
+            <Button onClick={() => navigate(`/organizer/recruitment-post/${eventId}`)} className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-500 hover:text-gray-900 font-bold transition-colors border-none sm:border-solid shadow-none sm:shadow-sm px-2 sm:px-4">
               <ArrowLeft size={16} /> <span className="hidden sm:inline">Back to List</span>
             </Button>
             <div className="hidden sm:block w-px h-5 bg-gray-200"></div>

@@ -4,6 +4,5 @@ public enum RecruitmentStatus {
     OPEN,
     CLOSED,
     DRAFT,
-    cLOSED,
     CANCELLED
 }

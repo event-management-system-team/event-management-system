@@ -40,6 +40,13 @@ const RecruitmentList = () => {
           buttonText: 'View Detail', 
           isActive: true 
         };
+      case 'DRAFT':
+        return { 
+          color: 'bg-yellow-400', 
+          text: 'Draft', 
+          buttonText: 'View Detail', 
+          isActive: false 
+        };
       case 'CLOSED':
         return { 
           color: 'bg-red-400', 

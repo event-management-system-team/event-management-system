@@ -118,6 +118,7 @@ public class RecruitmentServiceOrganizer {
 
         return RecruitmentDetailDTO.builder()
                 .recruitmentId(r.getRecruitmentId())
+                .eventId(r.getEvent() != null ? r.getEvent().getEventId() : null)
                 .eventName(eventName)
                 .positionName(r.getPositionName())
                 .description(r.getDescription())
@@ -130,7 +131,7 @@ public class RecruitmentServiceOrganizer {
     }
 
     @Transactional
-    public Recruitment createRecruitment(UUID eventId, CreateRecruitmentRequest request) {
+    public List<Recruitment> createRecruitment(UUID eventId, CreateRecruitmentRequest request) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event không tồn tại"));
 
@@ -152,19 +153,25 @@ public class RecruitmentServiceOrganizer {
                     .collect(java.util.stream.Collectors.toList());
         }
 
-        Recruitment recruitment = Recruitment.builder()
-                .event(event)
-                .customForm(customForm)
-                .positionName(request.getPositionName())
-                .description(request.getDescription())
-                .vacancy(request.getVacancy())
-                .requirements(requirementsStr)
-                .benefits(benefitRecruitments)
-                .deadline(request.getDeadline())
-                .status(request.getStatus() != null ? request.getStatus() : RecruitmentStatus.DRAFT)
-                .build();
+        RecruitmentStatus status = request.getStatus() != null ? request.getStatus() : RecruitmentStatus.DRAFT;
 
-        return recruitmentRepository.save(recruitment);
+        List<Recruitment> savedList = new ArrayList<>();
+        for (CreateRecruitmentRequest.PositionDTO pos : request.getPositions()) {
+            Recruitment recruitment = Recruitment.builder()
+                    .event(event)
+                    .customForm(customForm)
+                    .positionName(pos.getPositionName())
+                    .description(request.getDescription())
+                    .vacancy(pos.getVacancy())
+                    .requirements(requirementsStr)
+                    .benefits(benefitRecruitments)
+                    .deadline(request.getDeadline())
+                    .status(status)
+                    .build();
+            savedList.add(recruitmentRepository.save(recruitment));
+        }
+
+        return savedList;
     }
 
     @Transactional

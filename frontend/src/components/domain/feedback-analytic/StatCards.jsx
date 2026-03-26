@@ -36,9 +36,6 @@ export default function StatCards({
           Total Responses
         </p>
         <p className="text-4xl font-black">{totalResponses ?? "—"}</p>
-        <p className="text-xs font-bold text-emerald-500 mt-3">
-          ↑ +12% from last event
-        </p>
       </div>
 
       <div className="bg-[#f7f7f7] rounded-2xl p-4 md:p-5">
