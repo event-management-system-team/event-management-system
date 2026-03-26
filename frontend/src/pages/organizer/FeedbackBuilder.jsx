@@ -4,6 +4,7 @@ import {
   ArrowLeft, Smile, MessageSquare, Trash2, PlusCircle, X, Lock,
   Type as TypeIcon, AlignLeft, CheckSquare, ListChecks, ChevronDown, UploadCloud
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Sidebar from '../../components/layout/Sidebar'; 
 import axiosInstance from '../../config/axios'; 
 import { Alert } from '../../components/common/Alert';
@@ -11,6 +12,7 @@ import { Alert } from '../../components/common/Alert';
 const FeedbackBuilder = () => {
   const navigate = useNavigate();
   const { eventId } = useParams();
+  const { t } = useTranslation();
   const [formName, setFormName] = useState('Event Feedback Form');
   const [appAlert, setAppAlert] = useState({ type: '', message: '' });
   // const [formDesc, setFormDesc] = useState('Please help us improve our future events by leaving your feedback.');
@@ -177,7 +179,7 @@ const FeedbackBuilder = () => {
     if (!formName || formName.trim() === '') {
       setAppAlert({ 
         type: 'error', 
-        message: 'Failed to create form because title is empty.' 
+        message: t('org_form_title_empty') 
       });
       return; 
     }
@@ -196,15 +198,15 @@ const FeedbackBuilder = () => {
       
       if (response.status === 200 || response.status === 201) {
         if (isActive) {
-          setAppAlert({ type: 'success', message: "Form saved and published successfully!" });
+          setAppAlert({ type: 'success', message: t('org_form_published_success') });
           setIsLocked(true);
         } else {
-          setAppAlert({ type: 'success', message: "Draft saved successfully! (Not published yet)" });
+          setAppAlert({ type: 'success', message: t('org_draft_saved') });
         }
       }
     } catch (error) {
       console.error("Error saving form:", error);
-      setAppAlert({ type: 'error', message: "An error occurred while saving the form. Please try again." });
+      setAppAlert({ type: 'error', message: t('org_form_save_error') });
     }
   };
 
@@ -233,24 +235,24 @@ const FeedbackBuilder = () => {
         <header className="min-h-[64px] bg-white border-b border-gray-200 flex flex-wrap lg:flex-nowrap items-center justify-between px-4 lg:px-6 py-3 lg:py-0 shrink-0 z-10 gap-3">
           <div className="flex items-center gap-3 lg:gap-6">  
             <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 lg:gap-2 text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors">
-              <ArrowLeft size={16} /> <span className="hidden sm:inline">Back</span>
+              <ArrowLeft size={16} /> <span className="hidden sm:inline">{t('org_back')}</span>
             </button>
             <div className="w-px h-5 lg:h-6 bg-gray-300"></div> 
-            <h1 className="font-extrabold text-base lg:text-lg text-gray-900 tracking-tight">Feedback Form Builder</h1>
+            <h1 className="font-extrabold text-base lg:text-lg text-gray-900 tracking-tight">{t('org_feedback_form_builder')}</h1>
           </div>
 
           <div className="flex items-center gap-2 lg:gap-3 w-full sm:w-auto justify-end">
             {isLocked ? (
               <div className="px-3 lg:px-5 py-1.5 lg:py-2 bg-green-50 text-green-700 border border-green-200 rounded-lg text-xs lg:text-sm font-bold flex items-center gap-2 cursor-not-allowed w-full sm:w-auto justify-center">
-                <Lock size={14} /> Form Published
+                <Lock size={14} /> {t('org_form_published')}
               </div>
             ):(
               <>
                 <button onClick={() => handleSaveAction(false)} className="px-3 lg:px-5 py-1.5 lg:py-2 bg-white border border-gray-300 rounded-lg text-xs lg:text-sm font-bold text-gray-700 hover:bg-gray-50 transition-all flex-1 sm:flex-none text-center">
-                  Save Draft
+                  {t('org_save_draft')}
                 </button>
                 <button onClick={() => handleSaveAction(true)} className="px-3 lg:px-5 py-1.5 lg:py-2 bg-[#8c9db3] hover:bg-[#7a8ca3] text-white rounded-lg text-xs lg:text-sm font-bold shadow-md transition-all flex-1 sm:flex-none text-center">
-                  Publish
+                  {t('org_publish')}
                 </button>
               </>
             )}
@@ -262,16 +264,16 @@ const FeedbackBuilder = () => {
           
           {/* CỘT 1: TOOLBOX */}
           <div className="w-full lg:w-72 bg-white border-b lg:border-b-0 lg:border-r border-gray-100 p-4 lg:p-6 shrink-0 z-10 lg:overflow-y-auto">
-            <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 lg:mb-4">Question Types</h3>
+            <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 lg:mb-4">{t('org_question_types')}</h3>
             <div className={`flex lg:block gap-3 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 snap-x ${isLocked ? 'opacity-50 pointer-events-none' : ''}`}>
-              <div onClick={() => handleAddQuestion('text')} className="shrink-0 w-44 lg:w-full snap-start"><ToolItem icon={<TypeIcon size={18} className="text-gray-400"/>} title="Short Answer" desc="Small text field" /></div>
-              <div onClick={() => handleAddQuestion('paragraph')} className="shrink-0 w-44 lg:w-full snap-start"><ToolItem icon={<AlignLeft size={18} className="text-gray-400"/>} title="Paragraph" desc="Long text area" /></div>
-              <div onClick={() => handleAddQuestion('radio')} className="shrink-0 w-44 lg:w-full snap-start"><ToolItem icon={<CheckSquare size={18} className="text-gray-400"/>} title="Single Choice" desc="Select one option" /></div>
-              <div onClick={() => handleAddQuestion('checkbox')} className="shrink-0 w-44 lg:w-full snap-start"><ToolItem icon={<ListChecks size={18} className="text-gray-400"/>} title="Checkboxes" desc="Select multiple options" /></div>
-              <div onClick={() => handleAddQuestion('dropdown')} className="shrink-0 w-44 lg:w-full snap-start"><ToolItem icon={<ChevronDown size={18} className="text-gray-400"/>} title="Dropdown" desc="Select from list" /></div>
+              <div onClick={() => handleAddQuestion('text')} className="shrink-0 w-44 lg:w-full snap-start"><ToolItem icon={<TypeIcon size={18} className="text-gray-400"/>} title={t('org_short_answer')} desc={t('org_small_text_field')} /></div>
+              <div onClick={() => handleAddQuestion('paragraph')} className="shrink-0 w-44 lg:w-full snap-start"><ToolItem icon={<AlignLeft size={18} className="text-gray-400"/>} title={t('org_paragraph')} desc={t('org_long_text_area')} /></div>
+              <div onClick={() => handleAddQuestion('radio')} className="shrink-0 w-44 lg:w-full snap-start"><ToolItem icon={<CheckSquare size={18} className="text-gray-400"/>} title={t('org_single_choice')} desc={t('org_select_one_option')} /></div>
+              <div onClick={() => handleAddQuestion('checkbox')} className="shrink-0 w-44 lg:w-full snap-start"><ToolItem icon={<ListChecks size={18} className="text-gray-400"/>} title={t('org_checkboxes')} desc={t('org_select_multiple')} /></div>
+              <div onClick={() => handleAddQuestion('dropdown')} className="shrink-0 w-44 lg:w-full snap-start"><ToolItem icon={<ChevronDown size={18} className="text-gray-400"/>} title={t('org_dropdown')} desc={t('org_select_from_list')} /></div>
               
               <div className="shrink-0 w-full snap-start mt-0 lg:mt-4 border-l lg:border-l-0 lg:border-t border-gray-100 pl-3 lg:pl-0 lg:pt-4">
-                <div onClick={() => handleAddQuestion('NPS')} className="w-44 lg:w-full"><ToolItem icon={<Smile size={18} className="text-gray-400" />} title="Satisfaction Scale" desc="1 to 10 Emoji rating" /></div>
+                <div onClick={() => handleAddQuestion('NPS')} className="w-44 lg:w-full"><ToolItem icon={<Smile size={18} className="text-gray-400" />} title={t('org_satisfaction_scale')} desc={t('org_emoji_rating')} /></div>
               </div>
             </div>
           </div>
@@ -281,7 +283,7 @@ const FeedbackBuilder = () => {
             <div className="w-full max-w-2xl">
               <div className="bg-white rounded-xl lg:rounded-2xl shadow-lg overflow-hidden mb-6 border border-gray-100">
                 <div className="h-28 lg:h-40 bg-[#8c9db3] relative flex items-center justify-center px-4 text-center">
-                  <h2 className="relative text-white text-2xl lg:text-3xl font-extrabold tracking-tight drop-shadow-md z-10">Event Feedback</h2>
+                  <h2 className="relative text-white text-2xl lg:text-3xl font-extrabold tracking-tight drop-shadow-md z-10">{t('org_event_feedback')}</h2>
                 </div>
 
                 <div className="p-5 sm:p-8 lg:p-10">
@@ -295,7 +297,7 @@ const FeedbackBuilder = () => {
                       type="text" 
                       value={formName} 
                       disabled={isLocked} 
-                      placeholder="Enter form title..."
+                      placeholder={t('org_enter_form_title')}
                       onChange={(e) => {
                         setFormName(e.target.value);
                         // Tự động xoá lỗi khi người dùng nhập lại text hợp lệ
@@ -330,7 +332,7 @@ const FeedbackBuilder = () => {
                         {/* RENDER: TEXT / PARAGRAPH */}
                         {['text', 'paragraph'].includes(item.type) && (
                           <div className={`w-full bg-white border border-gray-200 rounded-xl p-3 lg:p-4 text-gray-400 text-xs lg:text-sm shadow-inner ${item.type === 'paragraph' ? 'h-20 lg:h-24 flex items-start' : ''}`}>
-                            {item.placeholder || 'Your answer here...'}
+                            {item.placeholder || t('org_your_answer')}
                           </div>
                         )}
 
@@ -349,7 +351,7 @@ const FeedbackBuilder = () => {
                         {/* RENDER: DROPDOWN */}
                         {item.type === 'dropdown' && (
                           <div className="w-full bg-white border border-gray-200 rounded-xl p-3 shadow-sm flex justify-between items-center text-gray-500 text-sm font-medium">
-                            <span>Choose an option</span>
+                            <span>{t('org_choose_option')}</span>
                             <ChevronDown size={18} />
                           </div>
                         )}
@@ -384,24 +386,24 @@ const FeedbackBuilder = () => {
             {activeQuestion ? (
               <div className={isLocked ? 'opacity-50 pointer-events-none' : ''}>
                 <div className="flex justify-between items-center mb-5 lg:mb-6 border-b border-gray-100 pb-3 lg:pb-4">
-                  <h3 className="font-extrabold text-gray-900 text-base lg:text-lg">Field Properties</h3>
+                  <h3 className="font-extrabold text-gray-900 text-base lg:text-lg">{t('org_field_properties')}</h3>
                   <span className="bg-[#f8fbff] text-[#8c9db3] border border-[#8c9db3]/20 text-[9px] lg:text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">
                     {getFormatTypeLabel(activeQuestion.type)}
                   </span>
                 </div>
 
                 <div className="mb-5 lg:mb-6">
-                  <div className="block text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Question Label</div>
+                  <div className="block text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">{t('org_question_label')}</div>
                   <textarea className="w-full border-2 border-gray-100 rounded-xl p-3 text-sm font-medium text-gray-800 outline-none focus:border-[#8c9db3] resize-none h-20 shadow-sm"
                     value={activeQuestion.label} 
                     onChange={(e) => handleUpdateActiveQuestion('label', e.target.value)}
-                    placeholder="Enter your question..."
+                    placeholder={t('org_enter_question')}
                   ></textarea>
                 </div>
 
                 {['text', 'paragraph'].includes(activeQuestion.type) && (
                   <div className="mb-5 lg:mb-6">
-                    <div className="block text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Placeholder</div>
+                    <div className="block text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">{t('org_placeholder')}</div>
                     <input type="text" className="w-full border-2 border-gray-100 rounded-xl p-2.5 text-sm font-medium text-gray-800 outline-none focus:border-[#8c9db3] shadow-sm" 
                       value={activeQuestion.placeholder || ''} 
                       onChange={(e) => handleUpdateActiveQuestion('placeholder', e.target.value)}
@@ -411,7 +413,7 @@ const FeedbackBuilder = () => {
 
                 {activeQuestion.type === 'paragraph' && (
                   <div className="mb-5 lg:mb-6">
-                    <div className="block text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Max Characters</div>
+                    <div className="block text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">{t('org_max_characters')}</div>
                     <input type="number" min="1" className="w-full border-2 border-gray-100 rounded-xl p-2.5 text-sm font-medium text-gray-800 outline-none focus:border-[#8c9db3] shadow-sm" 
                       value={activeQuestion.maxChars || ''} 
                       onChange={(e) => handleUpdateActiveQuestion('maxChars', parseInt(e.target.value))}
@@ -421,7 +423,7 @@ const FeedbackBuilder = () => {
 
                 {['radio', 'checkbox', 'dropdown'].includes(activeQuestion.type) && (
                   <div className="mb-6 lg:mb-8 bg-gray-50 p-4 rounded-xl border border-gray-100">
-                    <div className="block text-[10px] lg:text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3">Options</div>
+                    <div className="block text-[10px] lg:text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3">{t('org_options')}</div>
                     <div className="space-y-2 mb-4">
                       {activeQuestion.options?.map((opt, i) => (
                         <div key={i} className="flex items-center gap-2 bg-white p-1 rounded-lg border border-gray-200 focus-within:border-[#8c9db3] shadow-sm">
@@ -431,7 +433,7 @@ const FeedbackBuilder = () => {
                       ))}
                     </div>
                     <button onClick={handleAddOption} className="w-full py-2.5 bg-white border border-gray-200 border-dashed rounded-lg text-sm font-bold text-[#8c9db3] flex items-center justify-center gap-2 hover:bg-[#f8fbff] transition-all">
-                      <PlusCircle size={16} /> Add option
+                      <PlusCircle size={16} /> {t('org_add_option')}
                     </button>
                   </div>
                 )}
@@ -439,27 +441,27 @@ const FeedbackBuilder = () => {
                 {activeQuestion.type === 'NPS' && (
                   <div className="mb-6 lg:mb-8 p-4 bg-gray-50 rounded-xl border border-gray-100 space-y-4">
                     <div>
-                      <div className="block text-[10px] lg:text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Left Label (Score 1)</div>
+                      <div className="block text-[10px] lg:text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">{t('org_left_label')}</div>
                       <input type="text" value={activeQuestion.leftLabel} onChange={(e) => handleUpdateActiveQuestion('leftLabel', e.target.value)} className="w-full border border-gray-200 rounded-lg p-2.5 text-sm font-medium outline-none focus:border-[#8c9db3] shadow-sm" />
                     </div>
                     <div>
-                      <div className="block text-[10px] lg:text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Right Label (Score 10)</div>
+                      <div className="block text-[10px] lg:text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">{t('org_right_label')}</div>
                       <input type="text" value={activeQuestion.rightLabel} onChange={(e) => handleUpdateActiveQuestion('rightLabel', e.target.value)} className="w-full border border-gray-200 rounded-lg p-2.5 text-sm font-medium outline-none focus:border-[#8c9db3] shadow-sm" />
                     </div>
                   </div>
                 )}
 
                 <div className="flex justify-between items-center mb-6 lg:mb-8 bg-gray-50 p-4 rounded-xl border border-gray-100 mt-auto">
-                  <span className="text-sm font-bold text-gray-700">Required</span>
+                  <span className="text-sm font-bold text-gray-700">{t('org_required')}</span>
                   <Toggle active={activeQuestion.required} onClick={() => handleUpdateActiveQuestion('required', !activeQuestion.required)} />
                 </div>
 
                 <button onClick={() => handleRemoveQuestion(activeId)} className="w-full py-3.5 rounded-xl border border-red-200 text-red-500 font-bold text-sm flex items-center justify-center gap-2 hover:bg-red-50 transition-colors shadow-sm">
-                  <Trash2 size={18} /> Delete this question
+                  <Trash2 size={18} /> {t('org_delete_question')}
                 </button>
               </div>
             ) : (
-              <div className="text-center text-gray-400 mt-20 text-sm font-medium">Please select a question to edit.</div>
+              <div className="text-center text-gray-400 mt-20 text-sm font-medium">{t('org_select_question')}</div>
             )}
           </div>
         </div>

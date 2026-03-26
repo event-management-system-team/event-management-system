@@ -1,4 +1,5 @@
 // src/components/domain/feedback-analytic/StatCards.jsx
+import { useTranslation } from 'react-i18next';
 
 export default function StatCards({
   averageRating,
@@ -6,6 +7,7 @@ export default function StatCards({
   positiveFeedbackPct,
   isLoading,
 }) {
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
@@ -23,7 +25,7 @@ export default function StatCards({
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
       <div className="bg-[#f7f7f7] rounded-2xl p-4 md:p-5">
         <p className="text-xs text-gray-400 font-bold uppercase">
-          Average Rating
+          {t('org_average_rating')}
         </p>
         <p className="text-4xl font-black">
           {averageRating ?? "—"}
@@ -33,17 +35,17 @@ export default function StatCards({
 
       <div className="bg-[#f7f7f7] rounded-2xl p-4 md:p-5">
         <p className="text-xs text-gray-400 font-bold uppercase">
-          Total Responses
+          {t('org_total_responses')}
         </p>
         <p className="text-4xl font-black">{totalResponses ?? "—"}</p>
         <p className="text-xs font-bold text-emerald-500 mt-3">
-          ↑ +12% from last event
+          {t('org_from_last_event')}
         </p>
       </div>
 
       <div className="bg-[#f7f7f7] rounded-2xl p-4 md:p-5">
         <p className="text-xs text-gray-400 font-bold uppercase">
-          Positive Feedback
+          {t('org_positive_feedback')}
         </p>
         <p className="text-4xl font-black">{positiveFeedbackPct ?? "—"}%</p>
         <div className="mt-3">

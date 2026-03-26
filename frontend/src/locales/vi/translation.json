@@ -864,6 +864,15 @@
     "staff_not_yet": "Chưa có",
     "staff_search_resource": "Tìm tài liệu, tư liệu,...",
     "staff_resources_count": "{{count}} tài liệu",
-    "staff_by": "bởi"
+    "staff_by": "bởi",
+
+    "org_pdf_export_success": "Xuất PDF thành công!",
+    "org_pdf_export_failed": "Xuất PDF thất bại: {{error}}",
+    "org_delete_feedback_confirm": "Bạn có chắc chắn muốn xóa phản hồi này? Hành động này không thể hoàn tác.",
+    "org_feedback_deleted_success": "Xóa phản hồi thành công!",
+    "org_feedback_deleted_failed": "Xóa phản hồi thất bại: {{error}}",
+    "org_feedback_question_fallback": "Câu hỏi đánh giá #{{index}}",
+    "org_feedback_no_answer": "Khán giả không trả lời câu hỏi này.",
+    "org_view_all_feedback": "Xem tất cả phản hồi"
 }
 

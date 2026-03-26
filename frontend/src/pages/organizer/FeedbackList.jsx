@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from 'react-i18next';
-import { Eye, Search, Filter, Calendar, Plus, Lock } from "lucide-react";
+import { Eye, Search, Filter, Calendar, Plus } from "lucide-react";
 import { useFeedbacks } from "../../hooks/useFeedback";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { Pagination } from "antd";
@@ -16,7 +16,7 @@ const FeedbackList = () => {
 
 
   // --- STATE MỚI: Quản lý các bộ lọc ---
-  const [eventName, setEventName] = useState("Loading...");
+  const [eventName, setEventName] = useState("");
 
 
   // EFFECT: Gọi API lấy chi tiết Event để check endDate và lấy tên event
@@ -96,7 +96,7 @@ const FeedbackList = () => {
   if (isError) {
     return (
       <div className="flex min-h-screen bg-[#f8f7f2] font-sans items-center justify-center">
-        <p className="text-red-500 font-medium">Error loading feedbacks</p>
+        <p className="text-red-500 font-medium">{t('org_error_loading_feedbacks')}</p>
       </div>
     );
   }
@@ -134,7 +134,7 @@ const FeedbackList = () => {
           >
             <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
             <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
-              Attendee Feedback
+              {t('org_attendee_feedback')}
             </h1>
           </button>
           <p className="text-gray-500 font-medium italic text-xs sm:text-sm">
@@ -155,7 +155,7 @@ const FeedbackList = () => {
               strokeWidth={2.5}
               className="sm:w-[18px] sm:h-[18px]"
             />{" "}
-            <span className="whitespace-nowrap">Create Form</span>
+            <span className="whitespace-nowrap">{t('org_create_form')}</span>
           </Link>
         </div>
       </div>
@@ -233,7 +233,7 @@ const FeedbackList = () => {
                   {t('org_table_attendee')}
                 </th>
                 <th className="px-4 lg:px-6 py-4 lg:py-6 text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest text-left">
-                  Score
+                  {t('org_table_rating')}
                 </th>
                 <th className="px-4 lg:px-6 py-4 lg:py-6 text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest text-left">
                   {t('org_table_ticket')}
@@ -294,7 +294,7 @@ const FeedbackList = () => {
                     </td>
                     <td className="px-4 lg:px-6 py-4 lg:py-5">
                       <span className="inline-block text-[9px] sm:text-[10px] lg:text-[11px] font-bold uppercase italic tracking-wider text-[#8c9db3] bg-[#f8f7f2] px-2 sm:px-3 py-1 rounded-full border border-gray-100 whitespace-nowrap">
-                        {item.ticketName || "General"}
+                        {item.ticketName || t('org_general')}
                       </span>
                     </td>
                     <td className="px-4 lg:px-6 py-4 lg:py-5 text-center">

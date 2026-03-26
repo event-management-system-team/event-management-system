@@ -35,7 +35,7 @@ export default function AnalyticsPage() {
             className="flex items-center gap-4 text-gray-400 hover:text-gray-700 text-sm font-medium mb-3 transition-colors group"
           >
             <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
-            <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
+            <h1 className="font-sans text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
               {t('org_feedback_reviews')}
             </h1>
           </button>
@@ -51,7 +51,7 @@ export default function AnalyticsPage() {
             to={`/organizer/feedback/feedbacklist/${eventId}`}
             className="flex-1 sm:flex-none justify-center bg-white text-[#8c9db3] px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 text-xs sm:text-sm font-bold shadow-md transition-all active:scale-95"
           >
-            < span className="whitespace-nowrap">View All Feedback</span>
+            <span className="whitespace-nowrap">{t('org_view_all_feedback')}</span>
           </Link>
           <Link
             to={`/organizer/feedback/createform/${eventId}`}
@@ -62,7 +62,7 @@ export default function AnalyticsPage() {
               strokeWidth={2.5}
               className="sm:w-[18px] sm:h-[18px]"
             />{" "}
-            <span className="whitespace-nowrap">Create Feedback Form</span>
+            <span className="whitespace-nowrap">{t('org_create_feedback_form')}</span>
           </Link>
         </div>
       </div>

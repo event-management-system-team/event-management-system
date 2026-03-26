@@ -171,15 +171,15 @@ const FeedbackDetail = () => {
       const fileName = `Feedback_#${feedbackId}_${new Date().toISOString().slice(0, 10)}.pdf`;
       pdf.save(fileName);
       console.log('✅ PDF exported successfully:', fileName);
-      showAlert('success', 'PDF exported successfully!');
+      showAlert('success', t('org_pdf_export_success'));
     } catch (error) {
       console.error('❌ Error exporting PDF:', error);
-      showAlert('error', `Failed to export PDF: ${error.message}`);
+      showAlert('error', t('org_pdf_export_failed', { error: error.message }));
     }
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this feedback? This action cannot be undone.')) {
+    if (!window.confirm(t('org_delete_feedback_confirm'))) {
       return;
     }
 
@@ -187,14 +187,14 @@ const FeedbackDetail = () => {
     try {
       const response = await axiosInstance.delete(`/feedbacks/${feedbackId}`);
       if (response.status === 200) {
-        showAlert('success', 'Feedback deleted successfully!');
+        showAlert('success', t('org_feedback_deleted_success'));
         setTimeout(() => {
           navigate(-1); // Navigate back to feedback list
         }, 1500);
       }
     } catch (error) {
       console.error('Error deleting feedback:', error);
-      showAlert('error', `Failed to delete feedback: ${error.response?.data?.message || error.message}`);
+      showAlert('error', t('org_feedback_deleted_failed', { error: error.response?.data?.message || error.message }));
     } finally {
       setIsDeleting(false);
     }
@@ -227,7 +227,7 @@ const FeedbackDetail = () => {
               onClick={handleDelete}
               disabled={isDeleting}
               className={`flex-1 sm:flex-none justify-center px-4 py-2.5 sm:py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-red-500 hover:bg-red-50 flex items-center gap-2 transition-all shadow-sm ${isDeleting ? 'opacity-50 cursor-not-allowed' : ''}`}>
-              <Trash2 size={16} /> <span className="hidden sm:inline">{isDeleting ? 'Deleting...' : 'Delete'}</span>
+              <Trash2 size={16} /> <span className="hidden sm:inline">{isDeleting ? t('org_deleting') : t('org_delete')}</span>
             </button>
             <button
               onClick={handleExportPDF}
@@ -271,7 +271,7 @@ const FeedbackDetail = () => {
                 </div>
                 <div className="flex items-center gap-3 text-xs sm:text-sm">
                   <Calendar size={16} className="text-gray-400 shrink-0" />
-                  <span className="text-gray-600 font-medium">Submitted: {new Date(feedbackData?.submittedAt).toLocaleDateString()}</span>
+                  <span className="text-gray-600 font-medium">{t('org_submitted')} {feedbackData?.submittedAt ? new Date(feedbackData.submittedAt).toLocaleDateString() : 'N/A'}</span>
                 </div>
               </div>
             </div>
@@ -305,10 +305,10 @@ const FeedbackDetail = () => {
                     <div key={index} >
                       <h4 className="font-bold text-gray-800 text-sm sm:text-base flex items-start gap-2 mb-2 sm:mb-3 leading-snug">
                         {item.type === 'OPEN_COMMENT' ? <MessageSquare size={16} className="text-[#8c9db3] mt-0.5 shrink-0 sm:w-[18px] sm:h-[18px]" /> : <ListIcon size={16} className="text-[#8c9db3] mt-0.5 shrink-0 sm:w-[18px] sm:h-[18px]" />}
-                        {item.question || `Câu hỏi đánh giá #${index + 1}`}
+                        {item.question || t('org_feedback_question_fallback', { index: index + 1 })}
                       </h4>
                       <div className="bg-[#f8fbff] border border-[#8c9db3]/30 rounded-lg lg:rounded-xl p-4 lg:p-5 text-sm sm:text-base text-gray-700 leading-relaxed font-medium shadow-sm relative break-words">
-                        {item.answer || <span className="text-gray-400 italic">Khán giả không trả lời câu hỏi này.</span>}
+                        {item.answer || <span className="text-gray-400 italic">{t('org_feedback_no_answer')}</span>}
                       </div>
                     </div>
                   );

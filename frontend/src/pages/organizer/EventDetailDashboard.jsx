@@ -267,7 +267,7 @@ const EventDetailDashboard = () => {
                 <div className="flex-1">
                     <div className="flex items-center gap-3">
                         <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
-                            {loading ? 'Loading...' : event?.eventName || 'Event Not Found'}
+                            {loading ? t('org_loading') : event?.eventName || t('org_event_not_found')}
                         </h1>
                         {event?.status && (
                             <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${event.status === 'APPROVED' ? 'bg-green-50 text-green-700' :

@@ -9,8 +9,7 @@ import {
   Users,
   MessageSquare,
   Briefcase,
-  Settings,
-  LogOut,
+
   Lock,
   BarChart3,
   BarChart2,
@@ -248,13 +247,7 @@ const Sidebar = () => {
             </span>
           </button>
 
-          <Link
-            to="/profile"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
-          >
-            <Settings size={18} />
-            <span>{t("sb_settings")}</span>
-          </Link>
+
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors cursor-pointer"
