@@ -56,7 +56,6 @@ const RecruitmentDetail = () => {
               <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-1.5 sm:mb-2">
                 <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-900 tracking-tight">{detailData.positionName}</h1>
                 <span className={`px-2.5 py-1 text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider rounded-full whitespace-nowrap ${detailData.status === 'OPEN' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}>
-                  {detailData.status}
                 </span>
               </div>
               <p className="text-sm sm:text-base text-gray-500 font-medium flex items-center gap-2">

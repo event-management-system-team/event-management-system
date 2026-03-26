@@ -1,19 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import {
   ArrowLeft, User, Ticket, Mail, Calendar,
-  Download, Trash2, MessageSquare, ListIcon
+  Download, Trash2, MessageSquare, ListIcon, ThumbsUp
 } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import jsPDF from 'jspdf';
 import Sidebar from '../../components/layout/Sidebar';
 import axiosInstance from '../../config/axios';
+import { Alert } from '../../components/common/Alert';
+import { useAlert } from '../../hooks/useAlert';
 
 const FeedbackDetail = () => {
   const { feedbackId } = useParams();
   const [feedbackData, setFeedbackData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
+  const { alert, showAlert, closeAlert } = useAlert();
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -47,9 +52,153 @@ const FeedbackDetail = () => {
 
   // Sửa lỗi chính tả an toàn: Bắt cả trường hợp Backend trả về 'feedbackRespone' hoặc 'feedbackResponse'
   const detailData = feedbackData.feedbackResponse?.detail || feedbackData.feedbackRespone?.detail || [];
-  const npsScoreItem = detailData.find(item => item.type === 'NPS');
-  const npsScore = npsScoreItem ? npsScoreItem.answer : '--';
   const overallRating = feedbackData.feedbackResponse?.overallRating || feedbackData.feedbackRespone?.overallRating || 0;
+
+  // Array NPS emoji từ 1-10
+  const npsEmojis = ['😡', '😠', '😞', '🙁', '😐', '🙂', '😊', '😀', '😁', '😍'];
+  const npsEmoji = overallRating > 0 && overallRating <= 10 ? npsEmojis[overallRating - 1] : '';
+
+  const handleExportPDF = async () => {
+    try {
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      let yPosition = 15;
+
+      // ===== HEADER =====
+      pdf.setFontSize(18);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('FEEDBACK REPORT', 15, yPosition);
+
+      yPosition += 8;
+      pdf.setFontSize(10);
+      pdf.setFont(undefined, 'normal');
+      pdf.text(`Response #${feedbackId}`, 15, yPosition);
+      yPosition += 5;
+      pdf.text(`Event: ${feedbackData?.eventName || 'N/A'}`, 15, yPosition);
+      yPosition += 5;
+      pdf.text(`Submitted: ${feedbackData?.submittedAt || 'N/A'}`, 15, yPosition);
+
+      // Separator
+      yPosition += 7;
+      pdf.setLineWidth(0.5);
+      pdf.line(15, yPosition, 195, yPosition);
+
+      // ===== ATTENDEE INFO SECTION =====
+      yPosition += 8;
+      pdf.setFontSize(12);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('ATTENDEE INFORMATION', 15, yPosition);
+
+      yPosition += 7;
+      pdf.setFontSize(10);
+      pdf.setFont(undefined, 'normal');
+      const attendeeInfo = [
+        ['Full Name:', feedbackData.attendeeInfor?.fullName || 'N/A'],
+        ['Email:', feedbackData.attendeeInfor?.email || 'N/A'],
+        ['Phone:', feedbackData.attendeeInfor?.phoneNumber || 'N/A'],
+        ['Ticket Type:', feedbackData.attendeeInfor?.ticketType || 'ATTENDEE'],
+        ['Ticket Code:', feedbackData.attendeeInfor?.ticketCode || 'N/A'],
+      ];
+
+      attendeeInfo.forEach(([label, value]) => {
+        pdf.setFont(undefined, 'bold');
+        pdf.text(label, 15, yPosition);
+        pdf.setFont(undefined, 'normal');
+        const wrapped = pdf.splitTextToSize(String(value), 140);
+        pdf.text(wrapped, 50, yPosition);
+        yPosition += wrapped.length > 1 ? wrapped.length * 5 : 5;
+      });
+
+      // ===== RATINGS SECTION =====
+      yPosition += 5;
+      pdf.setFontSize(12);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('RATINGS & SCORES', 15, yPosition);
+
+      yPosition += 7;
+      pdf.setFontSize(10);
+      pdf.setFont(undefined, 'normal');
+      pdf.text(`NPS Score: ${overallRating}/10`, 15, yPosition);
+
+      // ===== FEEDBACK RESPONSES SECTION =====
+      yPosition += 10;
+      pdf.setFontSize(12);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('FEEDBACK RESPONSES', 15, yPosition);
+
+      yPosition += 7;
+      pdf.setFontSize(10);
+
+      detailData.forEach((item, index) => {
+        if (item.type === 'NPS') return;
+
+        // Check if we need a new page
+        if (yPosition > pageHeight - 30) {
+          pdf.addPage();
+          yPosition = 15;
+        }
+
+        // Question
+        pdf.setFont(undefined, 'bold');
+        const questionWrapped = pdf.splitTextToSize(
+          `Q${index + 1}: ${item.question || 'Feedback Question'}`,
+          170
+        );
+        pdf.text(questionWrapped, 15, yPosition);
+        yPosition += questionWrapped.length * 5;
+
+        // Answer
+        pdf.setFont(undefined, 'normal');
+        const answerWrapped = pdf.splitTextToSize(
+          item.answer || 'No response provided',
+          170
+        );
+        pdf.text(answerWrapped, 18, yPosition);
+        yPosition += answerWrapped.length * 5 + 3;
+      });
+
+      // ===== FOOTER =====
+      yPosition = pageHeight - 15;
+      pdf.setFontSize(8);
+      pdf.setFont(undefined, 'normal');
+      pdf.text(
+        `Generated on ${new Date().toLocaleString()}`,
+        15,
+        yPosition
+      );
+
+      // Download
+      const fileName = `Feedback_#${feedbackId}_${new Date().toISOString().slice(0, 10)}.pdf`;
+      pdf.save(fileName);
+      console.log('✅ PDF exported successfully:', fileName);
+      showAlert('success', 'PDF exported successfully!');
+    } catch (error) {
+      console.error('❌ Error exporting PDF:', error);
+      showAlert('error', `Failed to export PDF: ${error.message}`);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this feedback? This action cannot be undone.')) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const response = await axiosInstance.delete(`/feedbacks/${feedbackId}`);
+      if (response.status === 200) {
+        showAlert('success', 'Feedback deleted successfully!');
+        setTimeout(() => {
+          navigate(-1); // Navigate back to feedback list
+        }, 1500);
+      }
+    } catch (error) {
+      console.error('Error deleting feedback:', error);
+      showAlert('error', `Failed to delete feedback: ${error.response?.data?.message || error.message}`);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-[#f8f7f2] font-sans">
@@ -57,6 +206,7 @@ const FeedbackDetail = () => {
 
       {/* THÊM lg:h-screen lg:overflow-y-auto ĐỂ THANH CUỘN ĐỘC LẬP VỚI SIDEBAR NẾU CẦN */}
       <div className="flex-1 p-4 sm:p-6 lg:p-10 w-full overflow-x-hidden">
+        <Alert type={alert.type} message={alert.message} onClose={closeAlert} />
 
         {/* --- HEADER RESPONSIVE --- */}
         {/* Xếp dọc trên mobile, xếp ngang trên tablet/desktop */}
@@ -73,10 +223,15 @@ const FeedbackDetail = () => {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-            <button className="flex-1 sm:flex-none justify-center px-4 py-2.5 sm:py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-red-500 hover:bg-red-50 flex items-center gap-2 transition-all shadow-sm">
-              <Trash2 size={16} /> <span className="hidden sm:inline">{t('org_delete')}</span>
+            <button
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className={`flex-1 sm:flex-none justify-center px-4 py-2.5 sm:py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-red-500 hover:bg-red-50 flex items-center gap-2 transition-all shadow-sm ${isDeleting ? 'opacity-50 cursor-not-allowed' : ''}`}>
+              <Trash2 size={16} /> <span className="hidden sm:inline">{isDeleting ? 'Deleting...' : 'Delete'}</span>
             </button>
-            <button className="flex-1 sm:flex-none justify-center px-4 py-2.5 sm:py-2 bg-[#8c9db3] hover:bg-[#7a8ca3] text-white rounded-lg text-sm font-bold flex items-center gap-2 shadow-md transition-all">
+            <button
+              onClick={handleExportPDF}
+              className="flex-1 sm:flex-none justify-center px-4 py-2.5 sm:py-2 bg-[#8c9db3] hover:bg-[#7a8ca3] text-white rounded-lg text-sm font-bold flex items-center gap-2 shadow-md transition-all">
               <Download size={16} /> {t('org_export')}<span className="hidden sm:inline"> PDF</span>
             </button>
           </div>
@@ -100,8 +255,8 @@ const FeedbackDetail = () => {
                   </div>
                 )}
                 <h2 className="text-base lg:text-lg font-bold text-gray-900">{feedbackData.attendeeInfor?.fullName}</h2>
-                <span className="bg-[#8c9db3]/10 text-[#8c9db3] text-[10px] lg:text-xs font-bold px-3 py-1 rounded-full mt-2 uppercase tracking-wide">
-                  {feedbackData.attendeeInfor?.ticketType || "ATTENDEE"}
+                <span className="inline-block text-[9px] sm:text-[10px] lg:text-[11px] font-bold uppercase italic tracking-wider text-[#8c9db3] bg-[#f8f7f2] px-2 sm:px-3 py-1 rounded-full border border-gray-100 mt-2 whitespace-nowrap">
+                  {feedbackData.attendeeInfor?.ticketName || "ATTENDEE"}
                 </span>
               </div>
 
@@ -115,12 +270,8 @@ const FeedbackDetail = () => {
                   <span className="text-gray-600 font-medium">{feedbackData.attendeeInfor?.phoneNumber || 'N/A'}</span>
                 </div>
                 <div className="flex items-center gap-3 text-xs sm:text-sm">
-                  <Ticket size={16} className="text-gray-400 shrink-0" />
-                  <span className="text-gray-600 font-medium">Code: {feedbackData.attendeeInfor?.ticketCode || 'N/A'}</span>
-                </div>
-                <div className="flex items-center gap-3 text-xs sm:text-sm">
                   <Calendar size={16} className="text-gray-400 shrink-0" />
-                  <span className="text-gray-600 font-medium">{t('org_submitted')} {feedbackData?.submittedAt}</span>
+                  <span className="text-gray-600 font-medium">Submitted: {new Date(feedbackData?.submittedAt).toLocaleDateString()}</span>
                 </div>
               </div>
             </div>
@@ -131,13 +282,17 @@ const FeedbackDetail = () => {
             <div className="bg-white rounded-xl lg:rounded-2xl p-5 sm:p-6 lg:p-8 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] border border-gray-100 h-full">
               <h3 className="text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-6 lg:mb-8">{t('org_feedback_responses')}</h3>
 
-              {/* KHU VỰC ĐIỂM SỐ */}
-              <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 mb-8 pb-6 lg:mb-10 lg:pb-8 border-b border-gray-100">
-                <div className="flex-1">
-                  <p className="text-xs sm:text-sm font-bold text-gray-500 mb-2 sm:mb-3">Overall Score</p>
+              {/* KHU VỰC ĐIỂM SỐ RESPONSIVE */}
+              <div className="mb-8 pb-6 lg:mb-10 lg:pb-8 border-b border-gray-100">
+                <div>
+                  <p className="text-xs sm:text-sm font-bold text-gray-500 mb-2 sm:mb-3 flex items-center gap-2">
+                    <ThumbsUp size={16} className="text-[#8c9db3]" />
+                    NPS Score
+                  </p>
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl sm:text-3xl font-extrabold text-[#8c9db3]">{overallRating || npsScore}</span>
+                    <span className="text-2xl sm:text-3xl font-extrabold text-blue-500">{overallRating}</span>
                     <span className="text-gray-400 font-medium text-xs sm:text-sm mt-1 sm:mt-2">/ 10</span>
+                    {npsEmoji && <span className="text-2xl sm:text-3xl ml-2">{npsEmoji}</span>}
                   </div>
                 </div>
               </div>

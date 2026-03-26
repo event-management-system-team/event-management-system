@@ -14,9 +14,10 @@ const FeedbackList = () => {
   const navigate = useNavigate();
   const { data: feedbacks, isLoading, isError } = useFeedbacks(eventId);
 
-  // STATE: Quản lý trạng thái kết thúc và tên event
-  const [isEventEnded, setIsEventEnded] = useState(false);
-  const [eventName, setEventName] = useState("");
+
+  // --- STATE MỚI: Quản lý các bộ lọc ---
+  const [eventName, setEventName] = useState("Loading...");
+
 
   // EFFECT: Gọi API lấy chi tiết Event để check endDate và lấy tên event
   useEffect(() => {
@@ -26,16 +27,9 @@ const FeedbackList = () => {
         const eventData = response.data?.data || response.data;
 
         if (eventData) {
-          // Lấy tên event
-          if (eventData.eventName || eventData.name) {
-            setEventName(eventData.eventName || eventData.name);
-          }
-          // Check nếu event đã kết thúc
-          if (eventData.endDate) {
-            const isEnded =
-              new Date().getTime() > new Date(eventData.endDate).getTime();
-            setIsEventEnded(isEnded);
-          }
+          // --- THÊM DÒNG NÀY ---
+          // Thay .name bằng .title hoặc .eventName tùy thuộc vào cấu trúc Backend của bạn trả về
+          setEventName(eventData.name || eventData.title || eventData.eventName || "Unknown Event");
         }
       } catch (error) {
         console.error("Lỗi khi kiểm tra thời gian sự kiện:", error);
@@ -129,7 +123,8 @@ const FeedbackList = () => {
   const currentItems = filteredFeedbacks.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
-    <div className="p-10 w-full overflow-x-hidden">
+    // SỬA Ở ĐÂY: Đổi font-serif thành font-sans
+    <div className="p-10 w-full overflow-x-hidden font-sans">
       {/* --- HEADER --- */}
       <div className="flex justify-between items-end mb-8" ref={listTopRef}>
         <div>
@@ -151,28 +146,17 @@ const FeedbackList = () => {
         </div>
 
         <div className="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 w-full lg:w-auto">
-          {!isEventEnded ? (
-            <Link
-              to={`/organizer/feedback/createform/${eventId}`}
-              className="flex-1 sm:flex-none justify-center bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 text-xs sm:text-sm font-bold shadow-md transition-all active:scale-95"
-            >
-              <Plus
-                size={16}
-                strokeWidth={2.5}
-                className="sm:w-[18px] sm:h-[18px]"
-              />{" "}
-              <span className="whitespace-nowrap">{t('org_create_form')}</span>
-            </Link>
-          ) : (
-            <div className="flex-1 sm:flex-none justify-center bg-red-50 text-red-600 border border-red-100 px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 text-xs sm:text-sm font-bold shadow-sm cursor-not-allowed">
-              <Lock
-                size={16}
-                strokeWidth={2.5}
-                className="sm:w-[18px] sm:h-[18px]"
-              />{" "}
-              <span className="whitespace-nowrap">{t('org_event_ended')}</span>
-            </div>
-          )}
+          <Link
+            to={`/organizer/feedback/createform/${eventId}`}
+            className="flex-1 sm:flex-none justify-center bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 text-xs sm:text-sm font-bold shadow-md transition-all active:scale-95"
+          >
+            <Plus
+              size={16}
+              strokeWidth={2.5}
+              className="sm:w-[18px] sm:h-[18px]"
+            />{" "}
+            <span className="whitespace-nowrap">Create Form</span>
+          </Link>
         </div>
       </div>
 
@@ -200,17 +184,17 @@ const FeedbackList = () => {
               onChange={handleRatingChange}
               className="outline-none text-xs sm:text-sm font-medium text-gray-600 bg-transparent cursor-pointer"
             >
-              <option value="all">All Scores</option>
-              <option value="10">10 / 10</option>
-              <option value="9">9 / 10</option>
-              <option value="8">8 / 10</option>
-              <option value="7">7 / 10</option>
-              <option value="6">6 / 10</option>
-              <option value="5">5 / 10</option>
-              <option value="4">4 / 10</option>
-              <option value="3">3 / 10</option>
-              <option value="2">2 / 10</option>
-              <option value="1">1 / 10</option>
+              <option value="all">All NPS</option>
+              <option value="10">10 - Excellent 😍</option>
+              <option value="9">9 - Very Good 😁</option>
+              <option value="8">8 - Good 😀</option>
+              <option value="7">7 - Satisfied 😊</option>
+              <option value="6">6 - Okay 🙂</option>
+              <option value="5">5 - Neutral 😐</option>
+              <option value="4">4 - Poor 🙁</option>
+              <option value="3">3 - Bad 😞</option>
+              <option value="2">2 - Very Bad 😠</option>
+              <option value="1">1 - Terrible 😡</option>
             </select>
           </div>
 
