@@ -37,7 +37,7 @@ export default function StaffManagement() {
             case "resources":
                 return (
                     <Button
-                        className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5 py-5 h-12 w-40 hover:cursor-pointer"
+                        className="gap-2 bg-[#7FA5A5] hover:bg-[#6D9393] text-white rounded-full px-5 py-2 shadow-sm font-medium transition-colors hover:cursor-pointer h-10"
                         onClick={openResourceModal}
                     >
                         <Plus className="h-4 w-4" />
@@ -48,7 +48,7 @@ export default function StaffManagement() {
                 return (
                     <div className='flex gap-3'>
                         <Button
-                            className="gap-2 bg-[#f7f7f7] hover:bg-[#B3C8CF] text-gray rounded-full px-5 py-5 h-12 w-40 border-1 border-gray-200 hover:cursor-pointer"
+                            className="gap-2 bg-white hover:bg-gray-50 text-gray-700 rounded-full px-5 py-2 shadow-sm border border-gray-200 font-medium transition-colors hover:cursor-pointer h-10"
                             onClick={openScheduleModal}
                         >
                             <Calendar1 className="h-4 w-4" />
@@ -98,24 +98,24 @@ export default function StaffManagement() {
                 {/* Tabs */}
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                     <TabsList
-                        className="flex ml-7 gap-2 px-2 py-6 bg-white border-none rounded-xl shadow-sm w-fit">
+                        className="flex ml-7 gap-2 px-2 py-2 bg-white border border-gray-100 rounded-xl shadow-sm w-fit mb-6">
                         <TabsTrigger
                             value="staff"
-                            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold text-gray-500 transition-all hover:text-gray-900 data-[state=active]:bg-[#7FA5A5] data-[state=active]:text-white data-[state=active]:shadow p-4.5 hover:cursor-pointer"
+                            className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold text-gray-500 transition-all hover:text-gray-900 hover:bg-gray-50 data-[state=active]:bg-[#7FA5A5] data-[state=active]:text-white data-[state=active]:shadow-sm hover:cursor-pointer"
                         >
-                            Staff
+                            Staff List
                         </TabsTrigger>
 
                         <TabsTrigger
                             value="schedule"
-                            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold text-gray-500       transition-all hover:text-gray-900 data-[state=active]:bg-[#7FA5A5] data-[state=active]:text-white  data-[state=active]:shadow p-4.5 hover:cursor-pointer"
+                            className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold text-gray-500 transition-all hover:text-gray-900 hover:bg-gray-50 data-[state=active]:bg-[#7FA5A5] data-[state=active]:text-white data-[state=active]:shadow-sm hover:cursor-pointer"
                         >
                             Work Schedule
                         </TabsTrigger>
 
                         <TabsTrigger
                             value="resources"
-                            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold text-gray-500    transition-all hover:text-gray-900 data-[state=active]:bg-[#7FA5A5] data-[state=active]:text-white  data-[state=active]:shadow p-4.5 hover:cursor-pointer"
+                            className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold text-gray-500 transition-all hover:text-gray-900 hover:bg-gray-50 data-[state=active]:bg-[#7FA5A5] data-[state=active]:text-white data-[state=active]:shadow-sm hover:cursor-pointer"
                         >
                             Resources
                         </TabsTrigger>

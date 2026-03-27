@@ -133,24 +133,25 @@ export function EventAnalytics() {
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
                 {/* Header */}
-                <header className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-5">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <span>Dashboard</span>
-                            <ChevronRight className="h-4 w-4" />
-                            <span>Event Analytics</span>
-                        </div>
-                    </div>
+                <header className="bg-[#F1F0E8] px-8 py-5 pt-8">
                     <div className="flex items-start justify-between">
                         <div>
-                            <h1 className="text-foreground text-2xl mb-1 font-semibold">Event Analytics</h1>
-                            <p className="text-gray-500 text-sm">
-                                Comprehensive performance metrics and insights across all events
+                            <div className="flex items-center gap-4 text-gray-400 text-sm font-medium mb-3">
+                                <span>Dashboard</span>
+                                <ChevronRight className="h-4 w-4" />
+                                <span className="text-gray-600">Event Analytics</span>
+                            </div>
+                            <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">Event Analytics</h1>
+                            <p className="text-gray-500 text-sm mt-1">
+                                Comprehensive performance metrics and insights across all events.
                             </p>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex items-center gap-3">
                             {events.length > 0 && (
-                                <Button variant="outline" className="gap-2 h-12 rounded-full hover:cursor-pointer" onClick={handleExportExcel}>
+                                <Button 
+                                    className="gap-2 bg-white hover:bg-gray-50 text-[#1e2d3d] rounded-full px-5 py-2 shadow-sm border border-gray-200 font-medium transition-colors hover:cursor-pointer h-10" 
+                                    onClick={handleExportExcel}
+                                >
                                     <Download className="h-4 w-4" />
                                     Export Excel Report
                                 </Button>
