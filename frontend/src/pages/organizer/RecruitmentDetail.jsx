@@ -73,8 +73,8 @@ const RecruitmentDetail = () => {
                 <ClipboardList size={16} /> View Applications
               </Link>
 
-              {/* Edit Post — hiện khi status OPEN hoặc DRAFT */}
-              {(detailData.status === 'OPEN' || detailData.status === 'DRAFT') && (
+              {/* Edit Post — chỉ hiện khi status DRAFT */}
+              {detailData.status === 'DRAFT' && (
                 <button
                   onClick={handleEdit}
                   className="w-full sm:w-auto justify-center flex items-center gap-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm transition-all"
