@@ -582,10 +582,12 @@ export function EventDetail() {
                                             onConfirm={handleRejectEvent}
                                             okText="Yes"
                                             cancelText="No"
+                                            disabled={allChecklistComplete && !adminNotes.trim()}
                                         >
                                             <Button
                                                 variant="destructive"
                                                 className="w-full hover:cursor-pointer"
+                                                disabled={allChecklistComplete && !adminNotes.trim()}
                                             >
                                                 <X className="mr-2 h-4 w-4" />
                                                 Reject Submission
@@ -593,11 +595,18 @@ export function EventDetail() {
                                         </Popconfirm>
                                     </div>
 
-                                    {!allChecklistComplete && (
-                                        <div className="bg-orange-50 border border-orange-100 rounded-lg p-3">
-                                            <p className="text-xs text-orange-800">
-                                                Complete all checklist items to enable approval
-                                            </p>
+                                    {(!allChecklistComplete || (allChecklistComplete && !adminNotes.trim())) && (
+                                        <div className="bg-orange-50 border border-orange-100 rounded-lg p-3 space-y-1">
+                                            {!allChecklistComplete && (
+                                                <p className="text-xs text-orange-800">
+                                                    ✗ Complete all checklist items to enable approval
+                                                </p>
+                                            )}
+                                            {allChecklistComplete && !adminNotes.trim() && (
+                                                <p className="text-xs text-orange-800">
+                                                    ✗ All criteria are checked — fill in Internal Admin Notes to enable rejection
+                                                </p>
+                                            )}
                                         </div>
                                     )}
                                 </CardContent>
