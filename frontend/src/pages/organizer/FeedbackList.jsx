@@ -15,6 +15,7 @@ const FeedbackList = () => {
 
   // --- STATE MỚI: Quản lý các bộ lọc ---
   const [eventName, setEventName] = useState("Loading...");
+  const [isEventEnded, setIsEventEnded] = useState(false);
   
 
   // EFFECT: Gọi API lấy chi tiết Event để check endDate và lấy tên event
@@ -25,9 +26,12 @@ const FeedbackList = () => {
         const eventData = response.data?.data || response.data;
 
         if (eventData) {
-          // --- THÊM DÒNG NÀY ---
-          // Thay .name bằng .title hoặc .eventName tùy thuộc vào cấu trúc Backend của bạn trả về
           setEventName(eventData.name || eventData.title || eventData.eventName || "Unknown Event");
+          // Check if event has ended based on endDate
+          const endDate = eventData.endDate || eventData.end_date;
+          if (endDate && new Date(endDate) < new Date()) {
+            setIsEventEnded(true);
+          }
         }
       } catch (error) {
         console.error("Lỗi khi kiểm tra thời gian sự kiện:", error);
@@ -144,7 +148,6 @@ const FeedbackList = () => {
         </div>
 
         <div className="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 w-full lg:w-auto">
-<<<<<<< HEAD
           {!isEventEnded ? (
             <Link
               to={`/organizer/feedback/createform/${eventId}`}
@@ -167,19 +170,6 @@ const FeedbackList = () => {
               <span className="whitespace-nowrap">Event Ended</span>
             </div>
           )}
-=======
-          <Link
-            to={`/organizer/feedback/createform/${eventId}`}
-            className="flex-1 sm:flex-none justify-center bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 text-xs sm:text-sm font-bold shadow-md transition-all active:scale-95"
-          >
-            <Plus
-              size={16}
-              strokeWidth={2.5}
-              className="sm:w-[18px] sm:h-[18px]"
-            />{" "}
-            <span className="whitespace-nowrap">Create Form</span>
-          </Link>
->>>>>>> develop
         </div>
       </div>
 
