@@ -18,6 +18,7 @@ const RecruitmentList = () => {
       try {
         const response = await axiosInstance.get(`recruitments/dashboards/${eventId}`);
         if (response.status === 200 && response.data) {
+          console.log("Dashboard data:", response.data);
           setDashboardData(response.data);
         }
       } catch (error) {
@@ -86,7 +87,7 @@ const RecruitmentList = () => {
     );
   }
 
-  // Kiểm tra sự kiện đã kết thúc chưa (Dựa trên eventEndDate từ Backend)
+  // Kiểm tra sự kiện đã kết thúc chưa
   const isEventEnded = dashboardData?.eventEndDate 
     ? new Date() > new Date(dashboardData.eventEndDate) 
     : false;
@@ -145,7 +146,20 @@ const RecruitmentList = () => {
         <div className="space-y-4">
           {dashboardData?.recentRecruitments?.length > 0 ? (
             dashboardData.recentRecruitments.map((job, index) => {
-              const ui = getStatusUI(job.status);
+              
+              // --- XỬ LÝ LOGIC TRẠNG THÁI TRÊN FRONTEND ---
+              const now = new Date();
+              const isPastDeadline = job.deadline ? now > new Date(job.deadline) : false;
+              
+              let currentStatus = 'OPEN'; // Mặc định là đang tuyển
+              
+              // Ép cứng thành CLOSED nếu sự kiện đã kết thúc HOẶC đã quá hạn deadline
+              if (isEventEnded || isPastDeadline) {
+                currentStatus = 'CLOSED';
+              }
+              // ---------------------------------------------
+
+              const ui = getStatusUI(currentStatus);
               const progressPercent = job.total > 0 ? Math.min((job.currentCount / job.total) * 100, 100) : 0;
               
               return (

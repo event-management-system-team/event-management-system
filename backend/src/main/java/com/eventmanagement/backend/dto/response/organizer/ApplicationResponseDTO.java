@@ -30,6 +30,7 @@ public class ApplicationResponseDTO {
     private Map<String, Object> customAnswers;
     private List<Map<String, Object>> formSchema; // schema để map question ID → label
     private String status; 
+    private Map<String, Object> applicationData;
     // dinh dang lai ngay gio
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime appliedAt; 
