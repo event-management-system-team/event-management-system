@@ -8,6 +8,7 @@ import com.eventmanagement.backend.dto.response.admin.AccountSummaryResponse;
 import com.eventmanagement.backend.exception.BadRequestException;
 import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.repository.EventRepository;
+import com.eventmanagement.backend.repository.RefreshTokenRepository;
 import com.eventmanagement.backend.repository.UserRepository;
 import com.eventmanagement.backend.util.GenerateAvatarUrl;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class AdminAccountService {
     private final PasswordEncoder passwordEncoder;
     private final GenerateAvatarUrl generateAvatarUrl;
     private final EventRepository eventRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     public Page<UserResponse> getAllAccounts(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
@@ -80,6 +82,7 @@ public class AdminAccountService {
 
         if (user.getStatus() == Status.ACTIVE) {
             user.setStatus(Status.BANNED);
+            refreshTokenRepository.revokeAllUserTokens(user);
         } else {
             user.setStatus(Status.ACTIVE);
         }

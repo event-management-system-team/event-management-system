@@ -107,9 +107,9 @@ const WorkScheduleTab = ({
 
     return (
         <>
-            <TabsContent value="schedule" className="space-y-4">
-                <div className="flex-1 h-full w-full bg-slate-50/50 p-4 md:p-6 flex flex-col font-sans">
-                    <div className="flex-1 w-full h-full bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden sx-custom-calendar">
+            <TabsContent value="schedule" className="px-8 mt-2 h-[calc(100vh-230px)]">
+                <div className="flex flex-col h-full bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden font-sans">
+                    <div className="flex-1 overflow-auto sx-custom-calendar px-4 py-4">
                         <ScheduleXCalendar
                             calendarApp={calendar}
                             customComponents={customComponents}

@@ -201,7 +201,7 @@ const AccountList = ({ searchTerm, status, role, date, sortOption, onLoading, on
                     {/* Account Rows */}
                     {!paginatedAccounts || paginatedAccounts.length === 0 ? (
                         <div className="flex items-center justify-center flex-1 text-sm text-gray-400 mt-15">
-                            No account data yet
+                            No accounts found
                         </div>
                     ) : (
                         paginatedAccounts.map(account => (
@@ -255,19 +255,15 @@ const AccountList = ({ searchTerm, status, role, date, sortOption, onLoading, on
                                     </Link>
                                     <DropdownMenu modal={false}>
                                         <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" size="icon"
-                                                className="h-8 w-8 hover:bg-gray-100 cursor-pointer">
-                                                <MoreVertical className="h-4 w-4 text-gray-500" />
-                                            </Button>
+                                            {account.role !== "ADMIN" && (
+                                                <Button variant="ghost" size="icon"
+                                                    className="h-8 w-8 hover:bg-gray-100 cursor-pointer">
+                                                    <MoreVertical className="h-4 w-4 text-gray-500" />
+                                                </Button>
+                                            )}
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end"
                                             className="bg-[#f7f7f7] border-2 border-gray-200">
-                                            <Link to={`/admin/accounts/account-detail/${account.userId}`}>
-                                                <DropdownMenuItem>
-                                                    <UserCircle className="mr-2 h-4 w-4" />
-                                                    View account details
-                                                </DropdownMenuItem>
-                                            </Link>
 
                                             {account.role !== "ADMIN" && (
                                                 <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">

@@ -141,24 +141,22 @@ export function AccountDetail() {
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
                 {/* Header */}
-                <header className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-5">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Link to="/admin" className="hover:text-gray-900">
-                                Dashboard
-                            </Link>
-                            <ChevronRight className="h-4 w-4" />
-                            <Link to="/admin/accounts" className="hover:text-gray-900">
-                                Account Management
-                            </Link>
-                            <ChevronRight className="h-4 w-4" />
-                            <span>Account Detail</span>
+                <header className="bg-[#F1F0E8] px-8 py-5 pt-8">
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <div className="flex items-center gap-4 text-gray-400 text-sm font-medium mb-3">
+                                <Link className="text-gray-500 hover:text-gray-700" to="/admin">Dashboard</Link>
+                                <ChevronRight className="h-4 w-4" />
+                                <Link className="text-gray-500 hover:text-gray-700" to="/admin/accounts">Account Management</Link>
+                                <ChevronRight className="h-4 w-4" />
+                                <span className="text-gray-600">Account Detail</span>
+                            </div>
                         </div>
                     </div>
                 </header>
 
                 {/* Profile Summary Header */}
-                <div className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-6">
+                <div className="bg-[#F1F0E8] border-b border-gray-200 px-8 pb-6">
                     <div className="flex items-start justify-between">
                         <div className="flex items-center gap-6">
                             {/* Large Avatar */}
@@ -173,7 +171,7 @@ export function AccountDetail() {
                             {/* Account Info */}
                             <div>
                                 <div className="flex items-center gap-3 mb-2">
-                                    <h1 className="text-2xl font-semibold text-gray-900">
+                                    <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
                                         {account?.fullName}
                                     </h1>
                                     <Badge
@@ -244,11 +242,11 @@ export function AccountDetail() {
                         </TabsList>
 
                         <TabsContent value="basic" className="mt-0">
-                            <div className="p-8">
+                            <div className="p-8 pb-24">
                                 <div className="grid grid-cols-2 gap-6 mb-6">
                                     {/* Personal Information Card */}
-                                    <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
-                                        <CardHeader className="border-b border-gray-100">
+                                    <Card className="bg-[#ffffff] shadow-sm border border-gray-100 rounded-xl">
+                                        <CardHeader className="border-b border-gray-50 pb-5">
                                             <CardTitle className="text-lg">
                                                 Personal Information
                                             </CardTitle>
@@ -292,8 +290,8 @@ export function AccountDetail() {
                                     </Card>
 
                                     {/* Account Details Card */}
-                                    <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
-                                        <CardHeader className="border-b border-gray-100">
+                                    <Card className="bg-[#ffffff] shadow-sm border border-gray-100 rounded-xl">
+                                        <CardHeader className="border-b border-gray-50 pb-5">
                                             <CardTitle className="text-lg">Account Details</CardTitle>
                                             <CardDescription>
                                                 Administrative information and metrics

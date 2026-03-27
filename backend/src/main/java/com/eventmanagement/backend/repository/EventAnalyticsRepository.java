@@ -1,5 +1,6 @@
 package com.eventmanagement.backend.repository;
 
+import com.eventmanagement.backend.model.Event;
 import com.eventmanagement.backend.model.EventAnalytics;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -150,4 +151,6 @@ public interface EventAnalyticsRepository extends JpaRepository<EventAnalytics, 
             @Param("tickets") int tickets,
             @Param("revenue") double revenue
     );
+
+    boolean existsByEvent(Event event);
 }
