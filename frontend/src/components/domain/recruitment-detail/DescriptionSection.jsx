@@ -4,14 +4,16 @@ const DescriptionSection = ({ description, positions }) => {
     return (
         <section className="bg-white rounded-2xl p-8 shadow-sm border border-[#E5E1DA]/50">
             <div className="space-y-8">
-                <div>
-                    <h3 className="text-lg font-extrabold text-slate-900 mb-4">Description</h3>
-                    <p className="text-slate-600 text-[14px] leading-relaxed">
-                        {description}
-                    </p>
-                </div>
+                {description && (
+                    <div>
+                        <h3 className="text-lg font-extrabold text-slate-900 mb-4">Description</h3>
+                        <p className="text-slate-600 text-[14px] leading-relaxed">
+                            {description}
+                        </p>
+                    </div>
+                )}
 
-                <div className="pt-8 border-t border-slate-100">
+                <div className={description ? "pt-8 border-t border-slate-100" : ""}>
                     <h3 className="text-lg font-extrabold text-slate-900 mb-5">Open Positions & Requirements</h3>
 
                     <div className="space-y-4">
@@ -26,10 +28,20 @@ const DescriptionSection = ({ description, positions }) => {
                                         Hiring: {pos.vacancy} slot
                                     </span>
                                 </div>
-                                <div className="text-[13px] text-slate-600 pl-6 border-l-2 border-slate-200 ml-1.5">
-                                    <span className="font-semibold text-slate-700 block mb-1">Requirements:</span>
-                                    {pos.requirements}
-                                </div>
+
+                                {pos.description && (
+                                    <div className="text-[13px] text-slate-600 mb-3 pl-6 border-l-2 border-primary/20 ml-1.5">
+                                        <span className="font-semibold text-slate-700 block mb-1">Description:</span>
+                                        {pos.description}
+                                    </div>
+                                )}
+
+                                {pos.requirements && (
+                                    <div className="text-[13px] text-slate-600 pl-6 border-l-2 border-slate-200 ml-1.5">
+                                        <span className="font-semibold text-slate-700 block mb-1">Requirements:</span>
+                                        {pos.requirements}
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>

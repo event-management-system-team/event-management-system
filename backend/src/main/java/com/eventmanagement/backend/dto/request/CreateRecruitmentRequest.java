@@ -26,14 +26,16 @@ public class CreateRecruitmentRequest {
         @NotNull(message = "Vacancy is required")
         @Min(value = 1, message = "At least 1 vacancy required")
         private Integer vacancy;
+
+        private String description;
+
+        private List<String> requirements;
     }
 
     @NotEmpty(message = "At least one position is required")
     private List<PositionDTO> positions;
 
-    private String description;
-
-    private List<String> requirements;
+    // description & requirements are now inside PositionDTO
 
     private List<String> benefits;
 

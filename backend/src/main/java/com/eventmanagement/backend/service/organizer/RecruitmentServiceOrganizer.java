@@ -148,11 +148,6 @@ public class RecruitmentServiceOrganizer {
                     .orElseThrow(() -> new RuntimeException("Form không tồn tại"));
         }
 
-        String requirementsStr = null;
-        if (request.getRequirements() != null) {
-            requirementsStr = String.join("\n", request.getRequirements());
-        }
-
         List<BenefitRecruitment> benefitRecruitments = null;
         if (request.getBenefits() != null) {
             benefitRecruitments = request.getBenefits().stream()
@@ -167,11 +162,16 @@ public class RecruitmentServiceOrganizer {
 
         List<Recruitment> savedList = new ArrayList<>();
         for (CreateRecruitmentRequest.PositionDTO pos : request.getPositions()) {
+            String requirementsStr = null;
+            if (pos.getRequirements() != null) {
+                requirementsStr = String.join("\n", pos.getRequirements());
+            }
+
             Recruitment recruitment = Recruitment.builder()
                     .event(event)
                     .customForm(customForm)
                     .positionName(pos.getPositionName())
-                    .description(request.getDescription())
+                    .description(pos.getDescription())
                     .vacancy(pos.getVacancy())
                     .requirements(requirementsStr)
                     .benefits(benefitRecruitments)
