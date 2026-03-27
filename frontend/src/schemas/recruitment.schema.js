@@ -3,6 +3,8 @@ import { z } from "zod";
 const positionSchema = z.object({
   name: z.string().min(1, "Position name is required"),
   vacancy: z.coerce.number().min(1, "At least 1 vacancy required"),
+  description: z.string().optional(),
+  requirements: z.array(z.string()).optional(),
 });
 
 export const step1Schema = z.object({
@@ -14,12 +16,10 @@ export const step1Schema = z.object({
       { message: "All positions must have a name" }
     ),
   eventId: z.string().min(1, "Please select an event"),
-  description: z.string().optional(),
 });
 
 export const step2Schema = z.object({
   deadline: z.date({ required_error: "Application deadline is required" }),
-  requirements: z.array(z.string()).optional(),
   benefits: z.array(z.string()).optional(),
 });
 

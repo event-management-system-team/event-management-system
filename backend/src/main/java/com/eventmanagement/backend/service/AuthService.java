@@ -46,6 +46,9 @@ public class AuthService {
     @Value("${jwt.refresh-token-expiration}")
     private long refreshTokenExpiration;
 
+    @Value("${jwt.access-token-expiration}")
+    private long accessTokenExpiration;
+
     public RegisterResponse register(RegisterRequest request) {
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             throw new BadRequestException("Passwords do not match");
@@ -106,12 +109,14 @@ public class AuthService {
 
         String refreshToken = refreshTokenService.createRefreshToken(user, deviceInfo);
 
-        int maxAge = request.isRememberMe() ? (int) (refreshTokenExpiration / 1000) : -1;
+        // rememberMe=true: full refresh token TTL, rememberMe=false: minimum 1 day
+        int maxAge = request.isRememberMe() ? (int) (refreshTokenExpiration / 1000) : 86400;
         cookieUtil.addRefreshTokenCookie(response, refreshToken, maxAge);
 
         return LoginResponse.builder()
                 .accessToken(accessToken)
                 .tokenType("Bearer")
+                .expiresIn(accessTokenExpiration)
                 .user(LoginResponse.UserInfor.builder()
                         .user_id(user.getUserId())
                         .email(user.getEmail())
@@ -177,6 +182,7 @@ public class AuthService {
         return LoginResponse.builder()
                 .accessToken(accessToken)
                 .tokenType("Bearer")
+                .expiresIn(accessTokenExpiration)
                 .user(LoginResponse.UserInfor.builder()
                         .user_id(user.getUserId())
                         .email(user.getEmail())
@@ -215,6 +221,7 @@ public class AuthService {
         return RefreshTokenResponse.builder()
                 .accessToken(newAccessToken)
                 .tokenType("Bearer")
+                .expiresIn(accessTokenExpiration)
                 .user(LoginResponse.UserInfor.builder()
                         .user_id(user.getUserId())
                         .email(user.getEmail())

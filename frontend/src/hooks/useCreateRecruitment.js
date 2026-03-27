@@ -7,12 +7,10 @@ import organizerService from "../services/organizer.service";
 import { validateStep1, validateStep2 } from "../schemas/recruitment.schema";
 
 const initialForm = {
-  positions: [{ name: "", vacancy: "1" }],
+  positions: [{ name: "", vacancy: "1", description: "", requirements: [] }],
   eventId: "",
-  description: "",
   eventOptions: [],
 
-  requirements: [],
   benefits: [],
   deadline: null,
 
@@ -121,53 +119,95 @@ const useCreateRecruitment = (preselectedEventId = "") => {
       .catch(() => {});
   }, []);
 
-  // Edit mode: load dữ liệu recruitment hiện tại vào form
+  // Edit mode: load ALL positions cho event vào form
   useEffect(() => {
-    if (!editRecruitmentId) return;
-    recruitmentService.getRecruitmentById(editRecruitmentId)
-      .then((data) => {
-        // Parse requirements: backend trả về string ngăn cách bởi \n
-        const parseToArray = (val) => {
-          if (!val) return [];
-          if (Array.isArray(val)) return val;
-          try {
-            const parsed = JSON.parse(val);
-            if (Array.isArray(parsed)) return parsed;
-          } catch {
-            // not JSON, split by newline
-          }
-          return val.split('\n').map(s => s.trim()).filter(Boolean);
-        };
+    if (!editRecruitmentId || !preselectedEventId) return;
 
-        const parsedReqs = parseToArray(data.requirements);
-        const parsedBenefits = parseToArray(data.benefits);
+    const parseToArray = (val) => {
+      if (!val) return [];
+      if (Array.isArray(val)) return val;
+      try {
+        const parsed = JSON.parse(val);
+        if (Array.isArray(parsed)) return parsed;
+      } catch {
+        // not JSON, split by newline
+      }
+      return val.split('\n').map(s => s.trim()).filter(Boolean);
+    };
+
+    const loadAllPositions = async () => {
+      try {
+        // 1. Get dashboard to find ALL recruitmentIds for this event
+        const dashboard = await recruitmentService.getDashboard(preselectedEventId);
+        const allItems = dashboard?.recentRecruitments || [];
+
+        if (allItems.length === 0) return;
+
+        // 2. Fetch detail for each position
+        const detailPromises = allItems.map(item =>
+          recruitmentService.getRecruitmentById(item.recruitmentId)
+        );
+        const details = await Promise.all(detailPromises);
+
+        // 3. Build positions array from all details
+        const positions = details.map(data => ({
+          recruitmentId: data.recruitmentId,
+          name: data.positionName || "",
+          vacancy: String(data.vacancy || 1),
+          description: data.description || "",
+          requirements: parseToArray(data.requirements),
+        }));
+
+        // Use first position's data for shared fields (benefits, deadline, formId)
+        const firstData = details[0];
+        const parsedBenefits = parseToArray(firstData.benefits);
 
         setForm((prev) => ({
           ...prev,
-          positions: [
-            {
-              name: data.positionName || "",
-              vacancy: String(data.vacancy || 1),
-            },
-          ],
-          description: data.description || "",
-          requirements: parsedReqs,
+          positions,
           benefits: parsedBenefits,
-          deadline: data.deadline ? new Date(data.deadline) : null,
-          formId: data.formId || null,
+          deadline: firstData.deadline ? new Date(firstData.deadline) : null,
+          formId: firstData.formId || null,
         }));
 
-        // Tự động chuyển đến step phù hợp dựa trên dữ liệu đã điền
-        // Nếu đã có deadline hoặc requirements/benefits → step 2 đã xong → vào step 3
-        // Nếu chỉ có position name → step 1 đã xong → vào step 2
-        if (data.deadline || parsedReqs.length > 0 || parsedBenefits.length > 0) {
+        // Auto-navigate to appropriate step
+        const hasReqsOrBenefits = positions.some(p => p.requirements.length > 0) || parsedBenefits.length > 0;
+        if (firstData.deadline || hasReqsOrBenefits) {
           setStep(3);
-        } else if (data.positionName) {
+        } else if (positions.some(p => p.name)) {
           setStep(2);
         }
-      })
-      .catch(() => {});
-  }, [editRecruitmentId]);
+      } catch {
+        // Fallback: load single recruitment
+        try {
+          const data = await recruitmentService.getRecruitmentById(editRecruitmentId);
+          const parsedReqs = parseToArray(data.requirements);
+          const parsedBenefits = parseToArray(data.benefits);
+
+          setForm((prev) => ({
+            ...prev,
+            positions: [{
+              name: data.positionName || "",
+              vacancy: String(data.vacancy || 1),
+              description: data.description || "",
+              requirements: parsedReqs,
+            }],
+            benefits: parsedBenefits,
+            deadline: data.deadline ? new Date(data.deadline) : null,
+            formId: data.formId || null,
+          }));
+
+          if (data.deadline || parsedReqs.length > 0 || parsedBenefits.length > 0) {
+            setStep(3);
+          } else if (data.positionName) {
+            setStep(2);
+          }
+        } catch {}
+      }
+    };
+
+    loadAllPositions();
+  }, [editRecruitmentId, preselectedEventId]);
 
   // Tự động lưu form vào sessionStorage mỗi khi thay đổi (chỉ khi không phải edit mode)
   useEffect(() => {
@@ -203,71 +243,101 @@ const useCreateRecruitment = (preselectedEventId = "") => {
     positions: form.positions.map((p) => ({
       positionName: p.name,
       vacancy: parseInt(p.vacancy) || 1,
+      description: p.description || null,
+      requirements: (p.requirements || []).length > 0 ? p.requirements : null,
     })),
-    description: form.description || null,
-    requirements: form.requirements.length > 0 ? form.requirements : null,
     benefits: form.benefits.length > 0 ? form.benefits : null,
     deadline: form.deadline ? dayjs(form.deadline).toISOString() : null,
     formId: form.formId || null,
     status,
   });
 
+  // Helper: update tất cả positions đã tồn tại trên server
+  const updateAllPositions = async (status) => {
+    const payload = buildPayload(status);
+
+    if (isEditMode) {
+      // Edit mode: update từng position dựa trên recruitmentId đã load
+      const updatePromises = form.positions.map((pos, idx) => {
+        const posPayload = payload.positions[idx];
+        if (pos.recruitmentId) {
+          return recruitmentService.updateRecruitment(pos.recruitmentId, {
+            positionName: posPayload?.positionName,
+            vacancy: posPayload?.vacancy,
+            description: posPayload?.description,
+            requirements: posPayload?.requirements,
+            benefits: payload.benefits,
+            deadline: payload.deadline,
+            formId: payload.formId,
+            status,
+          });
+        }
+        return Promise.resolve();
+      });
+      await Promise.all(updatePromises);
+    } else {
+      // Non-edit mode: kiểm tra nếu event đã có recruitment → update all
+      let existingItems = [];
+      try {
+        const dashboard = await recruitmentService.getDashboard(form.eventId);
+        existingItems = dashboard?.recentRecruitments || [];
+      } catch {
+        // Nếu không lấy được dashboard, thử create
+      }
+
+      if (existingItems.length > 0) {
+        // Update từng existing position
+        const updatePromises = existingItems.map((item, idx) => {
+          const posPayload = payload.positions[idx];
+          if (posPayload) {
+            return recruitmentService.updateRecruitment(item.recruitmentId, {
+              positionName: posPayload.positionName,
+              vacancy: posPayload.vacancy,
+              description: posPayload.description,
+              requirements: posPayload.requirements,
+              benefits: payload.benefits,
+              deadline: payload.deadline,
+              formId: payload.formId,
+              status,
+            });
+          }
+          return Promise.resolve();
+        });
+        await Promise.all(updatePromises);
+      } else {
+        // Chưa có → create mới
+        await recruitmentService.createRecruitment(form.eventId, payload);
+      }
+    }
+  };
+
   const handleSaveDraft = async () => {
+    const errs = {};
     if (!form.eventId) {
-      setError("Please select an event first.");
+      errs.eventId = "Please select an event first.";
+    }
+    // Kiểm tra ít nhất 1 position có tên
+    const hasEmptyName = form.positions.some(p => !p.name || !p.name.trim());
+    if (hasEmptyName) {
+      form.positions.forEach((p, idx) => {
+        if (!p.name || !p.name.trim()) {
+          errs[`positions.${idx}.name`] = "Position name is required";
+        }
+      });
+    }
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs);
+      if (errs.eventId || hasEmptyName) {
+        setStep(1);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
       return;
     }
     setSaving(true);
     setError(null);
+    setErrors({});
     try {
-      const payload = buildPayload("DRAFT");
-      if (isEditMode) {
-        // Edit mode: chỉ update recruitment hiện tại (single position)
-        await recruitmentService.updateRecruitment(
-          editRecruitmentId,
-          {
-            positionName: payload.positions[0]?.positionName,
-            vacancy: payload.positions[0]?.vacancy,
-            description: payload.description,
-            requirements: payload.requirements,
-            benefits: payload.benefits,
-            deadline: payload.deadline,
-            formId: payload.formId,
-            status: "DRAFT",
-          },
-        );
-      } else {
-        // Kiểm tra nếu event đã có recruitment → update thay vì create
-        let existingId = null;
-        try {
-          const dashboard = await recruitmentService.getDashboard(form.eventId);
-          const existing = dashboard?.recentRecruitments || [];
-          if (existing.length > 0) {
-            existingId = existing[0].recruitmentId;
-          }
-        } catch {
-          // Nếu không lấy được dashboard, thử create bình thường
-        }
-
-        if (existingId) {
-          await recruitmentService.updateRecruitment(existingId, {
-            positionName: payload.positions[0]?.positionName,
-            vacancy: payload.positions[0]?.vacancy,
-            description: payload.description,
-            requirements: payload.requirements,
-            benefits: payload.benefits,
-            deadline: payload.deadline,
-            formId: payload.formId,
-            status: "DRAFT",
-          });
-        } else {
-          await recruitmentService.createRecruitment(
-            form.eventId,
-            payload,
-          );
-        }
-      }
-      // Stay on current step, show success feedback
+      await updateAllPositions("DRAFT");
       setDraftSaved(true);
       setTimeout(() => setDraftSaved(false), 3000);
     } catch (err) {
@@ -306,59 +376,47 @@ const useCreateRecruitment = (preselectedEventId = "") => {
   };
 
   const handleSubmit = async () => {
+    // --- Full validation trước khi submit ---
+    const errs = {};
+
+    // Step 1 validation
     if (!form.eventId) {
-      setError("Event is required.");
+      errs.eventId = "Please select an event.";
+    }
+    form.positions.forEach((p, idx) => {
+      if (!p.name || !p.name.trim()) {
+        errs[`positions.${idx}.name`] = "Position name is required";
+      }
+      const vac = parseInt(p.vacancy);
+      if (!vac || vac < 1) {
+        errs[`positions.${idx}.vacancy`] = "At least 1 vacancy required";
+      }
+    });
+
+    // Step 2 validation
+    if (!form.deadline) {
+      errs.deadline = "Application deadline is required";
+    } else if (eventStartDate && form.deadline >= eventStartDate) {
+      errs.deadline = "Deadline must be before the event start date";
+    }
+
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs);
+      // Navigate to the first step that has errors
+      if (errs.eventId || Object.keys(errs).some(k => k.startsWith('positions.'))) {
+        setStep(1);
+      } else if (errs.deadline) {
+        setStep(2);
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
+
     setSaving(true);
     setError(null);
+    setErrors({});
     try {
-      const payload = buildPayload("OPEN");
-      if (isEditMode) {
-        await recruitmentService.updateRecruitment(
-          editRecruitmentId,
-          {
-            positionName: payload.positions[0]?.positionName,
-            vacancy: payload.positions[0]?.vacancy,
-            description: payload.description,
-            requirements: payload.requirements,
-            benefits: payload.benefits,
-            deadline: payload.deadline,
-            formId: payload.formId,
-            status: "OPEN",
-          },
-        );
-      } else {
-        // Kiểm tra nếu event đã có recruitment → update thay vì create
-        let existingId = null;
-        try {
-          const dashboard = await recruitmentService.getDashboard(form.eventId);
-          const existing = dashboard?.recentRecruitments || [];
-          if (existing.length > 0) {
-            existingId = existing[0].recruitmentId;
-          }
-        } catch {
-          // Nếu không lấy được dashboard, thử create bình thường
-        }
-
-        if (existingId) {
-          await recruitmentService.updateRecruitment(existingId, {
-            positionName: payload.positions[0]?.positionName,
-            vacancy: payload.positions[0]?.vacancy,
-            description: payload.description,
-            requirements: payload.requirements,
-            benefits: payload.benefits,
-            deadline: payload.deadline,
-            formId: payload.formId,
-            status: "OPEN",
-          });
-        } else {
-          await recruitmentService.createRecruitment(
-            form.eventId,
-            payload,
-          );
-        }
-      }
+      await updateAllPositions("OPEN");
       clearDraft();
       setStep(4);
       window.scrollTo({ top: 0, behavior: "smooth" });

@@ -8,5 +8,6 @@ import lombok.Data;
 public class RefreshTokenResponse {
     private String accessToken;
     private String tokenType = "Bearer";
+    private long expiresIn; // access token TTL in milliseconds
     private LoginResponse.UserInfor user;
 }
