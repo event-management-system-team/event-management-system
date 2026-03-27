@@ -428,7 +428,7 @@ export function EventDetail() {
                                                         <div className="flex items-center gap-2 mb-1">
                                                             <Clock className="h-4 w-4 text-gray-400" />
                                                             <span className="text-sm font-semibold text-gray-900">
-                                                                {formatTime(item.startTime)}
+                                                                {formatTime(item.startTime)} - {formatTime(item.endTime)}
                                                             </span>
                                                         </div>
                                                         <div className="text-base font-medium text-gray-900 mb-1">
