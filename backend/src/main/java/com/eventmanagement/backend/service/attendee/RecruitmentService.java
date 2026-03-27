@@ -84,7 +84,7 @@ public class RecruitmentService {
     }
 
     public RecruitmentResponse getRecruitmentByEventSlug(String eventSlug) {
-        List<Recruitment> recruitments = recruitmentRepository.findByEvent_EventSlug(eventSlug);
+        List<Recruitment> recruitments = recruitmentRepository.findPublicByEventSlug(eventSlug);
 
         if (recruitments.isEmpty()) return null;
 

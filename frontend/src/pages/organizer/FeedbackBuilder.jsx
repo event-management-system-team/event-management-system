@@ -4,7 +4,7 @@ import {
   ArrowLeft, Smile, MessageSquare, Trash2, PlusCircle, X, Lock,
   Type as TypeIcon, AlignLeft, CheckSquare, ListChecks, ChevronDown, UploadCloud
 } from 'lucide-react';
-import Sidebar from '../../components/layout/Sidebar'; 
+
 import axiosInstance from '../../config/axios'; 
 import { Alert } from '../../components/common/Alert';
 
@@ -225,8 +225,7 @@ const FeedbackBuilder = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen bg-[#f8f7f2] font-sans overflow-hidden">
-      <Sidebar />
+    <div className="flex flex-col h-screen bg-[#F1F0E8] font-sans overflow-hidden">
 
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         {/* HEADER */}

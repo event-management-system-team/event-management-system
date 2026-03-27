@@ -10,6 +10,7 @@ import lombok.Data;
 @Builder
 public class RecruitmentDetailDTO {
     private UUID recruitmentId;
+    private UUID eventId;
     private String eventName;
     private String positionName;
     private String description;

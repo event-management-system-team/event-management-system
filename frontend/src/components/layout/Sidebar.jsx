@@ -1,21 +1,21 @@
-import React from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { logoutUser } from "../../store/slices/auth.slice";
+import { useState } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   CalendarDays,
   Users,
   MessageSquare,
   Briefcase,
-  Settings,
-  LogOut,
   Lock,
   BarChart3,
   BarChart2,
   UserCheck,
   ClipboardList,
-} from "lucide-react";
+  Menu,
+  X,
+} from 'lucide-react';
+import Logo from '../common/Logo';
+import OrganizerDropdown from '../domain/organizer/OrganizerDropdown';
 
 const extractEventId = (pathname) => {
   const patterns = [
@@ -36,8 +36,6 @@ const extractEventId = (pathname) => {
       return m[1];
     }
   }
-  // Fallback: keep sidebar unlocked on sub-pages (e.g. /applications/:recruitmentId)
-  // that don't carry eventId in the URL
   const subPagePatterns = [
     /\/organizer\/applications\/([^/]+)/,
     /\/organizer\/recruitments\/([^/]+)/,
@@ -47,206 +45,190 @@ const extractEventId = (pathname) => {
   if (isSubPage) {
     return sessionStorage.getItem("sidebar_eventId") || null;
   }
-  // On top-level pages (dashboard, my-events) clear the stored id
   sessionStorage.removeItem("sidebar_eventId");
   return null;
 };
 
-
-// ── NavItem ────────────────────────────────────────────────────────────────
-const NavItem = ({ to, icon, label, isActive }) => (
-  <Link
-    to={to}
-    className={`flex items-center gap-3 px-4 py-3 mb-1 rounded-xl font-medium transition-all duration-200
-      ${isActive
-        ? "bg-[#3b4758] text-white shadow-lg pointer-events-none"
-        : "text-gray-400 hover:bg-gray-800 hover:text-white"
-      }`}
-  >
-    <span className={isActive ? "text-gray-100" : "text-gray-400"}>{icon}</span>
-    <span>{label}</span>
-  </Link>
-);
-
-// ── DisabledNavItem (event tools khi chưa chọn event) ─────────────────────
-const DisabledNavItem = ({ icon, label }) => (
+// ── DisabledNavItem (event tools when no event is selected) ─────────────
+const DisabledNavItem = ({ icon: Icon, label }) => (
   <div
-    className="flex items-center gap-3 px-4 py-3 mb-1 rounded-xl font-medium text-gray-600 cursor-not-allowed select-none"
+    className="flex items-center gap-3 px-4 py-3 rounded-xl whitespace-nowrap border-2 border-transparent text-white/30 cursor-not-allowed select-none font-medium"
     title="Hãy vào một Event trước để dùng tính năng này"
   >
-    <span className="text-gray-600">{icon}</span>
+    <Icon size={20} className="shrink-0" />
     <span>{label}</span>
-    <Lock size={12} className="ml-auto text-gray-700 shrink-0" />
+    <Lock size={12} className="ml-auto shrink-0" />
   </div>
 );
 
-// ── Sidebar ────────────────────────────────────────────────────────────────
+// ── ActiveNavLink style (same as admin/staff) ──────────────────────────
+const navLinkClass = ({ isActive }) =>
+  `flex items-center gap-3 px-4 py-3 rounded-xl whitespace-nowrap border-2 transition-all duration-300 ease-in-out ${
+    isActive
+      ? "bg-white/20 text-white border-white/20 shadow-lg"
+      : "text-white/70 hover:bg-white/10 hover:text-white border-transparent"
+  } font-medium`;
+
+// ── Sidebar ────────────────────────────────────────────────────────────
 const Sidebar = () => {
   const location = useLocation();
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
 
-  const user = useSelector((state) => state.auth?.user);
+  const toggleSidebar = () => setIsOpen(!isOpen);
 
   const eventId = extractEventId(location.pathname);
 
-  const handleLogout = async () => {
-    await dispatch(logoutUser());
-    navigate("/login");
-  };
-
   // Active states
-  const isDashboardActive       = location.pathname.includes("/dashboard");
-  const isMyEventsActive        = location.pathname.includes("/my-events");
-  const isFeedbackActive        = location.pathname.includes("/feedback");
-  const isRecruitmentActive     = location.pathname.includes("/recruitment");
-  const isStaffActive           = location.pathname.includes("/staff");
-
-  // Event-specific links — chỉ tạo khi có eventId
-  const eventDashboardLink  = eventId ? `/organizer/events/${eventId}` : null;
-  const attendeesLink       = eventId ? `/organizer/events/${eventId}/attendees` : null;
-  const feedbackLink        = eventId ? `/organizer/feedback/feedbacklist/${eventId}` : null;
-  const analyticsLink       = eventId ? `/organizer/feedback/analytics/${eventId}` : null;
-  const recruitmentLink     = eventId ? `/organizer/recruitmentlist/${eventId}` : null;
-  const applicationsLink    = eventId ? `/organizer/applications/event/${eventId}` : null;
-  const staffLink           = eventId ? `/organizer/events/${eventId}/staff` : null;
-  
-  // Active states
-  const isEventDashboardActive  = eventId ? location.pathname === `/organizer/events/${eventId}` : false;
-  const isAttendeesActive       = location.pathname.includes("/attendees");
-  const isAnalyticsActive       = location.pathname.includes("/feedback/analytics");
+  const isFeedbackActive = location.pathname.includes("/feedback");
+  const isAnalyticsActive = location.pathname.includes("/feedback/analytics");
+  const isRecruitmentActive = location.pathname.includes("/recruitment");
   const isApplicationsPageActive = location.pathname.includes("/applications");
+  const isAttendeesActive = location.pathname.includes("/attendees");
+  const isStaffActive = location.pathname.includes("/staff");
 
-  // User display — backend trả snake_case: full_name, avatar_url, email
-  const displayName = user?.full_name || user?.fullName || user?.name || user?.email || "Organizer";
-  const avatarUrl = user?.avatar_url || user?.avatar
-    ? (user.avatar_url || user.avatar)
-    : `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=3b4758&color=fff`;
+  // Event-specific links
+  const eventDashboardLink = eventId ? `/organizer/events/${eventId}` : null;
+  const attendeesLink = eventId ? `/organizer/events/${eventId}/attendees` : null;
+  const feedbackLink = eventId ? `/organizer/feedback/feedbacklist/${eventId}` : null;
+  const analyticsLink = eventId ? `/organizer/feedback/analytics/${eventId}` : null;
+  const recruitmentLink = eventId ? `/organizer/recruitmentlist/${eventId}` : null;
+  const applicationsLink = eventId ? `/organizer/applications/event/${eventId}` : null;
+  const staffLink = eventId ? `/organizer/events/${eventId}/staff` : null;
+
+  const isEventDashboardActive = eventId
+    ? location.pathname === `/organizer/events/${eventId}`
+    : false;
+
+  // Overview nav items
+  const overviewItems = [
+    { title: "Dashboard", icon: LayoutDashboard, path: "/organizer/dashboard", end: true },
+    { title: "My Events", icon: CalendarDays, path: "/organizer/my-events", end: true },
+  ];
+
+  // Event tool items
+  const eventToolItems = [
+    { title: "Event Dashboard", icon: BarChart3, link: eventDashboardLink, isActive: isEventDashboardActive },
+    { title: "Attendees", icon: UserCheck, link: attendeesLink, isActive: isAttendeesActive },
+    { title: "Feedback", icon: MessageSquare, link: feedbackLink, isActive: isFeedbackActive && !isAnalyticsActive },
+    { title: "Feedback Analytics", icon: BarChart2, link: analyticsLink, isActive: isAnalyticsActive },
+    { title: "Recruitment", icon: Briefcase, link: recruitmentLink, isActive: isRecruitmentActive },
+    { title: "Application List", icon: ClipboardList, link: applicationsLink, isActive: isApplicationsPageActive },
+    { title: "Staff Management", icon: Users, link: staffLink, isActive: isStaffActive },
+  ];
 
   return (
-    <aside className="w-64 h-screen bg-[#1e293b] flex-col text-gray-300 fixed left-0 top-0 z-50 font-sans shadow-xl border-r border-gray-800 hidden lg:flex">
+    <>
+      {/* Mobile hamburger button */}
+      {!isOpen && (
+        <button
+          onClick={toggleSidebar}
+          className="lg:hidden fixed top-4 left-4 z-[60] p-2 bg-[#2C3E50] text-white rounded-xl shadow-lg"
+        >
+          <Menu size={24} />
+        </button>
+      )}
 
-      {/* Logo */}
-      <div className="p-6 flex items-center gap-3">
-        <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-xs shadow-md">
-          EH
-        </div>
-        <div>
-          <h1 className="text-white font-bold text-xl tracking-tight">
-            Event<span className="text-blue-400">Hub</span>
-          </h1>
-          <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
-            Organizer
-          </p>
-        </div>
-      </div>
-
-      {/* User Profile */}
-      <div className="mx-4 mb-6 p-3 bg-[#2d3a4f] rounded-xl flex items-center gap-3 border border-gray-700 shadow-sm">
-        <img
-          src={avatarUrl}
-          alt={displayName}
-          className="w-10 h-10 rounded-full object-cover border border-gray-500 shrink-0"
+      {/* Mobile overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[55] lg:hidden"
+          onClick={toggleSidebar}
         />
-        <div className="overflow-hidden">
-          <h3 className="text-white text-sm font-bold truncate">{displayName}</h3>
-          <p className="text-[11px] text-gray-400 truncate">Organizer</p>
-        </div>
-      </div>
+      )}
 
-      {/* Navigation */}
-      <nav className="flex-1 px-4 overflow-y-auto scrollbar-hide space-y-1">
-
-        {/* ── Overview ── */}
-        <p className="px-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 mt-1">
-          Overview
-        </p>
-        <NavItem
-          to="/organizer/dashboard"
-          icon={<LayoutDashboard size={20} />}
-          label="Dashboard"
-          isActive={isDashboardActive}
-        />
-        <NavItem
-          to="/organizer/my-events"
-          icon={<CalendarDays size={20} />}
-          label="My Events"
-          isActive={isMyEventsActive}
-        />
-
-        {/* ── Event Tools ── */}
-        <p className="px-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 mt-5">
-          Event Tools
-          {!eventId && (
-            <span className="ml-1 normal-case text-gray-700 font-normal text-[9px]">
-              — chọn event trước
-            </span>
-          )}
-        </p>
-
-        {eventDashboardLink ? (
-          <NavItem to={eventDashboardLink} icon={<BarChart3 size={20} />} label="Event Dashboard" isActive={isEventDashboardActive} />
-        ) : (
-          <DisabledNavItem icon={<BarChart3 size={20} />} label="Event Dashboard" />
-        )}
-
-        {attendeesLink ? (
-          <NavItem to={attendeesLink} icon={<UserCheck size={20} />} label="Attendees" isActive={isAttendeesActive} />
-        ) : (
-          <DisabledNavItem icon={<UserCheck size={20} />} label="Attendees" />
-        )}
-
-        {feedbackLink ? (
-          <NavItem to={feedbackLink} icon={<MessageSquare size={20} />} label="Feedback" isActive={isFeedbackActive && !isAnalyticsActive} />
-        ) : (
-          <DisabledNavItem icon={<MessageSquare size={20} />} label="Feedback" />
-        )}
-
-        {analyticsLink ? (
-          <NavItem to={analyticsLink} icon={<BarChart2 size={20} />} label="Feedback Analytics" isActive={isAnalyticsActive} />
-        ) : (
-          <DisabledNavItem icon={<BarChart2 size={20} />} label="Feedback Analytics" />
-        )}
-
-        {recruitmentLink ? (
-          <NavItem to={recruitmentLink} icon={<Briefcase size={20} />} label="Recruitment" isActive={isRecruitmentActive} />
-        ) : (
-          <DisabledNavItem icon={<Briefcase size={20} />} label="Recruitment" />
-        )}
-
-        {applicationsLink ? (
-          <NavItem to={applicationsLink} icon={<ClipboardList size={20} />} label="Application List" isActive={isApplicationsPageActive} />
-        ) : (
-          <DisabledNavItem icon={<ClipboardList size={20} />} label="Application List" />
-        )}
-
-        {staffLink ? (
-          <NavItem to={staffLink} icon={<Users size={20} />} label="Staff Management" isActive={isStaffActive} />
-        ) : (
-          <DisabledNavItem icon={<Users size={20} />} label="Staff Management" />
-        )}
-      </nav>
-
-      {/* Bottom */}
-      <div className="p-4 mt-auto border-t border-gray-700/50 bg-[#1a2333]">
-        <div className="space-y-1">
-          <Link
-            to="/profile"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
-          >
-            <Settings size={18} />
-            <span>Settings</span>
-          </Link>
+      {/* Sidebar */}
+      <aside
+        className={`
+          fixed lg:static inset-y-0 left-0 z-[60]
+          w-[280px] bg-[#2C3E50] text-white flex flex-col h-full shrink-0
+          shadow-2xl border-r border-white/10 transition-transform duration-300 ease-in-out
+          ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+        `}
+      >
+        <div className="flex flex-col h-full justify-between relative">
+          {/* Mobile close button */}
           <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors cursor-pointer"
+            onClick={toggleSidebar}
+            className="lg:hidden absolute top-4 right-4 text-white/50 hover:text-white"
           >
-            <LogOut size={18} />
-            <span>Log Out</span>
+            <X size={24} />
           </button>
+
+          {/* Logo */}
+          <div className="bg-slate-500/50 backdrop-blur-md border border-white/30 px-2 py-1 mr-18 ml-4 mt-5 shrink-0 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.2)] mb-4 transition-transform hover:-translate-y-1 hover:shadow-[0_15px_40px_rgb(0,0,0,0.3)] duration-300">
+            <div className="scale-100 origin-left ml-1">
+              <Logo />
+            </div>
+          </div>
+          <hr className="border-white/10 mb-6" />
+
+          {/* Navigation */}
+          <div className="p-5 flex flex-col gap-4 flex-1 overflow-y-auto">
+            {/* Overview */}
+            <nav className="space-y-2">
+              <p className="px-4 text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">
+                Overview
+              </p>
+              {overviewItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <NavLink
+                    key={item.title}
+                    to={item.path}
+                    end={item.end}
+                    onClick={() => setIsOpen(false)}
+                    className={navLinkClass}
+                  >
+                    <Icon size={20} className="shrink-0" />
+                    {item.title}
+                  </NavLink>
+                );
+              })}
+            </nav>
+
+            {/* Event Tools */}
+            <nav className="space-y-2 mt-2">
+              <p className="px-4 text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">
+                Event Tools
+                {!eventId && (
+                  <span className="ml-1 normal-case text-white/20 font-normal text-[9px]">
+                    — chọn event trước
+                  </span>
+                )}
+              </p>
+              {eventToolItems.map((item) => {
+                const Icon = item.icon;
+                if (!item.link) {
+                  return <DisabledNavItem key={item.title} icon={Icon} label={item.title} />;
+                }
+                return (
+                  <NavLink
+                    key={item.title}
+                    to={item.link}
+                    onClick={() => setIsOpen(false)}
+                    className={({ isActive: routerActive }) => {
+                      // Use our custom isActive logic for event tools
+                      const active = item.isActive || routerActive;
+                      return `flex items-center gap-3 px-4 py-3 rounded-xl whitespace-nowrap border-2 transition-all duration-300 ease-in-out ${
+                        active
+                          ? "bg-white/20 text-white border-white/20 shadow-lg"
+                          : "text-white/70 hover:bg-white/10 hover:text-white border-transparent"
+                      } font-medium`;
+                    }}
+                  >
+                    <Icon size={20} className="shrink-0" />
+                    {item.title}
+                  </NavLink>
+                );
+              })}
+            </nav>
+          </div>
+
+          {/* User dropdown */}
+          <OrganizerDropdown setIsOpen={setIsOpen} />
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 };
 

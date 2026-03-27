@@ -158,17 +158,21 @@ public class RecruitmentController {
             @PathVariable UUID eventId,
             @RequestBody CreateRecruitmentRequest request) {
         try {
-            Recruitment saved = recruitmentServiceOrganizer.createRecruitment(eventId, request);
+            List<Recruitment> savedList = recruitmentServiceOrganizer.createRecruitment(eventId, request);
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("recruitmentId", saved.getRecruitmentId());
-            response.put("positionName", saved.getPositionName());
-            response.put("vacancy", saved.getVacancy());
-            response.put("status", saved.getStatus());
-            response.put("deadline", saved.getDeadline());
-            response.put("createdAt", saved.getCreatedAt());
+            List<Map<String, Object>> responseList = new ArrayList<>();
+            for (Recruitment saved : savedList) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("recruitmentId", saved.getRecruitmentId());
+                item.put("positionName", saved.getPositionName());
+                item.put("vacancy", saved.getVacancy());
+                item.put("status", saved.getStatus());
+                item.put("deadline", saved.getDeadline());
+                item.put("createdAt", saved.getCreatedAt());
+                responseList.add(item);
+            }
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseList);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Lỗi khi tạo tuyển dụng: " + e.getMessage());

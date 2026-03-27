@@ -41,6 +41,13 @@ const RecruitmentList = () => {
           buttonText: 'View Detail', 
           isActive: true 
         };
+      case 'DRAFT':
+        return { 
+          color: 'bg-yellow-400', 
+          text: 'Draft', 
+          buttonText: 'View Detail', 
+          isActive: false 
+        };
       case 'CLOSED':
         return { 
           color: 'bg-red-400', 
@@ -68,12 +75,12 @@ const RecruitmentList = () => {
   };
 
   if (isLoading) {
-    return <div className="flex min-h-screen bg-[#ecebe4] items-center justify-center font-bold text-gray-500 animate-pulse">Loading recruitment list...</div>;
+    return <div className="flex min-h-screen bg-[#F1F0E8] items-center justify-center font-bold text-gray-500 animate-pulse">Loading recruitment list...</div>;
   }
 
   if (isError || !dashboardData) {
     return (
-      <div className="flex min-h-screen bg-[#ecebe4] items-center justify-center flex-col gap-4">
+      <div className="flex min-h-screen bg-[#F1F0E8] items-center justify-center flex-col gap-4">
         <p className="font-bold text-red-500 text-lg">Failed to load data!</p>
         <button onClick={() => window.location.reload()} className="px-4 py-2 bg-white rounded-lg shadow-sm text-sm font-bold">Retry</button>
       </div>
@@ -91,6 +98,7 @@ const RecruitmentList = () => {
     { title: "PENDING REVIEW", value: dashboardData?.stats?.pendingReviews || 0, color: "border-[#fb923c]" },
     { title: "HIRED STAFF", value: dashboardData?.stats?.hiredStaff || 0, color: "border-gray-300" }
   ];
+  const hasRecruitments = (dashboardData?.recentRecruitments?.length || 0) > 0;
 
   return (
     <div className="flex flex-col min-h-screen w-full">
@@ -110,18 +118,18 @@ const RecruitmentList = () => {
             <p className="text-gray-500 text-sm mt-1">Manage staff postings and review incoming applications.</p>
           </div>
           
-          {!isEventEnded ? (
+          {isEventEnded ? (
+            <div className="w-full sm:w-auto px-5 py-2.5 bg-red-50 text-red-600 border border-red-100 rounded-lg flex items-center gap-2 text-sm font-bold cursor-not-allowed shadow-sm">
+              <Lock size={18} /> Event Ended
+            </div>
+          ) : !hasRecruitments ? (
             <Link 
               to={`/organizer/recruitment-post/${eventId}`} 
               className="w-full sm:w-auto justify-center bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-5 py-2.5 rounded-lg flex items-center gap-2 text-sm font-bold shadow-md transition-all active:scale-95"
             >
               <Plus size={18} strokeWidth={2.5} /> Create Recruitment
             </Link>
-          ) : (
-            <div className="w-full sm:w-auto px-5 py-2.5 bg-red-50 text-red-600 border border-red-100 rounded-lg flex items-center gap-2 text-sm font-bold cursor-not-allowed shadow-sm">
-              <Lock size={18} /> Event Ended
-            </div>
-          )}
+          ) : null}
         </div>
 
         {/* STATS */}

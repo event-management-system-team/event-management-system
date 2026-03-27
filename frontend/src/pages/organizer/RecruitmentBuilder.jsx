@@ -4,7 +4,6 @@ import {
   FileText, Trash2, X, PlusCircle, Lock, Calendar, Clock,
   ChevronDown, ListChecks, Type as TypeIcon
 } from 'lucide-react';
-import Sidebar from '../../components/layout/Sidebar';
 import { useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../config/axios';
 import { Button } from 'antd';
@@ -153,10 +152,12 @@ const RecruitmentFormBuilder = () => {
         if (isActive) {
           setAppAlert({ type: 'success', message: "Recruitment form published successfully!" });
           setIsLocked(true);
-          // Tự navigate về bước 3 sau 1.2s để user thấy thông báo thành công
-          setTimeout(() => navigate(-1), 1200);
+          // Navigate về trang tạo recruitment post (Step 3 sẽ restore từ sessionStorage)
+          setTimeout(() => navigate(`/organizer/recruitment-post/${eventId}`), 1200);
         } else {
           setAppAlert({ type: 'success', message: "Draft saved successfully!" });
+          // Navigate về trang tạo recruitment post sau khi save draft
+          setTimeout(() => navigate(`/organizer/recruitment-post/${eventId}`), 1200);
         }
       }
     } catch (error) {
@@ -180,13 +181,13 @@ const RecruitmentFormBuilder = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-[#f8f7f2] font-sans overflow-hidden">
+    <div className="flex flex-col h-screen bg-[#F1F0E8] font-sans overflow-hidden">
 
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         {/* HEADER */}
         <header className="min-h-[64px] bg-white border-b border-gray-100 flex flex-wrap lg:flex-nowrap items-center justify-between px-4 lg:px-6 py-3 lg:py-0 shrink-0 z-10 shadow-sm gap-3 lg:gap-0">
           <div className="flex items-center gap-3 lg:gap-4 w-full lg:w-auto">
-            <Button onClick={() => navigate(-1)} className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-500 hover:text-gray-900 font-bold transition-colors border-none sm:border-solid shadow-none sm:shadow-sm px-2 sm:px-4">
+            <Button onClick={() => navigate(`/organizer/recruitment-post/${eventId}`)} className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-500 hover:text-gray-900 font-bold transition-colors border-none sm:border-solid shadow-none sm:shadow-sm px-2 sm:px-4">
               <ArrowLeft size={16} /> <span className="hidden sm:inline">Back to List</span>
             </Button>
             <div className="hidden sm:block w-px h-5 bg-gray-200"></div>
@@ -228,7 +229,7 @@ const RecruitmentFormBuilder = () => {
           </div>
 
           {/* CỘT 2: FORM CANVAS */}
-          <div className="w-full lg:flex-1 bg-[#ecebe4] p-4 sm:p-6 lg:p-8 lg:overflow-y-auto flex justify-center">
+          <div className="w-full lg:flex-1 bg-[#F1F0E8] p-4 sm:p-6 lg:p-8 lg:overflow-y-auto flex justify-center">
             <div className="w-full max-w-xl">
               <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden mb-6">
 

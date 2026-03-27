@@ -28,8 +28,8 @@ const RecruitmentDetail = () => {
     if (recruitmentId) fetchDetail();
   }, [recruitmentId]);
 
-  if (isLoading) return <div className="flex h-screen items-center justify-center font-bold text-gray-500 bg-[#f8f7f2]">Loading Data...</div>;
-  if (!detailData) return <div className="flex h-screen items-center justify-center font-bold text-red-500 bg-[#f8f7f2]">Recruitment post not found!</div>;
+  if (isLoading) return <div className="flex h-screen items-center justify-center font-bold text-gray-500 bg-[#F1F0E8]">Loading Data...</div>;
+  if (!detailData) return <div className="flex h-screen items-center justify-center font-bold text-red-500 bg-[#F1F0E8]">Recruitment post not found!</div>;
 
   // Truyền recruitmentId qua location.state để RecruitmentBuilder load đúng bài edit
   const handleEdit = () => {
@@ -72,8 +72,8 @@ const RecruitmentDetail = () => {
                 <ClipboardList size={16} /> View Applications
               </Link>
 
-              {/* Edit Post — chỉ hiện khi status OPEN */}
-              {detailData.status === 'OPEN' && (
+              {/* Edit Post — chỉ hiện khi status DRAFT */}
+              {detailData.status === 'DRAFT' && (
                 <button
                   onClick={handleEdit}
                   className="w-full sm:w-auto justify-center flex items-center gap-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm transition-all"

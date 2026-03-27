@@ -7,8 +7,7 @@ import organizerService from "../services/organizer.service";
 import { validateStep1, validateStep2 } from "../schemas/recruitment.schema";
 
 const initialForm = {
-  positionName: "",
-  vacancy: "1",
+  positions: [{ name: "", vacancy: "1" }],
   eventId: "",
   description: "",
   eventOptions: [],
@@ -110,8 +109,12 @@ const useCreateRecruitment = (preselectedEventId = "") => {
       .then((data) => {
         setForm((prev) => ({
           ...prev,
-          positionName: data.positionName || "",
-          vacancy: String(data.vacancy || 1),
+          positions: [
+            {
+              name: data.positionName || "",
+              vacancy: String(data.vacancy || 1),
+            },
+          ],
           description: data.description || "",
           requirements: (() => {
             if (!data.requirements) return [];
@@ -152,9 +155,11 @@ const useCreateRecruitment = (preselectedEventId = "") => {
     : null;
 
   const buildPayload = (status = "OPEN") => ({
-    positionName: form.positionName,
+    positions: form.positions.map((p) => ({
+      positionName: p.name,
+      vacancy: parseInt(p.vacancy) || 1,
+    })),
     description: form.description || null,
-    vacancy: parseInt(form.vacancy) || 1,
     requirements: form.requirements.length > 0 ? form.requirements : null,
     benefits: form.benefits.length > 0 ? form.benefits : null,
     deadline: form.deadline ? dayjs(form.deadline).toISOString() : null,
@@ -171,9 +176,20 @@ const useCreateRecruitment = (preselectedEventId = "") => {
     setError(null);
     try {
       if (isEditMode) {
+        // Edit mode: chỉ update recruitment hiện tại (single position)
+        const payload = buildPayload("DRAFT");
         await recruitmentService.updateRecruitment(
           editRecruitmentId,
-          buildPayload("DRAFT"),
+          {
+            positionName: payload.positions[0]?.positionName,
+            vacancy: payload.positions[0]?.vacancy,
+            description: payload.description,
+            requirements: payload.requirements,
+            benefits: payload.benefits,
+            deadline: payload.deadline,
+            formId: payload.formId,
+            status: "DRAFT",
+          },
         );
       } else {
         await recruitmentService.createRecruitment(
@@ -227,9 +243,19 @@ const useCreateRecruitment = (preselectedEventId = "") => {
     setError(null);
     try {
       if (isEditMode) {
+        const payload = buildPayload("OPEN");
         await recruitmentService.updateRecruitment(
           editRecruitmentId,
-          buildPayload("OPEN"),
+          {
+            positionName: payload.positions[0]?.positionName,
+            vacancy: payload.positions[0]?.vacancy,
+            description: payload.description,
+            requirements: payload.requirements,
+            benefits: payload.benefits,
+            deadline: payload.deadline,
+            formId: payload.formId,
+            status: "OPEN",
+          },
         );
       } else {
         await recruitmentService.createRecruitment(

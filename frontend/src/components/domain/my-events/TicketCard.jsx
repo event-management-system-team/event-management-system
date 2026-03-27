@@ -8,6 +8,7 @@ const TicketCard = ({
   location,
   ticketCount,
   status,
+  hasCheckedIn,
   eventSlug,
   eventId,
 }) => {
@@ -80,7 +81,7 @@ const TicketCard = ({
           >
             Details
           </Link>
-          {status?.toUpperCase() === 'CHECKED_IN' && (
+          {hasCheckedIn && (
             <Link
               to={`/attendee/submit-feedback/${eventId}`}
               className="w-full sm:flex-1 bg-white border-2 border-[#8aa8b2] text-[#8aa8b2] hover:bg-gray-50 py-2 md:py-2.5 rounded-lg flex items-center justify-center gap-2 text-xs md:text-sm font-bold transition-colors"
