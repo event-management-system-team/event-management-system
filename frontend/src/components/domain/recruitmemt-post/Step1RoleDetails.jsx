@@ -1,8 +1,10 @@
-import { Briefcase, Hash, Plus, Trash2 } from "lucide-react";
+import { Briefcase, Hash, Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
 import { FieldError, inputCls } from "./RecruitmentShared";
 
 const Step1RoleDetails = ({ form, onChange, errors = {} }) => {
-  const positions = form.positions || [{ name: "", vacancy: "1" }];
+  const positions = form.positions || [{ name: "", vacancy: "1", description: "", requirements: [] }];
+  const [expandedIdx, setExpandedIdx] = useState(0);
 
   const updatePosition = (index, field, value) => {
     const updated = positions.map((p, i) =>
@@ -12,12 +14,18 @@ const Step1RoleDetails = ({ form, onChange, errors = {} }) => {
   };
 
   const addPosition = () => {
-    onChange({ positions: [...positions, { name: "", vacancy: "1" }] });
+    const newPositions = [...positions, { name: "", vacancy: "1", description: "", requirements: [] }];
+    onChange({ positions: newPositions });
+    setExpandedIdx(newPositions.length - 1);
   };
 
   const removePosition = (index) => {
     if (positions.length <= 1) return;
-    onChange({ positions: positions.filter((_, i) => i !== index) });
+    const newPositions = positions.filter((_, i) => i !== index);
+    onChange({ positions: newPositions });
+    if (expandedIdx >= newPositions.length) {
+      setExpandedIdx(newPositions.length - 1);
+    }
   };
 
   return (
@@ -35,72 +43,102 @@ const Step1RoleDetails = ({ form, onChange, errors = {} }) => {
           {positions.map((pos, idx) => {
             const nameErr = errors[`positions.${idx}.name`];
             const vacErr = errors[`positions.${idx}.vacancy`];
+            const isExpanded = expandedIdx === idx;
             return (
               <div
                 key={idx}
-                className="flex items-start gap-3 p-4 rounded-xl border border-gray-100 bg-gray-50/60 transition hover:border-gray-200"
+                className="rounded-xl border border-gray-100 bg-gray-50/60 transition hover:border-gray-200 overflow-hidden"
               >
-                {/* Position Name */}
-                <div className="flex-1">
-                  {idx === 0 && (
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5">
-                      Position Name <span className="text-red-400">*</span>
-                    </label>
-                  )}
-                  <input
-                    type="text"
-                    placeholder="e.g. Volunteer, Stage Manager…"
-                    value={pos.name}
-                    onChange={(e) => updatePosition(idx, "name", e.target.value)}
-                    className={inputCls(nameErr)}
-                  />
-                  <FieldError msg={nameErr} />
+                {/* Header row */}
+                <div className="flex items-start gap-3 p-4">
+                  {/* Position Name */}
+                  <div className="flex-1">
+                    {idx === 0 && (
+                      <label className="block text-xs font-semibold text-gray-500 mb-1.5">
+                        Position Name <span className="text-red-400">*</span>
+                      </label>
+                    )}
+                    <input
+                      type="text"
+                      placeholder="e.g. Volunteer, Stage Manager…"
+                      value={pos.name}
+                      onChange={(e) => updatePosition(idx, "name", e.target.value)}
+                      className={inputCls(nameErr)}
+                    />
+                    <FieldError msg={nameErr} />
+                  </div>
+
+                  {/* Vacancy */}
+                  <div className="w-28">
+                    {idx === 0 && (
+                      <label className="block text-xs font-semibold text-gray-500 mb-1.5">
+                        Vacancies <span className="text-red-400">*</span>
+                      </label>
+                    )}
+                    <div className="relative">
+                      <Hash
+                        size={13}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                      />
+                      <input
+                        type="number"
+                        min="1"
+                        placeholder="1"
+                        value={pos.vacancy}
+                        onChange={(e) =>
+                          updatePosition(idx, "vacancy", e.target.value)
+                        }
+                        className={`w-full pl-8 pr-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 transition bg-white ${
+                          vacErr
+                            ? "border-red-400 focus:ring-red-200"
+                            : "border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]"
+                        }`}
+                      />
+                    </div>
+                    <FieldError msg={vacErr} />
+                  </div>
+
+                  {/* Expand/Collapse button */}
+                  <button
+                    type="button"
+                    onClick={() => setExpandedIdx(isExpanded ? -1 : idx)}
+                    className={`mt-${idx === 0 ? "7" : "1"} p-2 rounded-lg transition text-gray-500 hover:bg-gray-100`}
+                    title={isExpanded ? "Collapse" : "Expand description"}
+                  >
+                    {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  </button>
+
+                  {/* Remove button */}
+                  <button
+                    type="button"
+                    onClick={() => removePosition(idx)}
+                    disabled={positions.length <= 1}
+                    className={`mt-${idx === 0 ? "7" : "1"} p-2 rounded-lg transition ${
+                      positions.length <= 1
+                        ? "text-gray-300 cursor-not-allowed"
+                        : "text-red-400 hover:bg-red-50 hover:text-red-600"
+                    }`}
+                    title="Remove position"
+                  >
+                    <Trash2 size={16} />
+                  </button>
                 </div>
 
-                {/* Vacancy */}
-                <div className="w-28">
-                  {idx === 0 && (
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5">
-                      Vacancies <span className="text-red-400">*</span>
+                {/* Expandable description */}
+                {isExpanded && (
+                  <div className="px-4 pb-4 border-t border-gray-100 pt-3">
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                      Description for "{pos.name || `Position ${idx + 1}`}"
                     </label>
-                  )}
-                  <div className="relative">
-                    <Hash
-                      size={13}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                    />
-                    <input
-                      type="number"
-                      min="1"
-                      placeholder="1"
-                      value={pos.vacancy}
-                      onChange={(e) =>
-                        updatePosition(idx, "vacancy", e.target.value)
-                      }
-                      className={`w-full pl-8 pr-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 transition bg-white ${
-                        vacErr
-                          ? "border-red-400 focus:ring-red-200"
-                          : "border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]"
-                      }`}
+                    <textarea
+                      placeholder="Describe the responsibilities and daily tasks for this position…"
+                      value={pos.description || ""}
+                      onChange={(e) => updatePosition(idx, "description", e.target.value)}
+                      rows={4}
+                      className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] resize-y transition bg-white"
                     />
                   </div>
-                  <FieldError msg={vacErr} />
-                </div>
-
-                {/* Remove button */}
-                <button
-                  type="button"
-                  onClick={() => removePosition(idx)}
-                  disabled={positions.length <= 1}
-                  className={`mt-${idx === 0 ? "7" : "1"} p-2 rounded-lg transition ${
-                    positions.length <= 1
-                      ? "text-gray-300 cursor-not-allowed"
-                      : "text-red-400 hover:bg-red-50 hover:text-red-600"
-                  }`}
-                  title="Remove position"
-                >
-                  <Trash2 size={16} />
-                </button>
+                )}
               </div>
             );
           })}
@@ -149,20 +187,6 @@ const Step1RoleDetails = ({ form, onChange, errors = {} }) => {
             </select>
           )}
           <FieldError msg={errors.eventId} />
-        </div>
-
-        {/* --- Description --- */}
-        <div className="mt-6">
-          <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-            Job Description
-          </label>
-          <textarea
-            placeholder="Describe the responsibilities and daily tasks…"
-            value={form.description}
-            onChange={(e) => onChange({ description: e.target.value })}
-            rows={5}
-            className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] resize-y transition bg-white"
-          />
         </div>
       </section>
     </div>
