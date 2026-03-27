@@ -37,15 +37,9 @@ function App() {
     const msUntilRefresh = tokenExpiresAt - now - REFRESH_BEFORE_EXPIRY_MS;
 
     if (msUntilRefresh <= 0) {
-      // Token already expired or about to expire, refresh immediately
-      console.log("[TokenRefresh] Token expired or about to expire, refreshing now...");
       dispatch(autoRefreshToken());
     } else {
-      console.log(
-        `[TokenRefresh] Scheduling refresh in ${Math.round(msUntilRefresh / 1000)}s`,
-      );
       refreshTimerRef.current = setTimeout(() => {
-        console.log("[TokenRefresh] Proactively refreshing token...");
         dispatch(autoRefreshToken());
       }, msUntilRefresh);
     }
