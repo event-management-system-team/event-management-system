@@ -19,4 +19,5 @@ public class RecruitmentDetailDTO {
     private String requirements;
     private LocalDateTime deadline;
     private String status;
+    private java.util.UUID formId;
 }

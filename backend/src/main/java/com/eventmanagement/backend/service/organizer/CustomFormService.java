@@ -77,6 +77,12 @@ public class CustomFormService {
             LocalDateTime now = LocalDateTime.now();
             
             for (Recruitment r : recruitments) {
+                // Không thay đổi status của recruitment đang ở trạng thái DRAFT
+                // DRAFT chỉ được chuyển sang OPEN khi organizer submit recruitment post
+                if (RecruitmentStatus.DRAFT.equals(r.getStatus())) {
+                    continue;
+                }
+
                 r.setDeadline(savedForm.getDeadline());
                 if (savedForm.isActive()) {
                     if (now.isBefore(event.getStartDate())) {
@@ -93,7 +99,10 @@ public class CustomFormService {
                         }
                     }
                 } else {
-                    r.setStatus(RecruitmentStatus.CLOSED);
+                    // Form inactive: chỉ close các recruitment đang OPEN, không động đến DRAFT
+                    if (RecruitmentStatus.OPEN.equals(r.getStatus())) {
+                        r.setStatus(RecruitmentStatus.CLOSED);
+                    }
                 }
             }
             recruitmentRepository.saveAll(recruitments);

@@ -1,9 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
-  ArrowLeft, Calendar, Users, Briefcase, FileText, CheckCircle, Edit, ClipboardList
+  ArrowLeft, Calendar, Users, Briefcase, FileText, CheckCircle, Edit, ClipboardList, Gift
 } from 'lucide-react';
 import axiosInstance from '../../config/axios';
+
+const getStatusBadge = (status) => {
+  const s = status?.toUpperCase();
+  switch (s) {
+    case 'OPEN':
+      return { text: 'Recruiting', className: 'bg-teal-100 text-teal-700' };
+    case 'DRAFT':
+      return { text: 'Draft', className: 'bg-yellow-100 text-yellow-700' };
+    case 'CLOSED':
+      return { text: 'Closed', className: 'bg-red-100 text-red-600' };
+    default:
+      return { text: status || 'Unknown', className: 'bg-gray-100 text-gray-600' };
+  }
+};
 
 const RecruitmentDetail = () => {
   const { recruitmentId } = useParams();
@@ -31,6 +45,8 @@ const RecruitmentDetail = () => {
   if (isLoading) return <div className="flex h-screen items-center justify-center font-bold text-gray-500 bg-[#F1F0E8]">Loading Data...</div>;
   if (!detailData) return <div className="flex h-screen items-center justify-center font-bold text-red-500 bg-[#F1F0E8]">Recruitment post not found!</div>;
 
+  const statusBadge = getStatusBadge(detailData.status);
+
   // Truyền recruitmentId qua location.state để RecruitmentBuilder load đúng bài edit
   const handleEdit = () => {
     navigate(`/organizer/recruitment-post/${detailData.eventId}`, {
@@ -55,7 +71,8 @@ const RecruitmentDetail = () => {
             <div>
               <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-1.5 sm:mb-2">
                 <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-900 tracking-tight">{detailData.positionName}</h1>
-                <span className={`px-2.5 py-1 text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider rounded-full whitespace-nowrap ${detailData.status === 'OPEN' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}>
+                <span className={`px-2.5 py-1 text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider rounded-full whitespace-nowrap ${statusBadge.className}`}>
+                  {statusBadge.text}
                 </span>
               </div>
               <p className="text-sm sm:text-base text-gray-500 font-medium flex items-center gap-2">
@@ -113,7 +130,7 @@ const RecruitmentDetail = () => {
             </div>
           </div>
 
-          {/* Hàng 2: Description & Requirements */}
+          {/* Hàng 2: Description & Requirements & Benefits */}
           <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             
             {/* Description Section */}
@@ -128,7 +145,7 @@ const RecruitmentDetail = () => {
             </div>
 
             {/* Requirements Section */}
-            <div className="p-5 sm:p-6 lg:p-8 bg-gray-50/50">
+            <div className={`p-5 sm:p-6 lg:p-8 bg-gray-50/50 ${detailData.benefits ? 'border-b border-gray-100' : ''}`}>
               <div className="flex items-center gap-2 mb-3 sm:mb-4">
                 <CheckCircle size={18} className="text-teal-500 sm:w-5 sm:h-5" />
                 <h3 className="text-base sm:text-lg font-extrabold text-gray-900">Requirements</h3>
@@ -137,6 +154,19 @@ const RecruitmentDetail = () => {
                 {detailData.requirements || 'No specific requirements listed.'}
               </p>
             </div>
+
+            {/* Benefits Section */}
+            {detailData.benefits && (
+              <div className="p-5 sm:p-6 lg:p-8">
+                <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                  <Gift size={18} className="text-purple-500 sm:w-5 sm:h-5" />
+                  <h3 className="text-base sm:text-lg font-extrabold text-gray-900">Benefits</h3>
+                </div>
+                <p className="text-sm sm:text-base text-gray-600 font-medium leading-relaxed whitespace-pre-line">
+                  {detailData.benefits}
+                </p>
+              </div>
+            )}
 
           </div>
         </div>

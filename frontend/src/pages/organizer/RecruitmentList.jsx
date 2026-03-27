@@ -151,15 +151,17 @@ const RecruitmentList = () => {
               const now = new Date();
               const isPastDeadline = job.deadline ? now > new Date(job.deadline) : false;
               
-              let currentStatus = 'OPEN'; // Mặc định là đang tuyển
+              // Lấy status thật từ backend trước
+              let currentStatus = job.status?.toUpperCase() || 'OPEN';
               
-              // Ép cứng thành CLOSED nếu sự kiện đã kết thúc HOẶC đã quá hạn deadline
-              if (isEventEnded || isPastDeadline) {
+              // Chỉ override thành CLOSED nếu đang OPEN mà hết hạn
+              if (currentStatus === 'OPEN' && (isEventEnded || isPastDeadline)) {
                 currentStatus = 'CLOSED';
               }
               // ---------------------------------------------
 
               const ui = getStatusUI(currentStatus);
+              const isDraft = currentStatus === 'DRAFT';
               const progressPercent = job.total > 0 ? Math.min((job.currentCount / job.total) * 100, 100) : 0;
               
               return (
@@ -169,25 +171,27 @@ const RecruitmentList = () => {
                   <div className="w-full md:w-1/3">
                     <div className="flex items-center gap-3 mb-3 md:mb-4">
                       <h3 className="font-extrabold text-gray-900 text-base lg:text-lg ">{job.title}</h3>
-                      {job.isNew && (
+                      {!isDraft && job.isNew && (
                         <span className="bg-orange-100 text-orange-600 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
                           {job.newCount} NEW
                         </span>
                       )}
                     </div>
                     
-                    <div className="w-full sm:max-w-xs">
-                      <div className="flex justify-between text-[11px] font-bold text-gray-400 mb-1.5">
-                        <span className="uppercase tracking-widest">Hiring Progress</span>
-                        <span className="text-gray-600">{job.currentCount} / {job.total}</span>
+                    {!isDraft && (
+                      <div className="w-full sm:max-w-xs">
+                        <div className="flex justify-between text-[11px] font-bold text-gray-400 mb-1.5">
+                          <span className="uppercase tracking-widest">Hiring Progress</span>
+                          <span className="text-gray-600">{job.currentCount} / {job.total}</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-[#8c9db3] rounded-full transition-all duration-700 ease-out"
+                            style={{ width: `${progressPercent}%` }}
+                          ></div>
+                        </div>
                       </div>
-                      <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-[#8c9db3] rounded-full transition-all duration-700 ease-out"
-                          style={{ width: `${progressPercent}%` }}
-                        ></div>
-                      </div>
-                    </div>
+                    )}
                   </div>
 
                   {/* Cột 2: Trạng thái & Deadline */}
@@ -205,18 +209,31 @@ const RecruitmentList = () => {
 
                   {/* Cột 3: Nút bấm */}
                   <div className="w-full md:w-1/3 flex items-center justify-end gap-3 mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-none border-gray-50">
-                    {/* Nút Applications */}
-                    <Link
-                      to={`/organizer/applications/${job.recruitmentId}`}
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs lg:text-sm font-bold bg-orange-50 text-orange-600 hover:bg-orange-100 transition-all shadow-sm whitespace-nowrap"
-                    >
-                      Applications
-                      {job.newCount > 0 && (
-                        <span className="bg-orange-500 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
-                          {job.newCount}
-                        </span>
-                      )}
-                    </Link>
+                    {/* Nút Applications - ẩn khi DRAFT */}
+                    {!isDraft && (
+                      <Link
+                        to={`/organizer/applications/${job.recruitmentId}`}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs lg:text-sm font-bold bg-orange-50 text-orange-600 hover:bg-orange-100 transition-all shadow-sm whitespace-nowrap"
+                      >
+                        Applications
+                        {job.newCount > 0 && (
+                          <span className="bg-orange-500 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                            {job.newCount}
+                          </span>
+                        )}
+                      </Link>
+                    )}
+
+                    {/* Nút Edit - chỉ hiện khi DRAFT */}
+                    {isDraft && (
+                      <Link
+                        to={`/organizer/recruitment-post/${eventId}`}
+                        state={{ recruitmentId: job.recruitmentId }}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs lg:text-sm font-bold bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition-all shadow-sm whitespace-nowrap"
+                      >
+                        Edit Draft
+                      </Link>
+                    )}
 
                     {/* Nút View Detail */}
                     <Link
