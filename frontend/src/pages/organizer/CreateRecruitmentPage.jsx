@@ -1,5 +1,7 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { useState } from "react";
 import { ArrowLeft, ArrowRight, Rocket, AlertCircle, CheckCircle } from "lucide-react";
+import { Alert } from "../../components/common/Alert";
 import {
   StepIndicator,
   ProgressHeader,
@@ -18,6 +20,7 @@ const STEP_HINTS = {
 
 const CreateRecruitmentPage = () => {
   const { eventId: preselectedEventId } = useParams();
+  const [positionAlert, setPositionAlert] = useState(null);
 
   const {
     step,
@@ -33,7 +36,6 @@ const CreateRecruitmentPage = () => {
     handleContinueStep1,
     handleContinueStep2,
     handleSubmit,
-    isEditMode,
     eventStartDate,
     handleBack,
   } = useCreateRecruitment(preselectedEventId);
@@ -41,6 +43,21 @@ const CreateRecruitmentPage = () => {
   const handleChange = (partial) => {
     updateForm(partial);
     Object.keys(partial).forEach(clearFieldError);
+    // Clear position alert khi user thay đổi form
+    if (positionAlert) setPositionAlert(null);
+  };
+
+  const handleContinueStep1WithAlert = () => {
+    // Check if any position is empty
+    const hasEmptyPositions = (form.positions || []).some(p => !p.name || p.name.trim() === "");
+    
+    if (hasEmptyPositions) {
+      setPositionAlert("All positions must have a name. Please fill in or remove empty positions.");
+      return;
+    }
+    
+    setPositionAlert(null);
+    handleContinueStep1();
   };
 
   return (
@@ -61,6 +78,14 @@ const CreateRecruitmentPage = () => {
             <main className="flex-1 max-w-3xl w-full mx-auto py-10 px-4">
 
               <StepIndicator currentStep={step} />
+
+              {step === 1 && positionAlert && (
+                <Alert
+                  type="error"
+                  message={positionAlert}
+                  onClose={() => setPositionAlert(null)}
+                />
+              )}
 
               {step === 1 && (
                 <Step1RoleDetails
@@ -124,7 +149,7 @@ const CreateRecruitmentPage = () => {
 
                   {step === 1 && (
                     <button
-                      onClick={handleContinueStep1}
+                      onClick={handleContinueStep1WithAlert}
                       className="flex items-center gap-2 bg-[#2d3a4f] hover:bg-[#1e293b] text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition shadow-sm"
                     >
                       Continue to Requirements

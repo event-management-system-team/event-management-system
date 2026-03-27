@@ -7,12 +7,11 @@ import organizerService from "../services/organizer.service";
 import { validateStep1, validateStep2 } from "../schemas/recruitment.schema";
 
 const initialForm = {
-  positions: [{ name: "", vacancy: "1" }],
+  positions: [{ name: "", vacancy: "1", requirements: [] }],
   eventId: "",
   description: "",
   eventOptions: [],
 
-  requirements: [],
   benefits: [],
   deadline: null,
 
@@ -148,19 +147,20 @@ const useCreateRecruitment = (preselectedEventId = "") => {
             {
               name: data.positionName || "",
               vacancy: String(data.vacancy || 1),
+              requirements: parsedReqs,
             },
           ],
           description: data.description || "",
-          requirements: parsedReqs,
           benefits: parsedBenefits,
           deadline: data.deadline ? new Date(data.deadline) : null,
           formId: data.formId || null,
+          eventId: data.eventId || prev.eventId,
         }));
 
         // Tự động chuyển đến step phù hợp dựa trên dữ liệu đã điền
-        // Nếu đã có deadline hoặc requirements/benefits → step 2 đã xong → vào step 3
+        // Nếu đã có deadline hoặc benefits → step 2 đã xong → vào step 3
         // Nếu chỉ có position name → step 1 đã xong → vào step 2
-        if (data.deadline || parsedReqs.length > 0 || parsedBenefits.length > 0) {
+        if (data.deadline || parsedBenefits.length > 0) {
           setStep(3);
         } else if (data.positionName) {
           setStep(2);
@@ -199,18 +199,20 @@ const useCreateRecruitment = (preselectedEventId = "") => {
     ? new Date(selectedEvent.startDate)
     : null;
 
-  const buildPayload = (status = "OPEN") => ({
-    positions: form.positions.map((p) => ({
-      positionName: p.name,
-      vacancy: parseInt(p.vacancy) || 1,
-    })),
-    description: form.description || null,
-    requirements: form.requirements.length > 0 ? form.requirements : null,
-    benefits: form.benefits.length > 0 ? form.benefits : null,
-    deadline: form.deadline ? dayjs(form.deadline).toISOString() : null,
-    formId: form.formId || null,
-    status,
-  });
+  const buildPayload = (status = "OPEN") => {
+    return {
+      positions: form.positions.map((p) => ({
+        positionName: p.name,
+        vacancy: parseInt(p.vacancy) || 1,
+        requirements: p.requirements && p.requirements.length > 0 ? p.requirements : null,
+      })),
+      description: form.description || null,
+      benefits: form.benefits.length > 0 ? form.benefits : null,
+      deadline: form.deadline ? dayjs(form.deadline).toISOString() : null,
+      formId: form.formId || null,
+      status,
+    };
+  };
 
   const handleSaveDraft = async () => {
     if (!form.eventId) {

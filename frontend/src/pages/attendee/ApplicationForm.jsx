@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query'
 import recruitmentService from '../../services/recruitment.service'
 import LoadingState from '../../components/common/LoadingState'
 import EmptyState from '../../components/common/EmptyState'
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import profileService from '../../services/profile.service'
 import ClosedRecruitmentRedirect from '../../components/domain/attendee/application-form/ClosedRecruitmentRedirect';
 const ApplicationFormPage = () => {
