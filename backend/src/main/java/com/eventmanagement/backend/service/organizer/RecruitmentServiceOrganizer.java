@@ -127,6 +127,7 @@ public class RecruitmentServiceOrganizer {
                 .status(r.getStatus().name())
                 .requirements(r.getRequirements())
                 .benefits(benefitsStr)
+                .formId(r.getCustomForm() != null ? r.getCustomForm().getFormId() : null)
                 .build();
     }
 

@@ -4,7 +4,7 @@ import { FileText, Plus, Search, Info } from "lucide-react";
 import { FieldError } from "./RecruitmentShared";
 import useRecruitmentForms from "../../../hooks/useRecruitmentForms";
 
-const Step3SelectForm = ({ form, onChange, errors = {} }) => {
+const Step3SelectForm = ({ form, onChange, errors = {}, persistDraft }) => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
 
@@ -14,6 +14,12 @@ const Step3SelectForm = ({ form, onChange, errors = {} }) => {
   const filtered = forms.filter((f) =>
     f.formName?.toLowerCase().includes(search.toLowerCase()),
   );
+
+  // Lưu form state vào sessionStorage TRƯỚC khi navigate sang FormBuilder
+  const goToFormBuilder = () => {
+    if (persistDraft) persistDraft();
+    navigate(`/organizer/recruitmentcreate/${form.eventId}`);
+  };
 
   return (
     <div className="space-y-6">
@@ -27,7 +33,7 @@ const Step3SelectForm = ({ form, onChange, errors = {} }) => {
           </h2>
           <button
             type="button"
-            onClick={() => navigate(`/organizer/recruitmentcreate/${form.eventId}`)}
+            onClick={goToFormBuilder}
             className="flex items-center gap-1.5 text-xs font-semibold text-[#4a9e9e] hover:text-[#3d8f8f] transition"
           >
             <Plus size={13} />
@@ -62,47 +68,77 @@ const Step3SelectForm = ({ form, onChange, errors = {} }) => {
           <div className="space-y-3">
             {filtered.map((f) => {
               const isSelected = form.formId === f.formId;
+              const isDraftForm = !f.isActive;
               return (
                 <div
                   key={f.formId}
-                  onClick={() => onChange({ formId: f.formId })}
-                  className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all ${
-                    isSelected
-                      ? "border-[#4a9e9e]/50 bg-[#f0fafa]"
-                      : "border-gray-100 hover:border-gray-200 hover:bg-gray-50"
+                  onClick={() => {
+                    if (!isDraftForm) onChange({ formId: f.formId });
+                  }}
+                  className={`flex items-center gap-4 p-4 rounded-xl border transition-all ${
+                    isDraftForm
+                      ? "border-yellow-200 bg-yellow-50/50 cursor-default"
+                      : isSelected
+                        ? "border-[#4a9e9e]/50 bg-[#f0fafa] cursor-pointer"
+                        : "border-gray-100 hover:border-gray-200 hover:bg-gray-50 cursor-pointer"
                   }`}
                 >
                   <div
                     className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                      isSelected ? "bg-[#4a9e9e]/20" : "bg-gray-100"
+                      isDraftForm
+                        ? "bg-yellow-100"
+                        : isSelected ? "bg-[#4a9e9e]/20" : "bg-gray-100"
                     }`}
                   >
                     <FileText
                       size={18}
                       className={
-                        isSelected ? "text-[#4a9e9e]" : "text-gray-400"
+                        isDraftForm
+                          ? "text-yellow-500"
+                          : isSelected ? "text-[#4a9e9e]" : "text-gray-400"
                       }
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-800">
-                      {f.formName}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-semibold text-gray-800">
+                        {f.formName}
+                      </p>
+                      {isDraftForm && (
+                        <span className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full bg-yellow-100 text-yellow-700 border border-yellow-200">
+                          Draft
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-gray-400 truncate mt-0.5">
                       {f.formSchema?.length ?? 0} questions
+                      {isDraftForm && " · Publish this form before it can be used"}
                     </p>
                   </div>
-                  <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
-                      isSelected
-                        ? "border-[#4a9e9e] bg-[#4a9e9e]"
-                        : "border-gray-300"
-                    }`}
-                  >
-                    {isSelected && (
-                      <div className="w-2 h-2 rounded-full bg-white" />
-                    )}
-                  </div>
+                  {isDraftForm ? (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        goToFormBuilder();
+                      }}
+                      className="px-3 py-1.5 text-xs font-semibold text-yellow-700 bg-yellow-100 hover:bg-yellow-200 border border-yellow-200 rounded-lg transition flex-shrink-0"
+                    >
+                      Edit Form
+                    </button>
+                  ) : (
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                        isSelected
+                          ? "border-[#4a9e9e] bg-[#4a9e9e]"
+                          : "border-gray-300"
+                      }`}
+                    >
+                      {isSelected && (
+                        <div className="w-2 h-2 rounded-full bg-white" />
+                      )}
+                    </div>
+                  )}
                 </div>
               );
             })}

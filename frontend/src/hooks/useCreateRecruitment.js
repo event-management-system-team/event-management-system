@@ -27,10 +27,24 @@ const SESSION_KEY = "recruitment_draft_form";
 
 const serializeForm = (form, step) => {
   try {
+    let deadlineISO = null;
+    if (form.deadline) {
+      if (typeof form.deadline === 'string') {
+        deadlineISO = form.deadline;
+      } else if (typeof form.deadline.toISOString === 'function') {
+        deadlineISO = form.deadline.toISOString();
+      } else if (form.deadline.$d instanceof Date) {
+        // dayjs object — use $d which is the internal Date
+        deadlineISO = form.deadline.$d.toISOString();
+      } else {
+        // Fallback: try converting to Date
+        deadlineISO = new Date(form.deadline).toISOString();
+      }
+    }
     return JSON.stringify({
       ...form,
       eventOptions: [], // không cần persist list option
-      deadline: form.deadline ? form.deadline.toISOString() : null,
+      deadline: deadlineISO,
       _step: step,
     });
   } catch {
@@ -62,8 +76,12 @@ const useCreateRecruitment = (preselectedEventId = "") => {
   const editRecruitmentId = location.state?.recruitmentId || null;
   const isEditMode = !!editRecruitmentId;
 
+  // Nếu navigate từ Form Builder, luôn quay lại Step 3
+  const fromFormBuilder = location.state?.fromFormBuilder || false;
+
   // Khởi tạo state từ sessionStorage nếu đang quay lại từ Form Builder
   const [step, setStep] = useState(() => {
+    if (fromFormBuilder) return 3;
     if (isEditMode) return 1;
     const saved = sessionStorage.getItem(SESSION_KEY);
     if (saved) {
@@ -91,6 +109,7 @@ const useCreateRecruitment = (preselectedEventId = "") => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [errors, setErrors] = useState({});
+  const [draftSaved, setDraftSaved] = useState(false);
 
   // Load danh sách events của organizer vào dropdown
   useEffect(() => {
@@ -107,6 +126,22 @@ const useCreateRecruitment = (preselectedEventId = "") => {
     if (!editRecruitmentId) return;
     recruitmentService.getRecruitmentById(editRecruitmentId)
       .then((data) => {
+        // Parse requirements: backend trả về string ngăn cách bởi \n
+        const parseToArray = (val) => {
+          if (!val) return [];
+          if (Array.isArray(val)) return val;
+          try {
+            const parsed = JSON.parse(val);
+            if (Array.isArray(parsed)) return parsed;
+          } catch {
+            // not JSON, split by newline
+          }
+          return val.split('\n').map(s => s.trim()).filter(Boolean);
+        };
+
+        const parsedReqs = parseToArray(data.requirements);
+        const parsedBenefits = parseToArray(data.benefits);
+
         setForm((prev) => ({
           ...prev,
           positions: [
@@ -116,19 +151,20 @@ const useCreateRecruitment = (preselectedEventId = "") => {
             },
           ],
           description: data.description || "",
-          requirements: (() => {
-            if (!data.requirements) return [];
-            if (Array.isArray(data.requirements)) return data.requirements;
-            try {
-              return JSON.parse(data.requirements);
-            } catch {
-              return [data.requirements];
-            }
-          })(),
-          benefits: data.benefits || [],
+          requirements: parsedReqs,
+          benefits: parsedBenefits,
           deadline: data.deadline ? new Date(data.deadline) : null,
           formId: data.formId || null,
         }));
+
+        // Tự động chuyển đến step phù hợp dựa trên dữ liệu đã điền
+        // Nếu đã có deadline hoặc requirements/benefits → step 2 đã xong → vào step 3
+        // Nếu chỉ có position name → step 1 đã xong → vào step 2
+        if (data.deadline || parsedReqs.length > 0 || parsedBenefits.length > 0) {
+          setStep(3);
+        } else if (data.positionName) {
+          setStep(2);
+        }
       })
       .catch(() => {});
   }, [editRecruitmentId]);
@@ -143,6 +179,15 @@ const useCreateRecruitment = (preselectedEventId = "") => {
   }, [form, step, isEditMode]);
 
   const clearDraft = () => sessionStorage.removeItem(SESSION_KEY);
+
+  // Lưu form state vào sessionStorage ĐỒNG BỘ (gọi trước khi navigate ra ngoài)
+  const persistDraft = () => {
+    if (isEditMode) return;
+    const serialized = serializeForm(form, step);
+    if (serialized) {
+      sessionStorage.setItem(SESSION_KEY, serialized);
+    }
+  };
 
   const updateForm = (partial) => setForm((prev) => ({ ...prev, ...partial }));
 
@@ -175,9 +220,9 @@ const useCreateRecruitment = (preselectedEventId = "") => {
     setSaving(true);
     setError(null);
     try {
+      const payload = buildPayload("DRAFT");
       if (isEditMode) {
         // Edit mode: chỉ update recruitment hiện tại (single position)
-        const payload = buildPayload("DRAFT");
         await recruitmentService.updateRecruitment(
           editRecruitmentId,
           {
@@ -192,13 +237,39 @@ const useCreateRecruitment = (preselectedEventId = "") => {
           },
         );
       } else {
-        await recruitmentService.createRecruitment(
-          form.eventId,
-          buildPayload("DRAFT"),
-        );
+        // Kiểm tra nếu event đã có recruitment → update thay vì create
+        let existingId = null;
+        try {
+          const dashboard = await recruitmentService.getDashboard(form.eventId);
+          const existing = dashboard?.recentRecruitments || [];
+          if (existing.length > 0) {
+            existingId = existing[0].recruitmentId;
+          }
+        } catch {
+          // Nếu không lấy được dashboard, thử create bình thường
+        }
+
+        if (existingId) {
+          await recruitmentService.updateRecruitment(existingId, {
+            positionName: payload.positions[0]?.positionName,
+            vacancy: payload.positions[0]?.vacancy,
+            description: payload.description,
+            requirements: payload.requirements,
+            benefits: payload.benefits,
+            deadline: payload.deadline,
+            formId: payload.formId,
+            status: "DRAFT",
+          });
+        } else {
+          await recruitmentService.createRecruitment(
+            form.eventId,
+            payload,
+          );
+        }
       }
-      clearDraft();
-      navigate(`/organizer/recruitmentlist/${form.eventId}`);
+      // Stay on current step, show success feedback
+      setDraftSaved(true);
+      setTimeout(() => setDraftSaved(false), 3000);
     } catch (err) {
       setError(err?.response?.data?.message || "Failed to save draft.");
     } finally {
@@ -242,8 +313,8 @@ const useCreateRecruitment = (preselectedEventId = "") => {
     setSaving(true);
     setError(null);
     try {
+      const payload = buildPayload("OPEN");
       if (isEditMode) {
-        const payload = buildPayload("OPEN");
         await recruitmentService.updateRecruitment(
           editRecruitmentId,
           {
@@ -258,10 +329,35 @@ const useCreateRecruitment = (preselectedEventId = "") => {
           },
         );
       } else {
-        await recruitmentService.createRecruitment(
-          form.eventId,
-          buildPayload("OPEN"),
-        );
+        // Kiểm tra nếu event đã có recruitment → update thay vì create
+        let existingId = null;
+        try {
+          const dashboard = await recruitmentService.getDashboard(form.eventId);
+          const existing = dashboard?.recentRecruitments || [];
+          if (existing.length > 0) {
+            existingId = existing[0].recruitmentId;
+          }
+        } catch {
+          // Nếu không lấy được dashboard, thử create bình thường
+        }
+
+        if (existingId) {
+          await recruitmentService.updateRecruitment(existingId, {
+            positionName: payload.positions[0]?.positionName,
+            vacancy: payload.positions[0]?.vacancy,
+            description: payload.description,
+            requirements: payload.requirements,
+            benefits: payload.benefits,
+            deadline: payload.deadline,
+            formId: payload.formId,
+            status: "OPEN",
+          });
+        } else {
+          await recruitmentService.createRecruitment(
+            form.eventId,
+            payload,
+          );
+        }
       }
       clearDraft();
       setStep(4);
@@ -302,8 +398,10 @@ const useCreateRecruitment = (preselectedEventId = "") => {
     errors,
     isEditMode,
     eventStartDate,
+    draftSaved,
     updateForm,
     clearFieldError,
+    persistDraft,
     handleSaveDraft,
     handleContinueStep1,
     handleContinueStep2,

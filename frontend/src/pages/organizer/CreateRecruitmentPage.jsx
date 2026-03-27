@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Rocket, AlertCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, Rocket, AlertCircle, CheckCircle } from "lucide-react";
 import {
   StepIndicator,
   ProgressHeader,
@@ -25,8 +25,10 @@ const CreateRecruitmentPage = () => {
     saving,
     error,
     errors,
+    draftSaved,
     updateForm,
     clearFieldError,
+    persistDraft,
     handleSaveDraft,
     handleContinueStep1,
     handleContinueStep2,
@@ -80,7 +82,15 @@ const CreateRecruitmentPage = () => {
                   form={form}
                   onChange={handleChange}
                   errors={errors}
+                  persistDraft={persistDraft}
                 />
+              )}
+
+              {draftSaved && (
+                <div className="mt-4 flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm">
+                  <CheckCircle size={16} className="shrink-0" />
+                  Draft saved successfully!
+                </div>
               )}
 
               {error && (
