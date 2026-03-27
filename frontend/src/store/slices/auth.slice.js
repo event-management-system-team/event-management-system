@@ -128,6 +128,7 @@ export const logoutUser = createAsyncThunk(
 const initialState = {
   user: authService.getUser(),
   accessToken: null,
+  tokenExpiresAt: null, // timestamp (ms) when the access token expires
   isAuthenticated: authService.isAuthenticated(),
   loading: false,
   appLoading: true, // Used to block the app render until autoRefresh finishes
@@ -146,7 +147,12 @@ const authSlice = createSlice({
       state.registerSuccess = false;
     },
     setAccessToken: (state, action) => {
-      state.accessToken = action.payload;
+      if (typeof action.payload === 'object') {
+        state.accessToken = action.payload.token;
+        state.tokenExpiresAt = action.payload.expiresAt || null;
+      } else {
+        state.accessToken = action.payload;
+      }
       state.isAuthenticated = true;
     },
     setUser: (state, action) => {
@@ -183,6 +189,9 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
         state.user = action.payload.user;
         state.accessToken = action.payload.accessToken;
+        state.tokenExpiresAt = action.payload.expiresIn
+          ? Date.now() + action.payload.expiresIn
+          : null;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -198,6 +207,9 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
         state.user = action.payload.user;
         state.accessToken = action.payload.accessToken;
+        state.tokenExpiresAt = action.payload.expiresIn
+          ? Date.now() + action.payload.expiresIn
+          : null;
       })
       .addCase(loginWithGoogle.rejected, (state, action) => {
         state.loading = false;
@@ -210,6 +222,9 @@ const authSlice = createSlice({
       .addCase(autoRefreshToken.fulfilled, (state, action) => {
         state.isAuthenticated = true;
         state.accessToken = action.payload.accessToken;
+        state.tokenExpiresAt = action.payload.expiresIn
+          ? Date.now() + action.payload.expiresIn
+          : null;
         state.appLoading = false;
 
         if (action.payload.user) {
@@ -224,6 +239,7 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.user = null;
         state.accessToken = null;
+        state.tokenExpiresAt = null;
         state.appLoading = false;
       })
 
@@ -270,12 +286,14 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = null;
         state.accessToken = null;
+        state.tokenExpiresAt = null;
         state.isAuthenticated = false;
       })
       .addCase(logoutUser.rejected, (state) => {
         state.loading = false;
         state.user = null;
         state.accessToken = null;
+        state.tokenExpiresAt = null;
         state.isAuthenticated = false;
       });
   },

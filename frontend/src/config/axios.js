@@ -89,10 +89,16 @@ axiosInstance.interceptors.response.use(
         );
 
         const newAccessToken = response.data.accessToken;
+        const expiresIn = response.data.expiresIn;
         console.log("Token refreshed");
 
-        // Update store with new token
-        store.dispatch(setAccessToken(newAccessToken));
+        // Update store with new token and expiration
+        store.dispatch(
+          setAccessToken({
+            token: newAccessToken,
+            expiresAt: expiresIn ? Date.now() + expiresIn : null,
+          }),
+        );
 
         // Process all queued requests with the new token
         processQueue(null, newAccessToken);
