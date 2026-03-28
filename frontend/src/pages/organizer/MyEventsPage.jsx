@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
     Calendar,
     Zap,
-    CalendarClock,
     CheckCircle2,
     Plus,
     Search,
@@ -22,7 +21,6 @@ const EVENTS_PER_PAGE = 5;
 
 const STATUS_STYLES = {
     Active: { dotColor: 'bg-green-500', textColor: 'text-green-700', bgColor: 'bg-green-50' },
-    Upcoming: { dotColor: 'bg-orange-400', textColor: 'text-orange-600', bgColor: 'bg-orange-50' },
     Completed: { dotColor: 'bg-gray-400', textColor: 'text-gray-600', bgColor: 'bg-gray-100' },
     Rejected: { dotColor: 'bg-red-500', textColor: 'text-red-600', bgColor: 'bg-red-50' },
     Draft: { dotColor: 'bg-yellow-400', textColor: 'text-yellow-700', bgColor: 'bg-yellow-50' },
@@ -32,7 +30,6 @@ const STATUS_STYLES = {
 const getEventDisplayStatus = (status, startDate) => {
     switch (status) {
         case 'APPROVED':
-            if (dayjs(startDate).isAfter(dayjs())) return { label: 'Upcoming', ...STATUS_STYLES.Upcoming };
             return { label: 'Active', ...STATUS_STYLES.Active };
         case 'ONGOING':
             return { label: 'Active', ...STATUS_STYLES.Active };
@@ -53,7 +50,7 @@ const MyEventsPage = () => {
     const navigate = useNavigate();
 
     const [events, setEvents] = useState([]);
-    const [stats, setStats] = useState({ totalEvents: 0, activeCount: 0, upcomingCount: 0, completedCount: 0 });
+    const [stats, setStats] = useState({ totalEvents: 0, activeCount: 0, completedCount: 0 });
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [totalElements, setTotalElements] = useState(0);
@@ -65,22 +62,25 @@ const MyEventsPage = () => {
     const [deleting, setDeleting] = useState(false);
 
     const FILTER_TAGS = [
-        { key: 'all', label: 'Tất cả' },
-        { key: 'completed', label: 'Completed' },
-        { key: 'upcoming', label: 'Upcoming' },
-        { key: 'rejected', label: 'Rejected' },
+        { key: 'all', label: 'All' },
+        { key: 'APPROVED', label: 'Approved' },
+        { key: 'COMPLETED', label: 'Completed' },
+        { key: 'REJECTED', label: 'Rejected' },
+        { key: 'DRAFT', label: 'Draft' },
+        { key: 'PENDING', label: 'Pending' },
     ];
 
     const abortRef = useRef(null);
 
-    const fetchEvents = useCallback(async (page) => {
+    const fetchEvents = useCallback(async (page, filter) => {
         if (abortRef.current) abortRef.current.abort();
         const controller = new AbortController();
         abortRef.current = controller;
 
         try {
             setLoading(true);
-            const data = await organizerService.getMyEvents(page, EVENTS_PER_PAGE);
+            const statusParam = filter === 'all' ? undefined : filter;
+            const data = await organizerService.getMyEvents(page, EVENTS_PER_PAGE, statusParam);
             if (controller.signal.aborted) return;
             setEvents(data.content || []);
             setTotalPages(data.totalPages || 0);
@@ -105,26 +105,18 @@ const MyEventsPage = () => {
     }, []);
 
     useEffect(() => {
-        fetchEvents(currentPage);
+        fetchEvents(currentPage, activeFilter);
         fetchStats();
 
         return () => {
             if (abortRef.current) abortRef.current.abort();
         };
-    }, [currentPage, fetchEvents, fetchStats]);
+    }, [currentPage, activeFilter, fetchEvents, fetchStats]);
 
     const filteredEvents = useMemo(() => {
         let result = events;
 
-        // Filter by status tag
-        if (activeFilter !== 'all') {
-            result = result.filter((e) => {
-                const display = getEventDisplayStatus(e.status, e.startDate);
-                return display.label.toLowerCase() === activeFilter;
-            });
-        }
-
-        // Filter by search term
+        // Filter by search term (client-side only for search)
         if (searchTerm.trim()) {
             const lower = searchTerm.toLowerCase();
             result = result.filter(
@@ -136,7 +128,7 @@ const MyEventsPage = () => {
         }
 
         return result;
-    }, [events, searchTerm, activeFilter]);
+    }, [events, searchTerm]);
 
     const getStatusDisplay = (status, startDate) => getEventDisplayStatus(status, startDate);
 
@@ -204,13 +196,6 @@ const MyEventsPage = () => {
             iconColor: 'text-green-500',
         },
         {
-            title: 'UPCOMING',
-            value: stats.upcomingCount,
-            icon: CalendarClock,
-            iconBg: 'bg-orange-50',
-            iconColor: 'text-orange-500',
-        },
-        {
             title: 'COMPLETED',
             value: stats.completedCount,
             icon: CheckCircle2,
@@ -236,8 +221,8 @@ const MyEventsPage = () => {
                         My Events Management
                     </h1>
                     <p className="text-gray-500 text-sm mt-1">
-                        Overview of your current, upcoming and past event performances.
-                    </p>    
+                        Overview of your current and past event performances.
+                    </p>
                 </div>
                 <button
                     onClick={() => navigate('/organizer/create-event')}
@@ -249,7 +234,7 @@ const MyEventsPage = () => {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-4 gap-5 mb-8">
+            <div className="grid grid-cols-3 gap-5 mb-8">
                 {statCards.map((card, index) => {
                     const Icon = card.icon;
                     return (
@@ -294,10 +279,10 @@ const MyEventsPage = () => {
                         {FILTER_TAGS.map((tag) => (
                             <button
                                 key={tag.key}
-                                onClick={() => setActiveFilter(tag.key)}
+                                onClick={() => { setActiveFilter(tag.key); setCurrentPage(0); }}
                                 className={`px-4 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer ${activeFilter === tag.key
-                                        ? 'bg-[#2d3a4f] text-white border-[#2d3a4f]'
-                                        : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                                    ? 'bg-[#2d3a4f] text-white border-[#2d3a4f]'
+                                    : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
                                     }`}
                             >
                                 {tag.label}
@@ -456,7 +441,7 @@ const MyEventsPage = () => {
                 {!loading && totalElements > 0 && (
                     <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
                         <p className="text-sm text-[#7FA5A5] font-medium">
-                            Showing {filteredEvents.length} of {totalElements} events
+                            Showing {currentPage * EVENTS_PER_PAGE + 1}-{Math.min((currentPage + 1) * EVENTS_PER_PAGE, totalElements)} of {totalElements} events
                         </p>
                         <div className="flex items-center gap-2">
                             <button

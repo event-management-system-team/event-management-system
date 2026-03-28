@@ -7,7 +7,6 @@ import {
     MapPin,
     Calendar,
     ArrowRight,
-    ChevronDown,
 } from 'lucide-react';
 import dayjs from 'dayjs';
 import {
@@ -51,7 +50,7 @@ const StatCard = ({ icon: Icon, label, value, loading, color, colorBg }) => (
         <div
             className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 bg-${colorBg}`}
         >
-            <Icon size={22} className={`text-${color}`}  />
+            <Icon size={22} className={`text-${color}`} />
         </div>
         <div>
             <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">
@@ -105,7 +104,6 @@ const OrganizerDashboardPage = () => {
     const [stats, setStats] = useState({
         totalEvents: 0,
         activeCount: 0,
-        upcomingCount: 0,
         completedCount: 0,
     });
     const [events, setEvents] = useState([]);
@@ -240,9 +238,6 @@ const OrganizerDashboardPage = () => {
                 <div className="col-span-5 bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col">
                     <div className="flex items-center justify-between mb-2">
                         <h2 className="text-lg font-bold text-gray-900">Ticket Sales</h2>
-                        <button className="flex items-center gap-1 text-xs text-gray-400 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition">
-                            This Week <ChevronDown size={14} />
-                        </button>
                     </div>
 
                     {totalCapacity === 0 && !loading ? (
@@ -311,9 +306,6 @@ const OrganizerDashboardPage = () => {
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                         <div className="flex items-center justify-between mb-1">
                             <h2 className="text-lg font-bold text-gray-900">Sales Revenue</h2>
-                            <button className="flex items-center gap-1 text-xs text-gray-400 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition">
-                                Last 8 Months <ChevronDown size={14} />
-                            </button>
                         </div>
                         <div className="mb-4">
                             <p className="text-xs text-gray-400">Total Revenue</p>
@@ -347,9 +339,6 @@ const OrganizerDashboardPage = () => {
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                         <div className="flex items-center justify-between mb-5">
                             <h2 className="text-lg font-bold text-gray-900">Popular Events</h2>
-                            <button className="flex items-center gap-1 text-xs text-gray-400 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition">
-                                Popular <ChevronDown size={14} />
-                            </button>
                         </div>
 
                         {categoryStats.length === 0 && !loading ? (
