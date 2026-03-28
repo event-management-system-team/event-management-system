@@ -344,7 +344,7 @@ const OrganizerDashboardPage = () => {
                     {/* Popular Events */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                         <div className="flex items-center justify-between mb-5">
-                            <h2 className="text-lg font-bold text-gray-900">Popular Events</h2>
+                            <h2 className="text-lg font-bold text-gray-900">Top Event Categories</h2>
                         </div>
 
                         {categoryStats.length === 0 && !loading ? (

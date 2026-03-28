@@ -154,7 +154,7 @@ const EventDetailDashboard = () => {
                 total,
                 registeredCount,
                 breakdown: data.ticketSalesBreakdown || {},
-                checkedIn: data.checkedInCount || Math.round(registeredCount * 0.375),
+                checkedIn: data.checkedInCount ?? 0,
             });
 
             try {
