@@ -299,7 +299,7 @@ const EventDetailDashboard = () => {
             </div>
 
             {/* Stat Cards Row */}
-            <div className="grid grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-3 gap-4 mb-6">
                 {isFreeEvent ? (
                     <StatCard
                         icon={Ticket}
@@ -330,24 +330,21 @@ const EventDetailDashboard = () => {
                     iconColor="text-red-500"
                     loading={loading}
                 />
-                <StatCard
-                    icon={Users}
-                    label="Registered"
-                    value={ticketStats.registeredCount?.toLocaleString() || '0'}
-                    subText="Total registrations"
-                    iconBg="bg-blue-50"
-                    iconColor="text-blue-500"
-                    loading={loading}
-                />
-                <StatCard
-                    icon={Star}
-                    label="Capacity"
-                    value={(event?.totalCapacity || 0).toLocaleString()}
-                    subText="Maximum attendees"
-                    iconBg="bg-yellow-50"
-                    iconColor="text-yellow-500"
-                    loading={loading}
-                />
+                
+                {/* Avg Rating Card matching Dashboard style */}
+                <div className="bg-[#fafaf8] rounded-2xl border border-gray-100 shadow-sm px-6 py-5 flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 bg-amber-50">
+                        <Star size={22} className="text-amber-400" fill="currentColor" />
+                    </div>
+                    <div>
+                        <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">
+                            Avg. Rating
+                        </p>
+                        <p className="text-2xl font-bold text-gray-900 mt-0.5">
+                            {loading ? '—' : avgRating.toFixed(1)}
+                        </p>
+                    </div>
+                </div>
             </div>
 
             {/* Main Content: Attendee List + Ticket Sales */}

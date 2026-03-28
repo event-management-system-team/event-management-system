@@ -319,6 +319,12 @@ public class BookingService {
                                 throw new RuntimeException("Failed to update ticket counts.");
                         redisTemplate.delete(buildReservationKey(ticketTypeId, order.getUser().getUserId()));
                 }
+
+                // Cập nhật số lượng người đã đăng ký (registeredCount) cho event
+                if (order.getEvent() != null) {
+                        eventRepository.incrementRegisteredCount(order.getEvent().getEventId(), tickets.size());
+                }
+
                 emailService.sendTicketEmail(order.getUser(), order, tickets);
                 log.info("[Booking] Order {} confirmed — tickets set to {}", order.getOrderCode(), ticketFinalStatus);
         }

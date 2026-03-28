@@ -18,6 +18,7 @@ import com.eventmanagement.backend.model.TicketType;
 import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.repository.EventCategoryRepository;
 import com.eventmanagement.backend.repository.EventRepository;
+import com.eventmanagement.backend.repository.FeedbackRepository;
 import com.eventmanagement.backend.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +50,7 @@ public class OrganizerEventService {
     private final EventCategoryRepository eventCategoryRepository;
     private final TicketRepository ticketRepository;
     private final CloudinaryService cloudinaryService;
+    private final FeedbackRepository feedbackRepository;
 
     // create event for organizer that support cover image
     @Transactional
@@ -518,6 +520,8 @@ public class OrganizerEventService {
             }
         }
 
+        Double avgRating = feedbackRepository.findAverageRating(event.getEventId());
+
         return OrganizerEventResponse.builder()
                 .eventId(event.getEventId())
                 .eventName(event.getEventName())
@@ -536,6 +540,7 @@ public class OrganizerEventService {
                 .ticketSalesBreakdown(breakdown)
                 .categoryName(event.getCategory() != null ? event.getCategory().getCategoryName() : null)
                 .isFree(event.getIsFree())
+                .avgRating(avgRating != null ? Math.round(avgRating * 10) / 10.0 : 0.0)
                 .build();
     }
 
