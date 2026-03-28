@@ -16,8 +16,6 @@ import {
   ShieldCheck,
   User,
   Building2,
-  Award,
-  FileText,
   Camera,
   Check,
   X,
@@ -194,7 +192,7 @@ const OrganizerProfilePage = () => {
   const avatarUrl = profile?.avatarUrl || user?.avatarUrl || user?.avatar_url;
 
   return (
-    <div className="p-8 lg:p-12 flex flex-col items-center min-h-screen">
+    <div className="p-8 lg:p-12 flex flex-col items-center pb-12">
       {/* Header */}
       <div className="w-full max-w-6xl mb-8">
         <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
@@ -361,67 +359,35 @@ const OrganizerProfilePage = () => {
             </div>
           </div>
 
-          {/* Professional Bio */}
-          <div className="mb-10">
+          {/* Account Info */}
+          <div className="mb-12">
             <h3 className="text-lg font-extrabold text-slate-900 flex items-center gap-2 mb-4">
-              <FileText size={20} className="text-[#89A8B2]" />
-              Professional Bio
+              <Building2 size={20} className="text-[#89A8B2]" />
+              Account Info
             </h3>
-            <p className="text-slate-600 leading-relaxed text-sm lg:text-base border-l-4 border-slate-100 pl-6 py-2">
-              Experienced event organizer specializing in creating memorable experiences. Managing events through the EventHub platform with a focus on seamless coordination and exceptional execution.
-            </p>
-          </div>
-
-          {/* Organization & Specialties */}
-          <div className="grid md:grid-cols-2 gap-10 mb-12">
-            {/* Organization */}
-            <div>
-              <h3 className="text-lg font-extrabold text-slate-900 flex items-center gap-2 mb-4">
-                <Building2 size={20} className="text-[#89A8B2]" />
-                Account Info
-              </h3>
-              <div className="space-y-4 bg-slate-50 p-6 rounded-2xl border border-slate-100">
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-bold text-slate-400 uppercase w-20 shrink-0">Email:</span>
-                  <span className="text-sm font-bold text-slate-800">{profile?.email}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-bold text-slate-400 uppercase w-20 shrink-0">Role:</span>
-                  <span className="text-sm font-bold text-slate-800 capitalize">{profile?.role?.toLowerCase()}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-bold text-slate-400 uppercase w-20 shrink-0">Joined:</span>
-                  <span className="text-sm font-bold text-slate-800">
-                    {profile?.createdAt
-                      ? new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
-                      : '—'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-bold text-slate-400 uppercase w-20 shrink-0">Status:</span>
-                  <span className="text-sm font-bold text-green-600 flex items-center gap-1.5">
-                    <span className="w-2 h-2 bg-green-500 rounded-full" />
-                    {profile?.emailVerified ? 'Verified' : 'Unverified'}
-                  </span>
-                </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-slate-50 p-6 rounded-2xl border border-slate-100">
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-bold text-slate-400 uppercase">Email</span>
+                <span className="text-sm font-bold text-slate-800 truncate">{profile?.email}</span>
               </div>
-            </div>
-
-            {/* Specialties / Quick Stats */}
-            <div>
-              <h3 className="text-lg font-extrabold text-slate-900 flex items-center gap-2 mb-4">
-                <Award size={20} className="text-[#89A8B2]" />
-                Specialties
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {['Event Management', 'Team Coordination', 'Recruitment', 'Logistics'].map((tag) => (
-                  <span
-                    key={tag}
-                    className="bg-[#89A8B2] text-white text-[11px] font-bold px-4 py-2 rounded-lg shadow-sm"
-                  >
-                    {tag}
-                  </span>
-                ))}
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-bold text-slate-400 uppercase">Role</span>
+                <span className="text-sm font-bold text-slate-800 capitalize">{profile?.role?.toLowerCase()}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-bold text-slate-400 uppercase">Joined</span>
+                <span className="text-sm font-bold text-slate-800">
+                  {profile?.createdAt
+                    ? new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                    : '—'}
+                </span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-bold text-slate-400 uppercase">Status</span>
+                <span className="text-sm font-bold text-green-600 flex items-center gap-1.5">
+                  <span className="w-2 h-2 bg-green-500 rounded-full" />
+                  {profile?.emailVerified ? 'Verified' : 'Unverified'}
+                </span>
               </div>
             </div>
           </div>
