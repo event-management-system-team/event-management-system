@@ -70,6 +70,17 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
 
     Page<Event> findByOrganizer_UserId(UUID userId, Pageable pageable);
 
+    Page<Event> findByOrganizer_UserIdAndStatus(UUID userId, EventStatus status, Pageable pageable);
+
+    @Query("SELECT e FROM Event e WHERE e.organizer.userId = :userId AND " +
+           "((e.status = :statusApproved AND e.startDate <= CURRENT_TIMESTAMP) " +
+           "OR e.status = :statusOngoing)")
+    Page<Event> findActiveEventsByOrganizer(
+            @Param("userId") UUID userId,
+            @Param("statusApproved") EventStatus statusApproved,
+            @Param("statusOngoing") EventStatus statusOngoing,
+            Pageable pageable);
+
     // function to get status upcoming: approved + startDate > now
     @Query("SELECT COUNT(e) FROM Event e WHERE e.organizer.userId = :organizerId AND e.status = :status AND e.startDate > CURRENT_TIMESTAMP")
     long countByOrganizer_UserIdAndStatusAndStartDateAfterNow(
