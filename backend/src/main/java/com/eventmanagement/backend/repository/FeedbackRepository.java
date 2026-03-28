@@ -62,4 +62,8 @@ public interface FeedbackRepository extends JpaRepository<Feedback, UUID> {
 
     // Query 5 — Review List (Pagination)
     org.springframework.data.domain.Page<Feedback> findByEvent_EventIdOrderBySubmittedAtDesc(UUID eventId, org.springframework.data.domain.Pageable pageable);
+
+    // Query 6 — Average Rating across all events of an organizer
+    @Query("SELECT AVG(f.rating) FROM Feedback f WHERE f.event.organizer.userId = :organizerId")
+    Double findAverageRatingByOrganizer(@Param("organizerId") UUID organizerId);
 }

@@ -39,4 +39,6 @@ public class OrganizerEventResponse {
     private String categoryName;
     
     private Boolean isFree;
+
+    private Double avgRating;
 }
