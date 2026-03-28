@@ -88,9 +88,17 @@ export function CreateResourceModal({ eventId, isOpen, onClose, onAlert, onCreat
         const descriptionError = validateDescription(formData.description);
         if (descriptionError) newErrors.description = descriptionError;
 
+        const resourceTypeError = !formData.resourceType ? "Resource type is required" : null;
+        if (resourceTypeError) newErrors.resourceType = resourceTypeError;
+
+        const fileError = !uploadedFile ? "File is required" : null;
+        if (fileError) newErrors.file = fileError;
+
         setErrors({
             resourceName: resourceNameError || null,
             description: descriptionError || null,
+            resourceType: resourceTypeError || null,
+            file: fileError || null,
         });
         return Object.keys(newErrors).length === 0;
     };
@@ -104,34 +112,40 @@ export function CreateResourceModal({ eventId, isOpen, onClose, onAlert, onCreat
         }
     }
 
+    const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+
+    const allowedTypes = [
+        "application/pdf",
+        "image/jpeg",
+        "image/png",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    ]
+
+    const validateFile = (file) => {
+        if (!allowedTypes.includes(file.type)) {
+            setErrors(prev => ({ ...prev, file: "Unsupported file type. Allowed: PDF, DOCX, XLSX, JPG, PNG" }))
+            onAlert("error", "Unsupported file type. Please upload PDF, DOCX, XLSX, JPG, or PNG files.")
+            return false
+        }
+
+        if (file.size > MAX_FILE_SIZE) {
+            setErrors(prev => ({ ...prev, file: `File size (${formatFileSize(file.size)}) exceeds maximum allowed size of 10MB` }))
+            onAlert("error", `File "${file.name}" is ${formatFileSize(file.size)}. Maximum allowed size is 10MB.`)
+            return false
+        }
+
+        return true
+    }
+
     const handleFileUpload = e => {
         const file = e.target.files?.[0]
         if (!file) return
 
-        const allowedTypes = [
-            "application/pdf",
-            "image/jpeg",
-            "image/png",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        ]
-
-        if (!allowedTypes.includes(file.type)) {
-            setErrors(prev => ({ ...prev, file: "Unsupported file type" }))
-            return
-        }
-
-        if (file.size > 10 * 1024 * 1024) {
-            setErrors(prev => ({ ...prev, file: "File must be < 10MB" }))
-            return
-        }
+        if (!validateFile(file)) return
 
         setUploadedFile(file)
-
-        setErrors(prev => ({
-            ...prev,
-            file: ""
-        }))
+        setErrors(prev => ({ ...prev, file: null }))
     }
 
     const handleRemoveFile = () => {
@@ -148,7 +162,10 @@ export function CreateResourceModal({ eventId, isOpen, onClose, onAlert, onCreat
         const file = e.dataTransfer.files?.[0]
         if (!file) return
 
+        if (!validateFile(file)) return
+
         setUploadedFile(file)
+        setErrors(prev => ({ ...prev, file: null }))
     }
 
     const formatFileSize = (bytes) => {

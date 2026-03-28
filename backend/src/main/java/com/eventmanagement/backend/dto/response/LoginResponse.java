@@ -13,6 +13,7 @@ import lombok.Data;
 public class LoginResponse {
     private String accessToken;
     private String tokenType = "Bearer";
+    private long expiresIn; // access token TTL in milliseconds
     private UserInfor user;
 
     @Data

@@ -111,6 +111,7 @@ public class RecruitmentService {
                 .map((position) -> PositionResponse.builder()
                         .recruitmentId(position.getRecruitmentId())
                         .positionName(position.getPositionName())
+                        .description(position.getDescription())
                         .vacancy(position.getVacancy())
                         .availableSlots(position.getVacancy() - position.getApprovedCount())
                         .requirements(position.getRequirements())

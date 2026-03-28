@@ -209,24 +209,22 @@ export function EventDetail() {
             <main className="flex-1 overflow-auto">
 
                 {/* Header */}
-                <header className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-5">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Link to="/admin" className="hover:text-gray-900">
-                                Dashboard
-                            </Link>
-                            <ChevronRight className="h-4 w-4" />
-                            <Link to="/admin/events" className="hover:text-gray-900">
-                                Event Management
-                            </Link>
-                            <ChevronRight className="h-4 w-4" />
-                            <span>Event Detail</span>
+                <header className="bg-[#F1F0E8] px-8 py-5 pt-8">
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <div className="flex items-center gap-4 text-gray-400 text-sm font-medium mb-3">
+                                <Link className="text-gray-500 hover:text-gray-700" to="/admin">Dashboard</Link>
+                                <ChevronRight className="h-4 w-4" />
+                                <Link className="text-gray-500 hover:text-gray-700" to="/admin/events">Event Management</Link>
+                                <ChevronRight className="h-4 w-4" />
+                                <span className="text-gray-600">Event Detail</span>
+                            </div>
                         </div>
                     </div>
                 </header>
 
                 {/* Event Banner & Title Section */}
-                <div className="relative">
+                <div className="relative border-b-2 border-[#fff]">
                     {/* Banner Image */}
                     <div className="h-48 bg-gradient-to-r from-slate-800 to-slate-600 relative overflow-hidden">
                         {event?.bannerUrl ? (
@@ -243,7 +241,7 @@ export function EventDetail() {
                     </div>
 
                     {/* Event Title & Metadata */}
-                    <div className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-6">
+                    <div className="bg-[#F1F0E8] border-b border-gray-200 px-8 py-6 pb-2">
                         <div className="flex items-start justify-between mb-4">
                             <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-3">
@@ -254,7 +252,7 @@ export function EventDetail() {
                                         ● {event?.status}
                                     </Badge>
                                 </div>
-                                <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                                <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight mb-4">
                                     {event?.eventName}
                                 </h1>
                                 <div className="grid grid-cols-3 gap-6">
@@ -297,7 +295,7 @@ export function EventDetail() {
                 <div className={`p-8 ${isPending ? "grid grid-cols-12 gap-6" : ""}`}>
                     <div className={isPending ? "col-span-8" : "col-span-12"}>
                         <Tabs defaultValue="general" className="w-full">
-                            <TabsList className="h-12 bg-[#f7f7f7] border-b border-gray-200 w-full justify-start rounded-none p-0">
+                            <TabsList className="h-12 bg-transparent w-full justify-start rounded-none p-0">
                                 <TabsTrigger
                                     value="general"
                                     className="h-12 bg-transparent border-b-2 border-transparent data-[state=active]:border-[#7FA5A5] data-[state=active]:text-[#7FA5A5] rounded-none px-6 data-[state=active]:shadow-none"
@@ -306,10 +304,10 @@ export function EventDetail() {
                                 </TabsTrigger>
                             </TabsList>
 
-                            <TabsContent value="general" className="mt-6 space-y-6">
+                            <TabsContent value="general" className="mt-4 space-y-6">
                                 {/* Event Overview */}
-                                <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
-                                    <CardHeader className="border-b border-gray-200">
+                                <Card className="bg-[#ffffff] shadow-sm border border-gray-100 rounded-xl">
+                                    <CardHeader className="border-b border-gray-50 pb-5">
                                         <CardTitle className="text-lg font-semibold">Event Overview</CardTitle>
                                         <CardDescription className='font-light text-gray-500'>
                                             Detailed event description and information
@@ -323,8 +321,8 @@ export function EventDetail() {
                                 </Card>
 
                                 {/* Inventory & Pricing */}
-                                <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
-                                    <CardHeader className="border-b border-gray-200">
+                                <Card className="bg-[#ffffff] shadow-sm border border-gray-100 rounded-xl">
+                                    <CardHeader className="border-b border-gray-50 pb-5">
                                         <CardTitle className="text-lg font-semibold">
                                             Inventory & Pricing
                                         </CardTitle>
@@ -404,8 +402,8 @@ export function EventDetail() {
                                 </Card>
 
                                 {/* Event Timeline */}
-                                <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
-                                    <CardHeader className="border-b border-gray-200">
+                                <Card className="bg-[#ffffff] shadow-sm border border-gray-100 rounded-xl">
+                                    <CardHeader className="border-b border-gray-50 pb-5">
                                         <CardTitle className="text-lg font-semibold">Event Timeline</CardTitle>
                                         <CardDescription className='font-light text-gray-500'>
                                             Scheduled sessions and activities
@@ -430,7 +428,7 @@ export function EventDetail() {
                                                         <div className="flex items-center gap-2 mb-1">
                                                             <Clock className="h-4 w-4 text-gray-400" />
                                                             <span className="text-sm font-semibold text-gray-900">
-                                                                {formatTime(item.startTime)}
+                                                                {formatTime(item.startTime)} - {formatTime(item.endTime)}
                                                             </span>
                                                         </div>
                                                         <div className="text-base font-medium text-gray-900 mb-1">
@@ -456,9 +454,9 @@ export function EventDetail() {
 
                     {/* Review & Approve Panel - Only show if status is Pending */}
                     {isPending && (
-                        <div className="col-span-4">
-                            <Card className="bg-[#f7f7f7] shadow-sm sticky top-8 border border-gray-200">
-                                <CardHeader className="border-b border-gray-200">
+                        <div className="col-span-4 mt-16">
+                            <Card className="bg-[#ffffff] shadow-sm sticky top-8 border border-gray-100 rounded-xl">
+                                <CardHeader className="border-b border-gray-50 pb-5">
                                     <CardTitle className="text-lg font-semibold">Review & Approve</CardTitle>
                                     <CardDescription>
                                         Complete checklist before approval
@@ -582,10 +580,12 @@ export function EventDetail() {
                                             onConfirm={handleRejectEvent}
                                             okText="Yes"
                                             cancelText="No"
+                                            disabled={allChecklistComplete && !adminNotes.trim()}
                                         >
                                             <Button
                                                 variant="destructive"
                                                 className="w-full hover:cursor-pointer"
+                                                disabled={allChecklistComplete && !adminNotes.trim()}
                                             >
                                                 <X className="mr-2 h-4 w-4" />
                                                 Reject Submission
@@ -593,11 +593,18 @@ export function EventDetail() {
                                         </Popconfirm>
                                     </div>
 
-                                    {!allChecklistComplete && (
-                                        <div className="bg-orange-50 border border-orange-100 rounded-lg p-3">
-                                            <p className="text-xs text-orange-800">
-                                                Complete all checklist items to enable approval
-                                            </p>
+                                    {(!allChecklistComplete || (allChecklistComplete && !adminNotes.trim())) && (
+                                        <div className="bg-orange-50 border border-orange-100 rounded-lg p-3 space-y-1">
+                                            {!allChecklistComplete && (
+                                                <p className="text-xs text-orange-800">
+                                                    ✗ Complete all checklist items to enable approval
+                                                </p>
+                                            )}
+                                            {allChecklistComplete && !adminNotes.trim() && (
+                                                <p className="text-xs text-orange-800">
+                                                    ✗ All criteria are checked — fill in Internal Admin Notes to enable rejection
+                                                </p>
+                                            )}
                                         </div>
                                     )}
                                 </CardContent>

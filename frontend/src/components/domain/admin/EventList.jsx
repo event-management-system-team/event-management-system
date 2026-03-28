@@ -190,7 +190,7 @@ const EventList = ({ searchTerm, status, category, priceType, date, sortOption, 
                     {/* Event Rows */}
                     {!paginatedEvents || paginatedEvents.length === 0 ? (
                         <div className="flex items-center justify-center flex-1 text-sm text-gray-400 mt-15">
-                            No event data yet
+                            No events found
                         </div>
                     ) : (
                         paginatedEvents.map(event => {

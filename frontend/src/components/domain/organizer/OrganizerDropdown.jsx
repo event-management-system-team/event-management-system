@@ -16,7 +16,8 @@ const OrganizerDropdown = ({ setIsOpen }) => {
     };
 
     const menuItems = [
-        { key: '1', label: 'Logout', icon: <LogOut size={16} />, danger: true, onClick: handleLogout },
+        { key: 'profile', label: 'Profile', icon: <User size={16} />, onClick: () => { setIsOpen(false); navigate('/organizer/profile'); } },
+        { key: 'logout', label: 'Logout', icon: <LogOut size={16} />, danger: true, onClick: handleLogout },
     ];
 
     return (
