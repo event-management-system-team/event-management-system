@@ -58,7 +58,6 @@ public class CheckInService {
 
         User staff = userRepository.getReferenceById(staffId);
 
-
         CheckIn checkIn = CheckIn.builder()
                 .ticket(ticket)
                 .event(ticket.getEvent())
@@ -66,22 +65,23 @@ public class CheckInService {
                 .build();
         checkIn = checkInRepository.save(checkIn);
 
-
         ticket.setStatus(TicketStatus.CHECKED_IN);
         ticketRepository.save(ticket);
 
-        CheckInResponse response = mapToResponse(checkIn,ticket, staff);
+        CheckInResponse response = mapToResponse(checkIn, ticket, staff);
 
         messagingTemplate.convertAndSend("/topic/event/" + eventSlug + "/checkin", response);
 
-    return response;
+        return response;
 
     }
 
     public List<CheckInResponse> searchEventTickets(String eventSlug, String keyword) {
         String kw = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
 
-        List<Ticket> tickets = ticketRepository.searchTicketsByKeyword(eventSlug, kw);
+        List<TicketStatus> statuses = java.util.Arrays.asList(TicketStatus.CONFIRMED, TicketStatus.PAID,
+                TicketStatus.CHECKED_IN);
+        List<Ticket> tickets = ticketRepository.searchTicketsByKeyword(eventSlug, kw, statuses);
 
         return tickets.stream().map(ticket -> {
 

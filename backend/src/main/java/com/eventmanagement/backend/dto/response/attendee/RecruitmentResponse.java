@@ -19,7 +19,6 @@ public class RecruitmentResponse {
     private String location;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private String description;
     private LocalDateTime deadline;
     private LocalDateTime createdAt;
     private List<PositionResponse> positions;

@@ -1,19 +1,10 @@
 import { Briefcase } from 'lucide-react'
 
-const DescriptionSection = ({ description, positions }) => {
+const DescriptionSection = ({ positions }) => {
     return (
         <section className="bg-white rounded-2xl p-8 shadow-sm border border-[#E5E1DA]/50">
             <div className="space-y-8">
-                {description && (
-                    <div>
-                        <h3 className="text-lg font-extrabold text-slate-900 mb-4">Description</h3>
-                        <p className="text-slate-600 text-[14px] leading-relaxed">
-                            {description}
-                        </p>
-                    </div>
-                )}
-
-                <div className={description ? "pt-8 border-t border-slate-100" : ""}>
+                <div>
                     <h3 className="text-lg font-extrabold text-slate-900 mb-5">Open Positions & Requirements</h3>
 
                     <div className="space-y-4">
