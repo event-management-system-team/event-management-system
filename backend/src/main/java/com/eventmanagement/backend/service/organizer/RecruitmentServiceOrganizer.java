@@ -109,11 +109,11 @@ public class RecruitmentServiceOrganizer {
 
         String eventName = r.getEvent() != null ? r.getEvent().getEventName() : "Sự kiện chung";
 
-        String benefitsStr = null;
+        List<String> benefitTitles = null;
         if (r.getBenefits() != null && !r.getBenefits().isEmpty()) {
-            benefitsStr = r.getBenefits().stream()
+            benefitTitles = r.getBenefits().stream()
                     .map(BenefitRecruitment::getTitle)
-                    .collect(java.util.stream.Collectors.joining("\n"));
+                    .collect(java.util.stream.Collectors.toList());
         }
 
         return RecruitmentDetailDTO.builder()
@@ -126,7 +126,7 @@ public class RecruitmentServiceOrganizer {
                 .deadline(r.getDeadline())
                 .status(r.getStatus().name())
                 .requirements(r.getRequirements())
-                .benefits(benefitsStr)
+                .benefits(benefitTitles)
                 .formId(r.getCustomForm() != null ? r.getCustomForm().getFormId() : null)
                 .build();
     }
@@ -200,7 +200,10 @@ public class RecruitmentServiceOrganizer {
         }
         if (request.getBenefits() != null) {
             List<BenefitRecruitment> benefitRecruitments = request.getBenefits().stream()
-                    .map(b -> BenefitRecruitment.builder().title(b).build())
+                    .map(b -> BenefitRecruitment.builder()
+                            .title(b)
+                            .icon(mapBenefitIcon(b))
+                            .build())
                     .collect(java.util.stream.Collectors.toList());
             recruitment.setBenefits(benefitRecruitments);
         }

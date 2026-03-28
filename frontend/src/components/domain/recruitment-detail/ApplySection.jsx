@@ -18,7 +18,7 @@ const ApplySection = ({ eventSlug, active, location, daysLeft, filledPercentage,
 
             <div className="space-y-6 mb-10">
                 <div className="flex items-start gap-4">
-                    <Calendar size={18} className="text-primary mt-0.5" />
+                    <Calendar size={18} className="text-primary mt-0.5 shrink-0" />
                     <div>
                         <p className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold mb-1">Deadline</p>
 
@@ -33,7 +33,7 @@ const ApplySection = ({ eventSlug, active, location, daysLeft, filledPercentage,
                 </div>
 
                 <div className="flex items-start gap-4">
-                    <Clock size={18} className="text-primary mt-0.5" />
+                    <Clock size={18} className="text-primary mt-0.5 shrink-0" />
                     <div>
                         <p className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold mb-1">Event Date</p>
                         <p className="text-[14px] font-bold text-slate-600 leading-relaxed">
@@ -43,7 +43,7 @@ const ApplySection = ({ eventSlug, active, location, daysLeft, filledPercentage,
                 </div>
 
                 <div className="flex items-start gap-4">
-                    <MapPin size={18} className="text-primary mt-0.5" />
+                    <MapPin size={18} className="text-primary mt-0.5 shrink-0" />
                     <div>
                         <p className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold">Location</p>
                         <p className="text-[14px] font-bold text-slate-600 leading-relaxed">{location}</p>
@@ -53,8 +53,8 @@ const ApplySection = ({ eventSlug, active, location, daysLeft, filledPercentage,
 
             <div className="space-y-3 mb-8">
                 <div className="flex justify-between text-[11px] font-extrabold uppercase tracking-wide">
-                    <span className="text-slate-500">Available Slots</span>
-                    <span className="text-teal-accent">{totalAvailable} / {totalVacancy}</span>
+                    <span className="text-slate-500">Filled Positions</span>
+                    <span className="text-teal-accent">{totalVacancy - totalAvailable} / {totalVacancy}</span>
                 </div>
 
                 <Progress

@@ -28,6 +28,7 @@ const RecruitmentFormBuilder = () => {
   // FETCH & NORMALIZE EXISTING FORM DATA
   useEffect(() => {
     const fetchExistingForm = async () => {
+      // Load from DB — form was previously saved with isActive=false
       try {
         const response = await axiosInstance.get(`/events/${eventId}/forms?type=RECRUITMENT`);
 
@@ -127,43 +128,31 @@ const RecruitmentFormBuilder = () => {
     setActiveId(newSchema.length > 0 ? newSchema[0].fieldId : null);
   };
 
-  const handleSaveAction = async (isActive) => {
-    // 3. KIỂM TRA LỖI BLANK TITLE
+  const handleSaveAction = async () => {
     if (!formName || formName.trim() === '') {
-      setAppAlert({ 
-        type: 'error', 
-        message: 'Failed to create form because title is empty.' 
-      });
-      return; 
+      setAppAlert({ type: 'error', message: 'Failed to save form because title is empty.' });
+      return;
     }
-
-    setAppAlert({ type: '', message: '' }); // Xoá cảnh báo nếu đã hợp lệ
-
+    setAppAlert({ type: '', message: '' });
     try {
-      const payload = { 
+      const payload = {
         formName: formName.trim(),
-        formType: "RECRUITMENT", 
+        formType: "RECRUITMENT",
         formSchema: formSchema,
-        isActive: isActive
+        isActive: false   // Save as draft — will be activated when Organizer hits "Submit"
       };
-
       const response = await axiosInstance.post(`/events/${eventId}/forms`, payload);
       if (response.status === 200 || response.status === 201) {
-        if (isActive) {
-          setAppAlert({ type: 'success', message: "Recruitment form published successfully!" });
-          setIsLocked(true);
-          // Navigate về trang tạo recruitment post (Step 3 sẽ restore từ sessionStorage)
-          setTimeout(() => navigate(`/organizer/recruitment-post/${eventId}`, { state: { fromFormBuilder: true } }), 1200);
-        } else {
-          // Stay on the form builder page after saving draft
-          setAppAlert({ type: 'success', message: "Draft saved successfully!" });
-        }
+        setAppAlert({ type: 'success', message: "Form saved (draft). It will be activated when you publish the recruitment post." });
+        setTimeout(() => navigate(`/organizer/recruitment-post/${eventId}`, { state: { fromFormBuilder: true } }), 1200);
       }
     } catch (error) {
       console.error("Error saving form:", error);
       setAppAlert({ type: 'error', message: "An error occurred while saving the form." });
     }
   };
+
+
 
   const activeQuestion = formSchema.find(q => q.fieldId === activeId);
 
@@ -199,14 +188,9 @@ const RecruitmentFormBuilder = () => {
                 <Lock size={14} /> <span className="hidden sm:inline">Form Published</span><span className="sm:hidden">Locked</span>
               </div>
             ) : (
-              <>
-                <button onClick={() => handleSaveAction(false)} className="text-xs sm:text-sm font-bold text-gray-600 hover:text-gray-900 transition-colors flex-1 lg:flex-none py-2 text-center border sm:border-none border-gray-200 rounded-lg sm:rounded-none bg-white sm:bg-transparent">
-                  Save Draft
-                </button>
-                <button onClick={() => handleSaveAction(true)} className="px-4 sm:px-5 py-2 sm:py-2.5 bg-[#8c9db3] hover:bg-[#7a8ca3] text-white rounded-lg text-xs sm:text-sm font-bold shadow-md transition-all flex-1 lg:flex-none">
-                  Publish Form
-                </button>
-              </>
+              <button onClick={() => handleSaveAction()} className="px-4 sm:px-5 py-2 sm:py-2.5 bg-[#8c9db3] hover:bg-[#7a8ca3] text-white rounded-lg text-xs sm:text-sm font-bold shadow-md transition-all flex-1 lg:flex-none">
+                Save &amp; Return to Post
+              </button>
             )}
           </div>
         </header>

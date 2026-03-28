@@ -93,12 +93,13 @@ const useCreateRecruitment = (preselectedEventId = "") => {
   });
 
   const [form, setForm] = useState(() => {
-    if (isEditMode) return { ...initialForm, eventId: preselectedEventId };
-    const saved = sessionStorage.getItem(SESSION_KEY);
-    if (saved) {
-      const parsed = deserializeForm(saved);
-      if (parsed && parsed.form.eventId === preselectedEventId) {
-        return { ...parsed.form, eventOptions: [] };
+    if (fromFormBuilder || !isEditMode) {
+      const saved = sessionStorage.getItem(SESSION_KEY);
+      if (saved) {
+        const parsed = deserializeForm(saved);
+        if (parsed && parsed.form.eventId === preselectedEventId) {
+          return { ...parsed.form, eventOptions: [] };
+        }
       }
     }
     return { ...initialForm, eventId: preselectedEventId };
@@ -158,24 +159,50 @@ const useCreateRecruitment = (preselectedEventId = "") => {
           requirements: parseToArray(data.requirements),
         }));
 
-        // Use first position's data for shared fields (benefits, deadline, formId)
+        // Use first position's data for shared fields
         const firstData = details[0];
         const parsedBenefits = parseToArray(firstData.benefits);
+
+        let mergedFormId = firstData.formId || null;
+        let mergedFormName = "Staff Application Form";
+        let mergedFormSchema = [];
+        let mergedHasCustomForm = false;
+
+        if (!fromFormBuilder) {
+            try {
+               const formRes = await recruitmentService.getFormsByEvent(preselectedEventId, "RECRUITMENT");
+               if (formRes && formRes.formId) {
+                 mergedFormId = formRes.formId;
+                 mergedFormName = formRes.formName || formRes.form_name || "Staff Application Form";
+                 let schemaFromDB = formRes.formSchema || formRes.form_schema || [];
+                 if (typeof schemaFromDB === 'string') schemaFromDB = JSON.parse(schemaFromDB);
+                 mergedFormSchema = schemaFromDB;
+                 mergedHasCustomForm = true;
+               }
+            } catch(e) {}
+        }
 
         setForm((prev) => ({
           ...prev,
           positions,
           benefits: parsedBenefits,
           deadline: firstData.deadline ? new Date(firstData.deadline) : null,
-          formId: firstData.formId || null,
+          formId: mergedFormId,
+          formName: mergedFormName,
+          formSchema: mergedFormSchema,
+          hasCustomForm: mergedHasCustomForm,
         }));
 
         // Auto-navigate to appropriate step
-        const hasReqsOrBenefits = positions.some(p => p.requirements.length > 0) || parsedBenefits.length > 0;
-        if (firstData.deadline || hasReqsOrBenefits) {
-          setStep(3);
-        } else if (positions.some(p => p.name)) {
-          setStep(2);
+        if (fromFormBuilder) {
+          // Do not override step if returning from builder, will remain on Step 3
+        } else {
+          const hasReqsOrBenefits = positions.some(p => p.requirements.length > 0) || parsedBenefits.length > 0;
+          if (firstData.deadline || hasReqsOrBenefits) {
+            setStep(3);
+          } else if (positions.some(p => p.name)) {
+            setStep(2);
+          }
         }
       } catch {
         // Fallback: load single recruitment
@@ -183,6 +210,25 @@ const useCreateRecruitment = (preselectedEventId = "") => {
           const data = await recruitmentService.getRecruitmentById(editRecruitmentId);
           const parsedReqs = parseToArray(data.requirements);
           const parsedBenefits = parseToArray(data.benefits);
+
+          let mergedFormId = data.formId || null;
+          let mergedFormName = "Staff Application Form";
+          let mergedFormSchema = [];
+          let mergedHasCustomForm = false;
+          
+          if (!fromFormBuilder) {
+              try {
+                 const formRes = await recruitmentService.getFormsByEvent(preselectedEventId, "RECRUITMENT");
+                 if (formRes && formRes.formId) {
+                   mergedFormId = formRes.formId;
+                   mergedFormName = formRes.formName || formRes.form_name || "Staff Application Form";
+                   let schemaFromDB = formRes.formSchema || formRes.form_schema || [];
+                   if (typeof schemaFromDB === 'string') schemaFromDB = JSON.parse(schemaFromDB);
+                   mergedFormSchema = schemaFromDB;
+                   mergedHasCustomForm = true;
+                 }
+              } catch(e) {}
+          }
 
           setForm((prev) => ({
             ...prev,
@@ -194,13 +240,18 @@ const useCreateRecruitment = (preselectedEventId = "") => {
             }],
             benefits: parsedBenefits,
             deadline: data.deadline ? new Date(data.deadline) : null,
-            formId: data.formId || null,
+            formId: mergedFormId,
+            formName: mergedFormName,
+            formSchema: mergedFormSchema,
+            hasCustomForm: mergedHasCustomForm,
           }));
 
-          if (data.deadline || parsedReqs.length > 0 || parsedBenefits.length > 0) {
-            setStep(3);
-          } else if (data.positionName) {
-            setStep(2);
+          if (!fromFormBuilder) {
+            if (data.deadline || parsedReqs.length > 0 || parsedBenefits.length > 0) {
+              setStep(3);
+            } else if (data.positionName) {
+              setStep(2);
+            }
           }
         } catch {}
       }
@@ -222,7 +273,6 @@ const useCreateRecruitment = (preselectedEventId = "") => {
 
   // Lưu form state vào sessionStorage ĐỒNG BỘ (gọi trước khi navigate ra ngoài)
   const persistDraft = () => {
-    if (isEditMode) return;
     const serialized = serializeForm(form, step);
     if (serialized) {
       sessionStorage.setItem(SESSION_KEY, serialized);
@@ -254,7 +304,27 @@ const useCreateRecruitment = (preselectedEventId = "") => {
 
   // Helper: update tất cả positions đã tồn tại trên server
   const updateAllPositions = async (status) => {
+    // 1. Load existing form from DB to get formId, then activate/deactivate it
+    let finalFormId = form.formId;
+    try {
+      const existingForm = await recruitmentService.getFormsByEvent(form.eventId, "RECRUITMENT");
+      if (existingForm && existingForm.formId) {
+        finalFormId = existingForm.formId;
+        // Activate form only when publishing, deactivate on draft
+        const shouldActivate = status === "OPEN";
+        await recruitmentService.createForm(form.eventId, {
+          formName: existingForm.formName,
+          formType: "RECRUITMENT",
+          formSchema: existingForm.formSchema,
+          isActive: shouldActivate,
+        });
+      }
+    } catch (e) {
+      // No form created yet — that's fine, formId stays null
+    }
+
     const payload = buildPayload(status);
+    payload.formId = finalFormId;
 
     if (isEditMode) {
       // Edit mode: update từng position dựa trên recruitmentId đã load
@@ -394,9 +464,7 @@ const useCreateRecruitment = (preselectedEventId = "") => {
     });
 
     // Step 2 validation
-    if (!form.deadline) {
-      errs.deadline = "Application deadline is required";
-    } else if (eventStartDate && form.deadline >= eventStartDate) {
+    if (form.deadline && eventStartDate && form.deadline >= eventStartDate) {
       errs.deadline = "Deadline must be before the event start date";
     }
 

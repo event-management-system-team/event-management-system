@@ -1,6 +1,7 @@
 package com.eventmanagement.backend.dto.response.organizer;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import lombok.Builder;
@@ -14,7 +15,7 @@ public class RecruitmentDetailDTO {
     private String eventName;
     private String positionName;
     private String description;
-    private String benefits;
+    private List<String> benefits;
     private Integer vacancy;
     private String requirements;
     private LocalDateTime deadline;
