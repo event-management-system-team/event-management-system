@@ -485,11 +485,13 @@ public class OrganizerEventService {
         long ongoing = eventRepository.countByOrganizer_UserIdAndStatus(organizerId, EventStatus.ONGOING);
         long active = approved + ongoing;
         long completed = eventRepository.countByOrganizer_UserIdAndStatus(organizerId, EventStatus.COMPLETED);
+        Double avgRating = feedbackRepository.findAverageRatingByOrganizer(organizerId);
         
         return OrganizerEventStatsResponse.builder()
                 .totalEvents(total)
                 .activeCount(active)
                 .completedCount(completed)
+                .averageRating(avgRating != null ? Math.round(avgRating * 10) / 10.0 : 0.0)
                 .build();
     }
 
