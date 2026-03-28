@@ -75,6 +75,16 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
         long countByOrganizer_UserIdAndStatusAndStartDateAfterNow(
                         @Param("organizerId") UUID organizerId,
                         @Param("status") EventStatus status);
+    Page<Event> findByOrganizer_UserIdAndStatus(UUID userId, EventStatus status, Pageable pageable);
+
+    @Query("SELECT e FROM Event e WHERE e.organizer.userId = :userId AND " +
+           "((e.status = :statusApproved AND e.startDate <= CURRENT_TIMESTAMP) " +
+           "OR e.status = :statusOngoing)")
+    Page<Event> findActiveEventsByOrganizer(
+            @Param("userId") UUID userId,
+            @Param("statusApproved") EventStatus statusApproved,
+            @Param("statusOngoing") EventStatus statusOngoing,
+            Pageable pageable);
 
         @EntityGraph(attributePaths = "ticketTypes")
         @Query("SELECT e FROM Event e WHERE e.eventId IN :eventIds")

@@ -108,10 +108,10 @@ class OrganizerEventControllerTest {
                 .build();
 
         Page<OrganizerEventResponse> page = new PageImpl<>(List.of(eventResponse));
-        when(organizerEventService.getMyEvents(organizerId, 0, 10))
+        when(organizerEventService.getMyEvents(organizerId, 0, 10, null))
                 .thenReturn(page);
 
-        ResponseEntity<Page<OrganizerEventResponse>> result = controller.getMyEvents(0, 10);
+        ResponseEntity<Page<OrganizerEventResponse>> result = controller.getMyEvents(0, 10, null);
 
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals(1, result.getBody().getContent().size());
@@ -124,7 +124,6 @@ class OrganizerEventControllerTest {
         OrganizerEventStatsResponse stats = OrganizerEventStatsResponse.builder()
                 .totalEvents(10)
                 .activeCount(3)
-                .upcomingCount(4)
                 .completedCount(2)
                 .build();
 

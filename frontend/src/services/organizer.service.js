@@ -22,9 +22,11 @@ const organizerService = {
     },
 
     // ORGANIZER - EVENTS
-    getMyEvents: async (page = 0, size = 5) => {
+    getMyEvents: async (page = 0, size = 5, status) => {
+        const params = { page, size };
+        if (status) params.status = status;
         const response = await axiosInstance.get('/organizer/events', {
-            params: { page, size }
+            params
         })
         return response.data
     },

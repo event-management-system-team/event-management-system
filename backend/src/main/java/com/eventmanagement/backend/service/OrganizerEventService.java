@@ -68,6 +68,7 @@ public class OrganizerEventService {
             throw new BadRequestException("Step 1: Start time must be after now");
         }
 
+
         String bannerUrl = null;
         if (coverFile != null && !coverFile.isEmpty()) {
             try {
@@ -306,6 +307,7 @@ public class OrganizerEventService {
             throw new BadRequestException("Start date/time must be in the future");
         }
 
+
         if (coverFile != null && !coverFile.isEmpty()) {
             try {
                 String bannerUrl = cloudinaryService.uploadEventBanner(coverFile);
@@ -399,11 +401,46 @@ public class OrganizerEventService {
 
     /**
      * Lấy danh sách event của organizer có phân trang, sắp xếp theo ngày tạo mới
-     * nhất
+     * nhất. Hỗ trợ filter theo status (server-side).
      */
-    public Page<OrganizerEventResponse> getMyEvents(UUID organizerId, int page, int size) {
+    public Page<OrganizerEventResponse> getMyEvents(UUID organizerId, int page, int size, String statusFilter) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Event> eventPage = eventRepository.findByOrganizer_UserId(organizerId, pageable);
+        Page<Event> eventPage;
+
+        if (statusFilter == null || statusFilter.isBlank()) {
+            eventPage = eventRepository.findByOrganizer_UserId(organizerId, pageable);
+        } else {
+            switch (statusFilter.toUpperCase()) {
+                case "APPROVED":
+                    eventPage = eventRepository.findByOrganizer_UserIdAndStatus(
+                            organizerId, EventStatus.APPROVED, pageable);
+                    break;
+                case "ACTIVE":
+                    // Active = (APPROVED + startDate <= now) OR ONGOING
+                    eventPage = eventRepository.findActiveEventsByOrganizer(
+                            organizerId, EventStatus.APPROVED, EventStatus.ONGOING, pageable);
+                    break;
+                case "COMPLETED":
+                    eventPage = eventRepository.findByOrganizer_UserIdAndStatus(
+                            organizerId, EventStatus.COMPLETED, pageable);
+                    break;
+                case "REJECTED":
+                    eventPage = eventRepository.findByOrganizer_UserIdAndStatus(
+                            organizerId, EventStatus.REJECTED, pageable);
+                    break;
+                case "DRAFT":
+                    eventPage = eventRepository.findByOrganizer_UserIdAndStatus(
+                            organizerId, EventStatus.DRAFT, pageable);
+                    break;
+                case "PENDING":
+                    eventPage = eventRepository.findByOrganizer_UserIdAndStatus(
+                            organizerId, EventStatus.PENDING, pageable);
+                    break;
+                default:
+                    eventPage = eventRepository.findByOrganizer_UserId(organizerId, pageable);
+                    break;
+            }
+        }
 
         if (eventPage.isEmpty()) {
             return eventPage.map(this::mapToOrganizerResponse);
@@ -434,26 +471,22 @@ public class OrganizerEventService {
     }
 
     /**
-     * Lấy thống kê event của organizer (total, active, upcoming, completed)
-     * event upcoming: approved va start date > thoi gian hien tai
-     * event active: (APPROVED - upcoming) + ONGOING
-     * @param: organizerId
-     * @return  number of event status
+     * Lấy thống kê event của organizer (total, active, completed)
+     * event active: APPROVED + ONGOING
+     * @param organizerId
+     * @return number of event status
      */
     public OrganizerEventStatsResponse getMyEventStats(UUID organizerId) {
 
         long total = eventRepository.countByOrganizer_UserId(organizerId);
-        long upcoming = eventRepository.countByOrganizer_UserIdAndStatusAndStartDateAfterNow(organizerId,
-                EventStatus.APPROVED);
-        long allApprovedEvent = eventRepository.countByOrganizer_UserIdAndStatus(organizerId, EventStatus.APPROVED);
+        long approved = eventRepository.countByOrganizer_UserIdAndStatus(organizerId, EventStatus.APPROVED);
         long ongoing = eventRepository.countByOrganizer_UserIdAndStatus(organizerId, EventStatus.ONGOING);
-        long active = (allApprovedEvent - upcoming) + ongoing;
+        long active = approved + ongoing;
         long completed = eventRepository.countByOrganizer_UserIdAndStatus(organizerId, EventStatus.COMPLETED);
         
         return OrganizerEventStatsResponse.builder()
                 .totalEvents(total)
                 .activeCount(active)
-                .upcomingCount(upcoming)
                 .completedCount(completed)
                 .build();
     }
