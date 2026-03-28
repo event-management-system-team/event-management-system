@@ -499,9 +499,10 @@ public class OrganizerEventService {
         int totalSold = 0;
         int totalTickets = 0;
         BigDecimal totalRevenue = BigDecimal.ZERO;
+        java.util.Map<String, Integer> breakdown = new java.util.HashMap<>();
 
         if (event.getTicketTypes() != null) {
-            for (TicketType ticket : event.getTicketTypes()) {
+            for (com.eventmanagement.backend.model.TicketType ticket : event.getTicketTypes()) {
                 if (Boolean.TRUE.equals(ticket.getIsActive())) {
                     int sold = ticket.getSoldCount() != null ? ticket.getSoldCount() : 0;
                     totalSold += sold;
@@ -509,6 +510,9 @@ public class OrganizerEventService {
                     if (ticket.getPrice() != null) {
                         totalRevenue = totalRevenue.add(
                                 ticket.getPrice().multiply(BigDecimal.valueOf(sold)));
+                    }
+                    if (sold > 0) {
+                        breakdown.put(ticket.getTicketName() != null ? ticket.getTicketName() : "General", sold);
                     }
                 }
             }
@@ -529,6 +533,7 @@ public class OrganizerEventService {
                 .totalSold(totalSold)
                 .totalTickets(totalTickets)
                 .totalRevenue(totalRevenue)
+                .ticketSalesBreakdown(breakdown)
                 .categoryName(event.getCategory() != null ? event.getCategory().getCategoryName() : null)
                 .isFree(event.getIsFree())
                 .build();

@@ -149,17 +149,11 @@ const EventDetailDashboard = () => {
             const total = data.totalTickets || data.totalCapacity || 0;
             const registeredCount = data.registeredCount || 0;
 
-            const generalPct = 0.65;
-            const vipPct = 0.25;
-            const earlyPct = 0.10;
-
             setTicketStats({
                 sold,
                 total,
                 registeredCount,
-                general: Math.round(sold * generalPct),
-                vip: Math.round(sold * vipPct),
-                early: Math.round(sold * earlyPct),
+                breakdown: data.ticketSalesBreakdown || {},
                 checkedIn: data.checkedInCount || Math.round(registeredCount * 0.375),
             });
 
@@ -201,12 +195,19 @@ const EventDetailDashboard = () => {
                 { name: 'Free', value: ticketStats.sold || ticketStats.registeredCount || 0, pct: 100 },
             ];
         }
-        const { general, vip, early } = ticketStats;
-        return [
-            { name: 'General', value: general, pct: ticketStats.sold > 0 ? Math.round((general / ticketStats.sold) * 100) : 65 },
-            { name: 'VIP', value: vip, pct: ticketStats.sold > 0 ? Math.round((vip / ticketStats.sold) * 100) : 25 },
-            { name: 'Early', value: early, pct: ticketStats.sold > 0 ? Math.round((early / ticketStats.sold) * 100) : 10 },
-        ].filter(d => d.value > 0);
+        
+        const breakdown = ticketStats.breakdown || {};
+        const entries = Object.entries(breakdown);
+        
+        if (entries.length === 0) {
+            return [];
+        }
+
+        return entries.map(([name, value]) => ({
+            name,
+            value,
+            pct: ticketStats.sold > 0 ? Math.round((value / ticketStats.sold) * 100) : 0
+        })).sort((a, b) => b.value - a.value);
     }, [ticketStats, isFreeEvent]);
 
     const capacityPercent = ticketStats.total > 0
