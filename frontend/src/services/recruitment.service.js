@@ -107,6 +107,14 @@ const recruitmentService = {
     );
     return response.data;
   },
+
+  createForm: async (eventId, data) => {
+    const response = await axiosInstance.post(
+      `/events/${eventId}/forms`, // Matches RecruitmentBuilder call
+      data
+    );
+    return response.data;
+  },
 };
 
 export default recruitmentService;

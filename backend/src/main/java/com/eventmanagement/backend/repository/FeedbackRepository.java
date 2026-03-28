@@ -15,7 +15,7 @@ import com.eventmanagement.backend.model.Feedback;
 public interface FeedbackRepository extends JpaRepository<Feedback, UUID> {
 
     @Query(value = """
-                SELECT
+                SELECT DISTINCT ON (f.feedback_id)
                     CAST(f.feedback_id AS VARCHAR) AS feedbackId,
                     f.rating AS rating,
                     f.comment AS comment,
@@ -29,6 +29,7 @@ public interface FeedbackRepository extends JpaRepository<Feedback, UUID> {
                 LEFT JOIN tickets t ON t.user_id = u.user_id AND t.event_id = f.event_id
                 LEFT JOIN ticket_types tt ON t.ticket_type_id = tt.ticket_type_id
                 WHERE f.event_id = CAST(:eventId AS UUID)
+                ORDER BY f.feedback_id, f.created_at DESC
             """, nativeQuery = true)
     List<FeedbackResponseDTO> findFeedbacksByEventId(@Param("eventId") UUID eventId);
 

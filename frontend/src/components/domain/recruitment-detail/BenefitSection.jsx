@@ -33,15 +33,14 @@ const renderBenefitIcon = (iconName) => {
 const BenefitSection = ({ benefits }) => {
     if (!benefits || benefits.length === 0) return null;
 
-    // Normalize: handle cả string cũ lẫn object { icon, title, description }
+    // Normalize: handle cả string lẫn object { icon, title }
     const normalizedBenefits = benefits.map((b) => {
         if (typeof b === 'string') {
-            return { icon: guessIcon(b), title: b, description: null };
+            return { icon: guessIcon(b), title: b };
         }
         return {
             icon: b.icon || guessIcon(b.title),
             title: b.title || b,
-            description: b.description || null,
         };
     });
 
@@ -52,18 +51,13 @@ const BenefitSection = ({ benefits }) => {
                 Exclusive Benefits
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {normalizedBenefits.map((benefit, index) => (
-                    <div key={index} className="flex gap-4">
-                        <div className="w-11 h-11 rounded-xl bg-white flex items-center justify-center text-[#4ECDC4] shadow-sm shrink-0">
+                    <div key={index} className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-[#4ECDC4] shadow-sm shrink-0">
                             {renderBenefitIcon(benefit.icon)}
                         </div>
-                        <div>
-                            <p className="font-bold text-slate-800 text-sm">{benefit.title}</p>
-                            {benefit.description && (
-                                <p className="text-slate-500 text-[13px] mt-1.5 leading-relaxed">{benefit.description}</p>
-                            )}
-                        </div>
+                        <p className="font-bold text-slate-800 text-sm">{benefit.title}</p>
                     </div>
                 ))}
             </div>

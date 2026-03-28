@@ -18,6 +18,7 @@ import CreateRecruitmentPage from "../pages/organizer/CreateRecruitmentPage";
 import ApplicationList from "../pages/organizer/ApplicationList";
 import RecruitmentDetail from "../pages/organizer/RecruitmentDetail";
 import StaffManagement from "../pages/organizer/StaffManagement";
+import OrganizerProfilePage from "../pages/organizer/OrganizerProfilePage";
 
 const OrganizerRoutes = () => {
     return (
@@ -47,6 +48,9 @@ const OrganizerRoutes = () => {
 
                     {/* Staff */}
                     <Route path="events/:eventId/staff" element={<StaffManagement />} />
+
+                    {/* Profile */}
+                    <Route path="profile" element={<OrganizerProfilePage />} />
                 </Route>
             </Route>
         </Routes>

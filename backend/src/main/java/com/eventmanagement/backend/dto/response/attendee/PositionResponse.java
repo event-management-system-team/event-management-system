@@ -15,6 +15,7 @@ import java.util.UUID;
 public class PositionResponse {
     private UUID recruitmentId;
     private String positionName;
+    private String description;
     private int vacancy;
     private int availableSlots;
     private String requirements;

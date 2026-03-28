@@ -56,7 +56,6 @@ const RecruitmentDetailPage = () => {
                             benefits={recruitment?.benefits} />
 
                         <DescriptionSection
-                            description={recruitment?.description}
                             positions={recruitment?.positions} />
                     </div>
 

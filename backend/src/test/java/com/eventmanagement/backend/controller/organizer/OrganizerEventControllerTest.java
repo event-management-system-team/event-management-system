@@ -174,10 +174,10 @@ class OrganizerEventControllerTest {
                 .build();
 
         Page<AttendeeResponse> page = new PageImpl<>(List.of(attendee));
-        when(organizerEventService.getEventAttendees(eventId, 0, 10))
+        when(organizerEventService.getEventAttendees(eventId, 0, 10, null, null))
                 .thenReturn(page);
 
-        ResponseEntity<Page<AttendeeResponse>> result = controller.getEventAttendees(eventId, 0, 10);
+        ResponseEntity<Page<AttendeeResponse>> result = controller.getEventAttendees(eventId, 0, 10, null, null);
 
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals(1, result.getBody().getContent().size());

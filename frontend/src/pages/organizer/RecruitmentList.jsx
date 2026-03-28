@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Clock, Lock } from 'lucide-react';
+import { Plus, Clock, Lock, Briefcase, ChevronDown, ChevronUp } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../config/axios';
 
@@ -53,7 +53,7 @@ const RecruitmentList = () => {
           color: 'bg-red-400', 
           text: 'Closed', 
           buttonText: 'View Detail', 
-          isActive: true  // Organizer vẫn cần xem detail dù đã closed
+          isActive: true 
         };
       default:
         return { 
@@ -100,6 +100,44 @@ const RecruitmentList = () => {
   ];
   const hasRecruitments = (dashboardData?.recentRecruitments?.length || 0) > 0;
 
+  // --- Tính toán tổng hợp cho grouped view ---
+  const allJobs = dashboardData?.recentRecruitments || [];
+  const now = new Date();
+
+  // Xác định status thật cho từng position
+  const processedJobs = allJobs.map(job => {
+    let currentStatus = job.status?.toUpperCase() || 'OPEN';
+    const isPastDeadline = job.deadline ? now > new Date(job.deadline) : false;
+    if (currentStatus === 'OPEN' && (isEventEnded || isPastDeadline)) {
+      currentStatus = 'CLOSED';
+    }
+    return { ...job, currentStatus };
+  });
+
+  // Tổng hợp
+  const totalHired = processedJobs.reduce((sum, j) => sum + j.currentCount, 0);
+  const totalVacancy = processedJobs.reduce((sum, j) => sum + j.total, 0);
+  const totalNewApps = processedJobs.reduce((sum, j) => sum + j.newCount, 0);
+  const progressPercent = totalVacancy > 0 ? Math.min((totalHired / totalVacancy) * 100, 100) : 0;
+
+  // Grouped status: nếu có bất kỳ position DRAFT thì coi như DRAFT, nếu tất cả CLOSED thì CLOSED, còn lại OPEN
+  const hasDraft = processedJobs.some(j => j.currentStatus === 'DRAFT');
+  const allClosed = processedJobs.length > 0 && processedJobs.every(j => j.currentStatus === 'CLOSED');
+  const groupedStatus = hasDraft ? 'DRAFT' : allClosed ? 'CLOSED' : 'OPEN';
+  const groupedUI = getStatusUI(groupedStatus);
+  const isDraft = groupedStatus === 'DRAFT';
+
+  // Deadline: lấy deadline gần nhất
+  const deadlines = processedJobs.map(j => j.deadline).filter(Boolean);
+  const earliestDeadline = deadlines.length > 0 
+    ? deadlines.sort((a, b) => new Date(a) - new Date(b))[0] 
+    : null;
+
+  // Tên event (bỏ phần " - Position" ở title)
+  const eventName = processedJobs.length > 0 
+    ? (processedJobs[0].title?.split(' - ')?.[0] || 'Recruitment Post')
+    : 'Recruitment Post';
+
   return (
     <div className="flex flex-col min-h-screen w-full">
 
@@ -142,111 +180,161 @@ const RecruitmentList = () => {
           ))}
         </div>
 
-        {/* JOB LIST */}
+        {/* GROUPED RECRUITMENT POST */}
         <div className="space-y-4">
-          {dashboardData?.recentRecruitments?.length > 0 ? (
-            dashboardData.recentRecruitments.map((job, index) => {
+          {hasRecruitments ? (
+            <div className="bg-white rounded-xl lg:rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
               
-              // --- XỬ LÝ LOGIC TRẠNG THÁI TRÊN FRONTEND ---
-              const now = new Date();
-              const isPastDeadline = job.deadline ? now > new Date(job.deadline) : false;
-              
-              // Lấy status thật từ backend trước
-              let currentStatus = job.status?.toUpperCase() || 'OPEN';
-              
-              // Chỉ override thành CLOSED nếu đang OPEN mà hết hạn
-              if (currentStatus === 'OPEN' && (isEventEnded || isPastDeadline)) {
-                currentStatus = 'CLOSED';
-              }
-              // ---------------------------------------------
-
-              const ui = getStatusUI(currentStatus);
-              const isDraft = currentStatus === 'DRAFT';
-              const progressPercent = job.total > 0 ? Math.min((job.currentCount / job.total) * 100, 100) : 0;
-              
-              return (
-                <div key={job.recruitmentId || index} className="bg-white rounded-xl lg:rounded-2xl p-5 lg:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between border border-gray-100 hover:shadow-md transition-all group">
-                  
-                  {/* Cột 1: Tên & Tiến độ */}
-                  <div className="w-full md:w-1/3">
-                    <div className="flex items-center gap-3 mb-3 md:mb-4">
-                      <h3 className="font-extrabold text-gray-900 text-base lg:text-lg ">{job.title}</h3>
-                      {!isDraft && job.isNew && (
-                        <span className="bg-orange-100 text-orange-600 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                          {job.newCount} NEW
-                        </span>
-                      )}
-                    </div>
-                    
-                    {!isDraft && (
-                      <div className="w-full sm:max-w-xs">
-                        <div className="flex justify-between text-[11px] font-bold text-gray-400 mb-1.5">
-                          <span className="uppercase tracking-widest">Hiring Progress</span>
-                          <span className="text-gray-600">{job.currentCount} / {job.total}</span>
-                        </div>
-                        <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-[#8c9db3] rounded-full transition-all duration-700 ease-out"
-                            style={{ width: `${progressPercent}%` }}
-                          ></div>
-                        </div>
-                      </div>
+              {/* Header: tổng hợp 1 recruitment post */}
+              <div className="p-5 lg:p-6 flex flex-col md:flex-row md:items-center justify-between">
+                
+                {/* Cột 1: Tên event & progress */}
+                <div className="w-full md:w-1/3">
+                  <div className="flex items-center gap-3 mb-3 md:mb-4">
+                    <h3 className="font-extrabold text-gray-900 text-base lg:text-lg">{eventName}</h3>
+                    {!isDraft && totalNewApps > 0 && (
+                      <span className="bg-orange-100 text-orange-600 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                        {totalNewApps} NEW
+                      </span>
                     )}
                   </div>
+                  
+                  {!isDraft && (
+                    <div className="w-full sm:max-w-xs">
+                      <div className="flex justify-between text-[11px] font-bold text-gray-400 mb-1.5">
+                        <span className="uppercase tracking-widest">Hiring Progress</span>
+                        <span className="text-gray-600">{totalHired} / {totalVacancy}</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-[#8c9db3] rounded-full transition-all duration-700 ease-out"
+                          style={{ width: `${progressPercent}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-                  {/* Cột 2: Trạng thái & Deadline */}
-                  <div className="w-full md:w-1/4 flex flex-col justify-center gap-1.5 mt-4 md:mt-0">
-                    <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${ui.color} ${ui.isActive ? 'animate-pulse' : ''}`}></span>
-                      <span className="text-xs lg:text-sm font-bold text-gray-600">{ui.text}</span>
-                    </div>
-                    
-                    <div className="flex items-center gap-1.5 text-[11px] lg:text-xs font-medium text-gray-400">
-                      <Clock size={14} className="shrink-0" />
-                      <span className="truncate">Deadline: <span className="text-gray-500 font-semibold">{formatDeadline(job.deadline)}</span></span>
-                    </div>
+                {/* Cột 2: Status & Deadline */}
+                <div className="w-full md:w-1/4 flex flex-col justify-center gap-1.5 mt-4 md:mt-0">
+                  <div className="flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full ${groupedUI.color} ${groupedUI.isActive ? 'animate-pulse' : ''}`}></span>
+                    <span className="text-xs lg:text-sm font-bold text-gray-600">{groupedUI.text}</span>
                   </div>
+                  
+                  <div className="flex items-center gap-1.5 text-[11px] lg:text-xs font-medium text-gray-400">
+                    <Clock size={14} className="shrink-0" />
+                    <span className="truncate">Deadline: <span className="text-gray-500 font-semibold">{formatDeadline(earliestDeadline)}</span></span>
+                  </div>
+                </div>
 
-                  {/* Cột 3: Nút bấm */}
-                  <div className="w-full md:w-1/3 flex items-center justify-end gap-3 mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-none border-gray-50">
-                    {/* Nút Applications - ẩn khi DRAFT */}
-                    {!isDraft && (
+                {/* Cột 3: Buttons */}
+                <div className="w-full md:w-1/3 flex items-center justify-end gap-3 mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-none border-gray-50">
+                  {isDraft && (
+                    <Link
+                      to={`/organizer/recruitment-post/${eventId}`}
+                      state={{ recruitmentId: processedJobs[0]?.recruitmentId }}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs lg:text-sm font-bold bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition-all shadow-sm whitespace-nowrap"
+                    >
+                      Edit Draft
+                    </Link>
+                  )}
+
+                  {!isDraft && processedJobs.length === 1 && (
+                    <>
                       <Link
-                        to={`/organizer/applications/${job.recruitmentId}`}
+                        to={`/organizer/applications/${processedJobs[0].recruitmentId}`}
                         className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs lg:text-sm font-bold bg-orange-50 text-orange-600 hover:bg-orange-100 transition-all shadow-sm whitespace-nowrap"
                       >
                         Applications
-                        {job.newCount > 0 && (
+                        {totalNewApps > 0 && (
                           <span className="bg-orange-500 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
-                            {job.newCount}
+                            {totalNewApps}
                           </span>
                         )}
                       </Link>
-                    )}
-
-                    {/* Nút Edit - chỉ hiện khi DRAFT */}
-                    {isDraft && (
                       <Link
-                        to={`/organizer/recruitment-post/${eventId}`}
-                        state={{ recruitmentId: job.recruitmentId }}
-                        className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs lg:text-sm font-bold bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition-all shadow-sm whitespace-nowrap"
+                        to={`/organizer/recruitments/${processedJobs[0].recruitmentId}`}
+                        className="px-6 py-2.5 rounded-full text-xs lg:text-sm font-bold transition-all shadow-sm whitespace-nowrap bg-[#111827] text-white hover:bg-gray-800"
                       >
-                        Edit Draft
+                        {groupedUI.buttonText}
                       </Link>
-                    )}
-
-                    {/* Nút View Detail */}
-                    <Link
-                      to={`/organizer/recruitments/${job.recruitmentId}`}
-                      className="px-6 py-2.5 rounded-full text-xs lg:text-sm font-bold transition-all shadow-sm whitespace-nowrap bg-[#111827] text-white hover:bg-gray-800"
-                    >
-                      {ui.buttonText}
-                    </Link>
-                  </div>
-
+                    </>
+                  )}
                 </div>
-              );
-            })
+              </div>
+
+              {/* Positions list bên trong */}
+              {processedJobs.length > 1 && (
+                <div className="border-t border-gray-100">
+                  <div className="px-5 lg:px-6 py-3 bg-gray-50/70">
+                    <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                      <Briefcase size={12} />
+                      {processedJobs.length} Positions
+                    </p>
+                  </div>
+                  <div className="divide-y divide-gray-50">
+                    {processedJobs.map((job, index) => {
+                      const posName = job.title?.split(' - ')?.slice(1)?.join(' - ') || job.title;
+                      const posUI = getStatusUI(job.currentStatus);
+                      const posProgress = job.total > 0 ? Math.min((job.currentCount / job.total) * 100, 100) : 0;
+                      const posIsDraft = job.currentStatus === 'DRAFT';
+
+                      return (
+                        <div key={job.recruitmentId || index} className="px-5 lg:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-gray-50/50 transition-colors">
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <div className="w-8 h-8 rounded-lg bg-[#4a9e9e]/10 flex items-center justify-center shrink-0">
+                              <Briefcase size={14} className="text-[#4a9e9e]" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <p className="font-bold text-gray-800 text-sm truncate">{posName}</p>
+                                {!posIsDraft && job.isNew && (
+                                  <span className="bg-orange-100 text-orange-600 text-[9px] font-extrabold px-1.5 py-0.5 rounded-full">
+                                    {job.newCount} NEW
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-3 mt-0.5">
+                                <span className="flex items-center gap-1 text-[11px] text-gray-400">
+                                  <span className={`w-1.5 h-1.5 rounded-full ${posUI.color}`}></span>
+                                  {posUI.text}
+                                </span>
+                                <span className="text-[11px] text-gray-400">
+                                  {job.currentCount} / {job.total} slots
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0">
+                            {!posIsDraft && (
+                              <Link
+                                to={`/organizer/applications/${job.recruitmentId}`}
+                                className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-bold bg-orange-50 text-orange-600 hover:bg-orange-100 transition-all whitespace-nowrap"
+                              >
+                                Applications
+                                {job.newCount > 0 && (
+                                  <span className="bg-orange-500 text-white text-[9px] font-extrabold px-1 py-0.5 rounded-full min-w-[14px] text-center">
+                                    {job.newCount}
+                                  </span>
+                                )}
+                              </Link>
+                            )}
+                            <Link
+                              to={`/organizer/recruitments/${job.recruitmentId}`}
+                              className="px-3 py-1.5 rounded-full text-[11px] font-bold transition-all whitespace-nowrap bg-gray-100 text-gray-600 hover:bg-gray-200"
+                            >
+                              Detail
+                            </Link>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
           ) : (
              <div className="text-center p-16 bg-white rounded-2xl border-2 border-dashed border-gray-100">
                 <p className="text-gray-400 font-bold mb-2">No recruitment roles found.</p>

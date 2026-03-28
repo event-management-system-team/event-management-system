@@ -10,6 +10,10 @@ import org.springframework.stereotype.Repository;
 import com.eventmanagement.backend.constants.ApplicationStatus;
 import com.eventmanagement.backend.model.StaffApplication;
 
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import jakarta.transaction.Transactional;
+
 @Repository
 public interface StaffApplicationRepository extends JpaRepository<StaffApplication, UUID> {
     boolean existsByRecruitment_RecruitmentIdAndUser_UserId(UUID recruitmentId, UUID userId);
@@ -20,5 +24,9 @@ public interface StaffApplicationRepository extends JpaRepository<StaffApplicati
     List<StaffApplication> findByRecruitment_Event_EventId(UUID eventId);
     Optional<StaffApplication> findByApplicationId(UUID applicationId);
 
+    @Modifying
+    @Transactional
+    @Query("UPDATE StaffApplication s SET s.applicationStatus = 'REJECTED' WHERE s.applicationStatus = 'PENDING' AND s.recruitment.customForm.isActive = false")
+    int autoRejectExpiredApplications();
     
 }
