@@ -27,11 +27,12 @@ public interface TicketRepository extends JpaRepository<Ticket, UUID> {
     int countByOrderOrderId(UUID orderId);
 
     @Query("SELECT DISTINCT t FROM Ticket t LEFT JOIN FETCH t.checkIn c WHERE t.event.eventSlug = :eventSlug " +
+            "AND t.status IN :statuses " +
             "AND (:keyword IS NULL OR " +
             "LOWER(t.ticketCode) LIKE LOWER(CONCAT('%', cast(:keyword as string), '%')) OR " +
             "LOWER(t.user.fullName) LIKE LOWER(CONCAT('%', cast(:keyword as string), '%')) OR " +
             "LOWER(t.user.email) LIKE LOWER(CONCAT('%', cast(:keyword as string), '%')))")
-    List<Ticket> searchTicketsByKeyword(@Param("eventSlug") String eventSlug, @Param("keyword") String keyword);
+    List<Ticket> searchTicketsByKeyword(@Param("eventSlug") String eventSlug, @Param("keyword") String keyword, @Param("statuses") List<TicketStatus> statuses);
 
     long countByTicketType_TicketTypeIdAndStatus(UUID ticketTypeTicketTypeId, TicketStatus status);
 

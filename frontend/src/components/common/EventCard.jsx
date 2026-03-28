@@ -61,7 +61,7 @@ const EventCard = ({ startDate, totalCapacity, registeredCount, bannerUrl, event
                 </h3>
 
                 <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
-                    <MapPin size={14} />
+                    <MapPin size={14} className="shrink-0" />
                     <span className="truncate">{location}</span>
                 </div>
 
@@ -81,7 +81,7 @@ const EventCard = ({ startDate, totalCapacity, registeredCount, bannerUrl, event
                             <span className="px-3 py-1 bg-green-50 border border-green-200 text-green-600 rounded-lg text-sm font-extrabold uppercase tracking-wider inline-block">FREE</span>
                         )
                             :
-                            minPrice > 0 ? (
+                            (minPrice !== null && minPrice !== undefined && minPrice >= 0) ? (
                                 <span className="text-sm font-extrabold text-primary uppercase tracking-wider">
                                     From {minPrice.toLocaleString('vi-VN')}đ
                                 </span>
