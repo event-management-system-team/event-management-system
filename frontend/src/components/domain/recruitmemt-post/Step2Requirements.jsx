@@ -128,24 +128,23 @@ const Step2Requirements = ({ form, onChange, errors = {}, eventStartDate }) => {
               </div>
               Application Deadline
             </div>
-            <span className="text-xs font-normal text-gray-400">Optional</span>
+            <span className="text-xs font-medium text-red-400">Required</span>
           </h2>
           <DatePicker
             selected={form.deadline}
             onChange={(date) => onChange({ deadline: date })}
             dateFormat="dd/MM/yyyy"
-            placeholderText="Select a deadline or leave open..."
+            placeholderText="Select application deadline..."
             minDate={new Date()}
             maxDate={maxDeadline}
-            isClearable
             className={inputCls(errors.deadline)}
             wrapperClassName="w-full"
           />
           <p className="mt-1.5 text-xs text-gray-400 flex items-start gap-1.5">
             <Clock size={11} className="mt-0.5 shrink-0" />
             {maxDeadline
-              ? `Deadline must be before event start date (${maxDeadline.toLocaleDateString("en-GB")}). Leave empty if open until filled.`
-              : "Leave empty to keep applications open forever / until filled."}
+              ? `Must be before event start (${maxDeadline.toLocaleDateString("en-GB")}).`
+              : "Choose when applications will stop being accepted."}
           </p>
           <FieldError msg={errors.deadline} />
         </section>

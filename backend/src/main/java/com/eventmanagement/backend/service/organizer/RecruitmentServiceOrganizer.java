@@ -1,5 +1,6 @@
 package com.eventmanagement.backend.service.organizer;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -124,6 +125,7 @@ public class RecruitmentServiceOrganizer {
                 .description(r.getDescription())
                 .vacancy(r.getVacancy())
                 .deadline(r.getDeadline())
+                .eventStartDate(r.getEvent() != null ? r.getEvent().getStartDate() : null)
                 .status(r.getStatus().name())
                 .requirements(r.getRequirements())
                 .benefits(benefitTitles)
@@ -207,8 +209,48 @@ public class RecruitmentServiceOrganizer {
                     .collect(java.util.stream.Collectors.toList());
             recruitment.setBenefits(benefitRecruitments);
         }
-        if (request.getDeadline() != null)
-            recruitment.setDeadline(request.getDeadline());
+        if (request.getDeadline() != null) {
+            LocalDateTime newDeadline = request.getDeadline();
+            
+            // Validate: deadline must be before event start date
+            if (recruitment.getEvent() != null && recruitment.getEvent().getStartDate() != null) {
+                if (!newDeadline.isBefore(recruitment.getEvent().getStartDate())) {
+                    throw new RuntimeException("Deadline must be before the event start date (" 
+                        + recruitment.getEvent().getStartDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) + ")");
+                }
+            }
+
+            recruitment.setDeadline(newDeadline);
+            
+            // Sync deadline to all positions of this event
+            if (recruitment.getEvent() != null) {
+                List<Recruitment> related = recruitmentRepository.findByEvent_EventId(recruitment.getEvent().getEventId());
+                LocalDateTime now = LocalDateTime.now();
+                
+                for (Recruitment r : related) {
+                    if (!r.getRecruitmentId().equals(recruitmentId)) {
+                        r.setDeadline(newDeadline);
+                        
+                        // Re-evaluate status for OPEN/CLOSED recruitments
+                        if (RecruitmentStatus.OPEN.equals(r.getStatus()) || RecruitmentStatus.CLOSED.equals(r.getStatus())) {
+                            if (newDeadline.isAfter(now)) {
+                                r.setStatus(RecruitmentStatus.OPEN);
+                            } else {
+                                r.setStatus(RecruitmentStatus.CLOSED);
+                            }
+                        }
+                        recruitmentRepository.save(r);
+                    }
+                }
+
+                // Sync to CustomForm
+                customFormRepository.findByEvent_EventIdAndFormType(recruitment.getEvent().getEventId(), FormType.RECRUITMENT)
+                    .ifPresent(form -> {
+                        form.setDeadline(newDeadline);
+                        customFormRepository.save(form);
+                    });
+            }
+        }
         if (request.getStatus() != null)
             recruitment.setStatus(request.getStatus());
 

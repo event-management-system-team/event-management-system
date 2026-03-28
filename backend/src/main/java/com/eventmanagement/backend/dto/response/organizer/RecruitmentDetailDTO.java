@@ -19,6 +19,7 @@ public class RecruitmentDetailDTO {
     private Integer vacancy;
     private String requirements;
     private LocalDateTime deadline;
+    private LocalDateTime eventStartDate;
     private String status;
     private java.util.UUID formId;
 }

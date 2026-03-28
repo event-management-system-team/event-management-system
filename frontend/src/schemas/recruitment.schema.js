@@ -19,7 +19,7 @@ export const step1Schema = z.object({
 });
 
 export const step2Schema = z.object({
-  deadline: z.date().nullable().optional(),
+  deadline: z.date({ required_error: "Deadline is required", invalid_type_error: "Please select a valid date" }),
   benefits: z.array(z.string()).optional(),
 });
 
