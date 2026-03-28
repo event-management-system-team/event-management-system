@@ -22,6 +22,10 @@ import jakarta.transaction.Transactional;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, UUID> {
+    @Modifying
+    @Query("UPDATE Event e SET e.registeredCount = e.registeredCount + :count WHERE e.eventId = :eventId")
+    void incrementRegisteredCount(@Param("eventId") UUID eventId, @Param("count") int count);
+
         List<Event> findTop6ByStatusInOrderByRegisteredCountDesc(List<EventStatus> statuses);
 
         List<Event> findTop5ByStatusOrderByCreatedAtDesc(EventStatus status);

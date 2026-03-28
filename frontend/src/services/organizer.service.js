@@ -60,9 +60,12 @@ const organizerService = {
         return response.data
     },
 
-    getEventAttendees: async (eventId, page = 0, size = 10) => {
+    getEventAttendees: async (eventId, page = 0, size = 10, { ticketType, status } = {}) => {
+        const params = { page, size };
+        if (ticketType) params.ticketType = ticketType;
+        if (status) params.status = status;
         const response = await axiosInstance.get(`/organizer/events/${eventId}/attendees`, {
-            params: { page, size }
+            params
         })
         return response.data
     },

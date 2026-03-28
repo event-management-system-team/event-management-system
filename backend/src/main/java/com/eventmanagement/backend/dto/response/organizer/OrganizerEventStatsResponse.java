@@ -14,4 +14,5 @@ public class OrganizerEventStatsResponse {
     private long totalEvents;
     private long activeCount;
     private long completedCount;
+    private Double averageRating;
 }

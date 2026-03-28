@@ -34,7 +34,11 @@ public class OrganizerEventResponse {
 
     private BigDecimal totalRevenue;
 
+    private java.util.Map<String, Integer> ticketSalesBreakdown;
+
     private String categoryName;
     
     private Boolean isFree;
+
+    private Double avgRating;
 }
