@@ -548,15 +548,32 @@ public class OrganizerEventService {
      * Lấy danh sách attendees của một event có phân trang
      * Query từ bảng tickets (CONFIRMED, PAID, CHECKED_IN) thay vì event_registrations
      */
-    public Page<AttendeeResponse> getEventAttendees(UUID eventId, int page, int size) {
+    public Page<AttendeeResponse> getEventAttendees(UUID eventId, int page, int size,
+                                                      String ticketType, String status) {
         eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found: " + eventId));
 
-        List<TicketStatus> validStatuses = List.of(
-                TicketStatus.CONFIRMED, TicketStatus.PAID, TicketStatus.CHECKED_IN);
+        List<TicketStatus> validStatuses;
+        if (status != null && !status.isBlank()) {
+            String normalized = status.toUpperCase().replace("-", "_");
+            if ("CHECKED_IN".equals(normalized) || "CHECKEDIN".equals(normalized)) {
+                validStatuses = List.of(TicketStatus.CHECKED_IN);
+            } else if ("REGISTERED".equals(normalized)) {
+                validStatuses = List.of(TicketStatus.CONFIRMED, TicketStatus.PAID);
+            } else if ("CANCELLED".equals(normalized)) {
+                validStatuses = List.of(TicketStatus.CANCELLED);
+            } else {
+                validStatuses = List.of(TicketStatus.CONFIRMED, TicketStatus.PAID, TicketStatus.CHECKED_IN);
+            }
+        } else {
+            validStatuses = List.of(TicketStatus.CONFIRMED, TicketStatus.PAID, TicketStatus.CHECKED_IN);
+        }
+
+        String ticketTypeName = (ticketType != null && !ticketType.isBlank()) ? ticketType : null;
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<Ticket> tickets = ticketRepository.findAttendeeTicketsByEventId(eventId, validStatuses, pageable);
+        Page<Ticket> tickets = ticketRepository.findAttendeeTicketsByEventId(
+                eventId, validStatuses, ticketTypeName, pageable);
 
         return tickets.map(this::mapToAttendeeResponse);
     }
