@@ -35,59 +35,11 @@ const Step1RoleDetails = ({ form, onChange, errors = {} }) => {
           <div className="w-6 h-6 rounded-full bg-[#4a9e9e]/15 flex items-center justify-center">
             <Briefcase size={13} className="text-[#4a9e9e]" />
           </div>
-          Role Details
+          Positions
         </h2>
-
-        {/* --- Event selector --- */}
-        <div className="mb-6">
-          <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-            Event <span className="text-red-400">*</span>
-          </label>
-          {form.eventId && (form.eventOptions || []).length === 0 ? (
-            <div className="w-full px-4 py-2.5 text-sm border border-[#4a9e9e] rounded-xl bg-[#f0fafa] text-[#4a9e9e] font-medium">
-              Event ID: {form.eventId.slice(0, 8)}...
-            </div>
-          ) : (
-            <select
-              value={form.eventId}
-              onChange={(e) => onChange({ eventId: e.target.value })}
-              disabled={!!form.eventId}
-              className={`w-full px-4 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 bg-white transition appearance-none ${
-                errors.eventId
-                  ? "border-red-400 focus:ring-red-200"
-                  : "border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]"
-              }`}
-            >
-              <option value="">— Select event —</option>
-              {(form.eventOptions || []).map((ev) => (
-                <option key={ev.eventId} value={ev.eventId}>
-                  {ev.eventName}
-                </option>
-              ))}
-            </select>
-          )}
-          <FieldError msg={errors.eventId} />
-        </div>
-
-        {/* --- Description --- */}
-        <div className="mb-6">
-          <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-            Job Description
-          </label>
-          <textarea
-            placeholder="Describe the responsibilities and daily tasks…"
-            value={form.description}
-            onChange={(e) => onChange({ description: e.target.value })}
-            rows={5}
-            className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] resize-y transition bg-white"
-          />
-        </div>
 
         {/* --- Danh sách positions --- */}
         <div className="space-y-3 mb-4">
-          <label className="block text-xs font-semibold text-gray-600 mb-3">
-            Positions <span className="text-red-400">*</span>
-          </label>
           {positions.map((pos, idx) => {
             const nameErr = errors[`positions.${idx}.name`];
             const vacErr = errors[`positions.${idx}.vacancy`];
@@ -205,8 +157,6 @@ const Step1RoleDetails = ({ form, onChange, errors = {} }) => {
         {errors.positions && (
           <FieldError msg={errors.positions} />
         )}
-<<<<<<< HEAD
-=======
 
         {/* --- Event selector --- */}
         <div className="mt-6">
@@ -238,7 +188,6 @@ const Step1RoleDetails = ({ form, onChange, errors = {} }) => {
           )}
           <FieldError msg={errors.eventId} />
         </div>
->>>>>>> 61001302a156f8c89809a6f70848c8abd078eae8
       </section>
     </div>
   );

@@ -7,11 +7,7 @@ import organizerService from "../services/organizer.service";
 import { validateStep1, validateStep2 } from "../schemas/recruitment.schema";
 
 const initialForm = {
-<<<<<<< HEAD
-  positions: [{ name: "", vacancy: "1", requirements: [] }],
-=======
   positions: [{ name: "", vacancy: "1", description: "", requirements: [] }],
->>>>>>> 61001302a156f8c89809a6f70848c8abd078eae8
   eventId: "",
   eventOptions: [],
 
@@ -168,26 +164,6 @@ const useCreateRecruitment = (preselectedEventId = "") => {
 
         setForm((prev) => ({
           ...prev,
-<<<<<<< HEAD
-          positions: [
-            {
-              name: data.positionName || "",
-              vacancy: String(data.vacancy || 1),
-              requirements: parsedReqs,
-            },
-          ],
-          description: data.description || "",
-          benefits: parsedBenefits,
-          deadline: data.deadline ? new Date(data.deadline) : null,
-          formId: data.formId || null,
-          eventId: data.eventId || prev.eventId,
-        }));
-
-        // Tự động chuyển đến step phù hợp dựa trên dữ liệu đã điền
-        // Nếu đã có deadline hoặc benefits → step 2 đã xong → vào step 3
-        // Nếu chỉ có position name → step 1 đã xong → vào step 2
-        if (data.deadline || parsedBenefits.length > 0) {
-=======
           positions,
           benefits: parsedBenefits,
           deadline: firstData.deadline ? new Date(firstData.deadline) : null,
@@ -197,7 +173,6 @@ const useCreateRecruitment = (preselectedEventId = "") => {
         // Auto-navigate to appropriate step
         const hasReqsOrBenefits = positions.some(p => p.requirements.length > 0) || parsedBenefits.length > 0;
         if (firstData.deadline || hasReqsOrBenefits) {
->>>>>>> 61001302a156f8c89809a6f70848c8abd078eae8
           setStep(3);
         } else if (positions.some(p => p.name)) {
           setStep(2);
@@ -264,22 +239,6 @@ const useCreateRecruitment = (preselectedEventId = "") => {
     ? new Date(selectedEvent.startDate)
     : null;
 
-<<<<<<< HEAD
-  const buildPayload = (status = "OPEN") => {
-    return {
-      positions: form.positions.map((p) => ({
-        positionName: p.name,
-        vacancy: parseInt(p.vacancy) || 1,
-        requirements: p.requirements && p.requirements.length > 0 ? p.requirements : null,
-      })),
-      description: form.description || null,
-      benefits: form.benefits.length > 0 ? form.benefits : null,
-      deadline: form.deadline ? dayjs(form.deadline).toISOString() : null,
-      formId: form.formId || null,
-      status,
-    };
-  };
-=======
   const buildPayload = (status = "OPEN") => ({
     positions: form.positions.map((p) => ({
       positionName: p.name,
@@ -292,7 +251,6 @@ const useCreateRecruitment = (preselectedEventId = "") => {
     formId: form.formId || null,
     status,
   });
->>>>>>> 61001302a156f8c89809a6f70848c8abd078eae8
 
   // Helper: update tất cả positions đã tồn tại trên server
   const updateAllPositions = async (status) => {
