@@ -264,7 +264,7 @@ const Step1BasicInfo = ({ form, onChange, errors = {} }) => {
                 <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-5">
                     <AlertCircle size={16} className="text-amber-500 mt-0.5 shrink-0" />
                     <p className="text-xs text-amber-700 leading-relaxed">
-                        <strong>Note:</strong> The administration team needs a maximum of <strong>48 hours</strong> to check the event. Please create the event starting at least <strong>2 days</strong> to ensure progress.
+                        <strong>Note:</strong> The administrators need a maximum of <strong>48 hours</strong> to verify the event. Please create the event starting at least <strong>3 days from now</strong> to ensure progress.
                     </p>
                 </div>
 
@@ -275,7 +275,7 @@ const Step1BasicInfo = ({ form, onChange, errors = {} }) => {
                         onChange={(date) => onChange({ startDate: date })}
                         dateFormat="dd/MM/yyyy"
                         placeholderText="dd/mm/yyyy"
-                        minDate={dayjs().add(2, 'day').toDate()}
+                        minDate={new Date()}
                         className={`w-full px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 transition ${errors.startDate ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
                         wrapperClassName="w-full"
                     />
@@ -375,7 +375,7 @@ const Step1BasicInfo = ({ form, onChange, errors = {} }) => {
 // ─────────────────────────────────────────────
 // Step 2 – Tickets & Pricing
 // ─────────────────────────────────────────────
-const Step2Tickets = ({ form, onChange, errors = {} }) => {
+const Step2Tickets = ({ form, onChange, errors = {}, setErrors }) => {
     const isFree = form.isFree;
 
     const handleTicketChange = (idx, field, value) => {
@@ -383,6 +383,29 @@ const Step2Tickets = ({ form, onChange, errors = {} }) => {
             i === idx ? { ...t, [field]: value } : t
         );
         onChange({ tickets: updated });
+        // Clear duplicate error for this field when user types
+        if (field === 'name' && errors[`ticket_${idx}_name`]) {
+            setErrors?.((prev) => {
+                const next = { ...prev };
+                delete next[`ticket_${idx}_name`];
+                return next;
+            });
+        }
+    };
+
+    // Real-time duplicate check on blur
+    const handleTicketNameBlur = (idx) => {
+        const currentName = form.tickets[idx].name.trim().toLowerCase();
+        if (!currentName) return;
+        const duplicateIdx = form.tickets.findIndex(
+            (t, i) => i !== idx && t.name.trim().toLowerCase() === currentName
+        );
+        if (duplicateIdx !== -1) {
+            setErrors?.((prev) => ({
+                ...prev,
+                [`ticket_${idx}_name`]: 'This ticket name is already used',
+            }));
+        }
     };
 
     const addTicket = () => {
@@ -397,7 +420,6 @@ const Step2Tickets = ({ form, onChange, errors = {} }) => {
 
     const handleToggleFree = (v) => {
         if (v) {
-            // Bật Free: set tất cả price về 0
             onChange({
                 isFree: true,
                 tickets: form.tickets.map((t) => ({ ...t, price: '0' })),
@@ -447,6 +469,7 @@ const Step2Tickets = ({ form, onChange, errors = {} }) => {
                                         placeholder="e.g. General Admission"
                                         value={ticket.name}
                                         onChange={(e) => handleTicketChange(idx, 'name', e.target.value)}
+                                        onBlur={() => handleTicketNameBlur(idx)}
                                         className={`w-full px-3 py-2 text-sm border rounded-lg bg-white focus:outline-none focus:ring-2 transition ${errors[`ticket_${idx}_name`] ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
                                     />
                                     <FieldError msg={errors[`ticket_${idx}_name`]} />
@@ -859,8 +882,6 @@ const validateStep1 = (form) => {
     if (!form.categoryId) e.categoryId = 'Please select a category';
     if (!form.description.trim()) e.description = 'Description is required';
     if (!form.startDate) e.startDate = 'Event date is required';
-    else if (dayjs(form.startDate).startOf('day').isBefore(dayjs().add(2, 'day').startOf('day')))
-        e.startDate = 'Event date must be at least 2 days from now';
     if (!form.startTime) e.startTime = 'Start time is required';
     if (!form.endTime) e.endTime = 'End time is required';
     if (form.startTime && form.endTime && form.endTime <= form.startTime) {
@@ -877,8 +898,19 @@ const validateStep2 = (form) => {
             e.totalCapacity = 'Total capacity is required for free events';
         }
     } else {
+        // Track seen names for duplicate detection (case-insensitive, trimmed)
+        const seenNames = new Map(); // normalized name → first index
         form.tickets.forEach((t, idx) => {
-            if (!t.name.trim()) e[`ticket_${idx}_name`] = 'Ticket name is required';
+            if (!t.name.trim()) {
+                e[`ticket_${idx}_name`] = 'Ticket name is required';
+            } else {
+                const normalized = t.name.trim().toLowerCase();
+                if (seenNames.has(normalized)) {
+                    e[`ticket_${idx}_name`] = 'This ticket name is already used';
+                } else {
+                    seenNames.set(normalized, idx);
+                }
+            }
             if (!t.quantity || parseInt(t.quantity) <= 0) e[`ticket_${idx}_quantity`] = 'Quantity must be > 0';
         });
     }
@@ -1172,7 +1204,7 @@ const CreateEventPage = () => {
                 <StepIndicator currentStep={step} />
 
                 {step === 1 && <Step1BasicInfo form={form} onChange={(v) => { updateForm(v); setErrors((prev) => { const k = Object.keys(v)[0]; const n = { ...prev }; delete n[k]; return n; }); }} errors={errors} />}
-                {step === 2 && <Step2Tickets form={form} onChange={(v) => { updateForm(v); setErrors((prev) => { const n = { ...prev }; Object.keys(v).forEach((k) => { if (k === 'tickets') { Object.keys(n).forEach((ek) => { if (ek.startsWith('ticket_')) delete n[ek]; }); } else { delete n[k]; } }); return n; }); }} errors={errors} />}
+                {step === 2 && <Step2Tickets form={form} onChange={(v) => { updateForm(v); setErrors((prev) => { const n = { ...prev }; Object.keys(v).forEach((k) => { if (k === 'tickets') { Object.keys(n).forEach((ek) => { if (ek.startsWith('ticket_')) delete n[ek]; }); } else { delete n[k]; } }); return n; }); }} errors={errors} setErrors={setErrors} />}
                 {step === 3 && <Step3Agenda form={form} onChange={(v) => { updateForm(v); setErrors((prev) => { const n = { ...prev }; Object.keys(v).forEach((k) => { if (k === 'agenda') { Object.keys(n).forEach((ek) => { if (ek.startsWith('agenda_') || ek === '_agenda') delete n[ek]; }); } }); return n; }); }} errors={errors} />}
 
                 {error && (

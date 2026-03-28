@@ -68,6 +68,7 @@ public class OrganizerEventService {
             throw new BadRequestException("Step 1: Start time must be after now");
         }
 
+
         String bannerUrl = null;
         if (coverFile != null && !coverFile.isEmpty()) {
             try {
@@ -305,6 +306,7 @@ public class OrganizerEventService {
         if (!request.isDraft() && startDateTime.isBefore(LocalDateTime.now())) {
             throw new BadRequestException("Start date/time must be in the future");
         }
+
 
         if (coverFile != null && !coverFile.isEmpty()) {
             try {
