@@ -44,7 +44,7 @@ const Step3SelectForm = ({ form, onChange, errors = {}, persistDraft }) => {
           Choose a template for candidates to fill out for this position
         </p>
 
-        {/* Search */}
+        {/* Search
         <div className="relative mb-4">
           <Search
             size={14}
@@ -57,7 +57,7 @@ const Step3SelectForm = ({ form, onChange, errors = {}, persistDraft }) => {
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] bg-white transition"
           />
-        </div>
+        </div> */}
 
         {/* Form list */}
         {isLoading ? (
