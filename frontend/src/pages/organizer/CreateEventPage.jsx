@@ -224,7 +224,7 @@ const Step1BasicInfo = ({ form, onChange, errors = {} }) => {
                 <div>
                     <label className="block text-xs font-semibold text-gray-600 mb-1.5">Event Cover Image</label>
                     <div
-                        className="border-2 border-dashed border-[#4a9e9e]/40 rounded-xl bg-[#f0fafa] flex flex-col items-center justify-center py-10 cursor-pointer hover:bg-[#e6f5f5] transition"
+                        className={`border-2 border-dashed rounded-xl flex flex-col items-center justify-center py-10 cursor-pointer transition ${errors.coverFile ? 'border-red-400 bg-red-50/30 hover:bg-red-50/50' : 'border-[#4a9e9e]/40 bg-[#f0fafa] hover:bg-[#e6f5f5]'}`}
                         onClick={() => fileInputRef.current?.click()}
                         onDrop={handleDrop}
                         onDragOver={(e) => e.preventDefault()}
@@ -233,8 +233,8 @@ const Step1BasicInfo = ({ form, onChange, errors = {} }) => {
                             <img src={preview} alt="Cover preview" className="max-h-44 rounded-lg object-cover" />
                         ) : (
                             <>
-                                <div className="w-12 h-12 bg-[#4a9e9e]/20 rounded-full flex items-center justify-center mb-3">
-                                    <Upload size={22} className="text-[#4a9e9e]" />
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${errors.coverFile ? 'bg-red-100' : 'bg-[#4a9e9e]/20'}`}>
+                                    <Upload size={22} className={errors.coverFile ? 'text-red-400' : 'text-[#4a9e9e]'} />
                                 </div>
                                 <p className="text-sm font-medium text-gray-600">Click to upload or drag and drop</p>
                                 <p className="text-xs text-gray-400 mt-1">SVG, PNG, JPG or GIF (max. 800×400px)</p>
@@ -248,6 +248,7 @@ const Step1BasicInfo = ({ form, onChange, errors = {} }) => {
                         className="hidden"
                         onChange={handleFileChange}
                     />
+                    <FieldError msg={errors.coverFile} />
                 </div>
             </section>
 
@@ -887,6 +888,7 @@ const validateStep1 = (form) => {
     if (form.startTime && form.endTime && form.endTime <= form.startTime) {
         e.endTime = 'End time must be after start time';
     }
+    if (!form.coverFile && !form.coverPreview) e.coverFile = 'Event cover image is required';
     if (!form.location.trim()) e.location = 'Venue address is required';
     return e;
 };
