@@ -25,6 +25,7 @@ const SubmitFeedback = () => {
   const [isFormActive, setIsFormActive] = useState(true); 
   const [isClosed, setIsClosed] = useState(false); 
   const [isNotYetEnded, setIsNotYetEnded] = useState(false); 
+  const [isNotStarted, setIsNotStarted] = useState(false);
 
   // FETCH DATA
   useEffect(() => {
@@ -41,12 +42,18 @@ const SubmitFeedback = () => {
               date: eData.startDate ? new Date(eData.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Ongoing'
             });
 
-            if (eData.endDate) {
+            if (eData.endDate && eData.startDate) {
+              const eventStartTime = new Date(eData.startDate).getTime();
               const eventEndTime = new Date(eData.endDate).getTime();
               const currentTime = new Date().getTime();
+              const fourteenDaysLater = eventEndTime + (14 * 24 * 60 * 60 * 1000);
               
-              if (currentTime < eventEndTime) {
+              if (currentTime < eventStartTime) {
+                setIsNotStarted(true);
+              } else if (currentTime < eventEndTime) {
                 setIsNotYetEnded(true);
+              } else if (currentTime > fourteenDaysLater) {
+                setIsClosed(true);
               }
             }
           }
@@ -175,6 +182,23 @@ const SubmitFeedback = () => {
 
   if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-[#f2ede6]"><Loader2 className="animate-spin text-[#849b9f]" size={40}/></div>;
   
+  if (isNotStarted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6 font-sans">
+        <div className="bg-white rounded-[32px] shadow-sm max-w-md w-full p-12 text-center">
+          <div className="w-20 h-20 bg-purple-50 text-purple-400 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Calendar size={40} />
+          </div>
+          <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Event Not Started</h2>
+          <p className="text-gray-500 font-medium mb-10 leading-relaxed">
+            <strong>{eventInfo.name}</strong> has not started yet. Feedback will be available after the event concludes.
+          </p>
+          <Link to="/" className="block w-full py-4 bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-2xl font-bold transition-all">Return to Home</Link>
+        </div>
+      </div>
+    );
+  }
+
   if (isNotYetEnded) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6 font-sans">
@@ -377,6 +401,10 @@ const SubmitFeedback = () => {
               <div className="flex items-center gap-2 text-sm font-bold text-gray-400">
                 <Calendar size={16} />
                 <span>{eventInfo.date}</span>
+              </div>
+              <div className="mt-4 flex items-start gap-2 text-sm text-orange-600 bg-orange-50 p-3 rounded-xl border border-orange-100">
+                <Info size={18} className="mt-0.5 shrink-0" />
+                <p><strong>Notice:</strong> Feedback submission is only available for <strong>14 days</strong> after the event ends.</p>
               </div>
             </div>
             <div className="bg-[#f6f5f2] rounded-2xl p-4 flex items-center gap-3 shrink-0">

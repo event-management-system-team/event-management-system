@@ -284,7 +284,7 @@ const Step1BasicInfo = ({ form, onChange, errors = {}, setErrors }) => {
                 <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-5">
                     <AlertCircle size={16} className="text-amber-500 mt-0.5 shrink-0" />
                     <p className="text-xs text-amber-700 leading-relaxed">
-                        <strong>Note:</strong> The administrators need a maximum of <strong>48 hours</strong> to verify the event. Please create the event starting at least <strong>3 days from now</strong> to ensure progress.
+                        <strong>Note:</strong> The administrators need a maximum of <strong>48 hours</strong> to verify the event.
                     </p>
                 </div>
 
@@ -300,6 +300,9 @@ const Step1BasicInfo = ({ form, onChange, errors = {}, setErrors }) => {
                         wrapperClassName="w-full"
                     />
                     <FieldError msg={errors.startDate} />
+                    <p className="mt-1 text-[11px] text-gray-500">
+                        Please create the event starting at least <strong>3 days from now</strong> to ensure progress.
+                    </p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div>
