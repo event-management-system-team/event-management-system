@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
     CalendarDays,
@@ -8,7 +7,7 @@ import {
     MapPin,
     Calendar,
     ArrowRight,
-    ChevronDown,
+    Star,
 } from 'lucide-react';
 import dayjs from 'dayjs';
 import {
@@ -47,13 +46,12 @@ const DONUT_COLORS = ['#1E293B', '#F97316', '#94A3B8'];
 const formatVND = (value) =>
     new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(value);
 
-const StatCard = ({ icon: Icon, label, value, loading }) => (
+const StatCard = ({ icon: Icon, label, value, loading, color, colorBg }) => (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-5 flex items-center gap-4">
         <div
-            className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
-            style={{ backgroundColor: ACCENT_LIGHT }}
+            className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 bg-${colorBg}`}
         >
-            <Icon size={22} style={{ color: ACCENT }} />
+            <Icon size={22} className={`text-${color}`} />
         </div>
         <div>
             <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">
@@ -102,26 +100,22 @@ const CustomBarTooltip = ({ active, payload, label }) => {
 };
 
 const OrganizerDashboardPage = () => {
-    const { user } = useSelector((state) => state.auth);
-    const organizerId = user?.user_id;
     const navigate = useNavigate();
 
     const [stats, setStats] = useState({
         totalEvents: 0,
         activeCount: 0,
-        upcomingCount: 0,
         completedCount: 0,
     });
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const fetchData = useCallback(async () => {
-        if (!organizerId) return;
         setLoading(true);
         try {
             const [statsData, eventsData] = await Promise.all([
-                organizerService.getMyEventStats(organizerId),
-                organizerService.getMyEvents(organizerId, 0, 20),
+                organizerService.getMyEventStats(),
+                organizerService.getMyEvents(0, 20),
             ]);
             setStats(statsData);
             setEvents(eventsData.content || []);
@@ -130,14 +124,14 @@ const OrganizerDashboardPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [organizerId]);
+    }, []);
 
     useEffect(() => {
         fetchData();
     }, [fetchData]);
 
     const totalTicketsSold = useMemo(
-        () => events.reduce((sum, e) => sum + (e.registeredCount || 0), 0),
+        () => events.reduce((sum, e) => sum + (e.totalSold || 0), 0),
         [events],
     );
     const totalCapacity = useMemo(
@@ -155,11 +149,11 @@ const OrganizerDashboardPage = () => {
         const sold = totalTicketsSold;
         const available = Math.max(0, totalCapacity - sold);
         const fullyBookedCount = events.filter(
-            (e) => e.totalCapacity > 0 && e.registeredCount >= e.totalCapacity,
+            (e) => e.totalCapacity > 0 && e.totalSold >= e.totalCapacity,
         ).length;
         const soldOutTickets = events
-            .filter((e) => e.totalCapacity > 0 && e.registeredCount >= e.totalCapacity)
-            .reduce((s, e) => s + (e.registeredCount || 0), 0);
+            .filter((e) => e.totalCapacity > 0 && e.totalSold >= e.totalCapacity)
+            .reduce((s, e) => s + (e.totalSold || 0), 0);
         const partialSold = Math.max(0, sold - soldOutTickets);
 
         return [
@@ -203,10 +197,10 @@ const OrganizerDashboardPage = () => {
         <div className="p-8 min-h-screen">
             {/* Header */}
             <div className="mb-8">
-                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
                     Dashboard
                 </h1>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-gray-500 text-sm mt-1">
                     Welcome back! Here's an overview of your events.
                 </p>
             </div>
@@ -218,19 +212,30 @@ const OrganizerDashboardPage = () => {
                     label="Total Events"
                     value={stats.totalEvents}
                     loading={loading}
+                    color="blue-500"
+                    colorBg="blue-50"
                 />
                 <StatCard
                     icon={BookOpen}
                     label="Total Bookings"
                     value={totalBookings}
                     loading={loading}
+                    color="green-500"
+                    colorBg="green-50"
                 />
-                <StatCard
-                    icon={Ticket}
-                    label="Tickets Sold"
-                    value={totalTicketsSold}
-                    loading={loading}
-                />
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-5 flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 bg-amber-50">
+                        <Star size={22} className="text-amber-400" fill="currentColor" />
+                    </div>
+                    <div>
+                        <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">
+                            Avg. Rating
+                        </p>
+                        <p className="text-2xl font-bold text-gray-900 mt-0.5">
+                            {loading ? '—' : (stats.averageRating ?? 0).toFixed(1)}
+                        </p>
+                    </div>
+                </div>
             </div>
 
             {/* Charts Row — Ticket Sales (left, full height) | Sales Revenue + Popular Events (right) */}
@@ -239,9 +244,6 @@ const OrganizerDashboardPage = () => {
                 <div className="col-span-5 bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col">
                     <div className="flex items-center justify-between mb-2">
                         <h2 className="text-lg font-bold text-gray-900">Ticket Sales</h2>
-                        <button className="flex items-center gap-1 text-xs text-gray-400 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition">
-                            This Week <ChevronDown size={14} />
-                        </button>
                     </div>
 
                     {totalCapacity === 0 && !loading ? (
@@ -310,9 +312,6 @@ const OrganizerDashboardPage = () => {
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                         <div className="flex items-center justify-between mb-1">
                             <h2 className="text-lg font-bold text-gray-900">Sales Revenue</h2>
-                            <button className="flex items-center gap-1 text-xs text-gray-400 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition">
-                                Last 8 Months <ChevronDown size={14} />
-                            </button>
                         </div>
                         <div className="mb-4">
                             <p className="text-xs text-gray-400">Total Revenue</p>
@@ -345,10 +344,7 @@ const OrganizerDashboardPage = () => {
                     {/* Popular Events */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                         <div className="flex items-center justify-between mb-5">
-                            <h2 className="text-lg font-bold text-gray-900">Popular Events</h2>
-                            <button className="flex items-center gap-1 text-xs text-gray-400 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition">
-                                Popular <ChevronDown size={14} />
-                            </button>
+                            <h2 className="text-lg font-bold text-gray-900">Top Event Categories</h2>
                         </div>
 
                         {categoryStats.length === 0 && !loading ? (

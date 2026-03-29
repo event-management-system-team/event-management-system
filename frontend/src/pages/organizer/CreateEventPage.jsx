@@ -84,7 +84,7 @@ const StepIndicator = ({ currentStep }) => {
 const FieldError = ({ msg }) =>
     msg ? <p className="mt-1 text-xs text-red-500 flex items-center gap-1"><span>⚠</span>{msg}</p> : null;
 
-const Step1BasicInfo = ({ form, onChange, errors = {} }) => {
+const Step1BasicInfo = ({ form, onChange, errors = {}, setErrors }) => {
     const { categories, isLoading: catLoading } = useCategories();
     const fileInputRef = useRef(null);
     const [preview, setPreview] = useState(form.coverPreview || null);
@@ -149,9 +149,20 @@ const Step1BasicInfo = ({ form, onChange, errors = {} }) => {
     }, []);
     // ────────────────────────────────────────────────────────────────────────
 
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
+        if (file.size > MAX_FILE_SIZE) {
+            setErrors?.((prev) => ({
+                ...prev,
+                coverFile: `File size (${(file.size / 1024 / 1024).toFixed(1)}MB) exceeds the 5MB limit`,
+            }));
+            e.target.value = '';
+            return;
+        }
+        setErrors?.((prev) => { const n = { ...prev }; delete n.coverFile; return n; });
         const url = URL.createObjectURL(file);
         setPreview(url);
         onChange({ coverFile: file, coverPreview: url });
@@ -161,6 +172,14 @@ const Step1BasicInfo = ({ form, onChange, errors = {} }) => {
         e.preventDefault();
         const file = e.dataTransfer.files[0];
         if (!file) return;
+        if (file.size > MAX_FILE_SIZE) {
+            setErrors?.((prev) => ({
+                ...prev,
+                coverFile: `File size (${(file.size / 1024 / 1024).toFixed(1)}MB) exceeds the 5MB limit`,
+            }));
+            return;
+        }
+        setErrors?.((prev) => { const n = { ...prev }; delete n.coverFile; return n; });
         const url = URL.createObjectURL(file);
         setPreview(url);
         onChange({ coverFile: file, coverPreview: url });
@@ -224,7 +243,7 @@ const Step1BasicInfo = ({ form, onChange, errors = {} }) => {
                 <div>
                     <label className="block text-xs font-semibold text-gray-600 mb-1.5">Event Cover Image</label>
                     <div
-                        className="border-2 border-dashed border-[#4a9e9e]/40 rounded-xl bg-[#f0fafa] flex flex-col items-center justify-center py-10 cursor-pointer hover:bg-[#e6f5f5] transition"
+                        className={`border-2 border-dashed rounded-xl flex flex-col items-center justify-center py-10 cursor-pointer transition ${errors.coverFile ? 'border-red-400 bg-red-50/30 hover:bg-red-50/50' : 'border-[#4a9e9e]/40 bg-[#f0fafa] hover:bg-[#e6f5f5]'}`}
                         onClick={() => fileInputRef.current?.click()}
                         onDrop={handleDrop}
                         onDragOver={(e) => e.preventDefault()}
@@ -233,8 +252,8 @@ const Step1BasicInfo = ({ form, onChange, errors = {} }) => {
                             <img src={preview} alt="Cover preview" className="max-h-44 rounded-lg object-cover" />
                         ) : (
                             <>
-                                <div className="w-12 h-12 bg-[#4a9e9e]/20 rounded-full flex items-center justify-center mb-3">
-                                    <Upload size={22} className="text-[#4a9e9e]" />
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${errors.coverFile ? 'bg-red-100' : 'bg-[#4a9e9e]/20'}`}>
+                                    <Upload size={22} className={errors.coverFile ? 'text-red-400' : 'text-[#4a9e9e]'} />
                                 </div>
                                 <p className="text-sm font-medium text-gray-600">Click to upload or drag and drop</p>
                                 <p className="text-xs text-gray-400 mt-1">SVG, PNG, JPG or GIF (max. 800×400px)</p>
@@ -248,6 +267,7 @@ const Step1BasicInfo = ({ form, onChange, errors = {} }) => {
                         className="hidden"
                         onChange={handleFileChange}
                     />
+                    <FieldError msg={errors.coverFile} />
                 </div>
             </section>
 
@@ -259,32 +279,32 @@ const Step1BasicInfo = ({ form, onChange, errors = {} }) => {
                     </div>
                     Schedule Details
                 </h2>
+
+                {/* 48h review notice */}
+                <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-5">
+                    <AlertCircle size={16} className="text-amber-500 mt-0.5 shrink-0" />
+                    <p className="text-xs text-amber-700 leading-relaxed">
+                        <strong>Note:</strong> The administrators need a maximum of <strong>48 hours</strong> to verify the event.
+                    </p>
+                </div>
+
+                <div className="mb-4">
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">Event Date</label>
+                    <DatePicker
+                        selected={form.startDate}
+                        onChange={(date) => onChange({ startDate: date })}
+                        dateFormat="dd/MM/yyyy"
+                        placeholderText="dd/mm/yyyy"
+                        minDate={new Date()}
+                        className={`w-full px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 transition ${errors.startDate ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
+                        wrapperClassName="w-full"
+                    />
+                    <FieldError msg={errors.startDate} />
+                    <p className="mt-1 text-[11px] text-gray-500">
+                        Please create the event starting at least <strong>3 days from now</strong> to ensure progress.
+                    </p>
+                </div>
                 <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-xs font-semibold text-gray-600 mb-1.5">Start Date</label>
-                        <DatePicker
-                            selected={form.startDate}
-                            onChange={(date) => onChange({ startDate: date })}
-                            dateFormat="dd/MM/yyyy"
-                            placeholderText="dd/mm/yyyy"
-                            className={`w-full px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 transition ${errors.startDate ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
-                            wrapperClassName="w-full"
-                        />
-                        <FieldError msg={errors.startDate} />
-                    </div>
-                    <div>
-                        <label className="block text-xs font-semibold text-gray-600 mb-1.5">End Date</label>
-                        <DatePicker
-                            selected={form.endDate}
-                            onChange={(date) => onChange({ endDate: date })}
-                            dateFormat="dd/MM/yyyy"
-                            placeholderText="dd/mm/yyyy"
-                            minDate={form.startDate}
-                            className={`w-full px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 transition ${errors.endDate ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
-                            wrapperClassName="w-full"
-                        />
-                        <FieldError msg={errors.endDate} />
-                    </div>
                     <div>
                         <label className="block text-xs font-semibold text-gray-600 mb-1.5">Start Time</label>
                         <input
@@ -378,7 +398,7 @@ const Step1BasicInfo = ({ form, onChange, errors = {} }) => {
 // ─────────────────────────────────────────────
 // Step 2 – Tickets & Pricing
 // ─────────────────────────────────────────────
-const Step2Tickets = ({ form, onChange, errors = {} }) => {
+const Step2Tickets = ({ form, onChange, errors = {}, setErrors }) => {
     const isFree = form.isFree;
 
     const handleTicketChange = (idx, field, value) => {
@@ -386,6 +406,29 @@ const Step2Tickets = ({ form, onChange, errors = {} }) => {
             i === idx ? { ...t, [field]: value } : t
         );
         onChange({ tickets: updated });
+        // Clear duplicate error for this field when user types
+        if (field === 'name' && errors[`ticket_${idx}_name`]) {
+            setErrors?.((prev) => {
+                const next = { ...prev };
+                delete next[`ticket_${idx}_name`];
+                return next;
+            });
+        }
+    };
+
+    // Real-time duplicate check on blur
+    const handleTicketNameBlur = (idx) => {
+        const currentName = form.tickets[idx].name.trim().toLowerCase();
+        if (!currentName) return;
+        const duplicateIdx = form.tickets.findIndex(
+            (t, i) => i !== idx && t.name.trim().toLowerCase() === currentName
+        );
+        if (duplicateIdx !== -1) {
+            setErrors?.((prev) => ({
+                ...prev,
+                [`ticket_${idx}_name`]: 'This ticket name is already used',
+            }));
+        }
     };
 
     const addTicket = () => {
@@ -400,7 +443,6 @@ const Step2Tickets = ({ form, onChange, errors = {} }) => {
 
     const handleToggleFree = (v) => {
         if (v) {
-            // Bật Free: set tất cả price về 0
             onChange({
                 isFree: true,
                 tickets: form.tickets.map((t) => ({ ...t, price: '0' })),
@@ -450,6 +492,7 @@ const Step2Tickets = ({ form, onChange, errors = {} }) => {
                                         placeholder="e.g. General Admission"
                                         value={ticket.name}
                                         onChange={(e) => handleTicketChange(idx, 'name', e.target.value)}
+                                        onBlur={() => handleTicketNameBlur(idx)}
                                         className={`w-full px-3 py-2 text-sm border rounded-lg bg-white focus:outline-none focus:ring-2 transition ${errors[`ticket_${idx}_name`] ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
                                     />
                                     <FieldError msg={errors[`ticket_${idx}_name`]} />
@@ -588,6 +631,7 @@ const ToggleSetting = ({ icon, title, description, checked, onChange }) => (
 // ─────────────────────────────────────────────
 const emptyAgendaItem = () => ({
     title: '',
+    date: null,
     startTime: '',
     endTime: '',
     location: '',
@@ -669,6 +713,7 @@ const Step3Agenda = ({ form, onChange, errors = {} }) => {
                                 />
                                 <FieldError msg={errors[`agenda_${idx}_title`]} />
                             </div>
+
 
                             {/* Time row */}
                             <div className="grid grid-cols-2 gap-3 mb-3">
@@ -827,7 +872,7 @@ const SuccessScreen = ({ form, isEditMode }) => {
         </div>
     );
 };
-``
+
 // ─────────────────────────────────────────────
 // MAIN COMPONENT
 // ─────────────────────────────────────────────
@@ -836,7 +881,6 @@ const initialForm = {
     categoryId: '',
     description: '',
     startDate: null,
-    endDate: null,
     startTime: '',
     endTime: '',
     location: '',
@@ -860,11 +904,13 @@ const validateStep1 = (form) => {
     if (!form.eventName.trim()) e.eventName = 'Event name is required';
     if (!form.categoryId) e.categoryId = 'Please select a category';
     if (!form.description.trim()) e.description = 'Description is required';
-    if (!form.startDate) e.startDate = 'Start date is required';
-    if (!form.endDate) e.endDate = 'End date is required';
-    else if (form.startDate && form.endDate.getTime() < form.startDate.getTime()) e.endDate = 'End date must be after start date';
+    if (!form.startDate) e.startDate = 'Event date is required';
     if (!form.startTime) e.startTime = 'Start time is required';
     if (!form.endTime) e.endTime = 'End time is required';
+    if (form.startTime && form.endTime && form.endTime <= form.startTime) {
+        e.endTime = 'End time must be after start time';
+    }
+    if (!form.coverFile && !form.coverPreview) e.coverFile = 'Event cover image is required';
     if (!form.location.trim()) e.location = 'Venue address is required';
     return e;
 };
@@ -876,8 +922,19 @@ const validateStep2 = (form) => {
             e.totalCapacity = 'Total capacity is required for free events';
         }
     } else {
+        // Track seen names for duplicate detection (case-insensitive, trimmed)
+        const seenNames = new Map(); // normalized name → first index
         form.tickets.forEach((t, idx) => {
-            if (!t.name.trim()) e[`ticket_${idx}_name`] = 'Ticket name is required';
+            if (!t.name.trim()) {
+                e[`ticket_${idx}_name`] = 'Ticket name is required';
+            } else {
+                const normalized = t.name.trim().toLowerCase();
+                if (seenNames.has(normalized)) {
+                    e[`ticket_${idx}_name`] = 'This ticket name is already used';
+                } else {
+                    seenNames.set(normalized, idx);
+                }
+            }
             if (!t.quantity || parseInt(t.quantity) <= 0) e[`ticket_${idx}_quantity`] = 'Quantity must be > 0';
         });
     }
@@ -891,8 +948,10 @@ const validateStep3 = (form) => {
     }
     const eventStart = form.startTime;
     const eventEnd = form.endTime;
+
     form.agenda.forEach((item, idx) => {
         if (!item.title.trim()) e[`agenda_${idx}_title`] = 'Session title is required';
+
         if (!item.startTime) {
             e[`agenda_${idx}_startTime`] = 'Start time is required';
         } else if (eventStart && item.startTime < eventStart) {
@@ -921,6 +980,17 @@ const CreateEventPage = () => {
     const [error, setError] = useState(null);
     const [errors, setErrors] = useState({});
 
+
+    const scrollToFirstError = (errs) => {
+        setTimeout(() => {
+            const firstErrEl = document.querySelector('.border-red-400, [class*="border-red"]');
+            if (firstErrEl) {
+                firstErrEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstErrEl.focus?.();
+            }
+        }, 100);
+    };
+
     const updateForm = (partial) => setForm((prev) => ({ ...prev, ...partial }));
 
     useEffect(() => {
@@ -940,7 +1010,6 @@ const CreateEventPage = () => {
                     categoryId: data.categoryId || '',
                     description: data.description || '',
                     startDate: startDt ? startDt.toDate() : null,
-                    endDate: endDt ? endDt.toDate() : null,
                     startTime: startDt ? startDt.format('HH:mm') : '',
                     endTime: endDt ? endDt.format('HH:mm') : '',
                     location: data.location || '',
@@ -960,6 +1029,7 @@ const CreateEventPage = () => {
                     agenda: data.agendas?.length > 0
                         ? data.agendas.map((a) => ({
                             title: a.title || '',
+                            date: a.date ? new Date(a.date) : null,
                             startTime: a.startTime || '',
                             endTime: a.endTime || '',
                             location: a.location || '',
@@ -985,7 +1055,7 @@ const CreateEventPage = () => {
         categoryId: form.categoryId,
         description: form.description,
         startDate: form.startDate ? dayjs(form.startDate).format('YYYY-MM-DD') : '',
-        endDate: form.endDate ? dayjs(form.endDate).format('YYYY-MM-DD') : '',
+        endDate: form.startDate ? dayjs(form.startDate).format('YYYY-MM-DD') : '',
         startTime: form.startTime,
         endTime: form.endTime,
         location: form.location,
@@ -1001,14 +1071,17 @@ const CreateEventPage = () => {
             })),
         isFree: form.isFree,
         totalCapacity: form.isFree ? (parseInt(form.totalCapacity, 10) || 0) : undefined,
-        agenda: form.agenda.map((item) => ({
-            title: item.title,
-            startTime: item.startTime,
-            endTime: item.endTime,
-            description: item.description || '',
-            location: item.location || '',
-            speaker: item.speaker || '',
-        })),
+        agenda: form.agenda.map((item) => {
+            return {
+                title: item.title,
+                date: dayjs(form.startDate).format('YYYY-MM-DD'),
+                startTime: item.startTime,
+                endTime: item.endTime,
+                description: item.description || '',
+                location: item.location || '',
+                speaker: item.speaker || '',
+            };
+        }),
         draft: isDraft,
     });
 
@@ -1032,7 +1105,12 @@ const CreateEventPage = () => {
 
     const handleContinue = () => {
         const e = validateStep1(form);
-        if (Object.keys(e).length > 0) { setErrors(e); return; }
+        if (Object.keys(e).length > 0) {
+            setErrors(e);
+            showToast(`Please fix ${Object.keys(e).length} error(s) before continuing`);
+            scrollToFirstError(e);
+            return;
+        }
         setErrors({});
         setError(null);
         setStep(2);
@@ -1049,7 +1127,12 @@ const CreateEventPage = () => {
     // Step 2 → Step 3
     const handleContinueToAgenda = () => {
         const e = validateStep2(form);
-        if (Object.keys(e).length > 0) { setErrors(e); return; }
+        if (Object.keys(e).length > 0) {
+            setErrors(e);
+            showToast(`Please fix ${Object.keys(e).length} error(s) before continuing`);
+            scrollToFirstError(e);
+            return;
+        }
         setErrors({});
         setError(null);
         setStep(3);
@@ -1059,7 +1142,12 @@ const CreateEventPage = () => {
     // Step 3 → Submit
     const handleSubmitFinal = async () => {
         const e = validateStep3(form);
-        if (Object.keys(e).length > 0) { setErrors(e); return; }
+        if (Object.keys(e).length > 0) {
+            setErrors(e);
+
+            scrollToFirstError(e);
+            return;
+        }
         setErrors({});
         setSaving(true);
         setError(null);
@@ -1139,9 +1227,9 @@ const CreateEventPage = () => {
             <main className="max-w-3xl mx-auto py-10 px-4">
                 <StepIndicator currentStep={step} />
 
-                {step === 1 && <Step1BasicInfo form={form} onChange={(v) => { updateForm(v); setErrors((prev) => { const k = Object.keys(v)[0]; const n = { ...prev }; delete n[k]; return n; }); }} errors={errors} />}
-                {step === 2 && <Step2Tickets form={form} onChange={updateForm} errors={errors} />}
-                {step === 3 && <Step3Agenda form={form} onChange={updateForm} errors={errors} />}
+                {step === 1 && <Step1BasicInfo form={form} onChange={(v) => { updateForm(v); setErrors((prev) => { const k = Object.keys(v)[0]; const n = { ...prev }; delete n[k]; return n; }); }} errors={errors} setErrors={setErrors} />}
+                {step === 2 && <Step2Tickets form={form} onChange={(v) => { updateForm(v); setErrors((prev) => { const n = { ...prev }; Object.keys(v).forEach((k) => { if (k === 'tickets') { Object.keys(n).forEach((ek) => { if (ek.startsWith('ticket_')) delete n[ek]; }); } else { delete n[k]; } }); return n; }); }} errors={errors} setErrors={setErrors} />}
+                {step === 3 && <Step3Agenda form={form} onChange={(v) => { updateForm(v); setErrors((prev) => { const n = { ...prev }; Object.keys(v).forEach((k) => { if (k === 'agenda') { Object.keys(n).forEach((ek) => { if (ek.startsWith('agenda_') || ek === '_agenda') delete n[ek]; }); } }); return n; }); }} errors={errors} />}
 
                 {error && (
                     <div className="mt-4 flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
@@ -1149,6 +1237,8 @@ const CreateEventPage = () => {
                         {error}
                     </div>
                 )}
+
+
 
                 {/* Footer actions */}
                 <div className="flex items-center justify-between mt-6">

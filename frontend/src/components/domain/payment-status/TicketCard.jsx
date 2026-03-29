@@ -5,11 +5,13 @@ import { MdOutlineConfirmationNumber } from "react-icons/md";
 import { QRCodeSVG } from 'qrcode.react';
 
 const TicketCard = ({ event }) => {
+
+
   return (
     <div className="w-full bg-white rounded-xl shadow-xl flex flex-col md:flex-row overflow-hidden relative border border-gray-200">
       {/* Thông tin sự kiện */}
       <div className="flex-[3] p-8 md:p-10 flex flex-col md:flex-row gap-8 items-start">
-        <div className="w-full md:w-48 aspect-[3/4] bg-center bg-cover rounded-lg shadow-sm" style={{backgroundImage: `url(${event.image})`}}></div>
+        <div className="w-full md:w-48 aspect-[3/4] bg-center bg-cover rounded-lg shadow-sm" style={{ backgroundImage: `url(${event.image})` }}></div>
         <div className="flex flex-col gap-4 flex-1">
           <div>
             <span className="bg-[#8aa9b2]/10 text-[#8aa9b2] px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Confirmed</span>

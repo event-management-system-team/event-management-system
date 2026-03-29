@@ -54,15 +54,25 @@ const ScanQRPage = () => {
     }
 
 
+    // QR code encodes "/check-in/{ticketCode}" — extract the real ticketCode
+    const extractTicketCode = (scannedValue) => {
+        if (scannedValue && scannedValue.startsWith('/check-in/')) {
+            return scannedValue.replace('/check-in/', '');
+        }
+        return scannedValue;
+    };
+
     const handleSearchCheckIn = (ticketId) => {
         checkInMutation.mutate({ ticketId });
     }
 
-    const handleScanCheckIn = (ticketCode) => {
+    const handleScanCheckIn = (rawCode) => {
+        const ticketCode = extractTicketCode(rawCode);
         checkInMutation.mutate({ ticketCode });
     }
 
-    const handleVerifyTicket = async (ticketCode) => {
+    const handleVerifyTicket = async (rawCode) => {
+        const ticketCode = extractTicketCode(rawCode);
         const data = await staffService.searchEventTickets(eventSlug, ticketCode);
         const ticket = data.find(t => t.ticketCode === ticketCode) || data[0];
         if (!ticket) {

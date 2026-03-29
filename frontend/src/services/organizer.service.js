@@ -22,17 +22,17 @@ const organizerService = {
     },
 
     // ORGANIZER - EVENTS
-    getMyEvents: async (organizerId, page = 0, size = 5) => {
+    getMyEvents: async (page = 0, size = 5, status) => {
+        const params = { page, size };
+        if (status) params.status = status;
         const response = await axiosInstance.get('/organizer/events', {
-            params: { organizerId, page, size }
+            params
         })
         return response.data
     },
 
-    getMyEventStats: async (organizerId) => {
-        const response = await axiosInstance.get('/organizer/events/stats', {
-            params: { organizerId }
-        })
+    getMyEventStats: async () => {
+        const response = await axiosInstance.get('/organizer/events/stats')
         return response.data
     },
 
@@ -56,13 +56,16 @@ const organizerService = {
 
     // Alias used by EventDetailDashboard & EventAttendeesPage
     getEventDetail: async (eventId) => {
-        const response = await axiosInstance.get(`/organizer/events/${eventId}`)
+        const response = await axiosInstance.get(`/organizer/events/${eventId}/detail`)
         return response.data
     },
 
-    getEventAttendees: async (eventId, page = 0, size = 10) => {
+    getEventAttendees: async (eventId, page = 0, size = 10, { ticketType, status } = {}) => {
+        const params = { page, size };
+        if (ticketType) params.ticketType = ticketType;
+        if (status) params.status = status;
         const response = await axiosInstance.get(`/organizer/events/${eventId}/attendees`, {
-            params: { page, size }
+            params
         })
         return response.data
     },

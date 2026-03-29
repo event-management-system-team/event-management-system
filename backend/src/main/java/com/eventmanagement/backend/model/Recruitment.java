@@ -1,9 +1,5 @@
 package com.eventmanagement.backend.model;
 
-import com.eventmanagement.backend.constants.RecruitmentStatus;
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -12,6 +8,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import com.eventmanagement.backend.constants.RecruitmentStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,7 +45,13 @@ public class Recruitment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id", nullable = false)
+    @JsonIgnore
     private Event event;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "form_id")
+    @JsonIgnore
+    private CustomForm customForm;
 
     @Column(name = "position_name", nullable = false)
     private String positionName;
@@ -67,6 +70,7 @@ public class Recruitment {
     @Column(columnDefinition = "TEXT")
     private String requirements;
 
+    @Column(name = "deadline")
     private LocalDateTime deadline;
 
     @Enumerated(EnumType.STRING)
@@ -91,7 +95,6 @@ public class Recruitment {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "benefits", columnDefinition = "jsonb")

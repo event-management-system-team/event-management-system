@@ -1,6 +1,5 @@
 import {
     CheckCircle,
-    Bell,
     ChevronRight,
     Ban,
     Mail,
@@ -8,7 +7,6 @@ import {
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/domain/admin/Tabs.jsx';
 import { Link, useParams } from 'react-router';
-import { AdminSidebar } from "../../components/domain/admin/AdminSidebar.jsx";
 import { Button } from "../../components/domain/admin/Button.jsx";
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/domain/admin/Avatar.jsx";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/domain/admin/Card.jsx";
@@ -18,6 +16,8 @@ import { adminService } from "../../services/admin.service.js";
 import { Alert } from "../../components/common/Alert.jsx";
 import { useAlert } from '../../hooks/useAlert.js';
 import { Popconfirm } from 'antd';
+import LoadingState from '../../components/common/LoadingState.jsx';
+import EmptyState from '../../components/common/EmptyState.jsx';
 
 export function AccountDetail() {
     const { id } = useParams();
@@ -132,52 +132,31 @@ export function AccountDetail() {
         return `${datePart} at ${timePart}`;
     }
 
-    if (loading) return <div className="absolute top-0 left-0 w-full h-1 bg-blue-500 animate-pulse z-10" />
-    if (error) return <div>Something went wrong: {error}</div>;
-    if (!account) return <div>Cannot find account detail.</div>;
+    if (loading) return <LoadingState />
+    if (error || !account) return <EmptyState className='h-[600px]' />
 
     return (
         <div className="flex h-screen bg-[#F1F0E8]">
-            {/* Sidebar */}
-            <AdminSidebar />
 
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
                 {/* Header */}
-                <header className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-5">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Link to="/admin" className="hover:text-gray-900">
-                                Dashboard
-                            </Link>
-                            <ChevronRight className="h-4 w-4" />
-                            <Link to="/admin/accounts" className="hover:text-gray-900">
-                                Account Management
-                            </Link>
-                            <ChevronRight className="h-4 w-4" />
-                            <span>Account Detail</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            {/* Notification Icon */}
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-9 w-9 rounded-full"
-                            >
-                                <Bell className="h-5 w-5 text-gray-600" />
-                            </Button>
-                            {/* Profile Icon */}
-                            <Avatar className="w-9 h-9 cursor-pointer">
-                                <AvatarFallback className="bg-[#7FA5A5] text-white text-sm">
-                                    AR
-                                </AvatarFallback>
-                            </Avatar>
+                <header className="bg-[#F1F0E8] px-8 py-5 pt-8">
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <div className="flex items-center gap-4 text-gray-400 text-sm font-medium mb-3">
+                                <Link className="text-gray-500 hover:text-gray-700" to="/admin">Dashboard</Link>
+                                <ChevronRight className="h-4 w-4" />
+                                <Link className="text-gray-500 hover:text-gray-700" to="/admin/accounts">Account Management</Link>
+                                <ChevronRight className="h-4 w-4" />
+                                <span className="text-gray-600">Account Detail</span>
+                            </div>
                         </div>
                     </div>
                 </header>
 
                 {/* Profile Summary Header */}
-                <div className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-6">
+                <div className="bg-[#F1F0E8] border-b border-gray-200 px-8 pb-6">
                     <div className="flex items-start justify-between">
                         <div className="flex items-center gap-6">
                             {/* Large Avatar */}
@@ -192,7 +171,7 @@ export function AccountDetail() {
                             {/* Account Info */}
                             <div>
                                 <div className="flex items-center gap-3 mb-2">
-                                    <h1 className="text-2xl font-semibold text-gray-900">
+                                    <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
                                         {account?.fullName}
                                     </h1>
                                     <Badge
@@ -251,7 +230,7 @@ export function AccountDetail() {
                 </div>
 
                 {/* Tabs Navigation */}
-                <div className="bg-[#f7f7f7] border-b border-gray-200 px-8">
+                <div className="bg-[#F1F0E8] border-b border-gray-200 px-8">
                     <Tabs defaultValue="basic" className="w-full">
                         <TabsList className="h-12 bg-transparent border-0 p-0 space-x-6">
                             <TabsTrigger
@@ -263,11 +242,11 @@ export function AccountDetail() {
                         </TabsList>
 
                         <TabsContent value="basic" className="mt-0">
-                            <div className="p-8">
+                            <div className="p-8 pb-24">
                                 <div className="grid grid-cols-2 gap-6 mb-6">
                                     {/* Personal Information Card */}
-                                    <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
-                                        <CardHeader className="border-b border-gray-100">
+                                    <Card className="bg-[#ffffff] shadow-sm border border-gray-100 rounded-xl">
+                                        <CardHeader className="border-b border-gray-50 pb-5">
                                             <CardTitle className="text-lg">
                                                 Personal Information
                                             </CardTitle>
@@ -311,8 +290,8 @@ export function AccountDetail() {
                                     </Card>
 
                                     {/* Account Details Card */}
-                                    <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
-                                        <CardHeader className="border-b border-gray-100">
+                                    <Card className="bg-[#ffffff] shadow-sm border border-gray-100 rounded-xl">
+                                        <CardHeader className="border-b border-gray-50 pb-5">
                                             <CardTitle className="text-lg">Account Details</CardTitle>
                                             <CardDescription>
                                                 Administrative information and metrics

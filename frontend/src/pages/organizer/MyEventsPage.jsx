@@ -1,19 +1,17 @@
 import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
     Calendar,
     Zap,
-    CalendarClock,
     CheckCircle2,
     Plus,
-    SlidersHorizontal,
     Search,
     ChevronLeft,
     ChevronRight,
     MapPin,
     Pencil,
     Trash2,
+    AlertCircle,
 } from 'lucide-react';
 import dayjs from 'dayjs';
 import organizerService from '../../services/organizer.service';
@@ -23,7 +21,6 @@ const EVENTS_PER_PAGE = 5;
 
 const STATUS_STYLES = {
     Active: { dotColor: 'bg-green-500', textColor: 'text-green-700', bgColor: 'bg-green-50' },
-    Upcoming: { dotColor: 'bg-orange-400', textColor: 'text-orange-600', bgColor: 'bg-orange-50' },
     Completed: { dotColor: 'bg-gray-400', textColor: 'text-gray-600', bgColor: 'bg-gray-100' },
     Rejected: { dotColor: 'bg-red-500', textColor: 'text-red-600', bgColor: 'bg-red-50' },
     Draft: { dotColor: 'bg-yellow-400', textColor: 'text-yellow-700', bgColor: 'bg-yellow-50' },
@@ -33,7 +30,6 @@ const STATUS_STYLES = {
 const getEventDisplayStatus = (status, startDate) => {
     switch (status) {
         case 'APPROVED':
-            if (dayjs(startDate).isAfter(dayjs())) return { label: 'Upcoming', ...STATUS_STYLES.Upcoming };
             return { label: 'Active', ...STATUS_STYLES.Active };
         case 'ONGOING':
             return { label: 'Active', ...STATUS_STYLES.Active };
@@ -51,37 +47,40 @@ const getEventDisplayStatus = (status, startDate) => {
 };
 
 const MyEventsPage = () => {
-    const { user } = useSelector((state) => state.auth);
-    const organizerId = user?.user_id;
     const navigate = useNavigate();
 
     const [events, setEvents] = useState([]);
-    const [stats, setStats] = useState({ totalEvents: 0, activeCount: 0, upcomingCount: 0, completedCount: 0 });
+    const [stats, setStats] = useState({ totalEvents: 0, activeCount: 0, completedCount: 0 });
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [totalElements, setTotalElements] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const [showSearch, setShowSearch] = useState(false);
+    const [activeFilter, setActiveFilter] = useState('all');
     const [deleteTarget, setDeleteTarget] = useState(null);
     const [deleting, setDeleting] = useState(false);
 
+    const FILTER_TAGS = [
+        { key: 'all', label: 'All' },
+        { key: 'APPROVED', label: 'Approved' },
+        { key: 'COMPLETED', label: 'Completed' },
+        { key: 'REJECTED', label: 'Rejected' },
+        { key: 'DRAFT', label: 'Draft' },
+        { key: 'PENDING', label: 'Pending' },
+    ];
+
     const abortRef = useRef(null);
 
-    const fetchEvents = useCallback(async (page) => {
-        if (!organizerId) {
-            setLoading(false);
-            return;
-        }
-
+    const fetchEvents = useCallback(async (page, filter) => {
         if (abortRef.current) abortRef.current.abort();
         const controller = new AbortController();
         abortRef.current = controller;
 
         try {
             setLoading(true);
-            const data = await organizerService.getMyEvents(organizerId, page, EVENTS_PER_PAGE);
+            const statusParam = filter === 'all' ? undefined : filter;
+            const data = await organizerService.getMyEvents(page, EVENTS_PER_PAGE, statusParam);
             if (controller.signal.aborted) return;
             setEvents(data.content || []);
             setTotalPages(data.totalPages || 0);
@@ -94,36 +93,41 @@ const MyEventsPage = () => {
         } finally {
             if (!controller.signal.aborted) setLoading(false);
         }
-    }, [organizerId]);
+    }, []);
 
     const fetchStats = useCallback(async () => {
-        if (!organizerId) return;
         try {
-            const data = await organizerService.getMyEventStats(organizerId);
+            const data = await organizerService.getMyEventStats();
             setStats(data);
         } catch (err) {
             console.error('Failed to load stats:', err);
         }
-    }, [organizerId]);
+    }, []);
 
     useEffect(() => {
-        fetchEvents(currentPage);
+        fetchEvents(currentPage, activeFilter);
         fetchStats();
 
         return () => {
             if (abortRef.current) abortRef.current.abort();
         };
-    }, [organizerId, currentPage, fetchEvents, fetchStats]);
+    }, [currentPage, activeFilter, fetchEvents, fetchStats]);
 
     const filteredEvents = useMemo(() => {
-        if (!searchTerm.trim()) return events;
-        const lower = searchTerm.toLowerCase();
-        return events.filter(
-            (e) =>
-                e.eventName?.toLowerCase().includes(lower) ||
-                e.location?.toLowerCase().includes(lower) ||
-                e.categoryName?.toLowerCase().includes(lower)
-        );
+        let result = events;
+
+        // Filter by search term (client-side only for search)
+        if (searchTerm.trim()) {
+            const lower = searchTerm.toLowerCase();
+            result = result.filter(
+                (e) =>
+                    e.eventName?.toLowerCase().includes(lower) ||
+                    e.location?.toLowerCase().includes(lower) ||
+                    e.categoryName?.toLowerCase().includes(lower)
+            );
+        }
+
+        return result;
     }, [events, searchTerm]);
 
     const getStatusDisplay = (status, startDate) => getEventDisplayStatus(status, startDate);
@@ -192,13 +196,6 @@ const MyEventsPage = () => {
             iconColor: 'text-green-500',
         },
         {
-            title: 'UPCOMING',
-            value: stats.upcomingCount,
-            icon: CalendarClock,
-            iconBg: 'bg-orange-50',
-            iconColor: 'text-orange-500',
-        },
-        {
             title: 'COMPLETED',
             value: stats.completedCount,
             icon: CheckCircle2,
@@ -220,16 +217,16 @@ const MyEventsPage = () => {
             {/* Header */}
             <div className="flex items-start justify-between mb-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                    <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
                         My Events Management
                     </h1>
-                    <p className="text-sm text-gray-500 mt-1">
-                        Overview of your current, upcoming and past event performances.
+                    <p className="text-gray-500 text-sm mt-1">
+                        Overview of your current and past event performances.
                     </p>
                 </div>
                 <button
                     onClick={() => navigate('/organizer/create-event')}
-                    className="flex items-center gap-2 bg-[#2d3a4f] hover:bg-[#1e293b] text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm"
+                    className="flex items-center gap-2 bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-colors shadow-sm"
                 >
                     <Plus size={18} />
                     Create New Event
@@ -237,7 +234,7 @@ const MyEventsPage = () => {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-4 gap-5 mb-8">
+            <div className="grid grid-cols-3 gap-5 mb-8">
                 {statCards.map((card, index) => {
                     const Icon = card.icon;
                     return (
@@ -264,48 +261,43 @@ const MyEventsPage = () => {
             {/* Event Listings */}
             <div className="bg-background-light border border-gray-200 rounded-xl shadow-sm">
                 {/* Listings Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                    <h2 className="text-lg font-semibold text-gray-900">Event Listings</h2>
+                <div className="px-6 pt-5 pb-4 border-b border-gray-100">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-lg font-semibold text-gray-900">Event Listings</h2>
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Search events..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-full bg-white focus:outline-none focus:ring-2 focus:ring-[#7FA5A5]/30 focus:border-[#7FA5A5] w-56"
+                            />
+                        </div>
+                    </div>
                     <div className="flex items-center gap-2">
-                        {showSearch && (
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                <input
-                                    type="text"
-                                    placeholder="Search events..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#7FA5A5]/30 focus:border-[#7FA5A5] w-60"
-                                    autoFocus
-                                />
-                            </div>
-                        )}
-                        <button
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                            title="Filter"
-                        >
-                            <SlidersHorizontal size={18} className="text-gray-500" />
-                        </button>
-                        <button
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                            title="Search"
-                            onClick={() => {
-                                setShowSearch(!showSearch);
-                                if (showSearch) setSearchTerm('');
-                            }}
-                        >
-                            <Search size={18} className="text-gray-500" />
-                        </button>
+                        {FILTER_TAGS.map((tag) => (
+                            <button
+                                key={tag.key}
+                                onClick={() => { setActiveFilter(tag.key); setCurrentPage(0); }}
+                                className={`px-4 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer ${activeFilter === tag.key
+                                    ? 'bg-[#2d3a4f] text-white border-[#2d3a4f]'
+                                    : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                                    }`}
+                            >
+                                {tag.label}
+                            </button>
+                        ))}
                     </div>
                 </div>
 
                 {/* Table Header */}
                 <div className="grid grid-cols-12 gap-4 px-6 py-3 border-b border-gray-100 text-xs text-gray-400 uppercase tracking-wider font-medium">
-                    <div className="col-span-4">Event</div>
-                    <div className="col-span-2">Date</div>
-                    <div className="col-span-2">Status</div>
-                    <div className="col-span-3">Ticket Stats</div>
-                    <div className="col-span-1 text-right">Actions</div>
+                    <div className="col-span-4 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Event</div>
+                    <div className="col-span-2 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Date</div>
+                    <div className="col-span-2 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Status</div>
+                    <div className="col-span-3 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Ticket Stats</div>
+                    <div className="col-span-1 text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Actions</div>
                 </div>
 
                 {/* Loading State */}
@@ -329,7 +321,7 @@ const MyEventsPage = () => {
                 {!loading &&
                     filteredEvents.map((event) => {
                         const statusConfig = getStatusDisplay(event.status, event.startDate);
-                        const progress = getTicketProgress(event.registeredCount, event.totalCapacity);
+                        const progress = getTicketProgress(event.totalSold, event.totalTickets);
                         const progressColor = getProgressBarColor(progress);
 
                         return (
@@ -353,7 +345,7 @@ const MyEventsPage = () => {
                                         )}
                                     </div>
                                     <div className="min-w-0">
-                                        <p className="text-sm font-medium text-gray-900 truncate">
+                                        <p className="text-sm font-bold text-gray-900 truncate">
                                             {event.eventName}
                                         </p>
                                         <div className="flex items-center gap-1 mt-0.5">
@@ -383,14 +375,23 @@ const MyEventsPage = () => {
                                         <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dotColor}`} />
                                         {statusConfig.label}
                                     </span>
+                                    {/* Hiển thị rejection reason nếu bị REJECTED */}
+                                    {event.status === 'REJECTED' && event.rejectionReason && (
+                                        <div className="flex items-start gap-1 mt-1.5" title={event.rejectionReason}>
+                                            <AlertCircle size={11} className="text-red-400 shrink-0 mt-0.5" />
+                                            <p className="text-[11px] text-red-500 font-medium leading-tight line-clamp-2">
+                                                {event.rejectionReason}
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Ticket Stats */}
                                 <div className="col-span-3">
                                     <div className="flex items-center gap-3">
                                         <span className="text-sm text-gray-700 font-medium min-w-20">
-                                            {(event.registeredCount || 0).toLocaleString()}/
-                                            {(event.totalCapacity || 0).toLocaleString()}
+                                            {(event.totalSold || 0).toLocaleString()}/
+                                            {(event.totalTickets || 0).toLocaleString()}
                                         </span>
                                         <span className="text-xs text-gray-400 min-w-10">
                                             {progress}%
@@ -406,7 +407,7 @@ const MyEventsPage = () => {
 
                                 {/* Actions */}
                                 <div className="col-span-1 flex items-center justify-end gap-1">
-                                    {(event.status === 'PENDING' || event.status === 'DRAFT') ? (
+                                    {(event.status === 'PENDING' || event.status === 'DRAFT' || event.status === 'REJECTED') ? (
                                         <>
                                             <button
                                                 onClick={() => navigate(`/organizer/edit-event/${event.eventId}`)}
@@ -424,7 +425,10 @@ const MyEventsPage = () => {
                                             </button>
                                         </>
                                     ) : (
-                                        <button className="text-sm text-[#7FA5A5] hover:text-[#5d8585] font-medium transition-colors cursor-pointer">
+                                        <button
+                                            onClick={() => navigate(`/organizer/events/${event.eventId}`)}
+                                            className="flex items-center gap-1.5 px-2.5 py-1.5 text-md text-[#7FA5A5] hover:text-[#5d8585] hover:bg-[#7FA5A5]/10 rounded-lg cursor-pointer transition-colors font-bold"
+                                        >
                                             Manage
                                         </button>
                                     )}
@@ -437,7 +441,7 @@ const MyEventsPage = () => {
                 {!loading && totalElements > 0 && (
                     <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
                         <p className="text-sm text-[#7FA5A5] font-medium">
-                            Showing {filteredEvents.length} of {totalElements} events
+                            Showing {currentPage * EVENTS_PER_PAGE + 1}-{Math.min((currentPage + 1) * EVENTS_PER_PAGE, totalElements)} of {totalElements} events
                         </p>
                         <div className="flex items-center gap-2">
                             <button

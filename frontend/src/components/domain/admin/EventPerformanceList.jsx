@@ -1,30 +1,29 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../admin/Avatar";
 import { Badge } from "../admin/Badge";
 import { Card, CardContent } from "../admin/Card";
-import { adminService } from "../../../services/admin.service";
 import dayjs from "dayjs";
 
-const EventPerformanceList = ({ searchTerm, status, category, date, sortOption, onLoading, onError, formatVND, formatNumber }) => {
-    const [events, setEvents] = useState([])
+const EventPerformanceList = ({ events, searchTerm, status, category, date, sortOption, formatVND, formatNumber }) => {
+    // const [events, setEvents] = useState([])
 
-    const fetchData = async () => {
-        try {
-            onLoading(true)
-            const response = await adminService.getEventAnalytics()
+    // const fetchData = async () => {
+    //     try {
+    //         onLoading(true)
+    //         const response = await adminService.getEventAnalytics()
 
-            setEvents(response.data)
-        } catch (error) {
-            onError("Cannot load event analytics");
-            console.error(error)
-        } finally {
-            onLoading(false)
-        }
-    }
+    //         setEvents(response.data)
+    //     } catch (error) {
+    //         onError("Cannot load event analytics");
+    //         console.error(error)
+    //     } finally {
+    //         onLoading(false)
+    //     }
+    // }
 
-    useEffect(() => {
-        fetchData()
-    }, [])
+    // useEffect(() => {
+    //     fetchData()
+    // }, [])
 
     const processedEvents = useMemo(() => {
         let list = [...events];
@@ -126,16 +125,18 @@ const EventPerformanceList = ({ searchTerm, status, category, date, sortOption, 
                     </div>
 
                     {/* Event Rows */}
-                    {processedEvents?.length === 0 ? (
-                        <div className="text-center text-gray-500 border-none py-6">No events yet.</div>
+                    {!processedEvents || processedEvents?.length === 0 ? (
+                        <div className="flex items-center justify-center flex-1 text-sm text-gray-400 mt-15 mb-15">
+                            No event analytics data yet
+                        </div>
                     ) : (
-                        processedEvents.map(event => {
+                        processedEvents.map((event, index) => {
                             const progress = ticketProgress(event.totalCapacity, event.ticketsSold)
                             const containData = ["ONGOING", "COMPLETED"].includes(event.status)
                             const attendanceRate = event.attendanceRate * 100
                             return (
                                 <div
-                                    key={event.eventId}
+                                    key={`${event.eventId}-${index}`}
                                     className="grid grid-cols-10 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-[#eef3f5]"
                                 >
                                     <div className="col-span-3 flex items-center gap-3">

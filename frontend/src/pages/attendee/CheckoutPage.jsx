@@ -92,16 +92,18 @@ const CheckoutPage = () => {
       return;
     }
 
-    const ticket = selectedTickets[0];
-
     try {
+      const ticketsPayload = selectedTickets.map((t) => ({
+        ticketTypeId: t.ticketTypeId ?? null,
+        quantity: t.quantity,
+      }));
+
       const orderResult = await dispatch(
         createOrder({
-          ticketTypeId: ticket.ticketTypeId ?? null,
           eventId: selectedEvent?.eventId,
-          quantity: ticket.quantity,
           fullName: form.fullName,
           email: form.email,
+          tickets: ticketsPayload,
         }),
       ).unwrap();
 

@@ -9,42 +9,40 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
- 
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class RecruitmentDashBoardDTO {
-    private StatsDTO stats; // chua con so thong ke
-    private List<RecruitmentItemDTO> recentRecruitments; // chua con list recruitment moi nhat
+  private StatsDTO stats; // chua con so thong ke
+  private List<RecruitmentItemDTO> recentRecruitments; // chua con list recruitment moi nhat
+  private LocalDateTime eventEndDate;
 
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class StatsDTO {
+    private int activeRoles;
+    private int totalApplications;
+    private int pendingReviews;
+    private int hiredStaff;
+  }
 
-    public static class StatsDTO {
-      private int activeRoles;
-      private int totalApplications;
-      private int pendingReviews;
-      private int hiredStaff;  
-}
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class RecruitmentItemDTO {
+    private UUID recruitmentId;
+    private String title; // ten skien+ vi tri
+    private int newCount; // so luong moi
+    private int currentCount; // so luong da dau
+    private int total; // tong so luong can tuyen
+    private String status; // recruiting/ closed
+    private boolean isNew; // co moi khong
+    private LocalDateTime deadline; // han nop don
 
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class RecruitmentItemDTO {
-        private UUID recruitmentId;
-        private String title; // ten skien+ vi tri
-        private int newCount; // so luong moi
-        private int currentCount; // so luong da dau
-        private int total; // tong so luong can tuyen
-        private String status; // recruiting/ closed
-        private boolean isNew; // co moi khong
-        private LocalDateTime deadline; // han nop don
-
-    }
+  }
 
 }

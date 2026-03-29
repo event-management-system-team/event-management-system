@@ -1,141 +1,234 @@
-
-import React from 'react';
-import { Link, useLocation, useParams, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { logoutUser } from '../../store/slices/auth.slice';
+import { useState } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   CalendarDays,
   Users,
-  FileText,
   MessageSquare,
-  Settings,
-  LogOut
+  Briefcase,
+  Lock,
+  BarChart3,
+  BarChart2,
+  UserCheck,
+  ClipboardList,
+  Menu,
+  X,
 } from 'lucide-react';
+import Logo from '../common/Logo';
+import OrganizerDropdown from '../domain/organizer/OrganizerDropdown';
 
-
-const NavItem = ({ to, icon, label, isActive }) => {
-  return (
-    <Link
-      to={to}
-      className={`flex items-center gap-3 px-4 py-3 mb-1 rounded-xl font-medium transition-all duration-200
-        ${isActive
-          ? 'bg-[#3b4758] text-white shadow-lg pointer-events-none'
-          : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-        }`}
-    >
-      <span className={isActive ? 'text-gray-100' : 'text-gray-400'}>{icon}</span>
-      <span>{label}</span>
-    </Link>
-  );
+const extractEventId = (pathname) => {
+  const patterns = [
+    /\/organizer\/events\/([^/]+)/,
+    /\/organizer\/feedback\/feedbacklist\/([^/]+)/,
+    /\/organizer\/feedback\/createform\/([^/]+)/,
+    /\/organizer\/feedback\/analytics\/([^/]+)/,
+    /\/organizer\/recruitmentlist\/([^/]+)/,
+    /\/organizer\/recruitmentcreate\/([^/]+)/,
+    /\/organizer\/recruitment-post\/([^/]+)/,
+    /\/organizer\/edit-event\/([^/]+)/,
+    /\/organizer\/applications\/event\/([^/]+)/,
+  ];
+  for (const pattern of patterns) {
+    const m = pathname.match(pattern);
+    if (m) {
+      sessionStorage.setItem("sidebar_eventId", m[1]);
+      return m[1];
+    }
+  }
+  const subPagePatterns = [
+    /\/organizer\/applications\/([^/]+)/,
+    /\/organizer\/recruitments\/([^/]+)/,
+    /\/organizer\/feedback\/([^/]+)/,
+  ];
+  const isSubPage = subPagePatterns.some((p) => p.test(pathname));
+  if (isSubPage) {
+    return sessionStorage.getItem("sidebar_eventId") || null;
+  }
+  sessionStorage.removeItem("sidebar_eventId");
+  return null;
 };
 
+// ── DisabledNavItem (event tools when no event is selected) ─────────────
+const DisabledNavItem = ({ icon: Icon, label }) => (
+  <div
+    className="flex items-center gap-3 px-4 py-3 rounded-xl whitespace-nowrap border-2 border-transparent text-white/30 cursor-not-allowed select-none font-medium"
+    title="Hãy vào một Event trước để dùng tính năng này"
+  >
+    <Icon size={20} className="shrink-0" />
+    <span>{label}</span>
+    <Lock size={12} className="ml-auto shrink-0" />
+  </div>
+);
+
+// ── ActiveNavLink style (same as admin/staff) ──────────────────────────
+const navLinkClass = ({ isActive }) =>
+  `flex items-center gap-3 px-4 py-3 rounded-xl whitespace-nowrap border-2 transition-all duration-300 ease-in-out ${
+    isActive
+      ? "bg-white/20 text-white border-white/20 shadow-lg"
+      : "text-white/70 hover:bg-white/10 hover:text-white border-transparent"
+  } font-medium`;
+
+// ── Sidebar ────────────────────────────────────────────────────────────
 const Sidebar = () => {
   const location = useLocation();
-  const { eventId } = useParams();
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
 
-  //navavigate ve trang login
-  const handleLogout = async () => {
-    await dispatch(logoutUser());
-    navigate('/login');
-  };
+  const toggleSidebar = () => setIsOpen(!isOpen);
 
+  const eventId = extractEventId(location.pathname);
 
-  const isDashboardActive = location.pathname.includes('/dashboard');
-  const isMyEventsActive = location.pathname.includes('/my-events');
+  // Active states
+  const isFeedbackActive = location.pathname.includes("/feedback");
+  const isAnalyticsActive = location.pathname.includes("/feedback/analytics");
+  const isRecruitmentActive = location.pathname.includes("/recruitment");
+  const isApplicationsPageActive = location.pathname.includes("/applications");
+  const isAttendeesActive = location.pathname.includes("/attendees");
+  const isStaffActive = location.pathname.includes("/staff");
 
-  const isStaffActive = location.pathname.includes('/staff') || location.pathname.includes('/recruitment');
-  const isAppActive = location.pathname.includes('/applications');
-  const isFeedbackActive = location.pathname.includes('/feedback');
+  // Event-specific links
+  const eventDashboardLink = eventId ? `/organizer/events/${eventId}` : null;
+  const attendeesLink = eventId ? `/organizer/events/${eventId}/attendees` : null;
+  const feedbackLink = eventId ? `/organizer/feedback/feedbacklist/${eventId}` : null;
+  const analyticsLink = eventId ? `/organizer/feedback/analytics/${eventId}` : null;
+  const recruitmentLink = eventId ? `/organizer/recruitmentlist/${eventId}` : null;
+  const applicationsLink = eventId ? `/organizer/applications/event/${eventId}` : null;
+  const staffLink = eventId ? `/organizer/events/${eventId}/staff` : null;
 
-  const feedbackLink = eventId ? `/organizer/feedback/feedbacklist/${eventId}` : `/organizer/feedbacklist/1`;
+  const isEventDashboardActive = eventId
+    ? location.pathname === `/organizer/events/${eventId}`
+    : false;
+
+  // Overview nav items
+  const overviewItems = [
+    { title: "Dashboard", icon: LayoutDashboard, path: "/organizer/dashboard", end: true },
+    { title: "My Events", icon: CalendarDays, path: "/organizer/my-events", end: true },
+  ];
+
+  // Event tool items
+  const eventToolItems = [
+    { title: "Event Dashboard", icon: BarChart3, link: eventDashboardLink, isActive: isEventDashboardActive },
+    { title: "Attendees", icon: UserCheck, link: attendeesLink, isActive: isAttendeesActive },
+    { title: "Feedback", icon: MessageSquare, link: feedbackLink, isActive: isFeedbackActive && !isAnalyticsActive },
+    { title: "Feedback Analytics", icon: BarChart2, link: analyticsLink, isActive: isAnalyticsActive },
+    { title: "Recruitment", icon: Briefcase, link: recruitmentLink, isActive: isRecruitmentActive },
+    { title: "Application List", icon: ClipboardList, link: applicationsLink, isActive: isApplicationsPageActive },
+    { title: "Staff Management", icon: Users, link: staffLink, isActive: isStaffActive },
+  ];
 
   return (
-    <aside className="w-64 h-screen bg-[#1e293b] flex flex-col text-gray-300 fixed left-0 top-0 z-50 font-sans shadow-xl border-r border-gray-800">
+    <>
+      {/* Mobile hamburger button */}
+      {!isOpen && (
+        <button
+          onClick={toggleSidebar}
+          className="lg:hidden fixed top-4 left-4 z-[60] p-2 bg-[#2C3E50] text-white rounded-xl shadow-lg"
+        >
+          <Menu size={24} />
+        </button>
+      )}
 
-      {/* 1. Phần Logo */}
-      <div className="p-6 flex items-center gap-3">
-        <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-xs shadow-md">
-          EH
-        </div>
-        <div>
-          <h1 className="text-white font-bold text-xl tracking-tight">Event<span className="text-blue-400">Hub</span></h1>
-          <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">Organizer</p>
-        </div>
-      </div>
-
-      {/* 2. User Profile (FPT Software) */}
-      <div className="mx-4 mb-6 p-3 bg-[#2d3a4f] rounded-xl flex items-center gap-3 border border-gray-700 shadow-sm">
-        <img
-          src="https://ui-avatars.com/api/?name=FPT+Software&background=random"
-          alt="User"
-          className="w-10 h-10 rounded-full object-cover border border-gray-500"
+      {/* Mobile overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[55] lg:hidden"
+          onClick={toggleSidebar}
         />
-        <div className="overflow-hidden">
-          <h3 className="text-white text-sm font-bold truncate">FPT Software</h3>
-          <p className="text-[11px] text-gray-400 truncate">Senior Organizer</p>
-        </div>
-      </div>
+      )}
 
-      {/* 3. Phần Menu chính (tự cuộn nếu quá dài) */}
-      <nav className="flex-1 px-4 overflow-y-auto scrollbar-hide space-y-1">
-        <p className="px-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3 mt-1">
-          Main Menu
-        </p>
-
-        <NavItem
-          to="/organizer/dashboard"
-          icon={<LayoutDashboard size={20} />}
-          label="Dashboard"
-          isActive={isDashboardActive}
-        />
-        <NavItem
-          to="/organizer/my-events"
-          icon={<CalendarDays size={20} />}
-          label="My Events"
-          isActive={isMyEventsActive}
-        />
-        <NavItem
-          to="/organizer/staff"
-          icon={<Users size={20} />}
-          label="Staff Management"
-          isActive={isStaffActive}
-        />
-        <NavItem
-          to="/organizer/applications"
-          icon={<FileText size={20} />}
-          label="Applications"
-          isActive={isAppActive}
-        />
-        <NavItem
-          to={feedbackLink}
-          icon={<MessageSquare size={20} />}
-          label="Feedback & Rating"
-          isActive={isFeedbackActive}
-        />
-      </nav>
-
-
-      <div className="p-4 mt-auto border-t border-gray-700/50 bg-[#1a2333]">
-        <div className="space-y-1">
-          <Link to="/profile" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors">
-            <Settings size={18} />
-            <span>Settings</span>
-          </Link>
-
+      {/* Sidebar */}
+      <aside
+        className={`
+          fixed lg:static inset-y-0 left-0 z-[60]
+          w-[280px] bg-[#2C3E50] text-white flex flex-col h-full shrink-0
+          shadow-2xl border-r border-white/10 transition-transform duration-300 ease-in-out
+          ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+        `}
+      >
+        <div className="flex flex-col h-full justify-between relative">
+          {/* Mobile close button */}
           <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors cursor-pointer"
+            onClick={toggleSidebar}
+            className="lg:hidden absolute top-4 right-4 text-white/50 hover:text-white"
           >
-            <LogOut size={18} />
-            <span>Log Out</span>
+            <X size={24} />
           </button>
-        </div>
-      </div>
 
-    </aside>
+          {/* Logo */}
+          <div className="bg-slate-500/50 backdrop-blur-md border border-white/30 px-2 py-1 mr-18 ml-4 mt-5 shrink-0 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.2)] mb-4 transition-transform hover:-translate-y-1 hover:shadow-[0_15px_40px_rgb(0,0,0,0.3)] duration-300">
+            <div className="scale-100 origin-left ml-1">
+              <Logo />
+            </div>
+          </div>
+          <hr className="border-white/10 mb-6" />
+
+          {/* Navigation */}
+          <div className="p-5 flex flex-col gap-4 flex-1 overflow-y-auto">
+            {/* Overview */}
+            <nav className="space-y-2">
+              <p className="px-4 text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">
+                Overview
+              </p>
+              {overviewItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <NavLink
+                    key={item.title}
+                    to={item.path}
+                    end={item.end}
+                    onClick={() => setIsOpen(false)}
+                    className={navLinkClass}
+                  >
+                    <Icon size={20} className="shrink-0" />
+                    {item.title}
+                  </NavLink>
+                );
+              })}
+            </nav>
+
+            {/* Event Tools */}
+            <nav className="space-y-2 mt-2">
+              <p className="px-4 text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">
+                Event Tools
+                {!eventId && (
+                  <span className="ml-1 normal-case text-white/20 font-normal text-[9px]">
+                    — chọn event trước
+                  </span>
+                )}
+              </p>
+              {eventToolItems.map((item) => {
+                const Icon = item.icon;
+                if (!item.link) {
+                  return <DisabledNavItem key={item.title} icon={Icon} label={item.title} />;
+                }
+                return (
+                  <NavLink
+                    key={item.title}
+                    to={item.link}
+                    onClick={() => setIsOpen(false)}
+                    className={({ isActive: routerActive }) => {
+                      // Use our custom isActive logic for event tools
+                      const active = item.isActive || routerActive;
+                      return `flex items-center gap-3 px-4 py-3 rounded-xl whitespace-nowrap border-2 transition-all duration-300 ease-in-out ${
+                        active
+                          ? "bg-white/20 text-white border-white/20 shadow-lg"
+                          : "text-white/70 hover:bg-white/10 hover:text-white border-transparent"
+                      } font-medium`;
+                    }}
+                  >
+                    <Icon size={20} className="shrink-0" />
+                    {item.title}
+                  </NavLink>
+                );
+              })}
+            </nav>
+          </div>
+
+          {/* User dropdown */}
+          <OrganizerDropdown setIsOpen={setIsOpen} />
+        </div>
+      </aside>
+    </>
   );
 };
 

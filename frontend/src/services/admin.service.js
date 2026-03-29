@@ -40,12 +40,18 @@ export const adminService = {
     },
 
     createOrganizer: (data) => {
-        return axiosInstance.post(`/accounts/organizer`, data);
+        return axiosInstance.post(`/accounts/create-organizer`, data);
     },
 
     checkEmailAvailability: (email) => {
         return axiosInstance.get(`/accounts/check-email`, {
             params: { email }
+        });
+    },
+
+    checkPhoneAvailability: (phone) => {
+        return axiosInstance.get(`/accounts/check-phone`, {
+            params: { phone }
         });
     },
 

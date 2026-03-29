@@ -2,7 +2,7 @@ import SidebarPosition from '../../components/domain/attendee/application-form/S
 import FormContainer from '../../components/domain/attendee/application-form/FormContainer';
 import { useApplicationForm } from '../../hooks/useApplicationForm';
 import { Upload as UploadIcon, ChevronRight } from 'lucide-react';
-import { Form, Input, Select, Upload } from 'antd'
+import { Form, Input, Select, Upload, Radio, Checkbox } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import recruitmentService from '../../services/recruitment.service'
 import LoadingState from '../../components/common/LoadingState'
@@ -13,10 +13,11 @@ import ClosedRecruitmentRedirect from '../../components/domain/attendee/applicat
 const ApplicationFormPage = () => {
     const { eventSlug } = useParams();
 
-    const { data: recruitmentData, isLoading, isError } = useQuery({
+    const { data: applicationForm, isLoading, isError } = useQuery({
         queryKey: ['recruitments', eventSlug, 'applicationForm'],
         queryFn: () => recruitmentService.getApplicationForm(eventSlug),
         enabled: !!eventSlug,
+        retry: false,
     })
 
     const {
@@ -28,20 +29,23 @@ const ApplicationFormPage = () => {
         queryFn: () => profileService.getMyProfile(),
     });
 
-    const { form, selectedRole, setSelectedRole, selectedPosition, isSubmitting, isFull, handleSubmit } = useApplicationForm(recruitmentData?.recruitments, userProfile, eventSlug);
+    const { form, selectedRole, setSelectedRole, selectedPosition, isSubmitting, isFull, handleSubmit } = useApplicationForm(applicationForm?.recruitments, userProfile, eventSlug, applicationForm?.formSchema);
 
     if (isLoading || isProfileLoading) {
         return <LoadingState />;
     }
 
-    if (isError || !recruitmentData || isProfileError || !userProfile) {
+    if (isError) {
+        return <ClosedRecruitmentRedirect />;
+    }
+
+    if (!applicationForm || isProfileError || !userProfile) {
         return <EmptyState />;
     }
 
-    if (recruitmentData?.status === 'CLOSED') {
-        return <ClosedRecruitmentRedirect />;
-    }
-    const { formSchema, eventName, deadline, location, recruitments } = recruitmentData;
+
+
+    const { formSchema, eventName, deadline, location, recruitments } = applicationForm;
     const normFile = (e) => {
         if (Array.isArray(e)) {
             return e;
@@ -50,13 +54,88 @@ const ApplicationFormPage = () => {
     };
 
     const renderDynamicField = (field) => {
+        const { fieldId, type, label, required, placeholder, options, maxChars } = field;
 
-        // [1] TYPE: DROPDOWN
-        if (field.type === 'dropdown') {
+        // [1] TYPE: TEXT
+        if (type === 'text') {
             return (
                 <Form.Item
-                    name={field.fieldId}
-                    rules={[{ required: field.required, message: 'Please select an item in the list!' }]}
+                    name={fieldId}
+                    label={label}
+                    rules={[{ required, message: 'Please fill out this field!' }]}
+                    className="m-0"
+                >
+                    <Input
+                        placeholder={placeholder}
+                        size="large"
+                        className="rounded-[16px] border-[#d8ddde] focus:border-[#89A8B2] hover:border-[#89A8B2] p-4 transition-all"
+                    />
+                </Form.Item>
+            );
+        }
+
+        // [2] TYPE: PARAGRAPH
+        if (type === 'paragraph') {
+            return (
+                <Form.Item
+                    name={fieldId}
+                    label={label}
+                    rules={[{ required, message: 'Please fill out this field!' }]}
+                    className="m-0"
+                >
+                    <Input.TextArea
+                        placeholder={placeholder}
+                        rows={4}
+                        maxLength={maxChars}
+                        className="rounded-[16px] border-[#d8ddde] focus:border-[#89A8B2] hover:border-[#89A8B2] p-4 transition-all"
+                    />
+                </Form.Item>
+            );
+        }
+
+        // [3] TYPE: RADIO
+        if (type === 'radio') {
+            return (
+                <Form.Item
+                    name={fieldId}
+                    label={label}
+                    rules={[{ required, message: 'Please select an option!' }]}
+                    className="m-0"
+                >
+                    <Radio.Group>
+                        {options?.map((opt, idx) => (
+                            <Radio key={idx} value={opt}>{opt}</Radio>
+                        ))}
+                    </Radio.Group>
+                </Form.Item>
+            );
+        }
+
+        // [4] TYPE: CHECKBOX
+        if (type === 'checkbox') {
+            return (
+                <Form.Item
+                    name={fieldId}
+                    label={label}
+                    rules={[{ required, message: 'Please select at least one option!' }]}
+                    className="m-0"
+                >
+                    <Checkbox.Group>
+                        {options?.map((opt, idx) => (
+                            <Checkbox key={idx} value={opt}>{opt}</Checkbox>
+                        ))}
+                    </Checkbox.Group>
+                </Form.Item>
+            );
+        }
+
+        // [5] TYPE: DROPDOWN
+        if (type === 'dropdown') {
+            return (
+                <Form.Item
+                    name={fieldId}
+                    label={label}
+                    rules={[{ required, message: 'Please select an item in the list!' }]}
                     className="m-0"
                 >
                     <Select
@@ -64,7 +143,7 @@ const ApplicationFormPage = () => {
                         placeholder="-- Select an option --"
                         className="w-full h-12 [&_.ant-select-selector]:rounded-[16px] [&_.ant-select-selector]:border-[#d8ddde]"
                     >
-                        {field.options?.map((opt, idx) => (
+                        {options?.map((opt, idx) => (
                             <Select.Option key={idx} value={opt}>{opt}</Select.Option>
                         ))}
                     </Select>
@@ -72,31 +151,15 @@ const ApplicationFormPage = () => {
             );
         }
 
-        // [2] TYPE: PARAGRAPH
-        if (field.type === 'paragraph') {
+        // [6] TYPE: FILE UPLOAD
+        if (type === 'fileUpload') {
             return (
                 <Form.Item
-                    name={field.fieldId}
-                    rules={[{ required: field.required, message: 'Please fill out this field!' }]}
-                    className="m-0"
-                >
-                    <Input.TextArea
-                        placeholder={field.placeholder}
-                        rows={4}
-                        className="rounded-[16px] border-[#d8ddde] focus:border-[#89A8B2] hover:border-[#89A8B2] p-4 transition-all"
-                    />
-                </Form.Item>
-            );
-        }
-
-        // [3] TYPE: FILE UPLOAD 
-        if (field.type === 'file_upload') {
-            return (
-                <Form.Item
-                    name={field.fieldId}
+                    name={fieldId}
+                    label={label}
                     valuePropName="fileList"
                     getValueFromEvent={normFile}
-                    rules={[{ required: field.required, message: 'Please upload file!' }]}
+                    rules={[{ required, message: 'Please upload file!' }]}
                     className="m-0"
                 >
                     <Upload.Dragger

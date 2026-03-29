@@ -8,14 +8,19 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+
 import static org.mockito.ArgumentMatchers.any;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.eventmanagement.backend.constants.ApplicationStatus;
@@ -48,9 +53,9 @@ public class ApplicationServiceOrganizerTest {
     @BeforeEach
     void setUp() {
         org.springframework.test.util.ReflectionTestUtils.setField(
-            applicationServiceOrganizer, 
-            "eventStaffRepository", 
-            eventStaffRepository
+                applicationServiceOrganizer,
+                "eventStaffRepository",
+                eventStaffRepository
         );
         recruitmentId = UUID.randomUUID();
 
@@ -72,8 +77,8 @@ public class ApplicationServiceOrganizerTest {
     @Test
     void testGetApplications_WithFullData_Success() {
         Map<String, Object> applicationData = new HashMap<>();
-        applicationData.put("resume", "https://link-to-cv.com/cv.pdf");
-        applicationData.put("coverLetter", "Tôi rất mong muốn được làm công việc này.");
+        applicationData.put("cvUrl", "https://link-to-cv.com/cv.pdf");
+        applicationData.put("question1", "Tôi rất mong muốn được làm công việc này.");
         mockApplication.setApplicationData(applicationData);
 
         when(staffapplicationRepository.findByRecruitment_RecruitmentId(recruitmentId))
@@ -83,13 +88,14 @@ public class ApplicationServiceOrganizerTest {
         assertNotNull(result);
         assertEquals(1, result.size());
         ApplicationResponseDTO dto = result.get(0);
-        
+
         assertEquals("Le Thi C", dto.getName());
         assertEquals("Quản lý sự kiện", dto.getPosition());
         assertEquals("PENDING", dto.getStatus());
 
-        assertEquals("https://link-to-cv.com/cv.pdf", dto.getResume());
-        assertEquals("Tôi rất mong muốn được làm công việc này.", dto.getCoverLetter());
+        assertEquals("https://link-to-cv.com/cv.pdf", dto.getCvUrl());
+        assertNotNull(dto.getCustomAnswers());
+        assertEquals("Tôi rất mong muốn được làm công việc này.", dto.getCustomAnswers().get("question1"));
     }
 
     @Test
@@ -101,8 +107,8 @@ public class ApplicationServiceOrganizerTest {
         List<ApplicationResponseDTO> result = applicationServiceOrganizer.getApplicationsByRecruitment(recruitmentId);
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertNull(result.get(0).getResume());
-        assertNull(result.get(0).getCoverLetter());
+        assertNull(result.get(0).getCvUrl());
+        assertNull(result.get(0).getCustomAnswers());
     }
 
 
@@ -110,9 +116,9 @@ public class ApplicationServiceOrganizerTest {
     void testGetApplicationDetail_Success() {
         UUID appId = UUID.randomUUID();
         mockApplication.setApplicationId(appId);
-        
+
         Map<String, Object> appData = new HashMap<>();
-        appData.put("resume", "my-cv.pdf");
+        appData.put("cvUrl", "my-cv.pdf");
         mockApplication.setApplicationData(appData);
 
         when(staffapplicationRepository.findByApplicationId(appId)).thenReturn(java.util.Optional.of(mockApplication));
@@ -121,7 +127,7 @@ public class ApplicationServiceOrganizerTest {
 
         assertNotNull(result);
         assertEquals("Le Thi C", result.getName());
-        assertEquals("my-cv.pdf", result.getResume());
+        assertEquals("my-cv.pdf", result.getCvUrl());
     }
 
 
@@ -135,13 +141,13 @@ public class ApplicationServiceOrganizerTest {
         Event event = new Event();
         event.setEventId(eventId);
         mockRecruitment.setEvent(event);
-        
+
         UUID userId = UUID.randomUUID();
         mockUser.setUserId(userId);
         when(staffapplicationRepository.findById(appId)).thenReturn(java.util.Optional.of(mockApplication));
         when(eventStaffRepository.existsByEvent_EventIdAndUser_UserId(eventId, userId)).thenReturn(false);
         when(staffapplicationRepository.save(any(StaffApplication.class))).thenAnswer(i -> i.getArguments()[0]);
-        StaffApplication result = applicationServiceOrganizer.updateApplicationStatuss(appId, ApplicationStatus.APPROVED);
+        StaffApplication result = applicationServiceOrganizer.updateApplicationStatuses(appId, ApplicationStatus.APPROVED);
         assertNotNull(result);
         assertEquals(ApplicationStatus.APPROVED, result.getApplicationStatus());
         verify(eventStaffRepository, org.mockito.Mockito.times(1)).save(any(com.eventmanagement.backend.model.EventStaff.class));
@@ -158,10 +164,10 @@ public class ApplicationServiceOrganizerTest {
         when(staffapplicationRepository.findById(appId)).thenReturn(java.util.Optional.of(mockApplication));
         when(staffapplicationRepository.save(any(StaffApplication.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        StaffApplication result = applicationServiceOrganizer.updateApplicationStatuss(appId, ApplicationStatus.REJECTED);
+        StaffApplication result = applicationServiceOrganizer.updateApplicationStatuses(appId, ApplicationStatus.REJECTED);
 
         assertEquals(ApplicationStatus.REJECTED, result.getApplicationStatus());
-        
+
         verify(eventStaffRepository, org.mockito.Mockito.never()).save(any());
         verify(staffapplicationRepository, org.mockito.Mockito.times(1)).save(mockApplication);
     }

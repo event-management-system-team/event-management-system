@@ -45,20 +45,15 @@ public class OrganizerEventController {
     @GetMapping
     public ResponseEntity<Page<OrganizerEventResponse>> getMyEvents(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String status) {
 
         User organizer = getAuthenticatedUser();
 
-        Page<OrganizerEventResponse> events = organizerEventService.getMyEvents(organizer.getUserId(), page, size);
+        Page<OrganizerEventResponse> events = organizerEventService.getMyEvents(organizer.getUserId(), page, size, status);
         return ResponseEntity.ok(events);
     }
 
-    @GetMapping("/{eventId}")
-    public ResponseEntity<CreateEventResponse> getEventById(@PathVariable UUID eventId) {
-        User organizer = getAuthenticatedUser();
-        CreateEventResponse response = organizerEventService.getEventById(eventId, organizer);
-        return ResponseEntity.ok(response);
-    }
 
     @PutMapping(value = "/{eventId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CreateEventResponse> updateEvent(
@@ -68,6 +63,13 @@ public class OrganizerEventController {
 
         User organizer = getAuthenticatedUser();
         CreateEventResponse response = organizerEventService.updateEvent(eventId, organizer, request, coverFile);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{eventId}")
+    public ResponseEntity<CreateEventResponse> getEventById(@PathVariable UUID eventId) {
+        User organizer = getAuthenticatedUser();
+        CreateEventResponse response = organizerEventService.getEventById(eventId, organizer);
         return ResponseEntity.ok(response);
     }
 
@@ -86,10 +88,10 @@ public class OrganizerEventController {
         return ResponseEntity.ok(stats);
     }
 
-    @GetMapping("/{eventId}")
+    @GetMapping("/{eventId}/detail")
     public ResponseEntity<OrganizerEventResponse> getEventDetail(
             @PathVariable UUID eventId) {
-        
+
         OrganizerEventResponse event = organizerEventService.getEventDetail(eventId);
         return ResponseEntity.ok(event);
     }
@@ -98,9 +100,11 @@ public class OrganizerEventController {
     public ResponseEntity<Page<AttendeeResponse>> getEventAttendees(
             @PathVariable UUID eventId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String ticketType,
+            @RequestParam(required = false) String status) {
 
-        Page<AttendeeResponse> attendees = organizerEventService.getEventAttendees(eventId, page, size);
+        Page<AttendeeResponse> attendees = organizerEventService.getEventAttendees(eventId, page, size, ticketType, status);
         return ResponseEntity.ok(attendees);
     }
 

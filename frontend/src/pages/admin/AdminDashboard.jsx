@@ -1,13 +1,12 @@
-import { Bell, UserCircle, Clock, ArrowRight, } from 'lucide-react';
+import { UserCircle, Clock, ArrowRight, } from 'lucide-react';
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../../components/domain/admin/Button.jsx";
-import { Avatar, AvatarFallback } from "../../components/domain/admin/Avatar.jsx";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/domain/admin/Card.jsx";
 import { Badge } from "../../components/domain/admin/Badge.jsx";
-import { AdminSidebar } from "../../components/domain/admin/AdminSidebar.jsx";
 import { useEffect, useState } from 'react';
 import { adminService } from '../../services/admin.service.js';
 import LoadingState from '../../components/common/LoadingState.jsx';
+import EmptyState from '../../components/common/EmptyState.jsx';
 import dayjs from "dayjs";
 import DashboardCard from '../../components/domain/admin/DashboardCard.jsx';
 
@@ -43,48 +42,30 @@ export function AdminDashboard() {
         fetchData()
     }, [])
 
+    if (loading) return <LoadingState />
+    if (error) return <EmptyState className='h-[600px]' />
+
     return (
-        <div className="flex h-screen bg-[#F1F0E8]">
-
-            {loading && (
-                <LoadingState />
-            )}
-
-            {error && (
-                <EmptyState className='h-[600px]' />
-            )}
-
-            {/* Sidebar */}
-            <AdminSidebar />
+        <div className="flex flex-col flex-1 bg-[#F1F0E8]">
 
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
                 {/* Header */}
-                <header className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-5">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <span>Dashboard</span>
+                <header className="bg-[#F1F0E8] px-8 py-5 pt-8">
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <div className="flex items-center gap-4 text-gray-400 text-sm font-medium mb-3">
+                                <span className="text-gray-600">Dashboard</span>
+                            </div>
+                            <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">System Overview</h1>
+                            <p className="text-gray-500 text-sm mt-1">
+                                Monitor platform health and pending tasks.
+                            </p>
                         </div>
                         <div className="flex items-center gap-3">
-                            {/* Notification Icon */}
-                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full relative">
-                                <Bell className="h-5 w-5 text-gray-600" />
-                                <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
-                            </Button>
-                            {/* Profile Icon */}
-                            <Avatar className="w-9 h-9 cursor-pointer">
-                                <AvatarFallback className="bg-[#7FA5A5] text-white text-sm">AR</AvatarFallback>
-                            </Avatar>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-semibold text-gray-900">System Overview</h1>
-                            <p className="text-sm text-gray-500 mt-1">Monitor platform health and pending tasks</p>
-                        </div>
-                        <div className="text-sm text-gray-600">
-                            <span className="font-medium">Last updated:</span> {new Date().toLocaleTimeString()}
+                            <div className="px-4 py-2 bg-white rounded-lg shadow-sm border border-gray-100 text-sm text-gray-600 font-medium">
+                                <span className="text-gray-400 mr-2">Last updated:</span> {new Date().toLocaleTimeString()}
+                            </div>
                         </div>
                     </div>
                 </header>
@@ -105,49 +86,57 @@ export function AdminDashboard() {
                                         <CardDescription>Events awaiting review and approval</CardDescription>
                                     </div>
                                     <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100">
-                                        {summary?.pendingEvents} pending
+                                        {summary?.pendingEvents ?? 0} pending
                                     </Badge>
                                 </div>
                             </CardHeader>
                             <CardContent className="p-0">
                                 <div className="divide-y divide-gray-200">
-                                    {pendingEvents?.map((event) => {
-                                        const detailUrl = `/admin/events/event-detail/${event.eventSlug}`
+                                    {!pendingEvents || pendingEvents.length === 0 ? (
+                                        <div className="flex items-center justify-center flex-1 text-sm text-gray-400 mt-5 mb-20">
+                                            No pending event yet
+                                        </div>
+                                    ) : (
+                                        pendingEvents.map((event) => {
+                                            const detailUrl = `/admin/events/event-detail/${event.eventSlug}`
 
-                                        return (
-                                            <Link
-                                                key={event.eventSlug}
-                                                to={detailUrl}
-                                                className="block hover:bg-[#eef3f5] transition-colors"
-                                            >
-                                                <div className="p-4 px-8 flex items-center justify-between">
-                                                    <div className="flex-1 min-w-0">
-                                                        <div className="font-medium text-gray-900 mb-1 truncate">
-                                                            {event.eventName}
-                                                        </div>
-                                                        <div className="flex items-center gap-3 text-xs text-gray-500">
-                                                            <span className="flex items-center gap-1">
-                                                                <UserCircle className="h-3 w-3" />
-                                                                {event.organizer.fullName}
-                                                            </span>
-                                                            <span>•</span>
-                                                            <span className="flex items-center gap-1">
-                                                                <Clock className="h-3 w-3" />
-                                                                {dayjs(event.createdAt).format("MMM DD, YYYY")}
-                                                            </span>
+                                            return (
+                                                <Link
+                                                    key={event.eventSlug}
+                                                    to={detailUrl}
+                                                    className="block hover:bg-[#eef3f5] transition-colors"
+                                                >
+                                                    <div className="p-4 px-8 flex items-center justify-between">
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="font-medium text-gray-900 mb-1 truncate">
+                                                                {event.eventName}
+                                                            </div>
+                                                            <div className="flex items-center gap-3 text-xs text-gray-500">
+                                                                <span className="flex items-center gap-1">
+                                                                    <UserCircle className="h-3 w-3" />
+                                                                    {event.organizer.fullName}
+                                                                </span>
+                                                                <span>•</span>
+                                                                <span className="flex items-center gap-1">
+                                                                    <Clock className="h-3 w-3" />
+                                                                    {dayjs(event.createdAt).format("MMM DD, YYYY")}
+                                                                </span>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </Link>
-                                        )
-                                    })}
+                                                </Link>
+                                            )
+                                        })
+                                    )}
                                 </div>
-                                <div className="p-3 border-t border-gray-100">
-                                    <Button variant="ghost" className="w-full h-12 text-[#7FA5A5] hover:text-[#6D9393] hover:bg-[#7FA5A5]/10" onClick={() => navigate("/admin/events?status=PENDING")}>
-                                        View All Pending Events
-                                        <ArrowRight className="ml-2 h-4 w-4" />
-                                    </Button>
-                                </div>
+                                {pendingEvents && pendingEvents.length > 0 && (
+                                    <div className="p-3 border-t border-gray-100">
+                                        <Button variant="ghost" className="w-full h-12 text-[#7FA5A5] hover:text-[#6D9393] hover:bg-[#7FA5A5]/10 hover:cursor-pointer" onClick={() => navigate("/admin/events?status=PENDING")}>
+                                            View All Pending Events
+                                            <ArrowRight className="ml-2 h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     </div>

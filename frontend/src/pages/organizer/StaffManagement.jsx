@@ -1,8 +1,9 @@
 import {
     Plus,
     Calendar1,
+    ArrowLeft,
 } from 'lucide-react';
-import { useParams } from 'react-router';
+import { useParams, useNavigate } from 'react-router';
 import { useState } from "react";
 import { Button } from "../../components/domain/admin/Button.jsx";
 import { Tabs, TabsList, TabsTrigger } from "../../components/domain/admin/Tabs.jsx";
@@ -16,7 +17,8 @@ import WorkScheduleTab from '../../components/domain/organizer/WorkScheduleTab.j
 
 export default function StaffManagement() {
 
-    const { id } = useParams();
+    const { eventId } = useParams();
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('staff');
 
     const [loading, setLoading] = useState(true);
@@ -35,7 +37,7 @@ export default function StaffManagement() {
             case "resources":
                 return (
                     <Button
-                        className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5 py-5 h-12 w-40"
+                        className="gap-2 bg-[#7FA5A5] hover:bg-[#6D9393] text-white rounded-full px-5 py-2 shadow-sm font-medium transition-colors hover:cursor-pointer h-10"
                         onClick={openResourceModal}
                     >
                         <Plus className="h-4 w-4" />
@@ -46,7 +48,7 @@ export default function StaffManagement() {
                 return (
                     <div className='flex gap-3'>
                         <Button
-                            className="gap-2 bg-[#f7f7f7] hover:bg-[#B3C8CF] text-gray rounded-full px-5 py-5 h-12 w-40 border-1 border-gray-400"
+                            className="gap-2 bg-white hover:bg-gray-50 text-gray-700 rounded-full px-5 py-2 shadow-sm border border-gray-200 font-medium transition-colors hover:cursor-pointer h-10"
                             onClick={openScheduleModal}
                         >
                             <Calendar1 className="h-4 w-4" />
@@ -73,11 +75,17 @@ export default function StaffManagement() {
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
                 {/* Header */}
-                <header className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-5 pt-8">
+                <header className="bg-[#F1F0E8] px-8 py-5 pt-8">
                     <div className="flex items-start justify-between">
                         <div>
-                            <h1 className="text-foreground text-2xl mb-1 font-semibold">Staff Management</h1>
-                            <p className="text-gray-500 text-sm">
+                            <button
+                                onClick={() => navigate(-1)}
+                                className="flex items-center gap-4 text-gray-400 hover:text-gray-700 text-sm font-medium mb-3 transition-colors group"
+                            >
+                                <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
+                                <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">Staff Management</h1>
+                            </button>
+                            <p className="text-gray-500 text-sm mt-1">
                                 Oversee and manage system organizer accounts.
                             </p>
                         </div>
@@ -89,22 +97,25 @@ export default function StaffManagement() {
 
                 {/* Tabs */}
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                    <TabsList className="w-full justify-start bg-[#F1F0E8] rounded-none h-16">
+                    <TabsList
+                        className="flex ml-7 gap-2 px-2 py-2 bg-white border border-gray-100 rounded-xl shadow-sm w-fit mb-6">
                         <TabsTrigger
                             value="staff"
-                            className="relative rounded-none px-8 py-5 border-b-2 border-transparent text-gray-600 data-[state=active]:border-b-2 data-[state=active]:border-b-[#7FA5A5] data-[state=active]:text-gray-700 data-[state=active]:font-semibold"
+                            className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold text-gray-500 transition-all hover:text-gray-900 hover:bg-gray-50 data-[state=active]:bg-[#7FA5A5] data-[state=active]:text-white data-[state=active]:shadow-sm hover:cursor-pointer"
                         >
-                            Staff Information
+                            Staff List
                         </TabsTrigger>
+
                         <TabsTrigger
                             value="schedule"
-                            className="relative rounded-none px-8 py-5 border-b-2 border-transparent text-gray-600 data-[state=active]:border-b-2 data-[state=active]:border-b-[#7FA5A5] data-[state=active]:text-gray-700 data-[state=active]:font-semibold"
+                            className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold text-gray-500 transition-all hover:text-gray-900 hover:bg-gray-50 data-[state=active]:bg-[#7FA5A5] data-[state=active]:text-white data-[state=active]:shadow-sm hover:cursor-pointer"
                         >
                             Work Schedule
                         </TabsTrigger>
+
                         <TabsTrigger
                             value="resources"
-                            className="relative rounded-none px-8 py-5 border-b-2 border-transparent text-gray-600 data-[state=active]:border-b-2 data-[state=active]:border-b-[#7FA5A5] data-[state=active]:text-gray-700 data-[state=active]:font-semibold"
+                            className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold text-gray-500 transition-all hover:text-gray-900 hover:bg-gray-50 data-[state=active]:bg-[#7FA5A5] data-[state=active]:text-white data-[state=active]:shadow-sm hover:cursor-pointer"
                         >
                             Resources
                         </TabsTrigger>
@@ -112,14 +123,14 @@ export default function StaffManagement() {
 
                     {/* TAB 1: Staff Information */}
                     <StaffListTab
-                        id={id}
+                        id={eventId}
                         onLoading={setLoading}
                         onError={setError}
                     />
 
                     {/* TAB 2: Work Schedule */}
                     <WorkScheduleTab
-                        id={id}
+                        id={eventId}
                         isScheduleModalOpen={isScheduleModalOpen}
                         closeScheduleModal={closeScheduleModal}
                         onLoading={setLoading}
@@ -129,7 +140,7 @@ export default function StaffManagement() {
 
                     {/* TAB 3: Resources */}
                     <ResourceTab
-                        id={id}
+                        id={eventId}
                         isResourceModalOpen={isResourceModalOpen}
                         closeResourceModal={closeResourceModal}
                         onLoading={setLoading}

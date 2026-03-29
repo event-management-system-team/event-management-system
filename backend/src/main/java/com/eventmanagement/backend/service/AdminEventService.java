@@ -5,6 +5,8 @@ import com.eventmanagement.backend.dto.response.admin.EventResponse;
 import com.eventmanagement.backend.dto.response.admin.EventSummaryResponse;
 import com.eventmanagement.backend.exception.BadRequestException;
 import com.eventmanagement.backend.model.Event;
+import com.eventmanagement.backend.model.EventAnalytics;
+import com.eventmanagement.backend.repository.EventAnalyticsRepository;
 import com.eventmanagement.backend.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,6 +16,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AdminEventService {
     private final EventRepository eventRepository;
+    private final EventAnalyticsRepository eventAnalyticsRepository;
 
     public Page<EventResponse> getAllEvents(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
@@ -71,6 +76,22 @@ public class AdminEventService {
         event.setUpdatedAt(LocalDateTime.now());
 
         eventRepository.save(event);
+
+        if (eventAnalyticsRepository.existsByEvent(event)) {
+            return;
+        }
+
+        // insert into event analytics
+        EventAnalytics analytics = EventAnalytics.builder()
+                .event(event)
+                .reportDate(LocalDate.now())
+                .totalRegistrations(0)
+                .totalCheckins(0)
+                .totalTicketsSold(0)
+                .totalRevenue(BigDecimal.ZERO)
+                .build();
+
+        eventAnalyticsRepository.save(analytics);
     }
 
     @Transactional
@@ -86,6 +107,20 @@ public class AdminEventService {
         event.setUpdatedAt(LocalDateTime.now());
 
         eventRepository.save(event);
+    }
+
+    @Transactional
+    public void autoRejectExpiredPendingEvents() {
+        LocalDateTime deadline = LocalDateTime.now().plusDays(3);
+
+        List<Event> expiredEvents = eventRepository.findExpiredPendingEvents(EventStatus.PENDING, deadline);
+
+        for (Event event : expiredEvents) {
+            event.setStatus(EventStatus.REJECTED);
+            event.setRejectionReason("Event automatically rejected because it was not approved at least 3 days before the event start date");
+            event.setUpdatedAt(LocalDateTime.now());
+        }
+        eventRepository.saveAll(expiredEvents);
     }
 
     private EventResponse mapToResponse(Event event) {

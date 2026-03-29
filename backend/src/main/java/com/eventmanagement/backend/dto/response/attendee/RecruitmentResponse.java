@@ -19,15 +19,12 @@ public class RecruitmentResponse {
     private String location;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private String description;
     private LocalDateTime deadline;
     private LocalDateTime createdAt;
-
-    private RecruitmentStatus status;
     private List<PositionResponse> positions;
     private OrganizerResponse organizer;
     private List<BenefitRecruitmentDto> benefits;
-
+    private boolean isActive;
 
     @Builder
     @AllArgsConstructor

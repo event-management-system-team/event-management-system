@@ -1,9 +1,11 @@
 package com.eventmanagement.backend.repository;
 
-import com.eventmanagement.backend.constants.EventStatus;
-import com.eventmanagement.backend.model.Event;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -13,27 +15,31 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import com.eventmanagement.backend.constants.EventStatus;
+import com.eventmanagement.backend.model.Event;
+
+import jakarta.transaction.Transactional;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, UUID> {
+    @Modifying
+    @Query("UPDATE Event e SET e.registeredCount = e.registeredCount + :count WHERE e.eventId = :eventId")
+    void incrementRegisteredCount(@Param("eventId") UUID eventId, @Param("count") int count);
+
         List<Event> findTop6ByStatusInOrderByRegisteredCountDesc(List<EventStatus> statuses);
 
-    List<Event> findTop5ByStatusOrderByCreatedAtDesc(EventStatus status);
+        List<Event> findTop5ByStatusOrderByCreatedAtDesc(EventStatus status);
 
-    long countByStatus(EventStatus status);
+        long countByStatus(EventStatus status);
 
-    long countByStatusIn(List<EventStatus> statuses);
+        long countByStatusIn(List<EventStatus> statuses);
 
-    @Query("SELECT e FROM Event e " +
-            "WHERE e.status IN :statuses " +
-            "AND e.totalCapacity > 0 " +
-            "AND (e.registeredCount * 1.0 / e.totalCapacity) >= 0.8 " +
-            "ORDER BY (e.totalCapacity - e.registeredCount) ASC")
-    List<Event> findHotEventsSellingFast(@Param("statuses") List<EventStatus> statuses, Pageable pageable);
+        @Query("SELECT e FROM Event e " +
+                        "WHERE e.status IN :statuses " +
+                        "AND e.totalCapacity > 0 " +
+                        "AND (e.registeredCount * 1.0 / e.totalCapacity) >= 0.8 " +
+                        "ORDER BY (e.totalCapacity - e.registeredCount) ASC")
+        List<Event> findHotEventsSellingFast(@Param("statuses") List<EventStatus> statuses, Pageable pageable);
 
         @Query("SELECT e FROM Event e " +
                         "WHERE e.status IN :statuses " +
@@ -73,6 +79,16 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
         long countByOrganizer_UserIdAndStatusAndStartDateAfterNow(
                         @Param("organizerId") UUID organizerId,
                         @Param("status") EventStatus status);
+    Page<Event> findByOrganizer_UserIdAndStatus(UUID userId, EventStatus status, Pageable pageable);
+
+    @Query("SELECT e FROM Event e WHERE e.organizer.userId = :userId AND " +
+           "((e.status = :statusApproved AND e.startDate <= CURRENT_TIMESTAMP) " +
+           "OR e.status = :statusOngoing)")
+    Page<Event> findActiveEventsByOrganizer(
+            @Param("userId") UUID userId,
+            @Param("statusApproved") EventStatus statusApproved,
+            @Param("statusOngoing") EventStatus statusOngoing,
+            Pageable pageable);
 
         @EntityGraph(attributePaths = "ticketTypes")
         @Query("SELECT e FROM Event e WHERE e.eventId IN :eventIds")
@@ -108,5 +124,22 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
 
         @EntityGraph(attributePaths = "ticketTypes")
         @Query("SELECT e FROM Event e WHERE e.eventId = :eventId")
-        java.util.Optional<Event> findWithTicketsByEventId(@Param("eventId") UUID eventId);
+        Optional<Event> findWithTicketsByEventId(@Param("eventId") UUID eventId);
+
+        @Query("""
+                            SELECT e FROM Event e
+                            WHERE e.status = :status
+                            AND e.startDate <= :deadline
+                        """)
+        List<Event> findExpiredPendingEvents(
+                        @Param("status") EventStatus status,
+                        @Param("deadline") LocalDateTime deadline);
+
+        @Modifying
+        @Transactional
+        @Query("UPDATE Event e SET e.checkedInCount = :checkedInCount WHERE e.eventId = :eventId")
+        void updateTotalCheckins(@Param("eventId") UUID eventId, @Param("checkedInCount") int checkedInCount);
+
+        List<Event> findByStatus(@Param("status") EventStatus status);
+
 }

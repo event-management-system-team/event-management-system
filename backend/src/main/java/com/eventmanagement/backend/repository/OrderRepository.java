@@ -25,4 +25,9 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     List<Order> findExpiredPendingOrders(
             @Param("now") LocalDateTime now,
             @Param("status") OrderStatus status);
+
+
+    @Query("SELECT COALESCE(SUM(o.totalAmount), 0.0) FROM Order o WHERE o.event.eventId = :eventId AND o.status = 'PAID'")
+    Double sumRevenueByEventId(@Param("eventId") UUID eventId);
+
 }

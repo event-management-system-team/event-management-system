@@ -2,14 +2,14 @@ import { Progress } from 'antd'
 import { ArrowRight, Calendar, MapPin, Clock } from 'lucide-react'
 import { useNavigate } from 'react-router';
 
-const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage, formattedDeadline, totalAvailable, totalVacancy, deadlineDate, startDate, endDate }) => {
+const ApplySection = ({ eventSlug, active, location, daysLeft, filledPercentage, formattedDeadline, totalAvailable, totalVacancy, deadlineDate, startDate, endDate }) => {
 
     const navigate = useNavigate();
     return (
         <div className="bg-white rounded-2xl p-7 shadow-xl shadow-slate-200/50 border border-[#E5E1DA]/50">
             <div className="flex justify-between items-center mb-8">
                 <span className="bg-[#4ECDC4]/10 text-[#4ECDC4] text-[10px] font-extrabold px-3 py-1.5 rounded-full uppercase tracking-widest">
-                    {status}
+                    {active ? 'OPEN' : 'CLOSED'}
                 </span>
                 <span className="text-slate-400 text-xs font-medium">
                     {daysLeft > 0 ? daysLeft : 0} days left
@@ -18,7 +18,7 @@ const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage,
 
             <div className="space-y-6 mb-10">
                 <div className="flex items-start gap-4">
-                    <Calendar size={18} className="text-primary mt-0.5" />
+                    <Calendar size={18} className="text-primary mt-0.5 shrink-0" />
                     <div>
                         <p className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold mb-1">Deadline</p>
 
@@ -33,24 +33,17 @@ const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage,
                 </div>
 
                 <div className="flex items-start gap-4">
-                    <Clock size={18} className="text-primary mt-0.5" />
+                    <Clock size={18} className="text-primary mt-0.5 shrink-0" />
                     <div>
-                        <p className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold mb-1">Event Duration</p>
+                        <p className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold mb-1">Event Date</p>
                         <p className="text-[14px] font-bold text-slate-600 leading-relaxed">
-                            {(() => {
-                                const startStr = startDate ? new Date(startDate).toLocaleDateString('en-GB') : 'TBA';
-                                const endStr = endDate ? new Date(endDate).toLocaleDateString('en-GB') : 'TBA';
-
-                                if (startStr === 'TBA' && endStr === 'TBA') return 'TBA';
-                                if (startStr === endStr) return startStr;
-                                return `${startStr} - ${endStr}`;
-                            })()}
+                            {startDate ? new Date(startDate).toLocaleDateString('en-GB') : 'TBA'}
                         </p>
                     </div>
                 </div>
 
                 <div className="flex items-start gap-4">
-                    <MapPin size={18} className="text-primary mt-0.5" />
+                    <MapPin size={18} className="text-primary mt-0.5 shrink-0" />
                     <div>
                         <p className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold">Location</p>
                         <p className="text-[14px] font-bold text-slate-600 leading-relaxed">{location}</p>
@@ -60,8 +53,8 @@ const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage,
 
             <div className="space-y-3 mb-8">
                 <div className="flex justify-between text-[11px] font-extrabold uppercase tracking-wide">
-                    <span className="text-slate-500">Available Slots</span>
-                    <span className="text-teal-accent">{totalAvailable} / {totalVacancy}</span>
+                    <span className="text-slate-500">Filled Positions</span>
+                    <span className="text-teal-accent">{totalVacancy - totalAvailable} / {totalVacancy}</span>
                 </div>
 
                 <Progress
@@ -77,16 +70,16 @@ const ApplySection = ({ eventSlug, status, location, daysLeft, filledPercentage,
 
 
             <button
-                disabled={totalAvailable <= 0 || status === 'CLOSED'}
+                disabled={totalAvailable <= 0 || !active}
                 className="w-full py-4 text-[15px] font-extrabold rounded-xl transition-all duration-300 flex items-center justify-center gap-3 group uppercase
                bg-primary text-white shadow-lg shadow-primary/30 
                hover:bg-primary/90 hover:shadow-primary/50 hover:-translate-y-1
                disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:bg-slate-200"
                 onClick={() => navigate(`/attendee/recruitments/${eventSlug}/apply-staff`)}
             >
-                {status === 'CLOSED' ? 'CLOSED' : (totalAvailable <= 0 ? 'Fully Booked' : 'Apply Now')}
+                {!active ? 'CLOSED' : (totalAvailable <= 0 ? 'Fully Booked' : 'Apply Now')}
 
-                {!(totalAvailable <= 0 || status === 'CLOSED') && (
+                {!(totalAvailable <= 0 || !active) && (
                     <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1.5" />
                 )}
             </button>

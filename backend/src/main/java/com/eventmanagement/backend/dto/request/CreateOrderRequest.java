@@ -1,6 +1,10 @@
 package com.eventmanagement.backend.dto.request;
 
+import java.util.List;
 import java.util.UUID;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
@@ -17,13 +21,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CreateOrderRequest {
 
-    private UUID ticketTypeId;
-
     private UUID eventId;
 
-    @Min(1)
-    @Max(5)
-    private Integer quantity;
+    @Valid
+    @NotEmpty(message = "At least one ticket must be selected")
+    private List<TicketOrder> tickets;
 
     @NotBlank(message = "Full name is required")
     private String fullName;
@@ -31,4 +33,14 @@ public class CreateOrderRequest {
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
     private String email;
+
+    @Data
+    @NoArgsConstructor
+    public static class TicketOrder {
+        private UUID ticketTypeId;
+
+        @Min(1)
+        @Max(5)
+        private Integer quantity;
+    }
 }

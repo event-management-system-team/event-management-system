@@ -3,7 +3,7 @@ import organizerService from "../../../services/organizer.service";
 import { Card, CardContent } from "../admin/Card";
 import { TabsContent } from "../admin/Tabs";
 import { CreateResourceModal } from "./CreateResourceModal";
-import { Eye, Download, FileText, ImageIcon, } from "lucide-react";
+import { Eye, Download, FileText, ImageIcon, Calendar1 } from "lucide-react";
 import { Button } from "../admin/Button.jsx";
 
 const ResourceTab = ({ id, isResourceModalOpen, closeResourceModal, onLoading, onError, showAlert }) => {
@@ -94,66 +94,94 @@ const ResourceTab = ({ id, isResourceModalOpen, closeResourceModal, onLoading, o
         document.body.removeChild(link);
     };
 
-    const handleFilePreview = (file) => {
+    const handleFilePreview = (e, file) => {
+        e.preventDefault();
         if (!file?.fileUrl) return;
 
-        if (file.fileType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+        const officeTypes = [
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+            "application/msword", // .doc
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+            "application/vnd.ms-excel", // .xls
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
+            "application/vnd.ms-powerpoint" // .ppt
+        ];
+
+        if (officeTypes.includes(file.fileType)) {
             const officeViewer = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(file.fileUrl)}`;
-            // const googleViewer = `https://docs.google.com/gview?url=${encodeURIComponent(file.fileUrl)}&embedded=true`
             window.open(officeViewer, "_blank");
             return;
         }
 
         window.open(file.fileUrl, "_blank");
     };
-
     return (
         <>
-            <TabsContent value="resources" className="space-y-4">
-                {/* Recent Files */}
-                <Card className="shadow-sm border-none">
-                    <CardContent>
-                        <div className="space-y-4">
+            <TabsContent value="resources" className="px-8 mt-2">
+                <Card className="shadow-sm border border-gray-100 bg-white rounded-xl overflow-hidden">
+                    <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-900">Event Resources</h3>
+                            <p className="text-sm text-gray-500 mt-1">Files and guidelines available for staff members</p>
+                        </div>
+                    </div>
+                    <CardContent className="p-0">
+                        <div className="divide-y divide-gray-100">
                             {resources && resources.length > 0 ? (
                                 resources.map(file => (
                                     <div
                                         key={file.resourceId}
-                                        className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                                        className="flex items-center justify-between p-5 hover:bg-gray-50/80 transition-all group"
                                     >
-                                        <div className="flex items-center gap-4 flex-1">
-                                            <div className="flex-shrink-0">{getFileIcon(file.fileType)}</div>
+                                        <div className="flex items-start gap-4 flex-1">
+                                            <div className="flex-shrink-0 mt-0.5 p-2 bg-gray-50 rounded-lg group-hover:bg-white group-hover:shadow-sm border border-transparent group-hover:border-gray-100 transition-all">{getFileIcon(file.fileType)}</div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium text-gray-900 truncate">
+                                                <p className="text-sm font-semibold text-gray-900 truncate mb-1">
                                                     {file.resourceName}
                                                 </p>
-                                                <p className="text-xs text-gray-500">
-                                                    Uploaded {formatDate(file.createdAt)} • {formatFileSize(file.fileSize)}
-                                                </p>
+                                                <div className="flex items-center gap-3 text-xs text-gray-500">
+                                                    <span className="flex items-center gap-1.5"><Calendar1 className="w-3.5 h-3.5"/> {formatDate(file.createdAt)}</span>
+                                                    <span>•</span>
+                                                    <span>{formatFileSize(file.fileSize)}</span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2 ml-4">
+                                        <div className="flex items-center gap-2 ml-6 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <Button
-                                                variant="ghost"
+                                                variant="outline"
                                                 size="sm"
-                                                className="h-8 w-8 p-0"
-                                                onClick={() => handleFileDownload(file)}
+                                                className="h-8 w-8 p-0 rounded-full border-gray-200 hover:border-[#7FA5A5] hover:text-[#7FA5A5]"
+                                                onClick={(e) => handleFilePreview(e, file)}
+                                                title="Preview file"
                                             >
-                                                <Download className="h-4 w-4 text-gray-500" />
+                                                <Eye className="h-4 w-4" />
                                             </Button>
                                             <Button
-                                                variant="ghost"
+                                                variant="outline"
                                                 size="sm"
-                                                className="h-8 w-8 p-0"
-                                                onClick={() => handleFilePreview(file)}
+                                                className="h-8 w-8 p-0 rounded-full border-gray-200 hover:border-[#7FA5A5] hover:text-[#7FA5A5]"
+                                                onClick={() => handleFileDownload(file)}
+                                                title="Download file"
                                             >
-                                                <Eye className="h-4 w-4 text-gray-500" />
+                                                <Download className="h-4 w-4" />
                                             </Button>
                                         </div>
                                     </div>
                                 ))) : (
-                                <div className="text-center text-gray-500 border-none">No resource yet.</div>
-                            )}
+                                <div className="flex flex-col items-center justify-center py-20 text-center px-4">
+                                    <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-gray-50 border-2 border-dashed border-gray-200 mb-5">
+                                        <FileText className="w-8 h-8 text-gray-400" />
+                                    </div>
 
+                                    <h3 className="text-base font-semibold text-gray-900">
+                                        No resources available
+                                    </h3>
+
+                                    <p className="text-sm text-gray-500 mt-2 max-w-sm">
+                                        Upload documents and materials for your event staff.
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </CardContent>
                 </Card>
@@ -165,7 +193,7 @@ const ResourceTab = ({ id, isResourceModalOpen, closeResourceModal, onLoading, o
                 isOpen={isResourceModalOpen}
                 onClose={closeResourceModal}
                 onCreated={handleResourceCreated}
-                showAlert={showAlert}
+                onAlert={showAlert}
             />
         </>
     )

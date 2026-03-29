@@ -11,11 +11,14 @@ import EventAttendeesPage from "../pages/organizer/EventAttendeesPage";
 import FeedbackList from "../pages/organizer/FeedbackList";
 import FeedbackBuilder from "../pages/organizer/FeedbackBuilder";
 import FeedbackDetail from "../pages/organizer/FeedbackDetail";
+import FeedbackAnalytics from "../pages/organizer/FeedbackAnalytics";
 import RecruitmentList from "../pages/organizer/RecruitmentList";
 import RecruitmentBuilder from "../pages/organizer/RecruitmentBuilder";
+import CreateRecruitmentPage from "../pages/organizer/CreateRecruitmentPage";
 import ApplicationList from "../pages/organizer/ApplicationList";
 import RecruitmentDetail from "../pages/organizer/RecruitmentDetail";
 import StaffManagement from "../pages/organizer/StaffManagement";
+import OrganizerProfilePage from "../pages/organizer/OrganizerProfilePage";
 
 const OrganizerRoutes = () => {
     return (
@@ -28,24 +31,26 @@ const OrganizerRoutes = () => {
                     <Route path="events/:eventId" element={<EventDetailDashboard />} />
                     <Route path="events/:eventId/attendees" element={<EventAttendeesPage />} />
 
-                    {/* Events */}
-                    <Route path="my-events" element={<MyEventsPage />} />
-                    <Route path="create-event" element={<CreateEventPage />} />
+                    {/* Edit Event */}
                     <Route path="edit-event/:eventId" element={<CreateEventPage />} />
 
-                    {/* Feedback */}
+                    {/* Feedback — specific routes BEFORE the generic catch-all */}
                     <Route path="feedback/feedbacklist/:eventId" element={<FeedbackList />} />
                     <Route path="feedback/createform/:eventId" element={<FeedbackBuilder />} />
+                    <Route path="feedback/analytics/:eventId" element={<FeedbackAnalytics />} />
                     <Route path="feedback/:feedbackId" element={<FeedbackDetail />} />
-
-                    {/* Recruitment */}
                     <Route path="recruitmentlist/:eventId" element={<RecruitmentList />} />
                     <Route path="recruitmentcreate/:eventId" element={<RecruitmentBuilder />} />
+                    <Route path="recruitment-post/:eventId" element={<CreateRecruitmentPage />} />
+                    <Route path="applications/event/:eventId" element={<ApplicationList />} />
                     <Route path="applications/:recruitmentId" element={<ApplicationList />} />
                     <Route path="recruitments/:recruitmentId" element={<RecruitmentDetail />} />
 
                     {/* Staff */}
-                    <Route path=":id/staff" element={<StaffManagement />} />
+                    <Route path="events/:eventId/staff" element={<StaffManagement />} />
+
+                    {/* Profile */}
+                    <Route path="profile" element={<OrganizerProfilePage />} />
                 </Route>
             </Route>
         </Routes>

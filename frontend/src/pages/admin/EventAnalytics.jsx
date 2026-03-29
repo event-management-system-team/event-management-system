@@ -1,19 +1,16 @@
 import { useEffect, useState } from 'react';
-import { AdminSidebar } from "../../components/domain/admin/AdminSidebar.jsx";
 import { Button } from "../../components/domain/admin/Button.jsx";
-import { Avatar, AvatarFallback } from "../../components/domain/admin/Avatar.jsx";
 import { adminService } from '../../services/admin.service.js';
 import dayjs from "dayjs";
 import LoadingState from '../../components/common/LoadingState.jsx';
-import html2pdf from 'html2pdf.js';
-import html2canvas from "html2canvas";
+import EmptyState from '../../components/common/EmptyState.jsx';
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import GlobalAnalyticsCard from '../../components/domain/admin/GlobalAnalyticsCard.jsx';
 import EventChart from '../../components/domain/admin/EventChart.jsx';
 import AnalyticsFilter from '../../components/domain/admin/AnalyticsFilter.jsx';
 import EventPerformanceList from '../../components/domain/admin/EventPerformanceList.jsx';
-import { Bell, ChevronRight, Download } from 'lucide-react';
+import { ChevronRight, Download } from 'lucide-react';
 
 export function EventAnalytics() {
     const [events, setEvents] = useState([])
@@ -127,63 +124,38 @@ export function EventAnalytics() {
         return Number(num).toFixed(2)
     }
 
+    if (loading) return <LoadingState />
+    if (error) return <EmptyState className='h-[600px]' />
+
     return (
-        <div className="flex h-screen bg-[#F1F0E8]">
-
-            {loading && (
-                <LoadingState />
-            )}
-
-            {error && (
-                <EmptyState className='h-[600px]' />
-            )}
-
-            {/* Sidebar */}
-            <AdminSidebar />
+        <div className="flex flex-col flex-1 bg-[#F1F0E8]">
 
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
                 {/* Header */}
-                <header className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-5">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <span>Dashboard</span>
-                            <ChevronRight className="h-4 w-4" />
-                            <span>Event Analytics</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            {/* Notification Icon */}
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-9 w-9 rounded-full"
-                            >
-                                <Bell className="h-5 w-5 text-gray-600" />
-                            </Button>
-                            {/* Profile Icon */}
-                            <Avatar className="w-9 h-9 cursor-pointer">
-                                <AvatarFallback className="bg-[#7FA5A5] text-white text-sm">
-                                    AR
-                                </AvatarFallback>
-                            </Avatar>
-                        </div>
-                    </div>
+                <header className="bg-[#F1F0E8] px-8 py-5 pt-8">
                     <div className="flex items-start justify-between">
                         <div>
-                            <h1 className="text-foreground text-2xl mb-1 font-semibold">Event Analytics</h1>
-                            <p className="text-gray-500 text-sm">
-                                Comprehensive performance metrics and insights across all events
+                            <div className="flex items-center gap-4 text-gray-400 text-sm font-medium mb-3">
+                                <span>Dashboard</span>
+                                <ChevronRight className="h-4 w-4" />
+                                <span className="text-gray-600">Event Analytics</span>
+                            </div>
+                            <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">Event Analytics</h1>
+                            <p className="text-gray-500 text-sm mt-1">
+                                Comprehensive performance metrics and insights across all events.
                             </p>
                         </div>
-                        <div className="flex gap-2">
-                            {/* <Button variant="outline" className="gap-2" onClick={handleExportPDF}>
-                                <FileText className="h-4 w-4" />
-                                Export PDF
-                            </Button> */}
-                            <Button variant="outline" className="gap-2" onClick={handleExportExcel}>
-                                <Download className="h-4 w-4" />
-                                Export Excel Report
-                            </Button>
+                        <div className="flex items-center gap-3">
+                            {events.length > 0 && (
+                                <Button 
+                                    className="gap-2 bg-white hover:bg-gray-50 text-[#1e2d3d] rounded-full px-5 py-2 shadow-sm border border-gray-200 font-medium transition-colors hover:cursor-pointer h-10" 
+                                    onClick={handleExportExcel}
+                                >
+                                    <Download className="h-4 w-4" />
+                                    Export Excel Report
+                                </Button>
+                            )}
                         </div>
                     </div>
                 </header>
@@ -219,13 +191,12 @@ export function EventAnalytics() {
 
                 {/* Event Performance Table */}
                 <EventPerformanceList
+                    events={events}
                     searchTerm={searchTerm}
                     status={status}
                     category={category}
                     date={date}
                     sortOption={sortOption}
-                    onLoading={setLoading}
-                    onError={setError}
                     formatVND={formatVND}
                     formatNumber={formatNumber}
                 />

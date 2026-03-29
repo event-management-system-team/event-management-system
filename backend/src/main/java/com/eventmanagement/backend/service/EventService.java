@@ -1,16 +1,5 @@
 package com.eventmanagement.backend.service;
 
-import com.eventmanagement.backend.constants.EventStatus;
-import com.eventmanagement.backend.dto.response.attendee.*;
-import com.eventmanagement.backend.model.Event;
-import com.eventmanagement.backend.model.TicketType;
-import com.eventmanagement.backend.repository.EventRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,13 +8,29 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import com.eventmanagement.backend.constants.EventStatus;
+import com.eventmanagement.backend.dto.response.attendee.EventAgendaResponse;
+import com.eventmanagement.backend.dto.response.attendee.EventCategoryResponse;
+import com.eventmanagement.backend.dto.response.attendee.EventResponse;
+import com.eventmanagement.backend.dto.response.attendee.OrganizerResponse;
+import com.eventmanagement.backend.dto.response.attendee.TicketTypeResponse;
+import com.eventmanagement.backend.model.Event;
+import com.eventmanagement.backend.model.TicketType;
+import com.eventmanagement.backend.repository.EventRepository;
+
+import lombok.RequiredArgsConstructor;
+
 @Service
 @RequiredArgsConstructor
 public class EventService {
     private final EventRepository eventRepository;
 
     private final List<EventStatus> statuses = Arrays.asList(EventStatus.APPROVED, EventStatus.ONGOING);
-
 
     public List<EventResponse> getTopNewEvents() {
         List<Event> events = eventRepository.findTop6ByStatusInOrderByRegisteredCountDesc(statuses);
@@ -41,9 +46,9 @@ public class EventService {
     }
 
     public Page<EventResponse> searchEvents(String keyword, String location,
-                                            List<String> categories, LocalDate date,
-                                            BigDecimal price, Boolean isFree,
-                                            int page, int size) {
+            List<String> categories, LocalDate date,
+            BigDecimal price, Boolean isFree,
+            int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         String kw = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
@@ -132,7 +137,6 @@ public class EventService {
                             .build())
                     .collect(Collectors.toList());
         }
-
 
         return EventResponse.builder()
                 .eventId(event.getEventId())

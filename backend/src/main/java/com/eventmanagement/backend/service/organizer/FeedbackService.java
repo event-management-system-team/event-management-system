@@ -1,6 +1,8 @@
 package com.eventmanagement.backend.service.organizer;
 
 import java.lang.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,11 +11,18 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.eventmanagement.backend.dto.request.SubmitFeedbackRequest;
+import com.eventmanagement.backend.dto.response.admin.EventResponse;
+import com.eventmanagement.backend.dto.response.organizer.FeedbackAnalyticsResponse;
 import com.eventmanagement.backend.dto.response.organizer.FeedbackDetailResponseDTO;
+import com.eventmanagement.backend.dto.response.organizer.FeedbackItemResponse;
 import com.eventmanagement.backend.dto.response.organizer.FeedbackResponseDTO;
 import com.eventmanagement.backend.model.CustomForm;
 import com.eventmanagement.backend.model.Event;
@@ -37,122 +46,236 @@ public class FeedbackService {
     private final CustomFormRepository customFormRepository;
     private final TicketTypeRepository ticketRepository;
 
+    private FeedbackResponseDTO feedbackResponseDTO;
 
- private  FeedbackResponseDTO feedbackResponseDTO;
     public List<FeedbackResponseDTO> getFeedbacksByEvent(UUID eventId) {
         return feedbackRepository.findFeedbacksByEventId(eventId);
     }
+
     public Map<String, Object> getFeedbackListData(UUID eventId) {
         List<FeedbackResponseDTO> feedbacks = feedbackRepository.findFeedbacksByEventId(eventId);
-        
         Map<String, Object> response = new HashMap<>();
         response.put("feedbacks", feedbacks);
-        
         return response;
     }
 
-   public FeedbackDetailResponseDTO getFeedbackDetail(UUID feedbackId) {
-    Feedback feedback = feedbackRepository.findById(feedbackId)
-            .orElseThrow(() -> new RuntimeException("Feedback not found"));
-    
-    User user = feedback.getUser();
-    Event event = feedback.getEvent();
-    
-    if (user == null) throw new RuntimeException("Bài đánh giá này không có dữ liệu người dùng (User is null)!");
-    if (event == null) throw new RuntimeException("Bài đánh giá này không thuộc sự kiện nào (Event is null)!");
+    public FeedbackDetailResponseDTO getFeedbackDetail(UUID feedbackId) {
+        Feedback feedback = feedbackRepository.findById(feedbackId)
+                .orElseThrow(() -> new RuntimeException("Feedback not found"));
 
-    CustomForm form = customFormRepository.findByEvent_EventId(event.getEventId()).orElse(null);
-    List<Map<String, Object>> formSchema = (form != null) ? form.getFormSchema() : null;
+        User user = feedback.getUser();
+        Event event = feedback.getEvent();
 
-    List<Map<String, Object>> enrichedDetails = new ArrayList<>();
-    
-    if (feedback.getFeedbackData() != null) {
-        for (Map<String, Object> answerItem : feedback.getFeedbackData()) {
-            Map<String, Object> enrichedItem = new HashMap<>(answerItem);
-            
-            // Lấy field_id từ câu trả lời (có thể null đối với data cũ)
-            String fieldId = (String) enrichedItem.get("field_id");
-            
-            // Lấy thẳng "question" từ data cũ (nếu có) để tương thích ngược
-            String questionLabel = (String) enrichedItem.get("question");
-            
-            // Nếu data không có sẵn question, gán tạm label dựa trên fieldId
-            if (questionLabel == null) {
-                questionLabel = (fieldId != null) ? "Câu hỏi " + fieldId : "Câu hỏi không xác định";
-            }
+        if (user == null)
+            throw new RuntimeException("Bài đánh giá này không có dữ liệu người dùng (User is null)!");
+        if (event == null)
+            throw new RuntimeException("Bài đánh giá này không thuộc sự kiện nào (Event is null)!");
 
-            // Nếu có Schema từ CustomForm, thử map để lấy câu hỏi chính xác nhất
-            if (formSchema != null && fieldId != null) {
-                for (Map<String, Object> questionDef : formSchema) {
-                    // SỬA Ở ĐÂY: An toàn NullPointer và dùng đúng key "field_id" của React
-                    if (fieldId.equals(questionDef.get("field_id"))) { 
-                        // SỬA Ở ĐÂY: Lấy "question" thay vì "label"
-                        String schemaQuestion = (String) questionDef.get("question"); 
-                        if (schemaQuestion != null) {
-                            questionLabel = schemaQuestion;
+        CustomForm form = null;
+        List<Map<String, Object>> formSchema = null;
+        try {
+            form = customFormRepository.findByEvent_EventIdAndFormType(event.getEventId(), com.eventmanagement.backend.constants.FormType.FEEDBACK).orElse(null);
+            formSchema = (form != null) ? form.getFormSchema() : null;
+        } catch (Exception e) {
+            // formSchema deserialization may fail for seed data with {"fields": [...]} format
+            System.err.println("[FeedbackService] Could not load form schema for event " + event.getEventId() + ": " + e.getMessage());
+            formSchema = null;
+        }
+
+        List<Map<String, Object>> enrichedDetails = new ArrayList<>();
+
+        if (feedback.getFeedbackData() != null) {
+            for (Map<String, Object> answerItem : feedback.getFeedbackData()) {
+                Map<String, Object> enrichedItem = new HashMap<>(answerItem);
+
+                // Lấy field_id từ câu trả lời (có thể null đối với data cũ)
+                String fieldId = (String) enrichedItem.get("field_id");
+
+                // Lấy thẳng "question" từ data cũ (nếu có) để tương thích ngược
+                String questionLabel = (String) enrichedItem.get("question");
+
+                // Nếu data không có sẵn question, gán tạm label dựa trên fieldId
+                if (questionLabel == null) {
+                    questionLabel = (fieldId != null) ? "Câu hỏi " + fieldId : "Câu hỏi không xác định";
+                }
+
+                // Nếu có Schema từ CustomForm, thử map để lấy câu hỏi chính xác nhất
+                if (formSchema != null && fieldId != null) {
+                    for (Map<String, Object> questionDef : formSchema) {
+                        // SỬA Ở ĐÂY: An toàn NullPointer và dùng đúng key "field_id" của React
+                        if (fieldId.equals(questionDef.get("field_id"))) {
+                            // SỬA Ở ĐÂY: Lấy "question" thay vì "label"
+                            String schemaQuestion = (String) questionDef.get("question");
+                            if (schemaQuestion != null) {
+                                questionLabel = schemaQuestion;
+                            }
+                            break;
                         }
-                        break; 
                     }
                 }
+
+                enrichedItem.put("question", questionLabel);
+                enrichedDetails.add(enrichedItem);
             }
-            
-            enrichedItem.put("question", questionLabel);
-            enrichedDetails.add(enrichedItem);
         }
+
+        FeedbackDetailResponseDTO responseDTO = FeedbackDetailResponseDTO.builder()
+                .eventName(event.getEventName())
+                .submittedAt(event.getCreatedAt())
+                .build();
+
+        FeedbackDetailResponseDTO.AttendeeInfor attendeeInfor = new FeedbackDetailResponseDTO.AttendeeInfor();
+        attendeeInfor.setFullName(user.getFullName());
+        attendeeInfor.setEmail(user.getEmail());
+        attendeeInfor.setAvatar(user.getAvatarUrl());
+        attendeeInfor.setPhoneNumber(user.getPhone());
+        responseDTO.setAttendeeInfor(attendeeInfor);
+
+        FeedbackDetailResponseDTO.FeedbackResponse feedbackResponse = new FeedbackDetailResponseDTO.FeedbackResponse();
+        feedbackResponse.setOverallRating(feedback.getRating());
+        feedbackResponse.setComment(feedback.getComment());
+        feedbackResponse.setDetail(enrichedDetails);
+        responseDTO.setFeedbackResponse(feedbackResponse);
+
+        return responseDTO;
     }
 
-    FeedbackDetailResponseDTO responseDTO = FeedbackDetailResponseDTO.builder()
-            .eventName(event.getEventName())
-            .submittedAt(event.getCreatedAt())
-            .build();
-
-    FeedbackDetailResponseDTO.AttendeeInfor attendeeInfor = new FeedbackDetailResponseDTO.AttendeeInfor();
-    attendeeInfor.setFullName(user.getFullName());
-    attendeeInfor.setEmail(user.getEmail());
-    attendeeInfor.setAvatar(user.getAvatarUrl());
-    attendeeInfor.setPhoneNumber(user.getPhone());
-    responseDTO.setAttendeeInfor(attendeeInfor);
-
-    FeedbackDetailResponseDTO.FeedbackResponse feedbackResponse = new FeedbackDetailResponseDTO.FeedbackResponse();
-    feedbackResponse.setOverallRating(feedback.getRating());
-    feedbackResponse.setComment(feedback.getComment());
-    feedbackResponse.setDetail(enrichedDetails);
-    responseDTO.setFeedbackResponse(feedbackResponse);
-
-    return responseDTO;
-}
 
     @Transactional
     public Feedback createFeedback(UUID eventId, String email, SubmitFeedbackRequest request) {
-        
+
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Sự kiện không tồn tại!"));
-                
         // TÌM USER TRONG DATABASE BẰNG EMAIL LẤY TỪ TOKEN
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại hoặc phiên đăng nhập không hợp lệ!"));
 
-        UUID userId = user.getUserId(); // Rút ra ID thật để dùng cho các hàm check bên dưới
+        UUID userId = user.getUserId(); 
 
-        // ==== CÁC BƯỚC VALIDATE GIỮ NGUYÊN ====
-        if (event.getStartDate().isAfter(LocalDateTime.now())) {
+        if (event.getStartDate() != null && LocalDateTime.now().isBefore(event.getStartDate())) {
             throw new RuntimeException("Sự kiện chưa diễn ra, không thể gửi đánh giá!");
         }
 
-        // Kiểm tra xem đã đánh giá chưa (Dùng hàm vừa thêm ở Repository)
+        if (event.getEndDate() != null) {
+            LocalDateTime now = LocalDateTime.now();
+            if (now.isBefore(event.getEndDate())) {
+                throw new RuntimeException("Sự kiện chưa kết thúc, không thể gửi đánh giá!");
+            }
+            if (now.isAfter(event.getEndDate().plusDays(14))) {
+                throw new RuntimeException("Đã quá 14 ngày kể từ khi sự kiện kết thúc! Không thể gửi đánh giá nữa.");
+            }
+        }
+
         boolean alreadySubmitted = feedbackRepository.existsByEvent_EventIdAndUser_UserId(eventId, userId);
         if (alreadySubmitted) {
             throw new RuntimeException("Bạn đã gửi đánh giá cho sự kiện này rồi!");
         }
-
-        // ==== LƯU VÀO DATABASE ====
+        
         Feedback feedback = new Feedback();
         feedback.setEvent(event);
         feedback.setUser(user);
         feedback.setRating(request.getRating());
         feedback.setComment(request.getComment());
         feedback.setFeedbackData(request.getFeedbackData());
-        
+
         return feedbackRepository.save(feedback);
     }
+
+    public FeedbackAnalyticsResponse getFeedbackAnalytics(UUID eventId) {
+        if (!eventRepository.existsById(eventId)) {
+            throw new RuntimeException("Sự kiện không tồn tại!");
+        }
+
+        Double avgRating = feedbackRepository.findAverageRating(eventId);
+        Long totalResponses = feedbackRepository.countByEventId(eventId);
+        Double posPercentage = feedbackRepository.findPositivePercentage(eventId);
+
+        List<Object[]> rawDistribution = feedbackRepository.findRatingDistribution(eventId);
+        Map<Integer, Long> distributionMap = new HashMap<>();
+        for (Object[] row : rawDistribution) {
+            distributionMap.put((Integer) row[0], (Long) row[1]);
+        }
+
+        List<FeedbackAnalyticsResponse.RatingDistribution> ratingDistribution = new ArrayList<>();
+        for (int i = 1; i <= 10; i++) {
+            ratingDistribution
+                    .add(new FeedbackAnalyticsResponse.RatingDistribution(i, distributionMap.getOrDefault(i, 0L)));
+        }
+
+        return FeedbackAnalyticsResponse.builder()
+                .averageRating(avgRating != null ? round1(avgRating) : 0.0)
+                .totalResponses(totalResponses != null ? totalResponses : 0L)
+                .positiveFeedbackPct(posPercentage != null ? round1(posPercentage) : 0.0)
+                .ratingDistribution(ratingDistribution)
+                .build();
+    }
+
+    private Double round1(Double value) {
+        if (value == null)
+            return 0.0;
+        return BigDecimal.valueOf(value).setScale(1, RoundingMode.HALF_UP).doubleValue();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<FeedbackItemResponse> getFeedbackReviews(UUID eventId, Pageable pageable) {
+        if (!eventRepository.existsById(eventId)) {
+            throw new RuntimeException("Sự kiện không tồn tại!");
+        }
+
+        Page<Feedback> feedbackPage = feedbackRepository.findByEvent_EventIdOrderBySubmittedAtDesc(eventId, pageable);
+        return feedbackPage.map(this::toItemResponse);
+    }
+
+    private FeedbackItemResponse toItemResponse(Feedback feedback) {
+        return FeedbackItemResponse.builder()
+                .feedbackId(feedback.getId())
+                .attendeeName(feedback.getUser() != null ? feedback.getUser().getFullName() : "Khách ẩn danh")
+                .avatarUrl(feedback.getUser() != null ? feedback.getUser().getAvatarUrl() : null)
+                .rating(feedback.getRating())
+                .comment(feedback.getComment())
+                .submittedAt(feedback.getSubmittedAt())
+                .build();
+    }
+
+    public Map<String, Object> getEventInfoForFeedback(UUID eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sự kiện!"));
+        Map<String, Object> eventInfo = new HashMap<>();
+        eventInfo.put("eventId", event.getEventId());
+        eventInfo.put("eventName", event.getEventName());
+        eventInfo.put("startDate", event.getStartDate());
+        eventInfo.put("endDate", event.getEndDate());
+        eventInfo.put("bannerUrl", event.getBannerUrl()); 
+
+        return eventInfo;
+    }
+
+public EventResponse getEventById(UUID eventId) {
+    // 1. Tìm Event trong Database
+    Event event = eventRepository.findById(eventId)
+            .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Không tìm thấy sự kiện với ID: " + eventId));
+    
+    // 2. Map thủ công từ Entity (Event) sang DTO (EventResponse)
+    EventResponse response = new EventResponse();
+    
+    // Chú ý: Bạn sửa lại các hàm get/set dưới đây cho ĐÚNG VỚI TÊN BIẾN trong class của bạn nhé
+    response.setEventId(event.getEventId()); 
+    response.setEventName(event.getEventName()); // Có thể của bạn là event.getTitle() hoặc event.getName()
+    response.setStartDate(event.getStartDate());
+    response.setEndDate(event.getEndDate());
+    
+    // Nếu EventResponse của bạn cần thêm dữ liệu gì thì cứ set tiếp ở đây...
+    // response.setLocation(event.getLocation());
+    // response.setStatus(event.getStatus());
+                System.out.println("Event ID: " + event.getEventId());
+    return response;
+}
+
+@Transactional
+public void deleteFeedback(UUID feedbackId) {
+    Feedback feedback = feedbackRepository.findById(feedbackId)
+            .orElseThrow(() -> new RuntimeException("Feedback not found"));
+    feedbackRepository.delete(feedback);
+}
 }

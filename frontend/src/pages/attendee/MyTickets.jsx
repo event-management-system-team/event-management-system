@@ -25,17 +25,22 @@ const MyTicketsPage = () => {
         response.forEach((ticket) => {
           if (!groups[ticket.orderCode]) {
             groups[ticket.orderCode] = {
+              eventId: ticket.eventId,
               orderCode: ticket.orderCode,
               startDate: ticket.eventStartDate,
               eventName: ticket.eventName,
               location: ticket.eventLocation,
               ticketCount: 0,
               status: ticket.status,
+              hasCheckedIn: false,
               bannerUrl: ticket.eventBannerUrl,
               eventSlug: ticket.orderCode,
             };
           }
           groups[ticket.orderCode].ticketCount += 1;
+          if (ticket.status === 'CHECKED_IN') {
+            groups[ticket.orderCode].hasCheckedIn = true;
+          }
         });
 
         setTicketGroups(Object.values(groups));
@@ -54,9 +59,11 @@ const MyTicketsPage = () => {
     setCurrentPage(1);
   }, [filter]);
 
-  const filteredGroups = ticketGroups.filter(
-    (group) => filter === "All" || group.status === filter.toUpperCase(),
-  );
+  const filteredGroups = ticketGroups.filter((group) => {
+    if (filter === "All") return true;
+    if (filter === "Confirmed") return group.status === "CONFIRMED" || group.status === "PAID";
+    return group.status === filter.replace("-", "_").toUpperCase();
+  });
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -91,7 +98,7 @@ const MyTicketsPage = () => {
       </div>
 
       <div className="bg-white p-1 rounded-full flex gap-2 mb-10 w-fit border border-gray-200 shadow-sm overflow-x-auto">
-        {["All", "Confirmed", "Pending", "Cancelled"].map((tab) => (
+        {["All", "Confirmed", "Pending", "Checked-in", "Cancelled"].map((tab) => (
           <button
             key={tab}
             onClick={() => setFilter(tab)}
