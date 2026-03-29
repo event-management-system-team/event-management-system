@@ -26,6 +26,11 @@ public interface StaffApplicationRepository extends JpaRepository<StaffApplicati
 
     @Modifying
     @Transactional
+    @Query("UPDATE StaffApplication s SET s.applicationStatus = 'REJECTED' WHERE s.user.userId = :userId AND s.recruitment.event.eventId = :eventId AND s.applicationStatus = 'PENDING' AND s.applicationId <> :approvedAppId")
+    int rejectOtherApplicationsForEvent(UUID userId, UUID eventId, UUID approvedAppId);
+
+    @Modifying
+    @Transactional
     @Query("UPDATE StaffApplication s SET s.applicationStatus = 'REJECTED' WHERE s.applicationStatus = 'PENDING' AND s.recruitment.customForm.isActive = false")
     int autoRejectExpiredApplications();
     

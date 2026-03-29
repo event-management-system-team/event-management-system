@@ -12,6 +12,8 @@ import com.eventmanagement.backend.repository.CheckInRepository;
 import com.eventmanagement.backend.repository.TicketRepository;
 import com.eventmanagement.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +56,16 @@ public class CheckInService {
         // Chấp nhận cả CONFIRMED (vé miễn phí) và PAID (vé có phí)
         if (ticket.getStatus() != TicketStatus.CONFIRMED && ticket.getStatus() != TicketStatus.PAID) {
             throw new NotFoundException("Ticket code invalid or does not exist!");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime allowedStart = ticket.getEvent().getStartDate().minusHours(2);
+        LocalDateTime allowedEnd = ticket.getEvent().getEndDate().minusHours(1);
+
+        if (now.isBefore(allowedStart) || now.isAfter(allowedEnd)) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy");
+            throw new BadRequestException("Check-in is only allowed from "
+                    + allowedStart.format(formatter) + " to " + allowedEnd.format(formatter));
         }
 
         User staff = userRepository.getReferenceById(staffId);
