@@ -100,9 +100,11 @@ public class OrganizerEventController {
     public ResponseEntity<Page<AttendeeResponse>> getEventAttendees(
             @PathVariable UUID eventId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String ticketType,
+            @RequestParam(required = false) String status) {
 
-        Page<AttendeeResponse> attendees = organizerEventService.getEventAttendees(eventId, page, size);
+        Page<AttendeeResponse> attendees = organizerEventService.getEventAttendees(eventId, page, size, ticketType, status);
         return ResponseEntity.ok(attendees);
     }
 

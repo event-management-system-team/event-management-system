@@ -84,7 +84,7 @@ const StepIndicator = ({ currentStep }) => {
 const FieldError = ({ msg }) =>
     msg ? <p className="mt-1 text-xs text-red-500 flex items-center gap-1"><span>⚠</span>{msg}</p> : null;
 
-const Step1BasicInfo = ({ form, onChange, errors = {} }) => {
+const Step1BasicInfo = ({ form, onChange, errors = {}, setErrors }) => {
     const { categories, isLoading: catLoading } = useCategories();
     const fileInputRef = useRef(null);
     const [preview, setPreview] = useState(form.coverPreview || null);
@@ -149,9 +149,20 @@ const Step1BasicInfo = ({ form, onChange, errors = {} }) => {
     }, []);
     // ────────────────────────────────────────────────────────────────────────
 
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
+        if (file.size > MAX_FILE_SIZE) {
+            setErrors?.((prev) => ({
+                ...prev,
+                coverFile: `File size (${(file.size / 1024 / 1024).toFixed(1)}MB) exceeds the 5MB limit`,
+            }));
+            e.target.value = '';
+            return;
+        }
+        setErrors?.((prev) => { const n = { ...prev }; delete n.coverFile; return n; });
         const url = URL.createObjectURL(file);
         setPreview(url);
         onChange({ coverFile: file, coverPreview: url });
@@ -161,6 +172,14 @@ const Step1BasicInfo = ({ form, onChange, errors = {} }) => {
         e.preventDefault();
         const file = e.dataTransfer.files[0];
         if (!file) return;
+        if (file.size > MAX_FILE_SIZE) {
+            setErrors?.((prev) => ({
+                ...prev,
+                coverFile: `File size (${(file.size / 1024 / 1024).toFixed(1)}MB) exceeds the 5MB limit`,
+            }));
+            return;
+        }
+        setErrors?.((prev) => { const n = { ...prev }; delete n.coverFile; return n; });
         const url = URL.createObjectURL(file);
         setPreview(url);
         onChange({ coverFile: file, coverPreview: url });
@@ -1208,7 +1227,7 @@ const CreateEventPage = () => {
             <main className="max-w-3xl mx-auto py-10 px-4">
                 <StepIndicator currentStep={step} />
 
-                {step === 1 && <Step1BasicInfo form={form} onChange={(v) => { updateForm(v); setErrors((prev) => { const k = Object.keys(v)[0]; const n = { ...prev }; delete n[k]; return n; }); }} errors={errors} />}
+                {step === 1 && <Step1BasicInfo form={form} onChange={(v) => { updateForm(v); setErrors((prev) => { const k = Object.keys(v)[0]; const n = { ...prev }; delete n[k]; return n; }); }} errors={errors} setErrors={setErrors} />}
                 {step === 2 && <Step2Tickets form={form} onChange={(v) => { updateForm(v); setErrors((prev) => { const n = { ...prev }; Object.keys(v).forEach((k) => { if (k === 'tickets') { Object.keys(n).forEach((ek) => { if (ek.startsWith('ticket_')) delete n[ek]; }); } else { delete n[k]; } }); return n; }); }} errors={errors} setErrors={setErrors} />}
                 {step === 3 && <Step3Agenda form={form} onChange={(v) => { updateForm(v); setErrors((prev) => { const n = { ...prev }; Object.keys(v).forEach((k) => { if (k === 'agenda') { Object.keys(n).forEach((ek) => { if (ek.startsWith('agenda_') || ek === '_agenda') delete n[ek]; }); } }); return n; }); }} errors={errors} />}
 

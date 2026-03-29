@@ -45,9 +45,11 @@ public interface TicketRepository extends JpaRepository<Ticket, UUID> {
             "LEFT JOIN FETCH t.checkIn ci " +
             "WHERE t.event.eventId = :eventId " +
             "AND t.status IN :statuses " +
+            "AND (:ticketTypeName IS NULL OR tt.ticketName = :ticketTypeName) " +
             "ORDER BY t.createdAt DESC")
     Page<Ticket> findAttendeeTicketsByEventId(
             @Param("eventId") UUID eventId,
             @Param("statuses") List<TicketStatus> statuses,
+            @Param("ticketTypeName") String ticketTypeName,
             Pageable pageable);
 }
