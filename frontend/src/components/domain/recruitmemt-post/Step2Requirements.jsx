@@ -149,12 +149,7 @@ const Step2Requirements = ({ form, onChange, errors = {}, eventStartDate }) => {
           <FieldError msg={errors.deadline} />
         </section>
       </div>
-      '<div>
-        Staff:
-              
-        </div>
     </div>
-
   );
 };
 

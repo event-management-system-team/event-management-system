@@ -22,7 +22,6 @@ import {
 } from 'recharts';
 import dayjs from 'dayjs';
 import organizerService from '../../services/organizer.service';
-import recruitmentService from '../../services/recruitment.service';
 
 const ACCENT = '#2d3a4f';
 const ACCENT_LIGHT = '#f0fdf4';
@@ -138,9 +137,6 @@ const EventDetailDashboard = () => {
         checkedIn: 0,
     });
     const [loading, setLoading] = useState(true);
-    const [recruitment, setRecruitment] = useState(null);
-    const [selectedBenefit, setSelectedBenefit] = useState(null);
-    const [benefits, setBenefits] = useState([]);
 
     const fetchEventDetail = useCallback(async () => {
         if (!eventId) return;
@@ -189,26 +185,7 @@ const EventDetailDashboard = () => {
 
     useEffect(() => {
         fetchEventDetail();
-        // Fetch recruitment with benefits
-        if (!eventId) return;
-        const fetchRecruitment = async () => {
-            try {
-                const dashData = await recruitmentService.getDashboard(eventId);
-                if (dashData?.recentRecruitments && dashData.recentRecruitments.length > 0) {
-                    const recruitmentItem = dashData.recentRecruitments[0];
-                    setRecruitment(recruitmentItem);
-                    // Extract unique benefits
-                    if (recruitmentItem.benefits && recruitmentItem.benefits.length > 0) {
-                        const uniqueBenefits = [...new Set(recruitmentItem.benefits.map(b => typeof b === 'string' ? b : b.title))];
-                        setBenefits(uniqueBenefits);
-                    }
-                }
-            } catch (err) {
-                console.error('Failed to fetch recruitment:', err);
-            }
-        };
-        fetchRecruitment();
-    }, [fetchEventDetail, eventId]);
+    }, [fetchEventDetail]);
 
     const isFreeEvent = event?.isFree === true || (event?.totalRevenue === 0 && event?.isFree !== false);
 
@@ -503,55 +480,6 @@ const EventDetailDashboard = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Staff by Benefits Section */}
-            {recruitment && recruitment.benefits && recruitment.benefits.length > 0 && (
-                <div className="mt-6 bg-[#fafaf8] rounded-2xl border border-gray-100 p-6">
-                    <div className="mb-4 flex items-center gap-4">
-                        <h2 className="text-lg font-bold text-gray-900">Staff by Benefits</h2>
-                        <select
-                            value={selectedBenefit || ''}
-                            onChange={(e) => setSelectedBenefit(e.target.value || null)}
-                            className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
-                        >
-                            <option value="">-- All Benefits --</option>
-                            {recruitment.benefits.map((b, idx) => (
-                                <option key={idx} value={typeof b === 'string' ? b : b.title}>
-                                    {typeof b === 'string' ? b : b.title}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div>
-                        <p className="text-sm text-gray-600 mb-3">
-                            Total Benefits: {recruitment.benefits.length} | Total Staff Hired: {ticketStats.sold || 0}
-                        </p>
-                        {recruitment.benefits && recruitment.benefits.length > 0 ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                                {recruitment.benefits.map((benefit, idx) => {
-                                    const bn = typeof benefit === 'string' ? benefit : benefit.title;
-                                    return (
-                                        <button
-                                            key={idx}
-                                            onClick={() => setSelectedBenefit(selectedBenefit === bn ? null : bn)}
-                                            className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
-                                                selectedBenefit === bn
-                                                    ? 'bg-[#2d3a4f] text-white'
-                                                    : 'bg-white border border-gray-200 text-gray-700 hover:border-gray-300'
-                                            }`}
-                                        >
-                                            {bn}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        ) : (
-                            <p className="text-gray-400 text-sm">No benefits defined for this recruitment</p>
-                        )}
-                    </div>
-                </div>
-            )}
         </div>
     );
 };
