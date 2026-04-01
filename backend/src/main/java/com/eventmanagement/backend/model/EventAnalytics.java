@@ -13,7 +13,9 @@ import java.util.Map;
 import java.util.UUID;
 
 @Entity
-@Table(name = "event_analytics")
+@Table(name = "event_analytics", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "event_id", "report_date" })
+})
 @Getter
 @Setter
 @NoArgsConstructor

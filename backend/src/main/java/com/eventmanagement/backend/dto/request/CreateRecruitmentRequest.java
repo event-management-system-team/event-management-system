@@ -30,14 +30,14 @@ public class CreateRecruitmentRequest {
         private String description;
 
         private List<String> requirements;
+
+        private List<String> benefits;
     }
 
     @NotEmpty(message = "At least one position is required")
     private List<PositionDTO> positions;
 
-    // description & requirements are now inside PositionDTO
-
-    private List<String> benefits;
+    // benefits are now inside PositionDTO (per-position)
 
     @Future(message = "Deadline must be in the future")
     private LocalDateTime deadline;

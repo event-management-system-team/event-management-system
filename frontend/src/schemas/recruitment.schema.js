@@ -5,6 +5,7 @@ const positionSchema = z.object({
   vacancy: z.coerce.number().min(1, "At least 1 vacancy required"),
   description: z.string().optional(),
   requirements: z.array(z.string()).optional(),
+  benefits: z.array(z.string()).optional(),
 });
 
 export const step1Schema = z.object({
@@ -15,12 +16,11 @@ export const step1Schema = z.object({
       (arr) => arr.every((p) => p.name.trim().length > 0),
       { message: "All positions must have a name" }
     ),
-  eventId: z.string().min(1, "Please select an event"),
+  // eventId: z.string().min(1, "Please select an event"),
 });
 
 export const step2Schema = z.object({
   deadline: z.date({ required_error: "Deadline is required", invalid_type_error: "Please select a valid date" }),
-  benefits: z.array(z.string()).optional(),
 });
 
 export const validateStep1 = (form) => {

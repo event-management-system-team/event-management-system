@@ -7,11 +7,10 @@ import organizerService from "../services/organizer.service";
 import { validateStep1, validateStep2 } from "../schemas/recruitment.schema";
 
 const initialForm = {
-  positions: [{ name: "", vacancy: "1", description: "", requirements: [] }],
+  positions: [{ name: "", vacancy: "1", description: "", requirements: [], benefits: [] }],
   eventId: "",
   eventOptions: [],
 
-  benefits: [],
   deadline: null,
 
   formId: null,
@@ -157,11 +156,11 @@ const useCreateRecruitment = (preselectedEventId = "") => {
           vacancy: String(data.vacancy || 1),
           description: data.description || "",
           requirements: parseToArray(data.requirements),
+          benefits: parseToArray(data.benefits),
         }));
 
         // Use first position's data for shared fields
         const firstData = details[0];
-        const parsedBenefits = parseToArray(firstData.benefits);
 
         let mergedFormId = firstData.formId || null;
         let mergedFormName = "Staff Application Form";
@@ -185,7 +184,6 @@ const useCreateRecruitment = (preselectedEventId = "") => {
         setForm((prev) => ({
           ...prev,
           positions,
-          benefits: parsedBenefits,
           deadline: firstData.deadline ? new Date(firstData.deadline) : null,
           formId: mergedFormId,
           formName: mergedFormName,
@@ -197,7 +195,7 @@ const useCreateRecruitment = (preselectedEventId = "") => {
         if (fromFormBuilder) {
           // Do not override step if returning from builder, will remain on Step 3
         } else {
-          const hasReqsOrBenefits = positions.some(p => p.requirements.length > 0) || parsedBenefits.length > 0;
+          const hasReqsOrBenefits = positions.some(p => p.requirements.length > 0 || (p.benefits || []).length > 0);
           if (firstData.deadline || hasReqsOrBenefits) {
             setStep(3);
           } else if (positions.some(p => p.name)) {
@@ -237,8 +235,8 @@ const useCreateRecruitment = (preselectedEventId = "") => {
               vacancy: String(data.vacancy || 1),
               description: data.description || "",
               requirements: parsedReqs,
+              benefits: parsedBenefits,
             }],
-            benefits: parsedBenefits,
             deadline: data.deadline ? new Date(data.deadline) : null,
             formId: mergedFormId,
             formName: mergedFormName,
@@ -295,8 +293,8 @@ const useCreateRecruitment = (preselectedEventId = "") => {
       vacancy: parseInt(p.vacancy) || 1,
       description: p.description || null,
       requirements: (p.requirements || []).length > 0 ? p.requirements : null,
+      benefits: (p.benefits || []).length > 0 ? p.benefits : null,
     })),
-    benefits: form.benefits.length > 0 ? form.benefits : null,
     deadline: form.deadline ? dayjs(form.deadline).toISOString() : null,
     formId: form.formId || null,
     status,
@@ -336,7 +334,7 @@ const useCreateRecruitment = (preselectedEventId = "") => {
             vacancy: posPayload?.vacancy,
             description: posPayload?.description,
             requirements: posPayload?.requirements,
-            benefits: payload.benefits,
+            benefits: posPayload?.benefits,
             deadline: payload.deadline,
             formId: payload.formId,
             status,
@@ -365,7 +363,7 @@ const useCreateRecruitment = (preselectedEventId = "") => {
               vacancy: posPayload.vacancy,
               description: posPayload.description,
               requirements: posPayload.requirements,
-              benefits: payload.benefits,
+              benefits: posPayload.benefits,
               deadline: payload.deadline,
               formId: payload.formId,
               status,

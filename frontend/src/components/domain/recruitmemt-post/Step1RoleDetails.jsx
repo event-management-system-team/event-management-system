@@ -1,4 +1,4 @@
-import { Briefcase, Hash, Plus, Trash2, ChevronDown, ChevronUp, Check, CalendarDays } from "lucide-react";
+import { Briefcase, Hash, Plus, Trash2, ChevronDown, ChevronUp, Check, CalendarDays, Gift } from "lucide-react";
 import { useState } from "react";
 import { FieldError, inputCls } from "./RecruitmentShared";
 
@@ -10,10 +10,19 @@ const PRESET_REQUIREMENTS = [
   "Valid Driving License",
 ];
 
+const PRESET_BENEFITS = [
+  "Certificate",
+  "Free Lunch and water",
+  "Event uniform (T-shirt/Hat)",
+  "Sponsor gifts / Swag bag",
+  "Travel allowance",
+];
+
 const Step1RoleDetails = ({ form, onChange, errors = {} }) => {
   const positions = form.positions || [{ name: "", vacancy: "1", description: "", requirements: [] }];
   const [expandedIdx, setExpandedIdx] = useState(0);
   const [customReqText, setCustomReqText] = useState({});
+  const [customBenefitText, setCustomBenefitText] = useState({});
 
   const updatePosition = (index, field, value) => {
     const updated = positions.map((p, i) =>
@@ -51,6 +60,20 @@ const Step1RoleDetails = ({ form, onChange, errors = {} }) => {
     setCustomReqText((prev) => ({ ...prev, [idx]: "" }));
   };
 
+  const handleCustomBenefitChange = (idx, val) => {
+    setCustomBenefitText((prev) => ({ ...prev, [idx]: val }));
+  };
+
+  const addCustomBenefit = (idx) => {
+    const val = (customBenefitText[idx] || "").trim();
+    if (!val) return;
+    const posBenefits = positions[idx].benefits || [];
+    if (!posBenefits.includes(val)) {
+      updatePosition(idx, "benefits", [...posBenefits, val]);
+    }
+    setCustomBenefitText((prev) => ({ ...prev, [idx]: "" }));
+  };
+
   return (
     <div className="space-y-6">
       {/* --- Event selector --- */}
@@ -75,8 +98,8 @@ const Step1RoleDetails = ({ form, onChange, errors = {} }) => {
               onChange={(e) => onChange({ eventId: e.target.value })}
               disabled={!!form.eventId}
               className={`w-full px-4 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 bg-white transition appearance-none ${errors.eventId
-                  ? "border-red-400 focus:ring-red-200"
-                  : "border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]"
+                ? "border-red-400 focus:ring-red-200"
+                : "border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]"
                 }`}
             >
               <option value="">— Select event —</option>
@@ -105,7 +128,7 @@ const Step1RoleDetails = ({ form, onChange, errors = {} }) => {
             const explicitNameErr = errors[`positions.${idx}.name`];
             const fallbackNameErr = (!pos.name.trim() && errors.positions) ? "Position name is required" : null;
             const nameErr = explicitNameErr || fallbackNameErr;
-            
+
             const vacErr = errors[`positions.${idx}.vacancy`];
             const isExpanded = expandedIdx === idx;
             return (
@@ -154,8 +177,8 @@ const Step1RoleDetails = ({ form, onChange, errors = {} }) => {
                           updatePosition(idx, "vacancy", e.target.value)
                         }
                         className={`w-full pl-8 pr-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 transition bg-white ${vacErr
-                            ? "border-red-400 focus:ring-red-200"
-                            : "border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]"
+                          ? "border-red-400 focus:ring-red-200"
+                          : "border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]"
                           }`}
                       />
                     </div>
@@ -180,8 +203,8 @@ const Step1RoleDetails = ({ form, onChange, errors = {} }) => {
                       onClick={() => removePosition(idx)}
                       disabled={positions.length <= 1}
                       className={`p-2 rounded-lg transition ${positions.length <= 1
-                          ? "text-gray-300 cursor-not-allowed"
-                          : "text-red-400 hover:bg-red-50 hover:text-red-600"
+                        ? "text-gray-300 cursor-not-allowed"
+                        : "text-red-400 hover:bg-red-50 hover:text-red-600"
                         }`}
                       title="Remove position"
                     >
@@ -227,14 +250,14 @@ const Step1RoleDetails = ({ form, onChange, errors = {} }) => {
                                 updatePosition(idx, "requirements", newReqs);
                               }}
                               className={`flex items-center gap-2.5 px-3 py-2 rounded-xl border cursor-pointer transition-all select-none ${checked
-                                  ? "border-[#4a9e9e]/40 bg-[#f0fafa]"
-                                  : "border-gray-100 hover:border-gray-200 hover:bg-gray-50"
+                                ? "border-[#4a9e9e]/40 bg-[#f0fafa]"
+                                : "border-gray-100 hover:border-gray-200 hover:bg-gray-50"
                                 }`}
                             >
                               <div
                                 className={`w-3.5 h-3.5 rounded flex items-center justify-center border-2 flex-shrink-0 transition-all ${checked
-                                    ? "bg-[#4a9e9e] border-[#4a9e9e]"
-                                    : "border-gray-300"
+                                  ? "bg-[#4a9e9e] border-[#4a9e9e]"
+                                  : "border-gray-300"
                                   }`}
                               >
                                 {checked && <Check size={10} className="text-white" />}
@@ -286,6 +309,81 @@ const Step1RoleDetails = ({ form, onChange, errors = {} }) => {
                         <button
                           type="button"
                           onClick={() => addCustomReq(idx)}
+                          className="px-3 py-2 bg-[#4a9e9e] text-white text-xs rounded-lg hover:bg-[#3d8f8f] transition"
+                        >
+                          <Plus size={13} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Benefits & Perks */}
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-600 mb-2 flex items-center gap-1.5">
+                        <Gift size={13} className="text-[#4a9e9e]" />
+                        Benefits & Perks
+                      </label>
+
+                      {/* Selected benefit tags */}
+                      <div className="flex flex-wrap gap-2 mb-3 min-h-[28px]">
+                        {(pos.benefits || []).length === 0 ? (
+                          <span className="text-xs text-gray-400">No perks selected yet</span>
+                        ) : (
+                          (pos.benefits || []).map((b) => (
+                            <span
+                              key={b}
+                              className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#2d3a4f] text-white text-[11px] font-medium rounded-full"
+                            >
+                              {b}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  updatePosition(idx, "benefits", (pos.benefits || []).filter((x) => x !== b));
+                                }}
+                                className="ml-0.5 hover:text-red-300 transition"
+                              >
+                                ×
+                              </button>
+                            </span>
+                          ))
+                        )}
+                      </div>
+
+                      {/* Preset benefit pills */}
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {PRESET_BENEFITS.map((b) => {
+                          const selected = (pos.benefits || []).includes(b);
+                          return (
+                            <button
+                              key={b}
+                              type="button"
+                              onClick={() => {
+                                const list = pos.benefits || [];
+                                updatePosition(idx, "benefits", selected ? list.filter((x) => x !== b) : [...list, b]);
+                              }}
+                              className={`px-3 py-1 text-xs rounded-full border transition-all ${selected
+                                  ? "bg-[#4a9e9e] border-[#4a9e9e] text-white"
+                                  : "border-gray-200 text-gray-600 hover:border-[#4a9e9e]/50 hover:text-[#4a9e9e]"
+                                }`}
+                            >
+                              {b}
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {/* Custom benefit input */}
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="Add custom perk..."
+                          value={customBenefitText[idx] || ""}
+                          onChange={(e) => handleCustomBenefitChange(idx, e.target.value)}
+                          onKeyDown={(e) => e.key === "Enter" && addCustomBenefit(idx)}
+                          className="flex-1 px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] bg-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => addCustomBenefit(idx)}
                           className="px-3 py-2 bg-[#4a9e9e] text-white text-xs rounded-lg hover:bg-[#3d8f8f] transition"
                         >
                           <Plus size={13} />

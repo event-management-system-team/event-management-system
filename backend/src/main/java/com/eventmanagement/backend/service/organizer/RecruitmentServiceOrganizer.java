@@ -150,16 +150,6 @@ public class RecruitmentServiceOrganizer {
                     .orElseThrow(() -> new RuntimeException("Form không tồn tại"));
         }
 
-        List<BenefitRecruitment> benefitRecruitments = null;
-        if (request.getBenefits() != null) {
-            benefitRecruitments = request.getBenefits().stream()
-                    .map(b -> BenefitRecruitment.builder()
-                            .title(b)
-                            .icon(mapBenefitIcon(b))
-                            .build())
-                    .collect(java.util.stream.Collectors.toList());
-        }
-
         RecruitmentStatus status = request.getStatus() != null ? request.getStatus() : RecruitmentStatus.DRAFT;
 
         List<Recruitment> savedList = new ArrayList<>();
@@ -167,6 +157,16 @@ public class RecruitmentServiceOrganizer {
             String requirementsStr = null;
             if (pos.getRequirements() != null) {
                 requirementsStr = String.join("\n", pos.getRequirements());
+            }
+
+            List<BenefitRecruitment> benefitRecruitments = null;
+            if (pos.getBenefits() != null) {
+                benefitRecruitments = pos.getBenefits().stream()
+                        .map(b -> BenefitRecruitment.builder()
+                                .title(b)
+                                .icon(mapBenefitIcon(b))
+                                .build())
+                        .collect(java.util.stream.Collectors.toList());
             }
 
             Recruitment recruitment = Recruitment.builder()

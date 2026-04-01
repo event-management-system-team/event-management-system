@@ -135,7 +135,7 @@ public interface EventAnalyticsRepository extends JpaRepository<EventAnalytics, 
     @Transactional
     @Query(value = """
                 INSERT INTO event_analytics (event_id, report_date, total_registrations, total_checkins, total_tickets_sold, total_revenue, calculated_at)
-                VALUES (:eventId, CURRENT_DATE, :registrations, :checkins, :tickets, :revenue, CURRENT_TIMESTAMP)
+                VALUES (CAST(:eventId AS UUID), CURRENT_DATE, CAST(:registrations AS INTEGER), CAST(:checkins AS INTEGER), CAST(:tickets AS INTEGER), CAST(:revenue AS NUMERIC), CURRENT_TIMESTAMP)
                 ON CONFLICT (event_id, report_date) 
                 DO UPDATE SET 
                     total_registrations = EXCLUDED.total_registrations,

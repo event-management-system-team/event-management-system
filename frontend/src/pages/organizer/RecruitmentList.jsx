@@ -190,13 +190,22 @@ const RecruitmentList = () => {
                 
                 {/* Cột 1: Tên event & progress */}
                 <div className="w-full md:w-1/3">
-                  <div className="flex items-center gap-3 mb-3 md:mb-4">
+                  <div className="flex items-center gap-3 mb-1">
                     <h3 className="font-extrabold text-gray-900 text-base lg:text-lg">{eventName}</h3>
                     {!isDraft && totalNewApps > 0 && (
                       <span className="bg-orange-100 text-orange-600 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
                         {totalNewApps} NEW
                       </span>
                     )}
+                  </div>
+                  <div className="flex items-center gap-2 mb-3 md:mb-4">
+                    <Briefcase size={13} className="text-[#8c9db3] shrink-0" />
+                    <p className="text-xs text-gray-500 font-medium truncate">
+                      {processedJobs.length === 1
+                        ? (processedJobs[0].title?.split(' - ')?.slice(1)?.join(' - ') || processedJobs[0].title)
+                        : `${processedJobs.length} positions`
+                      }
+                    </p>
                   </div>
                   
                   {!isDraft && (
