@@ -21,7 +21,7 @@ const ApplySection = ({ eventSlug, active, location, daysLeft, filledPercentage,
 
             <div className="space-y-6 mb-10">
                 <div className="flex items-start gap-4">
-                    <Calendar size={18} className="text-primary mt-0.5" />
+                    <Calendar size={18} className="text-primary mt-0.5 shrink-0" />
                     <div>
                         <p className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold mb-1">{t("deadline")}</p>
 
@@ -36,7 +36,7 @@ const ApplySection = ({ eventSlug, active, location, daysLeft, filledPercentage,
                 </div>
 
                 <div className="flex items-start gap-4">
-                    <Clock size={18} className="text-primary mt-0.5" />
+                    <Clock size={18} className="text-primary mt-0.5 shrink-0" />
                     <div>
                         <p className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold mb-1">{t("event_duration")}</p>
                         <p className="text-[14px] font-bold text-slate-600 leading-relaxed">
@@ -46,7 +46,7 @@ const ApplySection = ({ eventSlug, active, location, daysLeft, filledPercentage,
                 </div>
 
                 <div className="flex items-start gap-4">
-                    <MapPin size={18} className="text-primary mt-0.5" />
+                    <MapPin size={18} className="text-primary mt-0.5 shrink-0" />
                     <div>
                         <p className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold">{t("location")}</p>
                         <p className="text-[14px] font-bold text-slate-600 leading-relaxed">{location}</p>

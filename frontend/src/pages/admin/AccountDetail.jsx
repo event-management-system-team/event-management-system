@@ -160,7 +160,7 @@ export function AccountDetail() {
                 </header>
 
                 {/* Profile Summary Header */}
-                <div className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-6">
+                <div className="bg-[#F1F0E8] border-b border-gray-200 px-8 pb-6">
                     <div className="flex items-start justify-between">
                         <div className="flex items-center gap-6">
                             {/* Large Avatar */}
@@ -175,7 +175,7 @@ export function AccountDetail() {
                             {/* Account Info */}
                             <div>
                                 <div className="flex items-center gap-3 mb-2">
-                                    <h1 className="text-2xl font-semibold text-gray-900">
+                                    <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
                                         {account?.fullName}
                                     </h1>
                                     <Badge
@@ -246,11 +246,11 @@ export function AccountDetail() {
                         </TabsList>
 
                         <TabsContent value="basic" className="mt-0">
-                            <div className="p-8">
+                            <div className="p-8 pb-24">
                                 <div className="grid grid-cols-2 gap-6 mb-6">
                                     {/* Personal Information Card */}
-                                    <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
-                                        <CardHeader className="border-b border-gray-100">
+                                    <Card className="bg-[#ffffff] shadow-sm border border-gray-100 rounded-xl">
+                                        <CardHeader className="border-b border-gray-50 pb-5">
                                             <CardTitle className="text-lg">
                                                 {t('ad_personal_info')}
                                             </CardTitle>
@@ -294,8 +294,8 @@ export function AccountDetail() {
                                     </Card>
 
                                     {/* Account Details Card */}
-                                    <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
-                                        <CardHeader className="border-b border-gray-100">
+                                    <Card className="bg-[#ffffff] shadow-sm border border-gray-100 rounded-xl">
+                                        <CardHeader className="border-b border-gray-50 pb-5">
                                             <CardTitle className="text-lg">{t('ad_account_details')}</CardTitle>
                                             <CardDescription>
                                                 {t('ad_account_details_desc')}

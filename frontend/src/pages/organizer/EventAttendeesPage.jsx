@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Users, Search, Download, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Users, Search, Download, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { useTranslation } from 'react-i18next';
@@ -55,6 +55,16 @@ const EventAttendeesPage = () => {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
 
+    // Filter states
+    const [filterTicketType, setFilterTicketType] = useState('');
+    const [filterStatus, setFilterStatus] = useState('');
+
+    // Available ticket types from event data
+    const ticketTypeOptions = useMemo(() => {
+        if (!event?.ticketSalesBreakdown) return [];
+        return Object.keys(event.ticketSalesBreakdown);
+    }, [event]);
+
     /* ── Fetch event name ── */
     useEffect(() => {
         organizerService.getEventDetail(eventId)
@@ -62,11 +72,14 @@ const EventAttendeesPage = () => {
             .catch(() => setEvent(null));
     }, [eventId]);
 
-    /* ── Fetch attendees ── */
+    /* ── Fetch attendees with filters ── */
     const fetchAttendees = useCallback(async (page = 0) => {
         setLoading(true);
         try {
-            const data = await organizerService.getEventAttendees(eventId, page, PAGE_SIZE);
+            const filters = {};
+            if (filterTicketType) filters.ticketType = filterTicketType;
+            if (filterStatus) filters.status = filterStatus;
+            const data = await organizerService.getEventAttendees(eventId, page, PAGE_SIZE, filters);
             setAttendees(data.content || []);
             setTotalElements(data.totalElements ?? (data.content?.length ?? 0));
             setTotalPages(data.totalPages ?? 1);
@@ -75,11 +88,16 @@ const EventAttendeesPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [eventId]);
+    }, [eventId, filterTicketType, filterStatus]);
+
+    useEffect(() => {
+        setCurrentPage(0);
+        fetchAttendees(0);
+    }, [fetchAttendees]);
 
     useEffect(() => {
         fetchAttendees(currentPage);
-    }, [fetchAttendees, currentPage]);
+    }, [currentPage]);
 
     /* ── Export Excel (client-side via ExcelJS) ── */
     const [exporting, setExporting] = useState(false);
@@ -164,7 +182,7 @@ const EventAttendeesPage = () => {
                     no: idx + 1,
                     name: a.fullName || '',
                     email: a.email || '',
-                    ticket: a.ticketType || t('org_general'),
+                    ticket: a.ticketType || 'General',
                     status: statusLabel,
                 });
 
@@ -250,16 +268,43 @@ const EventAttendeesPage = () => {
             {/* ── Card ── */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
 
-                {/* Search */}
-                <div className="mb-5 relative max-w-sm">
-                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input
-                        type="text"
-                        placeholder={t('org_search_name_email')}
-                        value={search}
-                        onChange={e => setSearch(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2d3a4f]/20 focus:border-[#2d3a4f] transition-colors"
-                    />
+                {/* Search & Filters */}
+                <div className="mb-5 flex flex-wrap items-center gap-3">
+                    {/* Search */}
+                    <div className="relative flex-1 min-w-[220px] max-w-sm">
+                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Search by name or email…"
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                            className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2d3a4f]/20 focus:border-[#2d3a4f] transition-colors"
+                        />
+                    </div>
+
+                    {/* Ticket Type Filter */}
+                    <select
+                        value={filterTicketType}
+                        onChange={e => setFilterTicketType(e.target.value)}
+                        className="px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#2d3a4f]/20 focus:border-[#2d3a4f] transition-colors cursor-pointer"
+                    >
+                        <option value="">All Ticket Types</option>
+                        {ticketTypeOptions.map(type => (
+                            <option key={type} value={type}>{type}</option>
+                        ))}
+                    </select>
+
+                    {/* Status Filter */}
+                    <select
+                        value={filterStatus}
+                        onChange={e => setFilterStatus(e.target.value)}
+                        className="px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#2d3a4f]/20 focus:border-[#2d3a4f] transition-colors cursor-pointer"
+                    >
+                        <option value="">All Statuses</option>
+                        <option value="registered">Registered</option>
+                        <option value="checked-in">Checked In</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
                 </div>
 
                 {/* Table */}

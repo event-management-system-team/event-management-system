@@ -4,7 +4,6 @@ import {
   FileText, Trash2, X, PlusCircle, Lock, Calendar, Clock,
   ChevronDown, ListChecks, Type as TypeIcon
 } from 'lucide-react';
-import Sidebar from '../../components/layout/Sidebar';
 import { useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../config/axios';
 import { Button } from 'antd';
@@ -29,6 +28,7 @@ const RecruitmentFormBuilder = () => {
   // FETCH & NORMALIZE EXISTING FORM DATA
   useEffect(() => {
     const fetchExistingForm = async () => {
+      // Load from DB — form was previously saved with isActive=false
       try {
         const response = await axiosInstance.get(`/events/${eventId}/forms?type=RECRUITMENT`);
 
@@ -128,42 +128,31 @@ const RecruitmentFormBuilder = () => {
     setActiveId(newSchema.length > 0 ? newSchema[0].fieldId : null);
   };
 
-  const handleSaveAction = async (isActive) => {
-    // 3. KIỂM TRA LỖI BLANK TITLE
+  const handleSaveAction = async () => {
     if (!formName || formName.trim() === '') {
-      setAppAlert({ 
-        type: 'error', 
-        message: 'Failed to create form because title is empty.' 
-      });
-      return; 
+      setAppAlert({ type: 'error', message: 'Failed to save form because title is empty.' });
+      return;
     }
-
-    setAppAlert({ type: '', message: '' }); // Xoá cảnh báo nếu đã hợp lệ
-
+    setAppAlert({ type: '', message: '' });
     try {
-      const payload = { 
+      const payload = {
         formName: formName.trim(),
-        formType: "RECRUITMENT", 
+        formType: "RECRUITMENT",
         formSchema: formSchema,
-        isActive: isActive
+        isActive: false   // Save as draft — will be activated when Organizer hits "Submit"
       };
-
       const response = await axiosInstance.post(`/events/${eventId}/forms`, payload);
       if (response.status === 200 || response.status === 201) {
-        if (isActive) {
-          setAppAlert({ type: 'success', message: "Recruitment form published successfully!" });
-          setIsLocked(true);
-          // Tự navigate về bước 3 sau 1.2s để user thấy thông báo thành công
-          setTimeout(() => navigate(-1), 1200);
-        } else {
-          setAppAlert({ type: 'success', message: "Draft saved successfully!" });
-        }
+        setAppAlert({ type: 'success', message: "Form saved (draft). It will be activated when you publish the recruitment post." });
+        setTimeout(() => navigate(`/organizer/recruitment-post/${eventId}`, { state: { fromFormBuilder: true } }), 1200);
       }
     } catch (error) {
       console.error("Error saving form:", error);
       setAppAlert({ type: 'error', message: "An error occurred while saving the form." });
     }
   };
+
+
 
   const activeQuestion = formSchema.find(q => q.fieldId === activeId);
 
@@ -180,13 +169,13 @@ const RecruitmentFormBuilder = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-[#f8f7f2] font-sans overflow-hidden">
+    <div className="flex flex-col h-screen bg-[#F1F0E8] font-sans overflow-hidden">
 
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         {/* HEADER */}
         <header className="min-h-[64px] bg-white border-b border-gray-100 flex flex-wrap lg:flex-nowrap items-center justify-between px-4 lg:px-6 py-3 lg:py-0 shrink-0 z-10 shadow-sm gap-3 lg:gap-0">
           <div className="flex items-center gap-3 lg:gap-4 w-full lg:w-auto">
-            <Button onClick={() => navigate(-1)} className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-500 hover:text-gray-900 font-bold transition-colors border-none sm:border-solid shadow-none sm:shadow-sm px-2 sm:px-4">
+            <Button onClick={() => navigate(`/organizer/recruitment-post/${eventId}`, { state: { fromFormBuilder: true } })} className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-500 hover:text-gray-900 font-bold transition-colors border-none sm:border-solid shadow-none sm:shadow-sm px-2 sm:px-4">
               <ArrowLeft size={16} /> <span className="hidden sm:inline">Back to List</span>
             </Button>
             <div className="hidden sm:block w-px h-5 bg-gray-200"></div>
@@ -199,14 +188,9 @@ const RecruitmentFormBuilder = () => {
                 <Lock size={14} /> <span className="hidden sm:inline">Form Published</span><span className="sm:hidden">Locked</span>
               </div>
             ) : (
-              <>
-                <button onClick={() => handleSaveAction(false)} className="text-xs sm:text-sm font-bold text-gray-600 hover:text-gray-900 transition-colors flex-1 lg:flex-none py-2 text-center border sm:border-none border-gray-200 rounded-lg sm:rounded-none bg-white sm:bg-transparent">
-                  Save Draft
-                </button>
-                <button onClick={() => handleSaveAction(true)} className="px-4 sm:px-5 py-2 sm:py-2.5 bg-[#8c9db3] hover:bg-[#7a8ca3] text-white rounded-lg text-xs sm:text-sm font-bold shadow-md transition-all flex-1 lg:flex-none">
-                  Publish Form
-                </button>
-              </>
+              <button onClick={() => handleSaveAction()} className="px-4 sm:px-5 py-2 sm:py-2.5 bg-[#8c9db3] hover:bg-[#7a8ca3] text-white rounded-lg text-xs sm:text-sm font-bold shadow-md transition-all flex-1 lg:flex-none">
+                Save &amp; Return to Post
+              </button>
             )}
           </div>
         </header>
@@ -228,7 +212,7 @@ const RecruitmentFormBuilder = () => {
           </div>
 
           {/* CỘT 2: FORM CANVAS */}
-          <div className="w-full lg:flex-1 bg-[#ecebe4] p-4 sm:p-6 lg:p-8 lg:overflow-y-auto flex justify-center">
+          <div className="w-full lg:flex-1 bg-[#F1F0E8] p-4 sm:p-6 lg:p-8 lg:overflow-y-auto flex justify-center">
             <div className="w-full max-w-xl">
               <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden mb-6">
 

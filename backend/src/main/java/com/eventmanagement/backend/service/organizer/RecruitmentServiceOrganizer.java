@@ -1,5 +1,6 @@
 package com.eventmanagement.backend.service.organizer;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -109,30 +110,39 @@ public class RecruitmentServiceOrganizer {
 
         String eventName = r.getEvent() != null ? r.getEvent().getEventName() : "Sự kiện chung";
 
-        String benefitsStr = null;
+        List<String> benefitTitles = null;
         if (r.getBenefits() != null && !r.getBenefits().isEmpty()) {
-            benefitsStr = r.getBenefits().stream()
+            benefitTitles = r.getBenefits().stream()
                     .map(BenefitRecruitment::getTitle)
-                    .collect(java.util.stream.Collectors.joining("\n"));
+                    .collect(java.util.stream.Collectors.toList());
         }
 
         return RecruitmentDetailDTO.builder()
                 .recruitmentId(r.getRecruitmentId())
+                .eventId(r.getEvent() != null ? r.getEvent().getEventId() : null)
                 .eventName(eventName)
                 .positionName(r.getPositionName())
                 .description(r.getDescription())
                 .vacancy(r.getVacancy())
                 .deadline(r.getDeadline())
+                .eventStartDate(r.getEvent() != null ? r.getEvent().getStartDate() : null)
                 .status(r.getStatus().name())
                 .requirements(r.getRequirements())
-                .benefits(benefitsStr)
+                .benefits(benefitTitles)
+                .formId(r.getCustomForm() != null ? r.getCustomForm().getFormId() : null)
                 .build();
     }
 
     @Transactional
-    public Recruitment createRecruitment(UUID eventId, CreateRecruitmentRequest request) {
+    public List<Recruitment> createRecruitment(UUID eventId, CreateRecruitmentRequest request) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event không tồn tại"));
+
+        // Kiểm tra: mỗi event chỉ được 1 recruitment post
+        List<Recruitment> existing = recruitmentRepository.findByEvent_EventId(eventId);
+        if (!existing.isEmpty()) {
+            throw new RuntimeException("Sự kiện này đã có bài tuyển dụng. Mỗi sự kiện chỉ được tạo 1 bài tuyển dụng.");
+        }
 
         CustomForm customForm = null;
         if (request.getFormId() != null) {
@@ -140,31 +150,40 @@ public class RecruitmentServiceOrganizer {
                     .orElseThrow(() -> new RuntimeException("Form không tồn tại"));
         }
 
-        String requirementsStr = null;
-        if (request.getRequirements() != null) {
-            requirementsStr = String.join("\n", request.getRequirements());
-        }
-
         List<BenefitRecruitment> benefitRecruitments = null;
         if (request.getBenefits() != null) {
             benefitRecruitments = request.getBenefits().stream()
-                    .map(b -> BenefitRecruitment.builder().title(b).build())
+                    .map(b -> BenefitRecruitment.builder()
+                            .title(b)
+                            .icon(mapBenefitIcon(b))
+                            .build())
                     .collect(java.util.stream.Collectors.toList());
         }
 
-        Recruitment recruitment = Recruitment.builder()
-                .event(event)
-                .customForm(customForm)
-                .positionName(request.getPositionName())
-                .description(request.getDescription())
-                .vacancy(request.getVacancy())
-                .requirements(requirementsStr)
-                .benefits(benefitRecruitments)
-                .deadline(request.getDeadline())
-                .status(request.getStatus() != null ? request.getStatus() : RecruitmentStatus.DRAFT)
-                .build();
+        RecruitmentStatus status = request.getStatus() != null ? request.getStatus() : RecruitmentStatus.DRAFT;
 
-        return recruitmentRepository.save(recruitment);
+        List<Recruitment> savedList = new ArrayList<>();
+        for (CreateRecruitmentRequest.PositionDTO pos : request.getPositions()) {
+            String requirementsStr = null;
+            if (pos.getRequirements() != null) {
+                requirementsStr = String.join("\n", pos.getRequirements());
+            }
+
+            Recruitment recruitment = Recruitment.builder()
+                    .event(event)
+                    .customForm(customForm)
+                    .positionName(pos.getPositionName())
+                    .description(pos.getDescription())
+                    .vacancy(pos.getVacancy())
+                    .requirements(requirementsStr)
+                    .benefits(benefitRecruitments)
+                    .deadline(request.getDeadline())
+                    .status(status)
+                    .build();
+            savedList.add(recruitmentRepository.save(recruitment));
+        }
+
+        return savedList;
     }
 
     @Transactional
@@ -183,12 +202,55 @@ public class RecruitmentServiceOrganizer {
         }
         if (request.getBenefits() != null) {
             List<BenefitRecruitment> benefitRecruitments = request.getBenefits().stream()
-                    .map(b -> BenefitRecruitment.builder().title(b).build())
+                    .map(b -> BenefitRecruitment.builder()
+                            .title(b)
+                            .icon(mapBenefitIcon(b))
+                            .build())
                     .collect(java.util.stream.Collectors.toList());
             recruitment.setBenefits(benefitRecruitments);
         }
-        if (request.getDeadline() != null)
-            recruitment.setDeadline(request.getDeadline());
+        if (request.getDeadline() != null) {
+            LocalDateTime newDeadline = request.getDeadline();
+            
+            // Validate: deadline must be before event start date
+            if (recruitment.getEvent() != null && recruitment.getEvent().getStartDate() != null) {
+                if (!newDeadline.isBefore(recruitment.getEvent().getStartDate())) {
+                    throw new RuntimeException("Deadline must be before the event start date (" 
+                        + recruitment.getEvent().getStartDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) + ")");
+                }
+            }
+
+            recruitment.setDeadline(newDeadline);
+            
+            // Sync deadline to all positions of this event
+            if (recruitment.getEvent() != null) {
+                List<Recruitment> related = recruitmentRepository.findByEvent_EventId(recruitment.getEvent().getEventId());
+                LocalDateTime now = LocalDateTime.now();
+                
+                for (Recruitment r : related) {
+                    if (!r.getRecruitmentId().equals(recruitmentId)) {
+                        r.setDeadline(newDeadline);
+                        
+                        // Re-evaluate status for OPEN/CLOSED recruitments
+                        if (RecruitmentStatus.OPEN.equals(r.getStatus()) || RecruitmentStatus.CLOSED.equals(r.getStatus())) {
+                            if (newDeadline.isAfter(now)) {
+                                r.setStatus(RecruitmentStatus.OPEN);
+                            } else {
+                                r.setStatus(RecruitmentStatus.CLOSED);
+                            }
+                        }
+                        recruitmentRepository.save(r);
+                    }
+                }
+
+                // Sync to CustomForm
+                customFormRepository.findByEvent_EventIdAndFormType(recruitment.getEvent().getEventId(), FormType.RECRUITMENT)
+                    .ifPresent(form -> {
+                        form.setDeadline(newDeadline);
+                        customFormRepository.save(form);
+                    });
+            }
+        }
         if (request.getStatus() != null)
             recruitment.setStatus(request.getStatus());
 
@@ -258,5 +320,18 @@ public class RecruitmentServiceOrganizer {
                 }
             }
         }
+    }
+
+    private String mapBenefitIcon(String benefitTitle) {
+        if (benefitTitle == null) return "gift";
+        String lower = benefitTitle.toLowerCase();
+        if (lower.contains("certificate") || lower.contains("award")) return "award";
+        if (lower.contains("lunch") || lower.contains("food") || lower.contains("meal") || lower.contains("coffee")) return "coffee";
+        if (lower.contains("stipend") || lower.contains("salary") || lower.contains("pay") || lower.contains("money")) return "star";
+        if (lower.contains("remote") || lower.contains("work") || lower.contains("job")) return "briefcase";
+        if (lower.contains("health") || lower.contains("insurance") || lower.contains("medical")) return "heart";
+        if (lower.contains("training") || lower.contains("learn") || lower.contains("course") || lower.contains("book")) return "book";
+        if (lower.contains("security") || lower.contains("safety") || lower.contains("protect")) return "shield";
+        return "gift";
     }
 }

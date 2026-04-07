@@ -32,7 +32,6 @@ public class EventService {
 
     private final List<EventStatus> statuses = Arrays.asList(EventStatus.APPROVED, EventStatus.ONGOING);
 
-
     public List<EventResponse> getTopNewEvents() {
         List<Event> events = eventRepository.findTop6ByStatusInOrderByRegisteredCountDesc(statuses);
 
@@ -47,9 +46,9 @@ public class EventService {
     }
 
     public Page<EventResponse> searchEvents(String keyword, String location,
-                                            List<String> categories, LocalDate date,
-                                            BigDecimal price, Boolean isFree,
-                                            int page, int size) {
+            List<String> categories, LocalDate date,
+            BigDecimal price, Boolean isFree,
+            int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         String kw = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
@@ -138,7 +137,6 @@ public class EventService {
                             .build())
                     .collect(Collectors.toList());
         }
-
 
         return EventResponse.builder()
                 .eventId(event.getEventId())

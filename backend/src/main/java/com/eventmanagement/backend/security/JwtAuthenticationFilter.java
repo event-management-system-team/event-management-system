@@ -6,6 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.eventmanagement.backend.constants.Status;
 import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.repository.UserRepository;
 import java.lang.*;
@@ -40,7 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 User user = userRepository.findById(userId).orElse(null);
 
-                if (user != null) {
+                if (user != null && user.getStatus() == Status.ACTIVE) {
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                             user,
                             null,

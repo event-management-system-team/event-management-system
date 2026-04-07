@@ -201,8 +201,7 @@ const FeedbackDetail = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-[#f8f7f2] font-sans">
-      <Sidebar />
+    <div className="flex flex-col min-h-screen bg-[#F1F0E8] font-sans">
 
       {/* THÊM lg:h-screen lg:overflow-y-auto ĐỂ THANH CUỘN ĐỘC LẬP VỚI SIDEBAR NẾU CẦN */}
       <div className="flex-1 p-4 sm:p-6 lg:p-10 w-full overflow-x-hidden">

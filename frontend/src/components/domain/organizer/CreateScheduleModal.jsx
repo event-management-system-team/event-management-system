@@ -187,6 +187,10 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
                 error = validateLocation(formData.location);
                 break;
 
+            case "date":
+                error = !selectedDate ? "Date is required" : null;
+                break;
+
             case "time":
                 error = validateTime(formData.startTime, formData.endTime);
                 break;
@@ -213,6 +217,9 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
         const locationError = validateLocation(formData.location);
         if (locationError) newErrors.location = locationError;
 
+        const dateError = !selectedDate ? "Date is required" : null;
+        if (dateError) newErrors.date = dateError;
+
         const timeError = validateTime(formData.startTime, formData.endTime);
         if (timeError) newErrors.time = timeError;
 
@@ -220,6 +227,7 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
             scheduleName: scheduleNameError || null,
             description: descriptionError || null,
             location: locationError || null,
+            date: dateError || null,
             time: timeError || null,
         });
         return Object.keys(newErrors).length === 0;
@@ -314,6 +322,13 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
     if (!isOpen) return null
 
     const isAllRolesSelected = selectedRoles.length === roles.length
+
+    const formatRole = (roleName) => {
+        return roleName
+            .toLowerCase()
+            .replace(/_/g, " ")
+            .replace(/\b\w/g, l => l.toUpperCase());
+    };
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -567,7 +582,7 @@ export function CreateScheduleModal({ eventId, isOpen, onClose, onCreated, onAle
                                                         <div className="flex items-center gap-2">
                                                             <Users className="h-4 w-4 text-gray-400" />
                                                             <span className="text-sm font-medium text-gray-900">
-                                                                {role.role}
+                                                                {formatRole(role.role)}
                                                             </span>
                                                         </div>
                                                     </td>

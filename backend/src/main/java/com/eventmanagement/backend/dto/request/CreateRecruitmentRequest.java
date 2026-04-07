@@ -14,20 +14,28 @@ import java.util.UUID;
 @Builder
 public class CreateRecruitmentRequest {
 
-    @NotNull(message = "Select an event")
-    private UUID eventId;
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class PositionDTO {
+        @NotBlank(message = "Position name is required")
+        @Size(max = 255, message = "Position name exceeds maximum length")
+        private String positionName;
 
-    @NotBlank(message = "Select a position")
-    @Size(max = 255, message = "Position name exceeds maximum length")
-    private String positionName;
+        @NotNull(message = "Vacancy is required")
+        @Min(value = 1, message = "At least 1 vacancy required")
+        private Integer vacancy;
 
-    private String description;
+        private String description;
 
-    @NotNull(message = "Select a department")
-    @Min(value = 1, message = "Department ID must be greater than 0")
-    private Integer vacancy;
+        private List<String> requirements;
+    }
 
-    private List<String> requirements;
+    @NotEmpty(message = "At least one position is required")
+    private List<PositionDTO> positions;
+
+    // description & requirements are now inside PositionDTO
 
     private List<String> benefits;
 
@@ -36,6 +44,5 @@ public class CreateRecruitmentRequest {
 
     private UUID formId;
 
-    @NotNull(message = "Select a status")
     private RecruitmentStatus status;
 }

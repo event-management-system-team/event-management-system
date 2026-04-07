@@ -152,8 +152,18 @@ public class FeedbackService {
 
         UUID userId = user.getUserId(); 
 
-        if (event.getStartDate().isAfter(LocalDateTime.now())) {
+        if (event.getStartDate() != null && LocalDateTime.now().isBefore(event.getStartDate())) {
             throw new RuntimeException("Sự kiện chưa diễn ra, không thể gửi đánh giá!");
+        }
+
+        if (event.getEndDate() != null) {
+            LocalDateTime now = LocalDateTime.now();
+            if (now.isBefore(event.getEndDate())) {
+                throw new RuntimeException("Sự kiện chưa kết thúc, không thể gửi đánh giá!");
+            }
+            if (now.isAfter(event.getEndDate().plusDays(14))) {
+                throw new RuntimeException("Đã quá 14 ngày kể từ khi sự kiện kết thúc! Không thể gửi đánh giá nữa.");
+            }
         }
 
         boolean alreadySubmitted = feedbackRepository.existsByEvent_EventIdAndUser_UserId(eventId, userId);

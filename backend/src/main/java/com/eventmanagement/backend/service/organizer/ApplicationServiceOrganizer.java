@@ -157,6 +157,13 @@ public class ApplicationServiceOrganizer {
             }
 
             recruitmentRepository.save(recruitment);
+            
+            // Auto-reject other pending applications for the same user in the same event
+            staffapplicationRepository.rejectOtherApplicationsForEvent(
+                applicant.getUserId(), 
+                event.getEventId(), 
+                applicationId
+            );
         }
         return staffapplicationRepository.save(application);
     }

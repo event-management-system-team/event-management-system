@@ -15,7 +15,12 @@ const useRecruitmentForms = (eventId) => {
       .then((res) => {
         if (!cancelled) {
           // Backend trả về một form object (hoặc null nếu chưa có form)
-          setForms(res && res.formId ? [res] : []);
+          if (res && res.formId) {
+            const isActive = res.active === true || res.isActive === true;
+            setForms([{ ...res, isActive }]);
+          } else {
+            setForms([]);
+          }
         }
       })
       .catch((err) => {

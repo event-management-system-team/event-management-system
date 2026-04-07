@@ -68,21 +68,17 @@ export function EventManagement() {
             <main className="flex-1 overflow-auto">
 
                 {/* Header */}
-                <header className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-5">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <span>{t('admin_dashboard')}</span>
-                            <ChevronRight className="h-4 w-4" />
-                            <span>{t('ad_event_management')}</span>
-                        </div>
-                    </div>
+                <header className="bg-[#F1F0E8] px-8 py-5 pt-8">
                     <div className="flex items-start justify-between">
                         <div>
-                            <h1 className="text-foreground text-2xl mb-1 font-semibold">
-                                {t('ad_event_management')}
-                            </h1>
-                            <p className="text-gray-500 text-sm">
-                                {t('ad_manage_events_desc')}
+                            <div className="flex items-center gap-4 text-gray-400 text-sm font-medium mb-3">
+                                <span>Dashboard</span>
+                                <ChevronRight className="h-4 w-4" />
+                                <span className="text-gray-600">Event Management</span>
+                            </div>
+                            <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">Event Management</h1>
+                            <p className="text-gray-500 text-sm mt-1">
+                                Manage and oversee all platform-wide events and requests.
                             </p>
                         </div>
                     </div>

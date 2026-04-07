@@ -38,9 +38,6 @@ export default function StatCards({
           {t('org_total_responses')}
         </p>
         <p className="text-4xl font-black">{totalResponses ?? "—"}</p>
-        <p className="text-xs font-bold text-emerald-500 mt-3">
-          {t('org_from_last_event')}
-        </p>
       </div>
 
       <div className="bg-[#f7f7f7] rounded-2xl p-4 md:p-5">

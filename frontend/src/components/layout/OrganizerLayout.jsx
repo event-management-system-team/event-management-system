@@ -3,12 +3,10 @@ import Sidebar from "./Sidebar";
 
 const OrganizerLayout = () => {
     return (
-        <div className="flex h-screen bg-[#F5F3EE]">
-            {/* Sidebar */}
+        <div className="flex h-screen overflow-hidden bg-[#F1F0E8] font-sans text-slate-800 relative">
             <Sidebar />
 
-            {/* Main Content */}
-            <main className="flex-1 ml-64 overflow-auto">
+            <main className="flex-1 h-full overflow-y-auto relative flex flex-col">
                 <Outlet />
             </main>
         </div>

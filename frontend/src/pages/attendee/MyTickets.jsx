@@ -41,11 +41,15 @@ const MyTicketsPage = () => {
               location: ticket.eventLocation,
               ticketCount: 0,
               status: ticket.status,
+              hasCheckedIn: false,
               bannerUrl: ticket.eventBannerUrl,
               eventSlug: ticket.orderCode,
             };
           }
           groups[ticket.orderCode].ticketCount += 1;
+          if (ticket.status === 'CHECKED_IN') {
+            groups[ticket.orderCode].hasCheckedIn = true;
+          }
         });
 
         setTicketGroups(Object.values(groups));

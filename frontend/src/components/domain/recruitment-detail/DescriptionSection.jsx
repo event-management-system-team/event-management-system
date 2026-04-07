@@ -1,8 +1,7 @@
 import { Briefcase } from 'lucide-react'
 import { useTranslation } from "react-i18next";
 
-const DescriptionSection = ({ description, positions }) => {
-    const { t } = useTranslation();
+const DescriptionSection = ({ positions }) => {
     return (
         <section className="bg-white rounded-2xl p-8 shadow-sm border border-[#E5E1DA]/50">
             <div className="space-y-8">
@@ -28,10 +27,20 @@ const DescriptionSection = ({ description, positions }) => {
                                         {t("hiring")}: {pos.vacancy} {t("slot")}
                                     </span>
                                 </div>
-                                <div className="text-[13px] text-slate-600 pl-6 border-l-2 border-slate-200 ml-1.5">
-                                    <span className="font-semibold text-slate-700 block mb-1">Requirements:</span>
-                                    {pos.requirements}
-                                </div>
+
+                                {pos.description && (
+                                    <div className="text-[13px] text-slate-600 mb-3 pl-6 border-l-2 border-primary/20 ml-1.5">
+                                        <span className="font-semibold text-slate-700 block mb-1">Description:</span>
+                                        {pos.description}
+                                    </div>
+                                )}
+
+                                {pos.requirements && (
+                                    <div className="text-[13px] text-slate-600 pl-6 border-l-2 border-slate-200 ml-1.5">
+                                        <span className="font-semibold text-slate-700 block mb-1">Requirements:</span>
+                                        {pos.requirements}
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>

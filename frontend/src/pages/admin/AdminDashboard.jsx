@@ -53,20 +53,21 @@ export function AdminDashboard() {
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
                 {/* Header */}
-                <header className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-5">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <span>{t('admin_dashboard')}</span>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center justify-between">
+                <header className="bg-[#F1F0E8] px-8 py-5 pt-8">
+                    <div className="flex items-start justify-between">
                         <div>
-                            <h1 className="text-2xl font-semibold text-gray-900">{t('ad_system_overview')}</h1>
-                            <p className="text-sm text-gray-500 mt-1">{t('ad_monitor_health')}</p>
+                            <div className="flex items-center gap-4 text-gray-400 text-sm font-medium mb-3">
+                                <span className="text-gray-600">Dashboard</span>
+                            </div>
+                            <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">System Overview</h1>
+                            <p className="text-gray-500 text-sm mt-1">
+                                Monitor platform health and pending tasks.
+                            </p>
                         </div>
-                        <div className="text-sm text-gray-600">
-                            <span className="font-medium">{t('ad_last_updated')}</span> {new Date().toLocaleTimeString()}
+                        <div className="flex items-center gap-3">
+                            <div className="px-4 py-2 bg-white rounded-lg shadow-sm border border-gray-100 text-sm text-gray-600 font-medium">
+                                <span className="text-gray-400 mr-2">Last updated:</span> {new Date().toLocaleTimeString()}
+                            </div>
                         </div>
                     </div>
                 </header>

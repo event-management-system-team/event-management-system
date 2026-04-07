@@ -31,7 +31,7 @@ const SidebarPosition = ({ selectedPosition, isFull, deadline, location }) => {
                     <div className="flex justify-between items-center py-3 border-b border-[#f1f1f1]">
                         <span className="text-sm text-[#89A8B2]">{t('app_available_slots')}</span>
                         <span className={`font-bold ${isFull ? 'text-red-500' : 'text-[#FF6B35]'}`}>
-                            {selectedPosition ? `${selectedPosition.availableSlots} / ${selectedPosition.vacancy}` : '---'}
+                            {selectedPosition ? `${selectedPosition.vacancy - selectedPosition.availableSlots} / ${selectedPosition.vacancy}` : '---'}
                         </span>
                     </div>
 

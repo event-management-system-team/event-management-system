@@ -19,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.eventmanagement.backend.constants.EventStatus;
-import com.eventmanagement.backend.constants.RecruitmentStatus;
 import com.eventmanagement.backend.dto.response.attendee.OrganizerResponse;
 import com.eventmanagement.backend.dto.response.attendee.PositionResponse;
 import com.eventmanagement.backend.dto.response.attendee.RecruitmentResponse;
@@ -36,7 +35,6 @@ public class RecruitmentService {
     private final RecruitmentRepository recruitmentRepository;
     private final CustomFormRepository customFormRepository;
 
-
     public List<RecruitmentResponse> getRecentRecruitments() {
 
         Pageable topThree = PageRequest.of(0, 3);
@@ -45,7 +43,6 @@ public class RecruitmentService {
         if (topEvent.isEmpty()) {
             return List.of();
         }
-
 
         List<Recruitment> recruitments = recruitmentRepository.findRecruitmentsByEventSlugs(topEvent);
 
@@ -56,8 +53,8 @@ public class RecruitmentService {
     }
 
     public Page<RecruitmentResponse> searchRecruitments(String keyword, String location,
-                                                        LocalDate deadline,
-                                                        int page, int size) {
+            LocalDate deadline,
+            int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         String kw = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
@@ -67,7 +64,6 @@ public class RecruitmentService {
         if (deadline != null) {
             dl = deadline.atTime(LocalTime.MAX);
         }
-
 
         List<EventStatus> statuses = Arrays.asList(EventStatus.APPROVED, EventStatus.ONGOING);
 
@@ -84,9 +80,10 @@ public class RecruitmentService {
     }
 
     public RecruitmentResponse getRecruitmentByEventSlug(String eventSlug) {
-        List<Recruitment> recruitments = recruitmentRepository.findByEvent_EventSlug(eventSlug);
+        List<Recruitment> recruitments = recruitmentRepository.findPublicByEventSlug(eventSlug);
 
-        if (recruitments.isEmpty()) return null;
+        if (recruitments.isEmpty())
+            return null;
 
         Event event = recruitments.get(0).getEvent();
 
@@ -111,12 +108,13 @@ public class RecruitmentService {
                 .map((position) -> PositionResponse.builder()
                         .recruitmentId(position.getRecruitmentId())
                         .positionName(position.getPositionName())
+                        .description(position.getDescription())
                         .vacancy(position.getVacancy())
                         .availableSlots(position.getVacancy() - position.getApprovedCount())
                         .requirements(position.getRequirements())
                         .status(position.getStatus())
-                        .build()
-                ).toList();
+                        .build())
+                .toList();
 
         OrganizerResponse organizerResponses = null;
         if (event.getOrganizer() != null) {
@@ -134,7 +132,8 @@ public class RecruitmentService {
                         .icon(benefit.getIcon())
                         .title(benefit.getTitle())
                         .description(benefit.getDescription())
-                        .build()).toList() : new ArrayList<>();
+                        .build())
+                .toList() : new ArrayList<>();
 
         boolean isFormActive = customFormRepository
                 .findByEvent_EventSlugAndFormTypeAndIsActiveTrue(event.getEventSlug(), FormType.RECRUITMENT)
@@ -148,7 +147,6 @@ public class RecruitmentService {
                 .location(event.getLocation())
                 .startDate(event.getStartDate())
                 .endDate(event.getEndDate())
-                .description(recruitment.getDescription())
                 .deadline(recruitment.getDeadline())
                 .createdAt(recruitment.getCreatedAt())
                 .positions(positionResponse)
@@ -157,6 +155,5 @@ public class RecruitmentService {
                 .isActive(isFormActive)
                 .build();
     }
-
 
 }

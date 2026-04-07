@@ -91,18 +91,25 @@ export function AccountManagement() {
                     </div>
                     <div className="flex items-start justify-between">
                         <div>
-                            <h1 className="text-foreground text-2xl mb-1 font-semibold">{t('ad_account_management')}</h1>
-                            <p className="text-gray-500 text-sm">
-                                {t('ad_manage_accounts_desc')}
+                            <div className="flex items-center gap-4 text-gray-400 text-sm font-medium mb-3">
+                                <span>Dashboard</span>
+                                <ChevronRight className="h-4 w-4" />
+                                <span className="text-gray-600">Account Management</span>
+                            </div>
+                            <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">Account Management</h1>
+                            <p className="text-gray-500 text-sm mt-1">
+                                Oversee and manage system organizer accounts.
                             </p>
                         </div>
-                        <Button
-                            className="gap-2 bg-primary hover:bg-[#B3C8CF] text-white rounded-full px-5 h-11 hover:cursor-pointer"
-                            onClick={openModal}
-                        >
-                            <Plus className="h-4 w-4" />
-                            {t('ad_create_organizer')}
-                        </Button>
+                        <div className="flex items-center gap-3">
+                            <Button
+                                className="gap-2 bg-[#7FA5A5] hover:bg-[#6D9393] text-white rounded-full px-5 py-2 shadow-sm font-medium transition-colors hover:cursor-pointer h-10"
+                                onClick={openModal}
+                            >
+                                <Plus className="h-4 w-4" />
+                                Create Organizer Account
+                            </Button>
+                        </div>
                     </div>
                 </header>
 

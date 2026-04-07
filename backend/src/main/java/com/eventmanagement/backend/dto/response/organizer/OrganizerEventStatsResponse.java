@@ -13,6 +13,6 @@ public class OrganizerEventStatsResponse {
 
     private long totalEvents;
     private long activeCount;
-    private long upcomingCount;
     private long completedCount;
+    private Double averageRating;
 }

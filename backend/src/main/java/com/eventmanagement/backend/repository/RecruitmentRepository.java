@@ -25,21 +25,23 @@ public interface RecruitmentRepository extends JpaRepository<Recruitment, UUID> 
     List<Recruitment> findByEvent_EventId(UUID eventId);
 
     @Query("SELECT e.eventSlug FROM Recruitment r JOIN r.event e " +
+            "WHERE r.status <> 'DRAFT' " +
             "GROUP BY e.eventSlug " +
             "ORDER BY MAX(r.createdAt) DESC")
     List<String> findRecentEventWithRecruitments(Pageable pageable);
 
     @Query("SELECT r FROM Recruitment r JOIN FETCH r.event e " +
             "WHERE r.event.eventSlug IN :eventSlugs " +
+            "AND r.status <> 'DRAFT' " +
             "ORDER BY r.status DESC, r.createdAt DESC")
     List<Recruitment> findRecruitmentsByEventSlugs(@Param("eventSlugs") List<String> eventSlugs);
 
     @Query("SELECT e.eventSlug FROM Recruitment r JOIN r.event e " +
-            "WHERE (:keyword IS NULL OR :keyword = '' " +
+            "WHERE r.status <> 'DRAFT' " +
+            "AND (:keyword IS NULL OR :keyword = '' " +
             "OR LOWER(r.positionName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "OR LOWER(e.eventName) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
-            "AND (:location IS NULL OR :location = '' OR LOWER(e.location) LIKE LOWER(CONCAT('%', :location, '%')))"
-            +
+            "AND (:location IS NULL OR :location = '' OR LOWER(e.location) LIKE LOWER(CONCAT('%', :location, '%')))" +
             "AND (CAST(:deadline AS TIMESTAMP ) IS NULL OR r.deadline <= :deadline)" +
             "GROUP BY e.eventSlug " +
             "ORDER BY MAX(r.createdAt) DESC")
@@ -50,10 +52,14 @@ public interface RecruitmentRepository extends JpaRepository<Recruitment, UUID> 
 
     @Query("SELECT r FROM Recruitment r JOIN FETCH r.event e " +
             "WHERE r.event.eventSlug IN :eventSlugs " +
+            "AND r.status <> 'DRAFT' " +
             "ORDER BY r.status DESC, r.createdAt DESC")
     List<Recruitment> searchRecruitments(@Param("eventSlugs") List<String> eventSlugs);
 
     List<Recruitment> findByEvent_EventSlug(String eventSlug);
+
+    @Query("SELECT r FROM Recruitment r WHERE r.event.eventSlug = :eventSlug AND r.status <> 'DRAFT'")
+    List<Recruitment> findPublicByEventSlug(@Param("eventSlug") String eventSlug);
 
     @Modifying
     @Transactional

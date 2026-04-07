@@ -7,7 +7,7 @@ import {
     MapPin,
     Calendar,
     ArrowRight,
-    ChevronDown,
+    Star,
 } from 'lucide-react';
 import dayjs from 'dayjs';
 import {
@@ -52,6 +52,7 @@ const StatCard = ({ icon: Icon, label, value, loading, color, colorBg }) => (
         <div
             className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 bg-${colorBg}`}
         >
+            <Icon size={22} className={`text-${color}`} />
             <Icon size={22} className={`text-${color}`} />
         </div>
         <div>
@@ -107,7 +108,6 @@ const OrganizerDashboardPage = () => {
     const [stats, setStats] = useState({
         totalEvents: 0,
         activeCount: 0,
-        upcomingCount: 0,
         completedCount: 0,
     });
     const [events, setEvents] = useState([]);
@@ -134,7 +134,7 @@ const OrganizerDashboardPage = () => {
     }, [fetchData]);
 
     const totalTicketsSold = useMemo(
-        () => events.reduce((sum, e) => sum + (e.registeredCount || 0), 0),
+        () => events.reduce((sum, e) => sum + (e.totalSold || 0), 0),
         [events],
     );
     const totalCapacity = useMemo(
@@ -152,11 +152,11 @@ const OrganizerDashboardPage = () => {
         const sold = totalTicketsSold;
         const available = Math.max(0, totalCapacity - sold);
         const fullyBookedCount = events.filter(
-            (e) => e.totalCapacity > 0 && e.registeredCount >= e.totalCapacity,
+            (e) => e.totalCapacity > 0 && e.totalSold >= e.totalCapacity,
         ).length;
         const soldOutTickets = events
-            .filter((e) => e.totalCapacity > 0 && e.registeredCount >= e.totalCapacity)
-            .reduce((s, e) => s + (e.registeredCount || 0), 0);
+            .filter((e) => e.totalCapacity > 0 && e.totalSold >= e.totalCapacity)
+            .reduce((s, e) => s + (e.totalSold || 0), 0);
         const partialSold = Math.max(0, sold - soldOutTickets);
 
         return [
@@ -226,14 +226,19 @@ const OrganizerDashboardPage = () => {
                     color="green-500"
                     colorBg="green-50"
                 />
-                <StatCard
-                    icon={Ticket}
-                    label={t('org_tickets_sold')}
-                    value={totalTicketsSold}
-                    loading={loading}
-                    color="red-500"
-                    colorBg="red-50"
-                />
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-5 flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 bg-amber-50">
+                        <Star size={22} className="text-amber-400" fill="currentColor" />
+                    </div>
+                    <div>
+                        <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">
+                            Avg. Rating
+                        </p>
+                        <p className="text-2xl font-bold text-gray-900 mt-0.5">
+                            {loading ? '—' : (stats.averageRating ?? 0).toFixed(1)}
+                        </p>
+                    </div>
+                </div>
             </div>
 
             {/* Charts Row — Ticket Sales (left, full height) | Sales Revenue + Popular Events (right) */}
@@ -241,10 +246,7 @@ const OrganizerDashboardPage = () => {
                 {/* Ticket Sales - Donut */}
                 <div className="col-span-5 bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col">
                     <div className="flex items-center justify-between mb-2">
-                        <h2 className="text-lg font-bold text-gray-900">{t('org_ticket_sales')}</h2>
-                        <button className="flex items-center gap-1 text-xs text-gray-400 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition">
-                            {t('org_this_week')} <ChevronDown size={14} />
-                        </button>
+                        <h2 className="text-lg font-bold text-gray-900">Ticket Sales</h2>
                     </div>
 
                     {totalCapacity === 0 && !loading ? (
@@ -312,10 +314,7 @@ const OrganizerDashboardPage = () => {
                     {/* Sales Revenue - Bar Chart */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                         <div className="flex items-center justify-between mb-1">
-                            <h2 className="text-lg font-bold text-gray-900">{t('org_sales_revenue')}</h2>
-                            <button className="flex items-center gap-1 text-xs text-gray-400 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition">
-                                {t('org_last_8_months')} <ChevronDown size={14} />
-                            </button>
+                            <h2 className="text-lg font-bold text-gray-900">Sales Revenue</h2>
                         </div>
                         <div className="mb-4">
                             <p className="text-xs text-gray-400">{t('org_total_revenue')}</p>
@@ -348,10 +347,7 @@ const OrganizerDashboardPage = () => {
                     {/* Popular Events */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                         <div className="flex items-center justify-between mb-5">
-                            <h2 className="text-lg font-bold text-gray-900">{t('org_popular_events')}</h2>
-                            <button className="flex items-center gap-1 text-xs text-gray-400 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition">
-                                {t('org_popular')} <ChevronDown size={14} />
-                            </button>
+                            <h2 className="text-lg font-bold text-gray-900">Top Event Categories</h2>
                         </div>
 
                         {categoryStats.length === 0 && !loading ? (

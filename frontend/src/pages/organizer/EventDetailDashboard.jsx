@@ -153,18 +153,12 @@ const EventDetailDashboard = () => {
             const total = data.totalTickets || data.totalCapacity || 0;
             const registeredCount = data.registeredCount || 0;
 
-            const generalPct = 0.65;
-            const vipPct = 0.25;
-            const earlyPct = 0.10;
-
             setTicketStats({
                 sold,
                 total,
                 registeredCount,
-                general: Math.round(sold * generalPct),
-                vip: Math.round(sold * vipPct),
-                early: Math.round(sold * earlyPct),
-                checkedIn: data.checkedInCount || Math.round(registeredCount * 0.375),
+                breakdown: data.ticketSalesBreakdown || {},
+                checkedIn: data.checkedInCount ?? 0,
             });
 
             try {
@@ -205,12 +199,19 @@ const EventDetailDashboard = () => {
                 { name: 'Free', value: ticketStats.sold || ticketStats.registeredCount || 0, pct: 100 },
             ];
         }
-        const { general, vip, early } = ticketStats;
-        return [
-            { name: 'General', value: general, pct: ticketStats.sold > 0 ? Math.round((general / ticketStats.sold) * 100) : 65 },
-            { name: 'VIP', value: vip, pct: ticketStats.sold > 0 ? Math.round((vip / ticketStats.sold) * 100) : 25 },
-            { name: 'Early', value: early, pct: ticketStats.sold > 0 ? Math.round((early / ticketStats.sold) * 100) : 10 },
-        ].filter(d => d.value > 0);
+
+        const breakdown = ticketStats.breakdown || {};
+        const entries = Object.entries(breakdown);
+
+        if (entries.length === 0) {
+            return [];
+        }
+
+        return entries.map(([name, value]) => ({
+            name,
+            value,
+            pct: ticketStats.sold > 0 ? Math.round((value / ticketStats.sold) * 100) : 0
+        })).sort((a, b) => b.value - a.value);
     }, [ticketStats, isFreeEvent]);
 
     const capacityPercent = ticketStats.total > 0
@@ -302,7 +303,7 @@ const EventDetailDashboard = () => {
             </div>
 
             {/* Stat Cards Row */}
-            <div className="grid grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-3 gap-4 mb-6">
                 {isFreeEvent ? (
                     <StatCard
                         icon={Ticket}
@@ -333,24 +334,21 @@ const EventDetailDashboard = () => {
                     iconColor="text-red-500"
                     loading={loading}
                 />
-                <StatCard
-                    icon={Users}
-                    label={t('org_registered')}
-                    value={ticketStats.registeredCount?.toLocaleString() || '0'}
-                    subText={t('org_total_registrations')}
-                    iconBg="bg-blue-50"
-                    iconColor="text-blue-500"
-                    loading={loading}
-                />
-                <StatCard
-                    icon={Star}
-                    label={t('org_capacity')}
-                    value={(event?.totalCapacity || 0).toLocaleString()}
-                    subText={t('org_maximum_attendees')}
-                    iconBg="bg-yellow-50"
-                    iconColor="text-yellow-500"
-                    loading={loading}
-                />
+
+                {/* Avg Rating Card matching Dashboard style */}
+                <div className="bg-[#fafaf8] rounded-2xl border border-gray-100 shadow-sm px-6 py-5 flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 bg-amber-50">
+                        <Star size={22} className="text-amber-400" fill="currentColor" />
+                    </div>
+                    <div>
+                        <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">
+                            Avg. Rating
+                        </p>
+                        <p className="text-2xl font-bold text-gray-900 mt-0.5">
+                            {loading ? '—' : avgRating.toFixed(1)}
+                        </p>
+                    </div>
+                </div>
             </div>
 
             {/* Main Content: Attendee List + Ticket Sales */}

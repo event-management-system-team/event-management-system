@@ -18,6 +18,7 @@ import com.eventmanagement.backend.model.TicketType;
 import com.eventmanagement.backend.model.User;
 import com.eventmanagement.backend.repository.EventCategoryRepository;
 import com.eventmanagement.backend.repository.EventRepository;
+import com.eventmanagement.backend.repository.FeedbackRepository;
 import com.eventmanagement.backend.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +50,7 @@ public class OrganizerEventService {
     private final EventCategoryRepository eventCategoryRepository;
     private final TicketRepository ticketRepository;
     private final CloudinaryService cloudinaryService;
+    private final FeedbackRepository feedbackRepository;
 
     // create event for organizer that support cover image
     @Transactional
@@ -67,6 +69,7 @@ public class OrganizerEventService {
         if (!request.isDraft() && startDateTime.isBefore(LocalDateTime.now())) {
             throw new BadRequestException("Step 1: Start time must be after now");
         }
+
 
         String bannerUrl = null;
         if (coverFile != null && !coverFile.isEmpty()) {
@@ -87,8 +90,8 @@ public class OrganizerEventService {
         } else {
             totalCapacity = request.getTickets() != null
                     ? request.getTickets().stream()
-                            .mapToInt(t -> t.getQuantity() != null ? t.getQuantity() : 0)
-                            .sum()
+                    .mapToInt(t -> t.getQuantity() != null ? t.getQuantity() : 0)
+                    .sum()
                     : 0;
         }
 
@@ -306,6 +309,7 @@ public class OrganizerEventService {
             throw new BadRequestException("Start date/time must be in the future");
         }
 
+
         if (coverFile != null && !coverFile.isEmpty()) {
             try {
                 String bannerUrl = cloudinaryService.uploadEventBanner(coverFile);
@@ -323,8 +327,8 @@ public class OrganizerEventService {
         } else {
             totalCapacity = request.getTickets() != null
                     ? request.getTickets().stream()
-                            .mapToInt(t -> t.getQuantity() != null ? t.getQuantity() : 0)
-                            .sum()
+                    .mapToInt(t -> t.getQuantity() != null ? t.getQuantity() : 0)
+                    .sum()
                     : 0;
         }
 
@@ -399,11 +403,46 @@ public class OrganizerEventService {
 
     /**
      * Lấy danh sách event của organizer có phân trang, sắp xếp theo ngày tạo mới
-     * nhất
+     * nhất. Hỗ trợ filter theo status (server-side).
      */
-    public Page<OrganizerEventResponse> getMyEvents(UUID organizerId, int page, int size) {
+    public Page<OrganizerEventResponse> getMyEvents(UUID organizerId, int page, int size, String statusFilter) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Event> eventPage = eventRepository.findByOrganizer_UserId(organizerId, pageable);
+        Page<Event> eventPage;
+
+        if (statusFilter == null || statusFilter.isBlank()) {
+            eventPage = eventRepository.findByOrganizer_UserId(organizerId, pageable);
+        } else {
+            switch (statusFilter.toUpperCase()) {
+                case "APPROVED":
+                    eventPage = eventRepository.findByOrganizer_UserIdAndStatus(
+                            organizerId, EventStatus.APPROVED, pageable);
+                    break;
+                case "ACTIVE":
+                    // Active = (APPROVED + startDate <= now) OR ONGOING
+                    eventPage = eventRepository.findActiveEventsByOrganizer(
+                            organizerId, EventStatus.APPROVED, EventStatus.ONGOING, pageable);
+                    break;
+                case "COMPLETED":
+                    eventPage = eventRepository.findByOrganizer_UserIdAndStatus(
+                            organizerId, EventStatus.COMPLETED, pageable);
+                    break;
+                case "REJECTED":
+                    eventPage = eventRepository.findByOrganizer_UserIdAndStatus(
+                            organizerId, EventStatus.REJECTED, pageable);
+                    break;
+                case "DRAFT":
+                    eventPage = eventRepository.findByOrganizer_UserIdAndStatus(
+                            organizerId, EventStatus.DRAFT, pageable);
+                    break;
+                case "PENDING":
+                    eventPage = eventRepository.findByOrganizer_UserIdAndStatus(
+                            organizerId, EventStatus.PENDING, pageable);
+                    break;
+                default:
+                    eventPage = eventRepository.findByOrganizer_UserId(organizerId, pageable);
+                    break;
+            }
+        }
 
         if (eventPage.isEmpty()) {
             return eventPage.map(this::mapToOrganizerResponse);
@@ -426,35 +465,33 @@ public class OrganizerEventService {
     public OrganizerEventResponse getEventDetail(UUID eventId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found: " + eventId));
-        
+
         Event eventWithTickets = eventRepository.findWithTicketsByEventId(eventId)
                 .orElse(event);
-        
+
         return mapToOrganizerResponse(eventWithTickets);
     }
 
     /**
-     * Lấy thống kê event của organizer (total, active, upcoming, completed)
-     * event upcoming: approved va start date > thoi gian hien tai
-     * event active: (APPROVED - upcoming) + ONGOING
-     * @param: organizerId
-     * @return  number of event status
+     * Lấy thống kê event của organizer (total, active, completed)
+     * event active: APPROVED + ONGOING
+     * @param organizerId
+     * @return number of event status
      */
     public OrganizerEventStatsResponse getMyEventStats(UUID organizerId) {
 
         long total = eventRepository.countByOrganizer_UserId(organizerId);
-        long upcoming = eventRepository.countByOrganizer_UserIdAndStatusAndStartDateAfterNow(organizerId,
-                EventStatus.APPROVED);
-        long allApprovedEvent = eventRepository.countByOrganizer_UserIdAndStatus(organizerId, EventStatus.APPROVED);
+        long approved = eventRepository.countByOrganizer_UserIdAndStatus(organizerId, EventStatus.APPROVED);
         long ongoing = eventRepository.countByOrganizer_UserIdAndStatus(organizerId, EventStatus.ONGOING);
-        long active = (allApprovedEvent - upcoming) + ongoing;
+        long active = approved + ongoing;
         long completed = eventRepository.countByOrganizer_UserIdAndStatus(organizerId, EventStatus.COMPLETED);
-        
+        Double avgRating = feedbackRepository.findAverageRatingByOrganizer(organizerId);
+
         return OrganizerEventStatsResponse.builder()
                 .totalEvents(total)
                 .activeCount(active)
-                .upcomingCount(upcoming)
                 .completedCount(completed)
+                .averageRating(avgRating != null ? Math.round(avgRating * 10) / 10.0 : 0.0)
                 .build();
     }
 
@@ -466,9 +503,10 @@ public class OrganizerEventService {
         int totalSold = 0;
         int totalTickets = 0;
         BigDecimal totalRevenue = BigDecimal.ZERO;
+        java.util.Map<String, Integer> breakdown = new java.util.HashMap<>();
 
         if (event.getTicketTypes() != null) {
-            for (TicketType ticket : event.getTicketTypes()) {
+            for (com.eventmanagement.backend.model.TicketType ticket : event.getTicketTypes()) {
                 if (Boolean.TRUE.equals(ticket.getIsActive())) {
                     int sold = ticket.getSoldCount() != null ? ticket.getSoldCount() : 0;
                     totalSold += sold;
@@ -477,9 +515,14 @@ public class OrganizerEventService {
                         totalRevenue = totalRevenue.add(
                                 ticket.getPrice().multiply(BigDecimal.valueOf(sold)));
                     }
+                    if (sold > 0) {
+                        breakdown.put(ticket.getTicketName() != null ? ticket.getTicketName() : "General", sold);
+                    }
                 }
             }
         }
+
+        Double avgRating = feedbackRepository.findAverageRating(event.getEventId());
 
         return OrganizerEventResponse.builder()
                 .eventId(event.getEventId())
@@ -496,8 +539,10 @@ public class OrganizerEventService {
                 .totalSold(totalSold)
                 .totalTickets(totalTickets)
                 .totalRevenue(totalRevenue)
+                .ticketSalesBreakdown(breakdown)
                 .categoryName(event.getCategory() != null ? event.getCategory().getCategoryName() : null)
                 .isFree(event.getIsFree())
+                .avgRating(avgRating != null ? Math.round(avgRating * 10) / 10.0 : 0.0)
                 .build();
     }
 
@@ -505,15 +550,32 @@ public class OrganizerEventService {
      * Lấy danh sách attendees của một event có phân trang
      * Query từ bảng tickets (CONFIRMED, PAID, CHECKED_IN) thay vì event_registrations
      */
-    public Page<AttendeeResponse> getEventAttendees(UUID eventId, int page, int size) {
+    public Page<AttendeeResponse> getEventAttendees(UUID eventId, int page, int size,
+                                                    String ticketType, String status) {
         eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found: " + eventId));
 
-        List<TicketStatus> validStatuses = List.of(
-                TicketStatus.CONFIRMED, TicketStatus.PAID, TicketStatus.CHECKED_IN);
+        List<TicketStatus> validStatuses;
+        if (status != null && !status.isBlank()) {
+            String normalized = status.toUpperCase().replace("-", "_");
+            if ("CHECKED_IN".equals(normalized) || "CHECKEDIN".equals(normalized)) {
+                validStatuses = List.of(TicketStatus.CHECKED_IN);
+            } else if ("REGISTERED".equals(normalized)) {
+                validStatuses = List.of(TicketStatus.CONFIRMED, TicketStatus.PAID);
+            } else if ("CANCELLED".equals(normalized)) {
+                validStatuses = List.of(TicketStatus.CANCELLED);
+            } else {
+                validStatuses = List.of(TicketStatus.CONFIRMED, TicketStatus.PAID, TicketStatus.CHECKED_IN);
+            }
+        } else {
+            validStatuses = List.of(TicketStatus.CONFIRMED, TicketStatus.PAID, TicketStatus.CHECKED_IN);
+        }
+
+        String ticketTypeName = (ticketType != null && !ticketType.isBlank()) ? ticketType : null;
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<Ticket> tickets = ticketRepository.findAttendeeTicketsByEventId(eventId, validStatuses, pageable);
+        Page<Ticket> tickets = ticketRepository.findAttendeeTicketsByEventId(
+                eventId, validStatuses, ticketTypeName, pageable);
 
         return tickets.map(this::mapToAttendeeResponse);
     }
