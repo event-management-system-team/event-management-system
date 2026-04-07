@@ -195,10 +195,10 @@ const EventDetailDashboard = () => {
                 { name: 'Free', value: ticketStats.sold || ticketStats.registeredCount || 0, pct: 100 },
             ];
         }
-        
+
         const breakdown = ticketStats.breakdown || {};
         const entries = Object.entries(breakdown);
-        
+
         if (entries.length === 0) {
             return [];
         }
@@ -268,11 +268,11 @@ const EventDetailDashboard = () => {
                         </h1>
                         {event?.status && (
                             <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${event.status === 'APPROVED' ? 'bg-green-50 text-green-700' :
-                                    event.status === 'ONGOING' ? 'bg-blue-50 text-blue-700' :
-                                        event.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700' :
-                                            event.status === 'COMPLETED' ? 'bg-gray-100 text-gray-600' :
-                                                event.status === 'DRAFT' ? 'bg-orange-50 text-orange-600' :
-                                                    'bg-gray-100 text-gray-600'
+                                event.status === 'ONGOING' ? 'bg-blue-50 text-blue-700' :
+                                    event.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700' :
+                                        event.status === 'COMPLETED' ? 'bg-gray-100 text-gray-600' :
+                                            event.status === 'DRAFT' ? 'bg-orange-50 text-orange-600' :
+                                                'bg-gray-100 text-gray-600'
                                 }`}>
                                 {event.status}
                             </span>
@@ -330,7 +330,7 @@ const EventDetailDashboard = () => {
                     iconColor="text-red-500"
                     loading={loading}
                 />
-                
+
                 {/* Avg Rating Card matching Dashboard style */}
                 <div className="bg-[#fafaf8] rounded-2xl border border-gray-100 shadow-sm px-6 py-5 flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 bg-amber-50">
