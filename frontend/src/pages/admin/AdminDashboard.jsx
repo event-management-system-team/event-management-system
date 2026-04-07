@@ -9,9 +9,11 @@ import LoadingState from '../../components/common/LoadingState.jsx';
 import EmptyState from '../../components/common/EmptyState.jsx';
 import dayjs from "dayjs";
 import DashboardCard from '../../components/domain/admin/DashboardCard.jsx';
+import { useTranslation } from 'react-i18next';
 
 export function AdminDashboard() {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [summary, setSummary] = useState()
     const [pendingEvents, setPendingEvents] = useState([])
 
@@ -82,11 +84,11 @@ export function AdminDashboard() {
                             <CardHeader className="border-b border-gray-100">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <CardTitle className="text-xl font-semibold text-gray-700">Pending Events</CardTitle>
-                                        <CardDescription>Events awaiting review and approval</CardDescription>
+                                        <CardTitle className="text-xl font-semibold text-gray-700">{t('ad_pending_events')}</CardTitle>
+                                        <CardDescription>{t('ad_events_awaiting')}</CardDescription>
                                     </div>
                                     <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100">
-                                        {summary?.pendingEvents ?? 0} pending
+                                        {summary?.pendingEvents ?? 0} {t('ad_pending')}
                                     </Badge>
                                 </div>
                             </CardHeader>
@@ -94,7 +96,7 @@ export function AdminDashboard() {
                                 <div className="divide-y divide-gray-200">
                                     {!pendingEvents || pendingEvents.length === 0 ? (
                                         <div className="flex items-center justify-center flex-1 text-sm text-gray-400 mt-5 mb-20">
-                                            No pending event yet
+                                            {t('ad_no_pending_event')}
                                         </div>
                                     ) : (
                                         pendingEvents.map((event) => {
@@ -132,7 +134,7 @@ export function AdminDashboard() {
                                 {pendingEvents && pendingEvents.length > 0 && (
                                     <div className="p-3 border-t border-gray-100">
                                         <Button variant="ghost" className="w-full h-12 text-[#7FA5A5] hover:text-[#6D9393] hover:bg-[#7FA5A5]/10 hover:cursor-pointer" onClick={() => navigate("/admin/events?status=PENDING")}>
-                                            View All Pending Events
+                                            {t('ad_view_all_pending')}
                                             <ArrowRight className="ml-2 h-4 w-4" />
                                         </Button>
                                     </div>

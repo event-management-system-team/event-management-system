@@ -9,6 +9,7 @@ import LoadingState from '../../common/LoadingState'
 import useCategories from '../../../hooks/useCategories';
 import { createSearchParams, useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
+import { useTranslation } from "react-i18next";
 
 
 const IconMap = {
@@ -27,6 +28,7 @@ const IconMap = {
 
 const CategorySection = () => {
 
+  const { t } = useTranslation();
   const { categories, isLoading, isEmpty } = useCategories();
 
   const navigate = useNavigate();
@@ -53,7 +55,7 @@ const CategorySection = () => {
     <section className="py-12 px-6 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <div className=" mb-5">
-          <h2 className="text-3xl font-extrabold ">Browse by Category</h2>
+          <h2 className="font-sans text-3xl font-extrabold ">{t("browse_by_category")}</h2>
         </div>
 
         <div className="hidden md:flex gap-3">
@@ -65,7 +67,7 @@ const CategorySection = () => {
           <LoadingState className="h-[200px]" />
         )
           : isEmpty ? (
-            <EmptyState className="h-[200px]" message="No categories found" />
+            <EmptyState className="h-[200px]" message={t("no_categories_found")} />
           )
             :
             <div className="relative">
@@ -88,7 +90,7 @@ const CategorySection = () => {
 
                       </div>
                       <span className="font-bold text-gray-700 group-hover:text-primary transition-colors text-center">
-                        {cat.categoryName}
+                        {t(cat.categoryName)}
                       </span>
                     </div>
                   </button>

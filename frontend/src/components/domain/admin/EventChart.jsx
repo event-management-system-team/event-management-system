@@ -14,8 +14,10 @@ import {
     Legend,
     ResponsiveContainer
 } from 'recharts';
+import { useTranslation } from 'react-i18next';
 
 const EventChart = ({ monthlySales, topRevenueEvents, categoryDis, formatVND }) => {
+    const { t } = useTranslation();
 
     const formatMonth = (month) => {
         if (!month) return ""
@@ -45,15 +47,15 @@ const EventChart = ({ monthlySales, topRevenueEvents, categoryDis, formatVND }) 
             {/* Ticket Sales By Month */}
             <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200" id="ticketsSold">
                 <CardHeader className="border-b border-gray-100">
-                    <CardTitle className="text-xl font-semibold text-gray-700">Ticket Sales Trend</CardTitle>
+                    <CardTitle className="text-xl font-semibold text-gray-700">{t('adc_ticket_sales_trend')}</CardTitle>
                     <CardDescription>
-                        Monthly ticket sales performance
+                        {t('adc_monthly_ticket_sales')}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-6">
                     {!monthlySalesData || monthlySalesData.length === 0 ? (
                         <div className="flex items-center justify-center h-[200px] text-sm text-gray-400">
-                            No data available
+                            {t('adc_no_data')}
                         </div>
                     ) : (
                         <ResponsiveContainer width='100%' height={240}>
@@ -89,15 +91,15 @@ const EventChart = ({ monthlySales, topRevenueEvents, categoryDis, formatVND }) 
             {/* Revenue By Month */}
             <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                 <CardHeader className="border-b border-gray-100">
-                    <CardTitle className="text-xl font-semibold text-gray-700">Revenue Trend</CardTitle>
+                    <CardTitle className="text-xl font-semibold text-gray-700">{t('adc_revenue_trend')}</CardTitle>
                     <CardDescription>
-                        Monthly revenue
+                        {t('adc_monthly_revenue')}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-6">
                     {!monthlySalesData || monthlySalesData.length === 0 ? (
                         <div className="flex items-center justify-center h-[200px] text-sm text-gray-400">
-                            No data available
+                            {t('adc_no_data')}
                         </div>
                     ) : (
                         <ResponsiveContainer width="100%" height={240}>
@@ -128,13 +130,13 @@ const EventChart = ({ monthlySales, topRevenueEvents, categoryDis, formatVND }) 
             {/* Event Category Distribution */}
             <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                 <CardHeader className="border-b border-gray-100">
-                    <CardTitle className="text-xl font-semibold text-gray-700">Event Distribution</CardTitle>
-                    <CardDescription>Events by category breakdown</CardDescription>
+                    <CardTitle className="text-xl font-semibold text-gray-700">{t('adc_event_distribution')}</CardTitle>
+                    <CardDescription>{t('adc_events_by_category')}</CardDescription>
                 </CardHeader>
                 <CardContent className="pt-6">
                     {!categoryDistributionData || categoryDistributionData.length === 0 ? (
                         <div className="flex items-center justify-center h-[200px] text-sm text-gray-400">
-                            No data available
+                            {t('adc_no_data')}
                         </div>
                     ) : (
                         <ResponsiveContainer width="100%" height={240}>
@@ -178,15 +180,15 @@ const EventChart = ({ monthlySales, topRevenueEvents, categoryDis, formatVND }) 
             {/* Top Events By Revenue */}
             <Card className="bg-[#f7f7f7] shadow-sm border border-gray-200">
                 <CardHeader className="border-b border-gray-100">
-                    <CardTitle className="text-xl font-semibold text-gray-700">Revenue by Event</CardTitle>
+                    <CardTitle className="text-xl font-semibold text-gray-700">{t('adc_revenue_by_event')}</CardTitle>
                     <CardDescription>
-                        Top performing events by revenue
+                        {t('adc_top_revenue')}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-6">
                     {!topRevenueEventsData || topRevenueEventsData.length === 0 ? (
                         <div className="flex items-center justify-center h-[200px] text-sm text-gray-400">
-                            No data available
+                            {t('adc_no_data')}
                         </div>
                     ) : (
                         <ResponsiveContainer width="100%" height={240}>

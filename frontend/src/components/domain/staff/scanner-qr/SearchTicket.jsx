@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Search, CheckCircle2, AlertCircle, UserCheck } from 'lucide-react';
 import PopUpInfoTicket from './PopUpInfoTicket';
+import { useTranslation } from 'react-i18next';
 
 const SearchTicket = ({ tickets, searchKeyword, handleSearch, onCheckIn, isCheckingIn }) => {
+    const { t } = useTranslation();
     const [keyword, setKeyword] = useState(searchKeyword);
     const [selectedTicket, setSelectedTicket] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -26,14 +28,14 @@ const SearchTicket = ({ tickets, searchKeyword, handleSearch, onCheckIn, isCheck
             return (
                 <div className="flex flex-col items-end shrink-0 gap-1">
                     <span className="bg-green-100 text-green-700 text-[10px] font-extrabold px-2 py-1 rounded-md flex items-center gap-1">
-                        <CheckCircle2 size={12} /> CHECKED IN
+                        <CheckCircle2 size={12} /> {t('staff_checked_in')}
                     </span>
                     <span className="text-[9px] text-slate-400 font-medium">
                         {attendee.checkInTime ? new Date(attendee.checkInTime).toLocaleTimeString() : ''}
                     </span>
                     {attendee.scannedBy && (
                         <span className="text-[8px] text-slate-400 italic flex items-center gap-1">
-                            <UserCheck size={10} /> by {attendee.scannedBy}
+                            <UserCheck size={10} /> {t('staff_by')} {attendee.scannedBy}
                         </span>
                     )}
                 </div>
@@ -59,7 +61,7 @@ const SearchTicket = ({ tickets, searchKeyword, handleSearch, onCheckIn, isCheck
                     }}
                     className="bg-[#89A8B2] hover:bg-[#6c8a94] text-white text-[11px] font-bold px-4 py-1.5 rounded-lg transition-colors shadow-sm shadow-[#89A8B2]/30"
                 >
-                    CHECK IN
+                    {t('staff_check_in').toUpperCase()}
                 </button>
             </div>
         );
@@ -68,9 +70,9 @@ const SearchTicket = ({ tickets, searchKeyword, handleSearch, onCheckIn, isCheck
     return (
         <div className="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 flex flex-col flex-1 min-h-[300px] lg:min-h-0 transition-all">
             <div className="flex items-center justify-between mb-4 px-1 shrink-0">
-                <h2 className="text-[#2C3E50] text-base font-extrabold tracking-tight">Attendee List</h2>
+                <h2 className="text-[#2C3E50] text-base font-extrabold tracking-tight">{t('staff_attendee_list')}</h2>
                 <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md">
-                    {tickets.length} Results
+                    {t('staff_results', { count: tickets.length })}
                 </span>
             </div>
 
@@ -85,7 +87,7 @@ const SearchTicket = ({ tickets, searchKeyword, handleSearch, onCheckIn, isCheck
                         onChange={(e) => setKeyword(e.target.value)}
                         onKeyDown={handleKeyDown}
                         className="w-full h-full rounded-r-xl border-none bg-transparent text-[#2C3E50] placeholder:text-slate-400 focus:ring-0 focus:outline-none text-sm font-medium"
-                        placeholder="Search by name, email or ticket code..."
+                        placeholder={t('staff_search_placeholder')}
                     />
                 </div>
             </div>
@@ -136,7 +138,7 @@ const SearchTicket = ({ tickets, searchKeyword, handleSearch, onCheckIn, isCheck
 
                 {tickets.length === 0 && (
                     <div className="text-center py-10 text-slate-400 text-sm italic">
-                        No tickets found matching your search.
+                        {t('staff_no_tickets_found')}
                     </div>
                 )}
             </div>

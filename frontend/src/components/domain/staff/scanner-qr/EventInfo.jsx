@@ -1,7 +1,9 @@
 import React from 'react';
 import { Calendar, MapPin } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const EventInfo = ({ eventInfo }) => {
+    const { t } = useTranslation();
     const formatDate = (dateString) => {
         if (!dateString) return '';
         const date = new Date(dateString);
@@ -18,7 +20,7 @@ const EventInfo = ({ eventInfo }) => {
         <div className="bg-[#2C3E50] rounded-3xl p-6 shadow-lg border border-[#34495E] relative overflow-hidden shrink-0">
             <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-[#89A8B2]/30 rounded-full blur-2xl"></div>
 
-            <h2 className="text-white/60 text-xs font-extrabold uppercase tracking-wider mb-1">Current Event</h2>
+            <h2 className="text-white/60 text-xs font-extrabold uppercase tracking-wider mb-1">{t('staff_current_event')}</h2>
             <h3 className="text-white text-lg font-bold leading-tight mb-4 relative z-10">{eventInfo.eventName}</h3>
 
             <div className="flex flex-col gap-3 text-sm text-white/80 font-medium">

@@ -1,8 +1,9 @@
 import { Briefcase, MapPin } from "lucide-react";
 import { Link } from 'react-router-dom'
+import { useTranslation } from "react-i18next";
 
 const RecruitmentCard = ({ positions = [], eventName, eventSlug, eventBannerUrl, deadline, createdAt, location, organizer, active }) => {
-
+    const { t } = useTranslation();
     const isNew = (new Date() - new Date(createdAt)) / (1000 * 60 * 60 * 24) <= 3;
 
     const dateObj = deadline ? new Date(deadline) : null;
@@ -15,11 +16,11 @@ const RecruitmentCard = ({ positions = [], eventName, eventSlug, eventBannerUrl,
 
                 {!active ? (
                     <span className="absolute top-0 right-0 bg-slate-500 text-white text-[9px] sm:text-[10px] font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-bl-xl z-20 shadow-sm tracking-widest uppercase">
-                        CLOSED
+                        {t("closed")}
                     </span>
                 ) : isNew && (
-                    <span className="absolute top-0 right-0 bg-red-500 text-white text-[9px] sm:text-[10px] font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-bl-xl z-20 shadow-sm tracking-wider">
-                        NEW
+                    <span className="absolute top-0 right-0 bg-red-500 text-white text-[9px] sm:text-[10px] font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-bl-xl z-20 shadow-sm tracking-wider uppercase">
+                        {t("status_new")}
                     </span>
                 )}
 
@@ -62,7 +63,7 @@ const RecruitmentCard = ({ positions = [], eventName, eventSlug, eventBannerUrl,
 
                         <div className="mt-2 sm:mt-3.5 flex items-center gap-1.5 sm:gap-2 overflow-hidden w-full">
 
-                            <span className="hidden sm:inline-block text-[10px] font-bold text-slate-400 uppercase tracking-widest shrink-0">JOB OPENINGS:</span>
+                            <span className="hidden sm:inline-block text-[10px] font-bold text-slate-400 uppercase tracking-widest shrink-0">{t("job_openings")}:</span>
 
                             <div className="flex items-center gap-1.5 sm:gap-2 overflow-hidden flex-nowrap flex-1 min-w-0">
                                 {positions.slice(0, 2).map((pos, idx) => (
@@ -96,7 +97,7 @@ const RecruitmentCard = ({ positions = [], eventName, eventSlug, eventBannerUrl,
                             </>
                         ) : (
                             <div className="flex flex-col items-center justify-center text-[#4ECDC4]">
-                                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest mb-0.5">OPEN</span>
+                                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest mb-0.5">{t("status_open")}</span>
                                 <span className="text-2xl sm:text-3xl font-black leading-none">∞</span>
                             </div>
                         )}

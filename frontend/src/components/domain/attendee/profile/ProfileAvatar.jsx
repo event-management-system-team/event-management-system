@@ -1,9 +1,11 @@
 import React, { useRef } from "react";
 import { FaCamera } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
+import { useTranslation } from "react-i18next";
 
 export const ProfileAvatar = ({ avatarUrl, isEditMode, onImageUpload }) => {
   const fileInputRef = useRef(null);
+  const { t } = useTranslation();
 
   const handleCameraClick = () => {
     if (isEditMode && fileInputRef.current) {
@@ -54,13 +56,13 @@ export const ProfileAvatar = ({ avatarUrl, isEditMode, onImageUpload }) => {
       />
 
       <div className="text-center">
-        <h2 className="text-2xl font-black text-blue-grey">
-          {isEditMode ? "Edit Public Profile" : "Public Profile"}
+        <h2 className="font-sans text-2xl font-black text-blue-grey">
+          {isEditMode ? t("edit_public_profile") : t("public_profile")}
         </h2>
-        <p className="text-sm text-gray-500 mt-1 font-medium">
+        <p className="font-sans text-sm text-gray-500 mt-1 font-medium">
           {isEditMode
-            ? "Update your essential information for the community."
-            : "Your essential information for the community."}
+            ? t("edit_profile_description")
+            : t("profile_description")}
         </p>
       </div>
     </div>

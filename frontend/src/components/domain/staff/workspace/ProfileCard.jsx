@@ -1,6 +1,8 @@
 import { ShieldCheck } from 'lucide-react'
+import { useTranslation } from 'react-i18next';
 
 const ProfileCard = ({ userInfo, staffRole }) => {
+    const { t } = useTranslation();
     return (
         <div className="w-full lg:w-4/12 bg-white rounded-[40px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden group flex flex-col">
             <div className="absolute top-0 left-0 w-full h-28 bg-gradient-to-br from-[#5d727a] to-[#89a8b2] opacity-20"></div>
@@ -24,7 +26,7 @@ const ProfileCard = ({ userInfo, staffRole }) => {
                 </div>
 
                 <span className="bg-[#89A8B2]/10 text-[#2C3E50] px-5 py-2 rounded-2xl text-[10px] 2xl:text-xs font-bold uppercase tracking-widest">
-                    Official Staff
+                    {t('staff_official_staff')}
                 </span>
             </div>
         </div>

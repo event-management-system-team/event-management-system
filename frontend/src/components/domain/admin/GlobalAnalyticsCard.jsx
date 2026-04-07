@@ -1,7 +1,9 @@
 import { Calendar, DollarSign, Target, Users, Zap } from "lucide-react";
 import { Card, CardContent } from "../admin/Card";
+import { useTranslation } from 'react-i18next';
 
 const GlobalAnalyticsCard = ({ summary, formatVND, formatNumber }) => {
+    const { t } = useTranslation();
 
     const formatTotalNumber = (num) => {
         return Number(num).toLocaleString('en-US')
@@ -9,35 +11,35 @@ const GlobalAnalyticsCard = ({ summary, formatVND, formatNumber }) => {
 
     const globalMetrics = [
         {
-            title: "TOTAL EVENTS",
+            title: t('adc_total_events'),
             value: formatTotalNumber(summary?.totalEvents ?? 0),
             icon: Calendar,
             iconBg: "bg-blue-100",
             iconColor: "text-blue-600"
         },
         {
-            title: "ACTIVE EVENTS",
+            title: t('adc_active_events'),
             value: formatTotalNumber(summary?.activeEvents ?? 0),
             icon: Zap,
             iconBg: "bg-green-100",
             iconColor: "text-green-600"
         },
         {
-            title: "TOTAL TICKETS SOLD",
+            title: t('adc_total_tickets_sold'),
             value: formatTotalNumber(summary?.totalTicketsSold ?? 0),
             icon: Target,
             iconBg: "bg-purple-100",
             iconColor: "text-purple-600"
         },
         {
-            title: "TOTAL REVENUE",
+            title: t('adc_total_revenue'),
             value: formatVND(summary?.totalRevenue ?? 0),
             icon: DollarSign,
             iconBg: "bg-emerald-100",
             iconColor: "text-emerald-600"
         },
         {
-            title: "AVG ATTENDANCE RATE",
+            title: t('adc_avg_attendance'),
             value: `${formatNumber(summary?.averageAttendanceRate ?? 0)} %`,
             icon: Users,
             iconBg: "bg-orange-100",

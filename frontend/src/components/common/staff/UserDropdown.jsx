@@ -3,9 +3,11 @@ import { ArrowLeftRight, LogOut, User } from 'lucide-react'
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser } from '../../../store/slices/auth.slice';
+import { useTranslation } from 'react-i18next';
 
 const UserDropdown = ({ setIsOpen }) => {
     const { user } = useSelector((state) => state.auth);
+    const { t } = useTranslation();
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -21,9 +23,9 @@ const UserDropdown = ({ setIsOpen }) => {
     };
 
     const menuItems = [
-        { key: '1', label: 'Attendee Mode', icon: <ArrowLeftRight size={16} className="text-[#4ECDC4]" />, onClick: handleSwitchMode },
+        { key: '1', label: t('staff_attendee_mode'), icon: <ArrowLeftRight size={16} className="text-[#4ECDC4]" />, onClick: handleSwitchMode },
         { type: 'divider' },
-        { key: '2', label: 'Logout', icon: <LogOut size={16} />, danger: true, onClick: handleLogout },
+        { key: '2', label: t('admin_logout'), icon: <LogOut size={16} />, danger: true, onClick: handleLogout },
     ];
 
     return (
@@ -41,7 +43,7 @@ const UserDropdown = ({ setIsOpen }) => {
                         <p className="text-sm font-bold text-white truncate">{user?.fullName || user?.full_name}</p>
                         <div className="flex items-center gap-1.5">
                             <div className="size-1.5 bg-[#4ECDC4] rounded-full animate-pulse"></div>
-                            <p className="text-[10px] text-white/60 uppercase tracking-wider font-bold">Online</p>
+                            <p className="text-[10px] text-white/60 uppercase tracking-wider font-bold">{t('staff_online')}</p>
                         </div>
                     </div>
                 </div>

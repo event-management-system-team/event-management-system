@@ -3,10 +3,13 @@ import { logoutUser } from "../../../store/slices/auth.slice";
 import { Dropdown, Avatar } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { User, LogOut, Ticket, FileText, ChevronDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const UserDropdown = ({ user }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const { t } = useTranslation();
 
   const handleLogout = () => {
     dispatch(logoutUser());
@@ -17,17 +20,17 @@ const UserDropdown = ({ user }) => {
   const items = [
     {
       key: "profile",
-      label: <Link to="/attendee/me">My Profile</Link>,
+      label: <Link to="/attendee/me">{t("my_profile")}</Link>,
       icon: <User size={16} />,
     },
     {
       key: "tickets",
-      label: <Link to="/attendee/my-tickets">My Tickets</Link>,
+      label: <Link to="/attendee/my-tickets">{t("my_tickets")}</Link>,
       icon: <Ticket size={16} />,
     },
     {
       key: "applications",
-      label: <Link to="/attendee/applications">My Applications</Link>,
+      label: <Link to="/attendee/applications">{t("my_applications")}</Link>,
       icon: <FileText size={16} />,
     },
     {
@@ -35,7 +38,7 @@ const UserDropdown = ({ user }) => {
     },
     {
       key: "logout",
-      label: "Logout",
+      label: t("logout"),
       icon: <LogOut size={16} />,
       danger: true,
       onClick: () => {

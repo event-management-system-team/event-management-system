@@ -23,17 +23,18 @@ import {
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
 import organizerService from '../../services/organizer.service';
 import useCategories from '../../hooks/useCategories';
 
 // ─────────────────────────────────────────────
 // Step indicator at the top
 // ─────────────────────────────────────────────
-const StepIndicator = ({ currentStep }) => {
+const StepIndicator = ({ currentStep, t }) => {
     const steps = [
-        { id: 1, label: 'Basic Info' },
-        { id: 2, label: 'Tickets & Pricing' },
-        { id: 3, label: 'Agenda' },
+        { id: 1, label: t('ce_basic_info') },
+        { id: 2, label: t('ce_tickets_pricing') },
+        { id: 3, label: t('ce_agenda') },
     ];
 
     return (
@@ -101,7 +102,7 @@ const Step1BasicInfo = ({ form, onChange, errors = {}, setErrors }) => {
     const locationWrapperRef = useRef(null);
 
     const fetchSuggestions = (query) => {
-        if (!query || query.trim().length < 3) {
+        if (!query || query.trim().length < 2) {
             setSuggestions([]);
             setShowSuggestions(false);
             return;
@@ -193,15 +194,15 @@ const Step1BasicInfo = ({ form, onChange, errors = {}, setErrors }) => {
                     <div className="w-6 h-6 rounded-full bg-[#4a9e9e]/15 flex items-center justify-center">
                         <Info size={13} className="text-[#4a9e9e]" />
                     </div>
-                    Event Details
+                    {t('ce_event_details')}
                 </h2>
 
                 {/* Event Name */}
                 <div className="mb-4">
-                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">Event Name</label>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">{t('ce_event_name')}</label>
                     <input
                         type="text"
-                        placeholder="Enter a catchy title for your event"
+                        placeholder={t('ce_event_name_placeholder')}
                         value={form.eventName}
                         onChange={(e) => onChange({ eventName: e.target.value })}
                         className={`w-full px-4 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 transition ${errors.eventName ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
@@ -211,14 +212,14 @@ const Step1BasicInfo = ({ form, onChange, errors = {}, setErrors }) => {
 
                 {/* Category */}
                 <div className="mb-4">
-                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">Category</label>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">{t('ce_category')}</label>
                     <select
                         value={form.categoryId}
                         onChange={(e) => onChange({ categoryId: e.target.value })}
                         disabled={catLoading}
                         className={`w-full px-4 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 bg-white transition appearance-none ${errors.categoryId ? 'border-red-400 focus:ring-red-200' : 'border-gray-200 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
                     >
-                        <option value="">{catLoading ? 'Loading...' : 'Select Category'}</option>
+                        <option value="">{catLoading ? t('ce_loading') : t('ce_select_category')}</option>
                         {categories.map((c) => (
                             <option key={c.categoryId} value={c.categoryId}>{c.categoryName}</option>
                         ))}
@@ -228,9 +229,9 @@ const Step1BasicInfo = ({ form, onChange, errors = {}, setErrors }) => {
 
                 {/* Description */}
                 <div className="mb-4">
-                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">Description</label>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">{t('ce_description')}</label>
                     <textarea
-                        placeholder="Tell your attendees what to expect..."
+                        placeholder={t('ce_description_placeholder')}
                         value={form.description}
                         onChange={(e) => onChange({ description: e.target.value })}
                         rows={5}
@@ -241,7 +242,7 @@ const Step1BasicInfo = ({ form, onChange, errors = {}, setErrors }) => {
 
                 {/* Event Cover Image */}
                 <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">Event Cover Image</label>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">{t('ce_cover_image')}</label>
                     <div
                         className={`border-2 border-dashed rounded-xl flex flex-col items-center justify-center py-10 cursor-pointer transition ${errors.coverFile ? 'border-red-400 bg-red-50/30 hover:bg-red-50/50' : 'border-[#4a9e9e]/40 bg-[#f0fafa] hover:bg-[#e6f5f5]'}`}
                         onClick={() => fileInputRef.current?.click()}
@@ -255,8 +256,8 @@ const Step1BasicInfo = ({ form, onChange, errors = {}, setErrors }) => {
                                 <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${errors.coverFile ? 'bg-red-100' : 'bg-[#4a9e9e]/20'}`}>
                                     <Upload size={22} className={errors.coverFile ? 'text-red-400' : 'text-[#4a9e9e]'} />
                                 </div>
-                                <p className="text-sm font-medium text-gray-600">Click to upload or drag and drop</p>
-                                <p className="text-xs text-gray-400 mt-1">SVG, PNG, JPG or GIF (max. 800×400px)</p>
+                                <p className="text-sm font-medium text-gray-600">{t('ce_upload_text')}</p>
+                                <p className="text-xs text-gray-400 mt-1">{t('ce_upload_hint')}</p>
                             </>
                         )}
                     </div>
@@ -277,7 +278,7 @@ const Step1BasicInfo = ({ form, onChange, errors = {}, setErrors }) => {
                     <div className="w-6 h-6 rounded-full bg-[#4a9e9e]/15 flex items-center justify-center">
                         <Clock size={13} className="text-[#4a9e9e]" />
                     </div>
-                    Schedule Details
+                    {t('ce_schedule_details')}
                 </h2>
 
                 {/* 48h review notice */}
@@ -306,7 +307,7 @@ const Step1BasicInfo = ({ form, onChange, errors = {}, setErrors }) => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-xs font-semibold text-gray-600 mb-1.5">Start Time</label>
+                        <label className="block text-xs font-semibold text-gray-600 mb-1.5">{t('ce_start_time')}</label>
                         <input
                             type="time"
                             value={form.startTime}
@@ -316,7 +317,7 @@ const Step1BasicInfo = ({ form, onChange, errors = {}, setErrors }) => {
                         <FieldError msg={errors.startTime} />
                     </div>
                     <div>
-                        <label className="block text-xs font-semibold text-gray-600 mb-1.5">End Time</label>
+                        <label className="block text-xs font-semibold text-gray-600 mb-1.5">{t('ce_end_time')}</label>
                         <input
                             type="time"
                             value={form.endTime}
@@ -334,15 +335,15 @@ const Step1BasicInfo = ({ form, onChange, errors = {}, setErrors }) => {
                     <div className="w-6 h-6 rounded-full bg-[#4a9e9e]/15 flex items-center justify-center">
                         <MapPin size={13} className="text-[#4a9e9e]" />
                     </div>
-                    Location
+                    {t('ce_location')}
                 </h2>
                 <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">Venue Address</label>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">{t('ce_venue_address')}</label>
                     <div className="relative" ref={locationWrapperRef}>
                         <MapPin size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 z-10" />
                         <input
                             type="text"
-                            placeholder="Search for a location or address"
+                            placeholder={t('ce_search_location')}
                             value={form.location}
                             onChange={handleLocationChange}
                             onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
@@ -362,7 +363,7 @@ const Step1BasicInfo = ({ form, onChange, errors = {}, setErrors }) => {
                         {showSuggestions && (
                             <ul className="absolute z-50 left-0 right-0 mt-1.5 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden max-h-64 overflow-y-auto">
                                 {suggestions.length === 0 ? (
-                                    <li className="px-4 py-3 text-sm text-gray-400 text-center">No results found</li>
+                                    <li className="px-4 py-3 text-sm text-gray-400 text-center">{t('ce_no_results')}</li>
                                 ) : (
                                     suggestions.map((item) => (
                                         <li
@@ -456,26 +457,26 @@ const Step2Tickets = ({ form, onChange, errors = {}, setErrors }) => {
         <div className="space-y-6">
             <section className={`bg-white rounded-2xl shadow-sm border p-7 transition-all ${isFree ? 'border-[#4a9e9e]/40 bg-[#f0fafa]/40' : 'border-gray-100'}`}>
                 <div className="flex items-center justify-between mb-1">
-                    <h2 className="text-lg font-bold text-gray-800">Step 2: Ticket Types &amp; Inventory</h2>
+                    <h2 className="text-lg font-bold text-gray-800">{t('ce_step2_title')}</h2>
                     {isFree && (
                         <span className="px-3 py-1 bg-[#4a9e9e]/10 text-[#4a9e9e] text-xs font-bold rounded-full border border-[#4a9e9e]/20">
-                            FREE EVENT
+                            {t('ce_free_event_badge')}
                         </span>
                     )}
                 </div>
                 <p className="text-sm text-gray-400 mb-6">
                     {isFree
-                        ? 'This is a free event — enter the total number of available spots below.'
-                        : 'Configure your pricing tiers and set availability for each category.'}
+                        ? t('ce_free_event_desc')
+                        : t('ce_paid_event_desc')}
                 </p>
 
                 {/* Ticket table — locked when isFree */}
                 <div className={`transition-all ${isFree ? 'opacity-50 pointer-events-none select-none' : ''}`}>
                     <div className="grid grid-cols-12 gap-3 mb-2 px-1">
-                        <div className="col-span-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Ticket Name</div>
-                        <div className="col-span-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Quantity</div>
+                        <div className="col-span-5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">{t('ce_ticket_name')}</div>
+                        <div className="col-span-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">{t('ce_quantity')}</div>
                         <div className="col-span-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                            {isFree ? 'Price' : 'Price (VND)'}
+                            {isFree ? t('ce_price') : t('ce_price_vnd')}
                         </div>
                         <div className="col-span-1" />
                     </div>
@@ -489,7 +490,7 @@ const Step2Tickets = ({ form, onChange, errors = {}, setErrors }) => {
                                 <div className="col-span-5">
                                     <input
                                         type="text"
-                                        placeholder="e.g. General Admission"
+                                        placeholder={t('ce_ticket_placeholder')}
                                         value={ticket.name}
                                         onChange={(e) => handleTicketChange(idx, 'name', e.target.value)}
                                         onBlur={() => handleTicketNameBlur(idx)}
@@ -511,7 +512,7 @@ const Step2Tickets = ({ form, onChange, errors = {}, setErrors }) => {
                                 <div className="col-span-3">
                                     {isFree ? (
                                         <div className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-100 text-gray-400 font-medium text-center">
-                                            FREE
+                                            {t('ce_free')}
                                         </div>
                                     ) : (
                                         <div className="relative">
@@ -555,7 +556,7 @@ const Step2Tickets = ({ form, onChange, errors = {}, setErrors }) => {
                         className="mt-4 w-full border-2 border-dashed border-gray-200 rounded-xl py-3 flex items-center justify-center gap-2 text-sm text-gray-500 hover:border-[#4a9e9e]/50 hover:text-[#4a9e9e] hover:bg-[#f0fafa] transition"
                     >
                         <Plus size={16} />
-                        Add Another Ticket Type
+                        {t('ce_add_ticket')}
                     </button>
                 </div>
             </section>
@@ -563,7 +564,7 @@ const Step2Tickets = ({ form, onChange, errors = {}, setErrors }) => {
 
             {/* Advanced Settings */}
             <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
-                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">Advanced Settings</p>
+                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">{t('ce_advanced_settings')}</p>
 
                 <div className="space-y-4">
                     {/* Is Free */}
@@ -576,8 +577,8 @@ const Step2Tickets = ({ form, onChange, errors = {}, setErrors }) => {
                                 </svg>
                             </div>
                         }
-                        title="Free event"
-                        description="All tickets are complimentary — pricing section will be locked"
+                        title={t('ce_free_event_toggle')}
+                        description={t('ce_free_event_toggle_desc')}
                         checked={isFree}
                         onChange={handleToggleFree}
                     />
@@ -585,7 +586,7 @@ const Step2Tickets = ({ form, onChange, errors = {}, setErrors }) => {
                     {isFree && (
                         <div className="ml-12 mt-1 animate-in fade-in">
                             <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-                                Total Capacity <span className="text-red-400">*</span>
+                                {t('ce_total_capacity')} <span className="text-red-400">*</span>
                             </label>
                             <input
                                 type="number"
@@ -596,7 +597,7 @@ const Step2Tickets = ({ form, onChange, errors = {}, setErrors }) => {
                                 className={`w-48 px-3 py-2 text-sm border rounded-xl focus:outline-none focus:ring-2 bg-white transition ${errors.totalCapacity ? 'border-red-400 focus:ring-red-200' : 'border-[#4a9e9e]/40 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e]'}`}
                             />
                             <FieldError msg={errors.totalCapacity} />
-                            <p className="mt-1 text-xs text-gray-400">Total number of attendees for this free event</p>
+                            <p className="mt-1 text-xs text-gray-400">{t('ce_total_capacity_hint')}</p>
                         </div>
                     )}
                 </div>
@@ -661,12 +662,12 @@ const Step3Agenda = ({ form, onChange, errors = {} }) => {
             <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
                 <div className="flex items-center justify-between mb-1">
                     <h2 className="text-base font-bold text-gray-800">
-                        Step 3: Event Agenda
+                        {t('ce_step3_title')}
                     </h2>
-                    <span className="text-xs text-gray-400 font-medium">{form.agenda.length} session{form.agenda.length !== 1 ? 's' : ''}</span>
+                    <span className="text-xs text-gray-400 font-medium">{t('ce_session_count', { count: form.agenda.length })}</span>
                 </div>
                 <p className="text-sm text-gray-400 mb-6">
-                    Plan out the schedule of your event. Add sessions, or activities in order.
+                    {t('ce_agenda_desc')}
                 </p>
 
                 {/* Agenda items */}
@@ -674,8 +675,8 @@ const Step3Agenda = ({ form, onChange, errors = {} }) => {
                     {form.agenda.length === 0 && (
                         <div className={`text-center py-10 rounded-xl ${errors._agenda ? 'bg-red-50 border border-red-200 text-red-400' : 'text-gray-300'}`}>
                             <ListOrdered size={36} className={`mx-auto mb-3 ${errors._agenda ? 'opacity-70' : 'opacity-40'}`} />
-                            <p className="text-sm font-medium">{errors._agenda || 'No sessions yet'}</p>
-                            <p className={`text-xs mt-1 ${errors._agenda ? 'text-red-300' : ''}`}>Click &quot;Add Session&quot; to start building your agenda.</p>
+                            <p className="text-sm font-medium">{errors._agenda || t('ce_no_sessions')}</p>
+                            <p className={`text-xs mt-1 ${errors._agenda ? 'text-red-300' : ''}`}>{t('ce_add_session_hint')}</p>
                         </div>
                     )}
 
@@ -700,10 +701,10 @@ const Step3Agenda = ({ form, onChange, errors = {} }) => {
 
                             {/* Title */}
                             <div className="mb-3 mt-2">
-                                <label className="block text-xs font-semibold text-gray-600 mb-1.5">Session Title <span className="text-red-400">*</span></label>
+                                <label className="block text-xs font-semibold text-gray-600 mb-1.5">{t('ce_session_title')} <span className="text-red-400">*</span></label>
                                 <input
                                     type="text"
-                                    placeholder="e.g. Opening Keynote, Workshop: UX Design..."
+                                    placeholder={t('ce_session_title_placeholder')}
                                     value={item.title}
                                     onChange={(e) => handleChange(idx, 'title', e.target.value)}
                                     className={`w-full px-4 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 transition bg-white ${errors[`agenda_${idx}_title`]
@@ -720,7 +721,7 @@ const Step3Agenda = ({ form, onChange, errors = {} }) => {
                                 <div>
                                     <label className="block text-xs font-semibold text-gray-600 mb-1.5">
                                         <Clock size={11} className="inline mr-1 text-[#4a9e9e]" />
-                                        Start Time <span className="text-red-400">*</span>
+                                        {t('ce_start_time')} <span className="text-red-400">*</span>
                                     </label>
                                     <input
                                         type="time"
@@ -736,7 +737,7 @@ const Step3Agenda = ({ form, onChange, errors = {} }) => {
                                 <div>
                                     <label className="block text-xs font-semibold text-gray-600 mb-1.5">
                                         <Clock size={11} className="inline mr-1 text-[#4a9e9e]" />
-                                        End Time <span className="text-red-400">*</span>
+                                        {t('ce_end_time')} <span className="text-red-400">*</span>
                                     </label>
                                     <input
                                         type="time"
@@ -755,11 +756,11 @@ const Step3Agenda = ({ form, onChange, errors = {} }) => {
                             <div className="mb-3">
                                 <label className="block text-xs font-semibold text-gray-600 mb-1.5">
                                     <MapPin size={11} className="inline mr-1 text-[#4a9e9e]" />
-                                    Location <span className="text-gray-300 font-normal">(optional)</span>
+                                    {t('ce_location_optional')} <span className="text-gray-300 font-normal">{t('ce_optional')}</span>
                                 </label>
                                 <input
                                     type="text"
-                                    placeholder="e.g. Hall A, Room 202, Main Stage..."
+                                    placeholder={t('ce_location_placeholder')}
                                     value={item.location}
                                     onChange={(e) => handleChange(idx, 'location', e.target.value)}
                                     className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4a9e9e]/30 focus:border-[#4a9e9e] transition bg-white"
@@ -770,10 +771,10 @@ const Step3Agenda = ({ form, onChange, errors = {} }) => {
                             <div>
                                 <label className="block text-xs font-semibold text-gray-600 mb-1.5">
                                     <AlignLeft size={11} className="inline mr-1 text-[#4a9e9e]" />
-                                    Description <span className="text-gray-300 font-normal">(optional)</span>
+                                    {t('ce_description_optional')} <span className="text-gray-300 font-normal">{t('ce_optional')}</span>
                                 </label>
                                 <textarea
-                                    placeholder="Brief description of this session..."
+                                    placeholder={t('ce_session_desc_placeholder')}
                                     value={item.description}
                                     onChange={(e) => handleChange(idx, 'description', e.target.value)}
                                     rows={2}
@@ -791,7 +792,7 @@ const Step3Agenda = ({ form, onChange, errors = {} }) => {
                     className="mt-5 w-full border-2 border-dashed border-gray-200 rounded-xl py-3 flex items-center justify-center gap-2 text-sm text-gray-500 hover:border-[#4a9e9e]/50 hover:text-[#4a9e9e] hover:bg-[#f0fafa] transition"
                 >
                     <Plus size={16} />
-                    Add Session
+                    {t('ce_add_session')}
                 </button>
             </section>
 
@@ -800,7 +801,7 @@ const Step3Agenda = ({ form, onChange, errors = {} }) => {
             <div className="flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3">
                 <Info size={15} className="text-blue-400 mt-0.5 shrink-0" />
                 <p className="text-xs text-blue-500 leading-relaxed">
-                    <strong>Tip:</strong> At least one session is required. Sessions will be shown to attendees on the event page in the order listed.
+                    <strong>{t('ce_tip')}</strong> {t('ce_tip_text')}
                 </p>
             </div>
         </div>
@@ -810,7 +811,7 @@ const Step3Agenda = ({ form, onChange, errors = {} }) => {
 // ─────────────────────────────────────────────
 // Step 4 – Success screen
 // ─────────────────────────────────────────────
-const SuccessScreen = ({ form, isEditMode }) => {
+const SuccessScreen = ({ form, isEditMode, t }) => {
     const navigate = useNavigate();
     return (
         <div className="flex flex-col items-center justify-center py-16 px-4">
@@ -821,12 +822,12 @@ const SuccessScreen = ({ form, isEditMode }) => {
                 </div>
 
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                    {isEditMode ? 'Event Updated Successfully!' : 'Event Submitted Successfully!'}
+                    {isEditMode ? t('ce_event_updated') : t('ce_event_submitted')}
                 </h2>
                 <p className="text-sm text-gray-400 mb-6">
                     {isEditMode
-                        ? 'Your event has been updated and resubmitted for review.'
-                        : 'Your event has been submitted for review. You can track its status in your events dashboard.'}
+                        ? t('ce_updated_desc')
+                        : t('ce_submitted_desc')}
                 </p>
 
                 {/* Event summary card */}
@@ -839,7 +840,7 @@ const SuccessScreen = ({ form, isEditMode }) => {
                         )}
                     </div>
                     <div>
-                        <p className="font-bold text-gray-900 text-sm">{form.eventName || 'New Event'}</p>
+                        <p className="font-bold text-gray-900 text-sm">{form.eventName || t('ce_new_event')}</p>
                         <p className="text-xs text-[#4a9e9e] flex items-center gap-1 mt-0.5">
                             <Calendar size={11} />
                             {form.startDate ? dayjs(form.startDate).format('DD/MM/YYYY') : '—'}
@@ -857,10 +858,10 @@ const SuccessScreen = ({ form, isEditMode }) => {
                     className="flex items-center gap-2 bg-[#2d3a4f] hover:bg-[#1e293b] text-white px-7 py-2.5 rounded-full text-sm font-medium transition-colors shadow-sm mb-6"
                 >
                     <ArrowLeft size={16} />
-                    Back to My Events
+                    {t('ce_back_to_events')}
                 </button>
 
-                <p className="text-[11px] uppercase tracking-widest text-gray-300 mb-3">Share Your Event</p>
+                <p className="text-[11px] uppercase tracking-widest text-gray-300 mb-3">{t('ce_share_event')}</p>
                 <div className="flex items-center gap-5">
                     <button className="text-gray-300 hover:text-blue-600 transition"><Facebook size={22} /></button>
                     <button className="text-gray-300 hover:text-sky-500 transition"><Twitter size={22} /></button>
@@ -899,7 +900,7 @@ const initialForm = {
 };
 
 // ─── Validation helpers ─────────────────────────────────────────────────────
-const validateStep1 = (form) => {
+const validateStep1 = (form, t) => {
     const e = {};
     if (!form.eventName.trim()) e.eventName = 'Event name is required';
     if (!form.categoryId) e.categoryId = 'Please select a category';
@@ -915,11 +916,11 @@ const validateStep1 = (form) => {
     return e;
 };
 
-const validateStep2 = (form) => {
+const validateStep2 = (form, t) => {
     const e = {};
     if (form.isFree) {
         if (!form.totalCapacity || parseInt(form.totalCapacity, 10) <= 0) {
-            e.totalCapacity = 'Total capacity is required for free events';
+            e.totalCapacity = t('ce_val_capacity');
         }
     } else {
         // Track seen names for duplicate detection (case-insensitive, trimmed)
@@ -941,10 +942,10 @@ const validateStep2 = (form) => {
     return e;
 };
 
-const validateStep3 = (form) => {
+const validateStep3 = (form, t) => {
     const e = {};
     if (form.agenda.length === 0) {
-        e._agenda = 'At least one session is required';
+        e._agenda = t('ce_val_agenda_required');
     }
     const eventStart = form.startTime;
     const eventEnd = form.endTime;
@@ -958,7 +959,7 @@ const validateStep3 = (form) => {
             e[`agenda_${idx}_startTime`] = `Must be at or after event start time (${eventStart})`;
         }
         if (!item.endTime) {
-            e[`agenda_${idx}_endTime`] = 'End time is required';
+            e[`agenda_${idx}_endTime`] = t('ce_val_session_end');
         } else if (item.startTime && item.endTime <= item.startTime) {
             e[`agenda_${idx}_endTime`] = 'End time must be after start time';
         } else if (eventEnd && item.endTime > eventEnd) {
@@ -972,6 +973,7 @@ const CreateEventPage = () => {
     const navigate = useNavigate();
     const { eventId } = useParams();
     const isEditMode = Boolean(eventId);
+    const { t } = useTranslation();
 
     const [step, setStep] = useState(1);
     const [form, setForm] = useState(initialForm);
@@ -1040,7 +1042,7 @@ const CreateEventPage = () => {
                 });
             } catch (err) {
                 if (!cancelled) {
-                    setError(err.response?.data?.message || 'Failed to load event data.');
+                    setError(err.response?.data?.message || t('ce_load_failed'));
                 }
             } finally {
                 if (!cancelled) setLoadingEvent(false);
@@ -1097,17 +1099,17 @@ const CreateEventPage = () => {
             }
             navigate('/organizer/my-events');
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to save draft. Please try again.');
+            setError(err.response?.data?.message || t('ce_save_draft_failed'));
         } finally {
             setSaving(false);
         }
     };
 
     const handleContinue = () => {
-        const e = validateStep1(form);
+        const e = validateStep1(form, t);
         if (Object.keys(e).length > 0) {
             setErrors(e);
-            showToast(`Please fix ${Object.keys(e).length} error(s) before continuing`);
+            showToast(t('ce_fix_errors', { count: Object.keys(e).length }));
             scrollToFirstError(e);
             return;
         }
@@ -1126,10 +1128,10 @@ const CreateEventPage = () => {
 
     // Step 2 → Step 3
     const handleContinueToAgenda = () => {
-        const e = validateStep2(form);
+        const e = validateStep2(form, t);
         if (Object.keys(e).length > 0) {
             setErrors(e);
-            showToast(`Please fix ${Object.keys(e).length} error(s) before continuing`);
+            showToast(t('ce_fix_errors', { count: Object.keys(e).length }));
             scrollToFirstError(e);
             return;
         }
@@ -1141,7 +1143,7 @@ const CreateEventPage = () => {
 
     // Step 3 → Submit
     const handleSubmitFinal = async () => {
-        const e = validateStep3(form);
+        const e = validateStep3(form, t);
         if (Object.keys(e).length > 0) {
             setErrors(e);
 
@@ -1161,7 +1163,7 @@ const CreateEventPage = () => {
             setStep(4);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to submit event. Please try again.');
+            setError(err.response?.data?.message || t('ce_submit_failed'));
         } finally {
             setSaving(false);
         }
@@ -1171,7 +1173,7 @@ const CreateEventPage = () => {
         return (
             <div className="flex items-center justify-center min-h-screen bg-[#f0f0ec]">
                 <div className="inline-block w-8 h-8 border-3 border-gray-200 border-t-[#7FA5A5] rounded-full animate-spin" />
-                <p className="ml-3 text-sm text-gray-400">Loading event data...</p>
+                <p className="ml-3 text-sm text-gray-400">{t('ce_loading_event')}</p>
             </div>
         );
     }
@@ -1179,7 +1181,7 @@ const CreateEventPage = () => {
     if (step === 4) {
         return (
             <div className="min-h-screen bg-[#f0f0ec] p-8">
-                <SuccessScreen form={form} isEditMode={isEditMode} />
+                <SuccessScreen form={form} isEditMode={isEditMode} t={t} />
             </div>
         );
     }
@@ -1197,10 +1199,10 @@ const CreateEventPage = () => {
                             onClick={() => navigate('/organizer/my-events')}
                             className="hover:text-gray-700 transition"
                         >
-                            My Events
+                            {t('ce_my_events')}
                         </button>
                         <span>›</span>
-                        <span className="font-semibold text-gray-700">{isEditMode ? 'Edit Event' : 'Create New Event'}</span>
+                        <span className="font-semibold text-gray-700">{isEditMode ? t('ce_edit_event') : t('ce_create_new_event')}</span>
                     </nav>
 
                     <div className="flex items-center gap-5">
@@ -1208,10 +1210,10 @@ const CreateEventPage = () => {
                             onClick={handleSaveDraft}
                             className="text-sm font-medium text-gray-500 hover:text-gray-800 transition"
                         >
-                            Save Draft
+                            {t('ce_save_draft')}
                         </button>
                         <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider">Progress</span>
+                            <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider">{t('ce_progress')}</span>
                             <div className="w-36 h-2 bg-gray-100 rounded-full overflow-hidden">
                                 <div
                                     className="h-full bg-[#4a9e9e] rounded-full transition-all duration-500"
@@ -1225,7 +1227,7 @@ const CreateEventPage = () => {
 
             {/* Main content */}
             <main className="max-w-3xl mx-auto py-10 px-4">
-                <StepIndicator currentStep={step} />
+                <StepIndicator currentStep={step} t={t} />
 
                 {step === 1 && <Step1BasicInfo form={form} onChange={(v) => { updateForm(v); setErrors((prev) => { const k = Object.keys(v)[0]; const n = { ...prev }; delete n[k]; return n; }); }} errors={errors} setErrors={setErrors} />}
                 {step === 2 && <Step2Tickets form={form} onChange={(v) => { updateForm(v); setErrors((prev) => { const n = { ...prev }; Object.keys(v).forEach((k) => { if (k === 'tickets') { Object.keys(n).forEach((ek) => { if (ek.startsWith('ticket_')) delete n[ek]; }); } else { delete n[k]; } }); return n; }); }} errors={errors} setErrors={setErrors} />}
@@ -1248,7 +1250,7 @@ const CreateEventPage = () => {
                             className="flex items-center gap-2 px-6 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition"
                         >
                             <ArrowLeft size={16} />
-                            Back
+                            {t('ce_back')}
                         </button>
                     ) : (
                         <div />
@@ -1259,7 +1261,7 @@ const CreateEventPage = () => {
                             onClick={handleContinue}
                             className="flex items-center gap-2 bg-[#2d3a4f] hover:bg-[#1e293b] text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition shadow-sm"
                         >
-                            Continue to Tickets
+                            {t('ce_continue_tickets')}
                             <ArrowRight size={16} />
                         </button>
                     )}
@@ -1269,7 +1271,7 @@ const CreateEventPage = () => {
                             onClick={handleContinueToAgenda}
                             className="flex items-center gap-2 bg-[#2d3a4f] hover:bg-[#1e293b] text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition shadow-sm"
                         >
-                            Continue to Agenda
+                            {t('ce_continue_agenda')}
                             <ArrowRight size={16} />
                         </button>
                     )}
@@ -1280,7 +1282,7 @@ const CreateEventPage = () => {
                             disabled={saving}
                             className="flex items-center gap-2 bg-[#2d3a4f] hover:bg-[#1e293b] text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition shadow-sm disabled:opacity-60"
                         >
-                            {saving ? 'Submitting…' : 'Submit Event'}
+                            {saving ? t('ce_submitting') : t('ce_submit_event')}
                             <Rocket size={16} />
                         </button>
                     )}
@@ -1289,10 +1291,10 @@ const CreateEventPage = () => {
                 {/* Footer hint */}
                 <p className="text-center text-xs text-gray-400 mt-6">
                     {step === 1
-                        ? 'Step 1 of 3: Provide basic info about your event to get started.'
+                        ? t('ce_step1_hint')
                         : step === 2
-                            ? 'Step 2 of 3: Configure your tickets and pricing.'
-                            : 'Step 3 of 3: Add at least one session to your event agenda.'}
+                            ? t('ce_step2_hint')
+                            : t('ce_step3_hint')}
                 </p>
             </main>
         </div>

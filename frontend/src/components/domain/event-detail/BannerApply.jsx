@@ -1,8 +1,10 @@
 import { Briefcase } from 'lucide-react'
 import { useNavigate } from 'react-router';
 import useRecruitmentDetail from '../../../hooks/useRecruitmentDetail'
+import { useTranslation } from "react-i18next";
 
 const BannerApply = ({ eventSlug }) => {
+    const { t } = useTranslation();
 
     const { data: recruitment } = useRecruitmentDetail(eventSlug);
 
@@ -25,10 +27,10 @@ const BannerApply = ({ eventSlug }) => {
                     <Briefcase className="w-6 h-6" />
                 </div>
                 <div>
-                    <h4 className="text-xl font-bold">Join the Event Team</h4>
+                    <h4 className="text-xl font-bold">{t("join_the_event_team")}</h4>
                     <p className="text-sm text-slate-600 mt-1">
-                        We are looking for: {positionNames}
-                        {recruitment.length > 3 && " and more..."}
+                        {t("we_are_looking_for")} {positionNames}
+                        {recruitment.length > 3 && ` ${t("and_more")}`}
                     </p>
                 </div>
             </div>
@@ -37,7 +39,7 @@ const BannerApply = ({ eventSlug }) => {
                 className="bg-teal-accent hover:bg-teal-accent/90 text-white font-bold px-8 py-3 rounded-full transition-all shrink-0"
                 onClick={() => navigate(`/recruitments/${eventSlug}`)}
             >
-                Apply Now
+                {t("apply_now")}
             </button>
 
         </div>

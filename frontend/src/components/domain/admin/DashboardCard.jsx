@@ -1,12 +1,14 @@
 import { AlertCircle, Calendar, Users, UserX, Zap } from "lucide-react";
 import { Card, CardContent } from "../admin/Card";
 import { Link } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 
 const DashboardCard = ({ summary }) => {
+    const { t } = useTranslation();
 
     const summaryMetrics = [
         {
-            title: "TOTAL EVENTS",
+            title: t('adc_total_events'),
             value: summary?.totalEvents ?? 0,
             icon: Calendar,
             iconBg: "bg-blue-100",
@@ -14,14 +16,14 @@ const DashboardCard = ({ summary }) => {
             link: "/admin/events"
         },
         {
-            title: "ACTIVE EVENTS",
+            title: t('adc_active_events'),
             value: summary?.activeEvents ?? 0,
             icon: Zap,
             iconBg: "bg-green-100",
             iconColor: "text-green-600"
         },
         {
-            title: "PENDING REVIEWS",
+            title: t('adc_pending_reviews'),
             value: summary?.pendingEvents ?? 0,
             icon: AlertCircle,
             iconBg: "bg-orange-100",
@@ -30,7 +32,7 @@ const DashboardCard = ({ summary }) => {
             highlight: true
         },
         {
-            title: "ORGANIZER ACCOUNTS",
+            title: t('adc_organizer_accounts'),
             value: summary?.organizerAccounts ?? 0,
             icon: Users,
             iconBg: "bg-purple-100",
@@ -38,7 +40,7 @@ const DashboardCard = ({ summary }) => {
             link: "/admin/accounts?role=ORGANIZER"
         },
         {
-            title: "SUSPENDED ACCOUNTS",
+            title: t('adc_suspended_accounts'),
             value: summary?.bannedAccounts ?? 0,
             icon: UserX,
             iconBg: "bg-red-100",

@@ -8,8 +8,10 @@ import { Input } from './Input.jsx';
 import { Label } from './Label.jsx';
 import { useState } from 'react';
 import { adminService } from "../../../services/admin.service.js";
+import { useTranslation } from 'react-i18next';
 
 export function CreateOrganizerModal({ isOpen, onClose, onCreated, onAlert }) {
+    const { t } = useTranslation();
     const [showPassword, setShowPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -213,10 +215,10 @@ export function CreateOrganizerModal({ isOpen, onClose, onCreated, onAlert }) {
                     <div>
                         <div className="mb-6">
                             <h2 className="text-xl font-semibold text-gray-900 mb-1">
-                                General Information
+                                {t('adc_general_info')}
                             </h2>
                             <p className="text-sm text-gray-500">
-                                Please provide the primary contact details for this organizer account.
+                                {t('adc_general_info_desc')}
                             </p>
                         </div>
 
@@ -224,7 +226,7 @@ export function CreateOrganizerModal({ isOpen, onClose, onCreated, onAlert }) {
                             <div>
                                 <Label htmlFor="fullName"
                                     className="text-sm font-medium text-gray-700 mb-1.5 block">
-                                    Organization Name <span className="text-red-500">*</span>
+                                    {t('adc_org_name')} <span className="text-red-500">*</span>
                                 </Label>
                                 <Input
                                     id="fullName"
@@ -252,7 +254,7 @@ export function CreateOrganizerModal({ isOpen, onClose, onCreated, onAlert }) {
 
                             <div>
                                 <Label htmlFor="email" className="text-sm font-medium text-gray-700 mb-1.5 block">
-                                    Email Address <span className="text-red-500">*</span>
+                                    {t('adc_email_address')} <span className="text-red-500">*</span>
                                 </Label>
                                 <Input
                                     id="email"
@@ -280,7 +282,7 @@ export function CreateOrganizerModal({ isOpen, onClose, onCreated, onAlert }) {
 
                             <div>
                                 <Label htmlFor="phone" className="text-sm font-medium text-gray-700 mb-1.5 block">
-                                    Phone Number
+                                    {t('adc_phone_number')}
                                 </Label>
                                 <Input
                                     id="phone"
@@ -309,7 +311,7 @@ export function CreateOrganizerModal({ isOpen, onClose, onCreated, onAlert }) {
                             <div>
                                 <Label htmlFor="password"
                                     className="text-sm font-medium text-gray-700 mb-1.5 block">
-                                    Password <span className="text-red-500">*</span>
+                                    {t('adc_password')} <span className="text-red-500">*</span>
                                 </Label>
                                 <div className="relative">
                                     <Input
@@ -357,7 +359,7 @@ export function CreateOrganizerModal({ isOpen, onClose, onCreated, onAlert }) {
                             onClick={onClose}
                             className="px-6 hover:cursor-pointer"
                         >
-                            Cancel
+                            {t('adc_cancel')}
                         </Button>
 
                         <div className="flex gap-2">
@@ -366,7 +368,7 @@ export function CreateOrganizerModal({ isOpen, onClose, onCreated, onAlert }) {
                                 className="px-6 bg-[#7FA5A5] hover:bg-[#6D9393] text-white hover:cursor-pointer"
                                 disabled={!isStep1Valid}
                             >
-                                Create Account
+                                {t('adc_create_account')}
                             </Button>
                         </div>
                     </div>

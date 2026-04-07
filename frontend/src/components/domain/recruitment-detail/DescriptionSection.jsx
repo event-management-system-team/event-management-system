@@ -1,11 +1,19 @@
 import { Briefcase } from 'lucide-react'
+import { useTranslation } from "react-i18next";
 
 const DescriptionSection = ({ positions }) => {
     return (
         <section className="bg-white rounded-2xl p-8 shadow-sm border border-[#E5E1DA]/50">
             <div className="space-y-8">
                 <div>
-                    <h3 className="text-lg font-extrabold text-slate-900 mb-5">Open Positions & Requirements</h3>
+                    <h3 className="text-lg font-extrabold text-slate-900 mb-4">{t("description")}</h3>
+                    <p className="text-slate-600 text-[14px] leading-relaxed">
+                        {description}
+                    </p>
+                </div>
+
+                <div className="pt-8 border-t border-slate-100">
+                    <h3 className="text-lg font-extrabold text-slate-900 mb-5">{t("open_positions_requirements")}</h3>
 
                     <div className="space-y-4">
                         {positions?.map((pos) => (
@@ -16,7 +24,7 @@ const DescriptionSection = ({ positions }) => {
                                         {pos.positionName}
                                     </h4>
                                     <span className="text-[11px] font-bold bg-primary/10 text-primary px-3 py-1.5 rounded-lg uppercase tracking-wide">
-                                        Hiring: {pos.vacancy} slot
+                                        {t("hiring")}: {pos.vacancy} {t("slot")}
                                     </span>
                                 </div>
 

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { registerSchema } from "../../../../schemas/register.schema";
+import { createRegisterSchema } from "../../../../schemas/register.schema";
 import {
   registerUser,
   clearError,
@@ -14,10 +14,12 @@ import { Button } from "../../../common/Button";
 import { MdArrowForward } from "react-icons/md";
 import { FaRegCheckCircle, FaRegCircle } from "react-icons/fa";
 import LogoImg from "../../../../assets/logo.png";
+import { useTranslation } from "react-i18next";
 
 export const RegisterForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { loading, error, registerSuccess, isAuthenticated } = useSelector(
     (state) => state.auth,
   );
@@ -36,7 +38,7 @@ export const RegisterForm = () => {
     watch,
     trigger,
   } = useForm({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(createRegisterSchema(t)),
     mode: "onBlur",
     defaultValues: {
       fullName: "",
@@ -104,10 +106,10 @@ export const RegisterForm = () => {
 
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Create a new account 🎉
+            {t("create_account_title")}
           </h2>
           <p className="text-gray-500">
-            It only takes 2 minutes to get started
+            {t("create_account_subtitle")}
           </p>
         </div>
 
@@ -121,8 +123,8 @@ export const RegisterForm = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <InputField
             id="fullName"
-            label="Full Name"
-            placeholder="Your full name"
+            label={t("full_name")}
+            placeholder="Nguyen Van A"
             type="text"
             error={errors.fullName}
             {...register("fullName")}
@@ -131,7 +133,7 @@ export const RegisterForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <InputField
               id="email"
-              label="Email"
+              label={t("email_label")}
               placeholder="example@email.com"
               type="email"
               error={errors.email}
@@ -139,7 +141,7 @@ export const RegisterForm = () => {
             />
             <InputField
               id="phone"
-              label="Phone Number"
+              label={t("phone_number")}
               placeholder="+1234567890"
               type="tel"
               error={errors.phone}
@@ -150,7 +152,7 @@ export const RegisterForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <InputField
               id="password"
-              label="Password"
+              label={t("password")}
               type="password"
               placeholder="••••••••"
               error={errors.password}
@@ -160,7 +162,7 @@ export const RegisterForm = () => {
             />
             <InputField
               id="confirmPassword"
-              label="Confirm Password"
+              label={t("confirm_password")}
               type="password"
               placeholder="••••••••"
               error={errors.confirmPassword}
@@ -175,7 +177,7 @@ export const RegisterForm = () => {
               ) : (
                 <FaRegCircle className="text-gray-300 text-sm" />
               )}
-              At least 8 characters
+              {t("pwd_at_least_8")}
             </div>
             <div className="flex items-center gap-1.5 text-[10px] text-gray-500 font-medium">
               {passwordStrength.special ? (
@@ -183,7 +185,7 @@ export const RegisterForm = () => {
               ) : (
                 <FaRegCircle className="text-gray-300 text-sm" />
               )}
-              One special character
+              {t("pwd_special_char")}
             </div>
             <div className="flex items-center gap-1.5 text-[10px] text-gray-500 font-medium">
               {passwordStrength.uppercase ? (
@@ -191,7 +193,7 @@ export const RegisterForm = () => {
               ) : (
                 <FaRegCircle className="text-gray-300 text-sm" />
               )}
-              One uppercase letter
+              {t("pwd_uppercase")}
             </div>
             <div className="flex items-center gap-1.5 text-[10px] text-gray-500 font-medium">
               {passwordStrength.number ? (
@@ -199,7 +201,7 @@ export const RegisterForm = () => {
               ) : (
                 <FaRegCircle className="text-gray-300 text-sm" />
               )}
-              One number
+              {t("pwd_number")}
             </div>
           </div>
 
@@ -211,13 +213,13 @@ export const RegisterForm = () => {
                 {...register("agreeToTerms")}
               />
               <span className="ml-3 text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">
-                I agree to the{" "}
+                {t("agree_to")}{" "}
                 <a className="text-[#8aa8b2] hover:underline" href="#">
-                  Terms of Use
+                  {t("terms_of_use")}
                 </a>{" "}
-                and{" "}
+                {t("and")}{" "}
                 <a className="text-[#8aa8b2] hover:underline" href="#">
-                  Privacy Policy
+                  {t("privacy_policy")}
                 </a>
               </span>
             </label>
@@ -230,7 +232,7 @@ export const RegisterForm = () => {
           </div>
 
           <Button type="submit" disabled={loading}>
-            <span>{loading ? "Creating Account..." : "Create Account"}</span>
+            <span>{loading ? t("creating_account") : t("create_account")}</span>
             <span className="group-hover:translate-x-1 transition-transform">
               <MdArrowForward className="text-xl" />
             </span>
@@ -238,12 +240,12 @@ export const RegisterForm = () => {
         </form>
 
         <p className="mt-8 text-center text-gray-600 text-sm font-medium">
-          Already have an account?
+          {t("already_have_account")}
           <Link
             to="/login"
             className="text-[#8aa8b2] font-bold hover:underline ml-1"
           >
-            Login now
+            {t("login_now_link")}
           </Link>
         </p>
       </div>

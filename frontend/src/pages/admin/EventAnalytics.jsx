@@ -11,8 +11,10 @@ import EventChart from '../../components/domain/admin/EventChart.jsx';
 import AnalyticsFilter from '../../components/domain/admin/AnalyticsFilter.jsx';
 import EventPerformanceList from '../../components/domain/admin/EventPerformanceList.jsx';
 import { ChevronRight, Download } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export function EventAnalytics() {
+    const { t } = useTranslation();
     const [events, setEvents] = useState([])
     const [summary, setSummary] = useState()
     const [monthlySales, setMonthlySales] = useState([])
@@ -148,12 +150,12 @@ export function EventAnalytics() {
                         </div>
                         <div className="flex items-center gap-3">
                             {events.length > 0 && (
-                                <Button 
-                                    className="gap-2 bg-white hover:bg-gray-50 text-[#1e2d3d] rounded-full px-5 py-2 shadow-sm border border-gray-200 font-medium transition-colors hover:cursor-pointer h-10" 
+                                <Button
+                                    className="gap-2 bg-white hover:bg-gray-50 text-[#1e2d3d] rounded-full px-5 py-2 shadow-sm border border-gray-200 font-medium transition-colors hover:cursor-pointer h-10"
                                     onClick={handleExportExcel}
                                 >
                                     <Download className="h-4 w-4" />
-                                    Export Excel Report
+                                    {t('ad_export_excel')}
                                 </Button>
                             )}
                         </div>

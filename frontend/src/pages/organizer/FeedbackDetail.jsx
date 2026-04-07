@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  ArrowLeft, User, Ticket, Mail, Calendar, 
-  Download, Trash2, MessageSquare, ListIcon, ThumbsUp 
+import {
+  ArrowLeft, User, Ticket, Mail, Calendar,
+  Download, Trash2, MessageSquare, ListIcon, ThumbsUp
 } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import jsPDF from 'jspdf';
-import Sidebar from '../../components/layout/Sidebar'; 
+import Sidebar from '../../components/layout/Sidebar';
 import axiosInstance from '../../config/axios';
 import { Alert } from '../../components/common/Alert';
 import { useAlert } from '../../hooks/useAlert';
@@ -18,6 +19,7 @@ const FeedbackDetail = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
   const { alert, showAlert, closeAlert } = useAlert();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchFeedbackDetail = async () => {
@@ -25,7 +27,7 @@ const FeedbackDetail = () => {
       setIsError(false);
       try {
         const response = await axiosInstance.get(`/feedbacks/${feedbackId}`);
-        if(response.status === 200 && response.data) {
+        if (response.status === 200 && response.data) {
           console.log("🔥 JSON BACKEND TRẢ VỀ:", response.data);
           setFeedbackData(response.data);
         } else {
@@ -42,16 +44,16 @@ const FeedbackDetail = () => {
   }, [feedbackId]);
 
   if (isLoading) {
-    return <div className="flex min-h-screen items-center justify-center bg-[#F1F0E8] font-sans text-gray-500 font-medium">Loading feedback details...</div>;
+    return <div className="flex min-h-screen items-center justify-center bg-[#f8f7f2] font-sans text-gray-500 font-medium">{t('org_loading_feedback_detail')}</div>;
   }
   if (isError || !feedbackData) {
-    return <div className="flex min-h-screen items-center justify-center bg-[#F1F0E8] font-sans text-red-500 font-medium">Error loading feedback detail</div>;
+    return <div className="flex min-h-screen items-center justify-center bg-[#f8f7f2] font-sans text-red-500 font-medium">{t('org_error_feedback_detail')}</div>;
   }
 
   // Sửa lỗi chính tả an toàn: Bắt cả trường hợp Backend trả về 'feedbackRespone' hoặc 'feedbackResponse'
   const detailData = feedbackData.feedbackResponse?.detail || feedbackData.feedbackRespone?.detail || [];
   const overallRating = feedbackData.feedbackResponse?.overallRating || feedbackData.feedbackRespone?.overallRating || 0;
-  
+
   // Array NPS emoji từ 1-10
   const npsEmojis = ['😡', '😠', '😞', '🙁', '😐', '🙂', '😊', '😀', '😁', '😍'];
   const npsEmoji = overallRating > 0 && overallRating <= 10 ? npsEmojis[overallRating - 1] : '';
@@ -66,7 +68,7 @@ const FeedbackDetail = () => {
       pdf.setFontSize(18);
       pdf.setFont(undefined, 'bold');
       pdf.text('FEEDBACK REPORT', 15, yPosition);
-      
+
       yPosition += 8;
       pdf.setFontSize(10);
       pdf.setFont(undefined, 'normal');
@@ -86,7 +88,7 @@ const FeedbackDetail = () => {
       pdf.setFontSize(12);
       pdf.setFont(undefined, 'bold');
       pdf.text('ATTENDEE INFORMATION', 15, yPosition);
-      
+
       yPosition += 7;
       pdf.setFontSize(10);
       pdf.setFont(undefined, 'normal');
@@ -169,15 +171,15 @@ const FeedbackDetail = () => {
       const fileName = `Feedback_#${feedbackId}_${new Date().toISOString().slice(0, 10)}.pdf`;
       pdf.save(fileName);
       console.log('✅ PDF exported successfully:', fileName);
-      showAlert('success', 'PDF exported successfully!');
+      showAlert('success', t('org_pdf_export_success'));
     } catch (error) {
       console.error('❌ Error exporting PDF:', error);
-      showAlert('error', `Failed to export PDF: ${error.message}`);
+      showAlert('error', t('org_pdf_export_failed', { error: error.message }));
     }
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this feedback? This action cannot be undone.')) {
+    if (!window.confirm(t('org_delete_feedback_confirm'))) {
       return;
     }
 
@@ -185,14 +187,14 @@ const FeedbackDetail = () => {
     try {
       const response = await axiosInstance.delete(`/feedbacks/${feedbackId}`);
       if (response.status === 200) {
-        showAlert('success', 'Feedback deleted successfully!');
+        showAlert('success', t('org_feedback_deleted_success'));
         setTimeout(() => {
           navigate(-1); // Navigate back to feedback list
         }, 1500);
       }
     } catch (error) {
       console.error('Error deleting feedback:', error);
-      showAlert('error', `Failed to delete feedback: ${error.response?.data?.message || error.message}`);
+      showAlert('error', t('org_feedback_deleted_failed', { error: error.response?.data?.message || error.message }));
     } finally {
       setIsDeleting(false);
     }
@@ -204,7 +206,7 @@ const FeedbackDetail = () => {
       {/* THÊM lg:h-screen lg:overflow-y-auto ĐỂ THANH CUỘN ĐỘC LẬP VỚI SIDEBAR NẾU CẦN */}
       <div className="flex-1 p-4 sm:p-6 lg:p-10 w-full overflow-x-hidden">
         <Alert type={alert.type} message={alert.message} onClose={closeAlert} />
-        
+
         {/* --- HEADER RESPONSIVE --- */}
         {/* Xếp dọc trên mobile, xếp ngang trên tablet/desktop */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-0 mb-6 lg:mb-8">
@@ -214,22 +216,22 @@ const FeedbackDetail = () => {
               <ArrowLeft size={20} />
             </button>
             <div>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-900 tracking-tight leading-tight">Feedback Detail</h1>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-900 tracking-tight leading-tight">{t('org_feedback_detail')}</h1>
               <p className="text-gray-500 font-medium text-xs sm:text-sm mt-1">Response #{feedbackId || '001'} • {feedbackData?.eventName}</p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-            <button 
+            <button
               onClick={handleDelete}
               disabled={isDeleting}
               className={`flex-1 sm:flex-none justify-center px-4 py-2.5 sm:py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-red-500 hover:bg-red-50 flex items-center gap-2 transition-all shadow-sm ${isDeleting ? 'opacity-50 cursor-not-allowed' : ''}`}>
-              <Trash2 size={16} /> <span className="hidden sm:inline">{isDeleting ? 'Deleting...' : 'Delete'}</span>
+              <Trash2 size={16} /> <span className="hidden sm:inline">{isDeleting ? t('org_deleting') : t('org_delete')}</span>
             </button>
-            <button 
+            <button
               onClick={handleExportPDF}
               className="flex-1 sm:flex-none justify-center px-4 py-2.5 sm:py-2 bg-[#8c9db3] hover:bg-[#7a8ca3] text-white rounded-lg text-sm font-bold flex items-center gap-2 shadow-md transition-all">
-              <Download size={16} /> Export<span className="hidden sm:inline"> PDF</span>
+              <Download size={16} /> {t('org_export')}<span className="hidden sm:inline"> PDF</span>
             </button>
           </div>
         </div>
@@ -237,12 +239,12 @@ const FeedbackDetail = () => {
         {/* --- MAIN CONTENT GRID RESPONSIVE --- */}
         {/* Mobile: 1 cột | Desktop: 3 cột */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-          
+
           {/* CỘT TRÁI: THÔNG TIN KHÁN GIẢ */}
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-white rounded-xl lg:rounded-2xl p-5 lg:p-6 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] border border-gray-100">
-              <h3 className="text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-5 lg:mb-6">Attendee Profile</h3>
-              
+              <h3 className="text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-5 lg:mb-6">{t('org_attendee_profile')}</h3>
+
               <div className="flex flex-col items-center mb-6 text-center">
                 {feedbackData.attendeeInfor?.avatar ? (
                   <img src={feedbackData.attendeeInfor.avatar} alt="Avatar" className="w-20 h-20 lg:w-24 lg:h-24 rounded-full object-cover border-4 border-[#f8f7f2] shadow-sm mb-4" />
@@ -268,7 +270,7 @@ const FeedbackDetail = () => {
                 </div>
                 <div className="flex items-center gap-3 text-xs sm:text-sm">
                   <Calendar size={16} className="text-gray-400 shrink-0" />
-                  <span className="text-gray-600 font-medium">Submitted: {new Date(feedbackData?.submittedAt).toLocaleDateString()}</span>
+                  <span className="text-gray-600 font-medium">{t('org_submitted')} {feedbackData?.submittedAt ? new Date(feedbackData.submittedAt).toLocaleDateString() : 'N/A'}</span>
                 </div>
               </div>
             </div>
@@ -277,7 +279,7 @@ const FeedbackDetail = () => {
           {/* CỘT PHẢI: NỘI DUNG FEEDBACK */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl lg:rounded-2xl p-5 sm:p-6 lg:p-8 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] border border-gray-100 h-full">
-              <h3 className="text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-6 lg:mb-8">Feedback Responses</h3>
+              <h3 className="text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-6 lg:mb-8">{t('org_feedback_responses')}</h3>
 
               {/* KHU VỰC ĐIỂM SỐ RESPONSIVE */}
               <div className="mb-8 pb-6 lg:mb-10 lg:pb-8 border-b border-gray-100">
@@ -297,15 +299,15 @@ const FeedbackDetail = () => {
               {/* CÁC CÂU HỎI TEXT */}
               <div className="space-y-6 lg:space-y-8">
                 {detailData.map((item, index) => {
-                  if(item.type === 'NPS') return null;
+                  if (item.type === 'NPS') return null;
                   return (
                     <div key={index} >
                       <h4 className="font-bold text-gray-800 text-sm sm:text-base flex items-start gap-2 mb-2 sm:mb-3 leading-snug">
                         {item.type === 'OPEN_COMMENT' ? <MessageSquare size={16} className="text-[#8c9db3] mt-0.5 shrink-0 sm:w-[18px] sm:h-[18px]" /> : <ListIcon size={16} className="text-[#8c9db3] mt-0.5 shrink-0 sm:w-[18px] sm:h-[18px]" />}
-                        { item.question || `Câu hỏi đánh giá #${index + 1}` }
+                        {item.question || t('org_feedback_question_fallback', { index: index + 1 })}
                       </h4>
                       <div className="bg-[#f8fbff] border border-[#8c9db3]/30 rounded-lg lg:rounded-xl p-4 lg:p-5 text-sm sm:text-base text-gray-700 leading-relaxed font-medium shadow-sm relative break-words">
-                        {item.answer || <span className="text-gray-400 italic">Khán giả không trả lời câu hỏi này.</span>}
+                        {item.answer || <span className="text-gray-400 italic">{t('org_feedback_no_answer')}</span>}
                       </div>
                     </div>
                   );

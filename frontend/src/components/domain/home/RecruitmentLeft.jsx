@@ -3,28 +3,29 @@ import {
     ArrowRight,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const RecruitmentLeft = () => {
 
+    const { t } = useTranslation();
+
     const BENEFITS = [
-        "Competitive hourly rates & performance bonuses",
-        "Official certification for every event",
-        "Flexible shifts managed via mobile app",
+        t("benefit_1"),
+        t("benefit_2"),
+        t("benefit_3"),
     ];
 
     return (
         <div className="lg:col-span-5 space-y-8">
             {/* Badge */}
             <div className="inline-block bg-teal-100 text-teal-700 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
-                Work with us
+                {t("work_with_us")}
             </div>
 
-            <h2 className="text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight ">
-                Work at the Hottest <br /> Events in Town
-            </h2>
+            <h2 className="font-sans text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight " dangerouslySetInnerHTML={{ __html: t("recruitment_title") }} />
 
             <p className="text-lg text-gray-600 leading-relaxed">
-                Join our community of 5000+ professionals. Gain experience, get certified, and earn competitive pay while enjoying the front row of the biggest events.
+                {t("recruitment_desc")}
             </p>
 
             {/* List Benefits */}
@@ -39,7 +40,7 @@ const RecruitmentLeft = () => {
 
             <Link to={'/recruitments'}>
                 <button className="bg-gray-900 text-white px-8 py-4 rounded-full font-bold shadow-xl hover:bg-primary hover:shadow-primary/30 transition-all duration-300 flex items-center gap-2 group">
-                    Explore Opportunities
+                    {t("explore_opportunities")}
                     <ArrowRight className="group-hover:translate-x-1 transition-transform" />
                 </button>
             </Link>

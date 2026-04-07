@@ -8,8 +8,10 @@ import { Button } from "./Button";
 import { CheckCircle, Eye, X } from "lucide-react";
 import { adminService } from "../../../services/admin.service";
 import dayjs from "dayjs";
+import { useTranslation } from 'react-i18next';
 
 const EventList = ({ searchTerm, status, category, priceType, date, sortOption, onLoading, onError, showAlert }) => {
+    const { t } = useTranslation();
     const [events, setEvents] = useState([])
     const [originalEvents, setOriginalEvents] = useState([])
     const [currentPage, setCurrentPage] = useState(0);
@@ -178,19 +180,19 @@ const EventList = ({ searchTerm, status, category, priceType, date, sortOption, 
                     {/* Table Header */}
                     <div
                         className="grid grid-cols-12 gap-4 px-6 py-3 border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wide items-center">
-                        <div className="col-span-3">Events</div>
-                        <div className="col-span-2">Organizer</div>
-                        <div className="col-span-2">Date & Time</div>
-                        <div className="col-span-2">Tickets Sold</div>
-                        <div className="col-span-1">Status</div>
-                        <div className="col-span-1 text-center">Created At</div>
-                        <div className="col-span-1 text-right">Actions</div>
+                        <div className="col-span-3">{t('adc_events_col')}</div>
+                        <div className="col-span-2">{t('adc_organizer_col')}</div>
+                        <div className="col-span-2">{t('adc_date_time')}</div>
+                        <div className="col-span-2">{t('adc_tickets_sold')}</div>
+                        <div className="col-span-1">{t('adc_status')}</div>
+                        <div className="col-span-1 text-center">{t('adc_created_at')}</div>
+                        <div className="col-span-1 text-right">{t('adc_actions')}</div>
                     </div>
 
                     {/* Event Rows */}
                     {!paginatedEvents || paginatedEvents.length === 0 ? (
                         <div className="flex items-center justify-center flex-1 text-sm text-gray-400 mt-15">
-                            No events found
+                            {t('adc_no_event')}
                         </div>
                     ) : (
                         paginatedEvents.map(event => {
@@ -303,9 +305,9 @@ const EventList = ({ searchTerm, status, category, priceType, date, sortOption, 
                     <div className="px-6 py-4 flex items-center justify-between text-sm text-gray-600">
                         <div>
                             {isSearching ? (
-                                <>Showing {processedEvents.length} search results</>
+                                <>{t('adc_showing_search', { count: processedEvents.length })}</>
                             ) : (
-                                <>Showing {totalItems === 0 ? 0 : startItem}–{Math.min((currentPage + 1) * pageSize, totalItems)} of {totalItems} events</>
+                                <>{t('adc_showing_events', { start: totalItems === 0 ? 0 : startItem, end: Math.min((currentPage + 1) * pageSize, totalItems), total: totalItems })}</>
                             )}
                         </div>
 

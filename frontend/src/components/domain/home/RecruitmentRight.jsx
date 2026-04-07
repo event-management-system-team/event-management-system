@@ -4,8 +4,10 @@ import LoadingState from '../../common/LoadingState';
 import RecruitmentCard from "../../common/RecruitmentCard";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 const RecruitmentRight = () => {
 
+  const { t } = useTranslation();
   const { data: recruitments, isLoading, isError } = useQuery({
     queryKey: ['recruitments', 'recent'],
     queryFn: () => recruitmentService.getRecentRecruitment()
@@ -31,7 +33,7 @@ const RecruitmentRight = () => {
 
 
       <p className="text-center text-sm text-gray-500 mt-2 font-medium">
-        Thinking about joining? <Link to="/recruitments" className="text-primary hover:underline">View 150+ open positions</Link>
+        {t("thinking_about_joining")} <Link to="/recruitments" className="text-primary hover:underline">{t("view_open_positions")}</Link>
       </p>
     </div>
   )

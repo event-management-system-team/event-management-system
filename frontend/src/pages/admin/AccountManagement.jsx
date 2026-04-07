@@ -11,8 +11,10 @@ import AccountSummaryCard from '../../components/domain/admin/AccountSummaryCard
 import EmptyState from '../../components/common/EmptyState.jsx';
 import AccountFilter from '../../components/domain/admin/AccountFilter.jsx';
 import AccountList from '../../components/domain/admin/AccountList.jsx';
+import { useTranslation } from 'react-i18next';
 
 export function AccountManagement() {
+    const { t } = useTranslation();
 
     const [searchParams] = useSearchParams()
     const roleParam = searchParams.get("role")
@@ -78,7 +80,15 @@ export function AccountManagement() {
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
                 {/* Header */}
-                <header className="bg-[#F1F0E8] px-8 py-5 pt-8">
+                <header className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-5">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <span>{t('admin_dashboard')}</span>
+                            <ChevronRight className="h-4 w-4" />
+                            <span>{t('ad_account_management')}</span>
+                        </div>
+
+                    </div>
                     <div className="flex items-start justify-between">
                         <div>
                             <div className="flex items-center gap-4 text-gray-400 text-sm font-medium mb-3">

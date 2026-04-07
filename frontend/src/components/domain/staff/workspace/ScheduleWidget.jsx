@@ -1,10 +1,12 @@
 import { CalendarDays } from 'lucide-react'
 import EmptyState from '../../../common/EmptyState';
 import { Link, useParams } from 'react-router';
+import { useTranslation } from 'react-i18next';
 
 const ScheduleWidget = ({ schedules }) => {
 
     const { eventSlug } = useParams();
+    const { t } = useTranslation();
 
     const formatWidgetTime = (isoString) => {
         if (!isoString) return '';
@@ -20,7 +22,7 @@ const ScheduleWidget = ({ schedules }) => {
         const day = date.getDate().toString().padStart(2, '0');
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
 
-        const dateStr = isToday ? 'TODAY' : `${day}/${month}`;
+        const dateStr = isToday ? t('staff_today') : `${day}/${month}`;
 
         return `${timeStr} - ${dateStr}`;
     };
@@ -28,7 +30,7 @@ const ScheduleWidget = ({ schedules }) => {
     return (
         <div className="w-full lg:w-1/2 bg-white rounded-[40px] p-6 2xl:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] group flex flex-col z-10">
             <div className="flex justify-between items-center mb-5 shrink-0">
-                <h3 className="text-xl 2xl:text-2xl font-black text-[#2C3E50]">My Schedule</h3>
+                <h3 className="text-xl 2xl:text-2xl font-black text-[#2C3E50]">{t('staff_my_schedule')}</h3>
                 <Link
                     to={`/staff/${eventSlug}/my-schedule`}
                     className="size-10 2xl:size-12 rounded-2xl bg-[#FF6B35]/10 text-[#FF6B35] flex items-center justify-center hover:bg-[#FF6B35]/20 transition-all cursor-pointer"
@@ -39,7 +41,7 @@ const ScheduleWidget = ({ schedules }) => {
 
             <div className="space-y-3 relative before:absolute before:inset-y-0 before:left-3.5 before:w-0.5 before:bg-gray-100">
                 {schedules.length === 0 && (
-                    <EmptyState message='You have no upcoming shifts' />
+                    <EmptyState message={t('staff_no_shifts')} />
                 )}
 
                 {schedules.map((schedule, index) => {

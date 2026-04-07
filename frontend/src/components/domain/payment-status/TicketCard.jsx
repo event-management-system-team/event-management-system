@@ -3,8 +3,10 @@ import { IoCalendarClearOutline } from "react-icons/io5";
 import { MdOutlineLocationOn } from "react-icons/md";
 import { MdOutlineConfirmationNumber } from "react-icons/md";
 import { QRCodeSVG } from 'qrcode.react';
+import { useTranslation } from "react-i18next";
 
 const TicketCard = ({ event }) => {
+  const { t } = useTranslation();
 
 
   return (
@@ -14,7 +16,7 @@ const TicketCard = ({ event }) => {
         <div className="w-full md:w-48 aspect-[3/4] bg-center bg-cover rounded-lg shadow-sm" style={{ backgroundImage: `url(${event.image})` }}></div>
         <div className="flex flex-col gap-4 flex-1">
           <div>
-            <span className="bg-[#8aa9b2]/10 text-[#8aa9b2] px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Confirmed</span>
+            <span className="bg-[#8aa9b2]/10 text-[#8aa9b2] px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">{t("confirmed")}</span>
             <h2 className="text-2xl md:text-3xl font-bold text-[#131516] mt-3">{event.title}</h2>
           </div>
           <div className="flex flex-col gap-3 mt-2 text-[#6a787c]">
@@ -41,7 +43,7 @@ const TicketCard = ({ event }) => {
             <div className="w-32 h-32 bg-gray-200 animate-pulse rounded"></div>
           )}
         </div>
-        <p className="text-[#6a787c] text-xs font-semibold uppercase tracking-widest mb-1">Ticket ID</p>
+        <p className="text-[#6a787c] text-xs font-semibold uppercase tracking-widest mb-1">{t("ticket_id")}</p>
         <p className="text-[#131516] font-bold text-lg">{event.ticketId}</p>
       </div>
     </div>

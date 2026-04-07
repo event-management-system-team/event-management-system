@@ -6,6 +6,7 @@ import useFetchEventSearch from "../../hooks/useFetchEventSearch";
 import useFilterEvents from '../../hooks/useFilterEvents'
 import { Filter } from "lucide-react";
 import DynamicBreadcrumb from "../../components/common/DynamicBreadcrumb";
+import { useTranslation } from "react-i18next";
 
 const EventsPage = () => {
 
@@ -27,6 +28,8 @@ const EventsPage = () => {
 
     const events = data?.content || []
     const isEmpty = isError || events.length === 0
+
+    const { t } = useTranslation();
 
     const filterControls = useFilterEvents({ initialValues: filters, searchParams, setSearchParams });
 
@@ -51,7 +54,7 @@ const EventsPage = () => {
                         <div className="flex items-center gap-1.5 text-gray-400">
                             <Filter className="w-3.5 h-3.5" strokeWidth={3} />
                             <h3 className="text-[13px] font-bold uppercase tracking-widest">
-                                Filters
+                                {t("FILTERS")}
                             </h3>
                         </div>
                     </div>

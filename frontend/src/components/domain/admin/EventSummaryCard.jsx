@@ -1,32 +1,34 @@
 import { Calendar, CalendarCheck, CheckCircle, Zap } from "lucide-react";
 import { Card, CardContent } from "../admin/Card";
+import { useTranslation } from 'react-i18next';
 
 const EventSummaryCard = ({ summary }) => {
+    const { t } = useTranslation();
 
     const summaryMetrics = (summary) => [
         {
-            title: "TOTAL EVENTS",
+            title: t('adc_total_events'),
             value: summary?.totalEvents ?? 0,
             icon: Calendar,
             iconBg: "bg-blue-100",
             iconColor: "text-blue-600"
         },
         {
-            title: "ACTIVE",
+            title: t('adc_active'),
             value: summary?.activeEvents ?? 0,
             icon: Zap,
             iconBg: "bg-green-100",
             iconColor: "text-green-600"
         },
         {
-            title: "PENDING",
+            title: t('adc_pending'),
             value: summary?.pendingEvents ?? 0,
             icon: CalendarCheck,
             iconBg: "bg-orange-100",
             iconColor: "text-orange-600"
         },
         {
-            title: "COMPLETED",
+            title: t('adc_completed'),
             value: summary?.completedEvents ?? 0,
             icon: CheckCircle,
             iconBg: "bg-gray-200",

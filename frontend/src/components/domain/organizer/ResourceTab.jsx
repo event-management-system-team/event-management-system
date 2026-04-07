@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import organizerService from "../../../services/organizer.service";
 import { Card, CardContent } from "../admin/Card";
 import { TabsContent } from "../admin/Tabs";
+import { useTranslation } from 'react-i18next';
 import { CreateResourceModal } from "./CreateResourceModal";
 import { Eye, Download, FileText, ImageIcon, Calendar1 } from "lucide-react";
 import { Button } from "../admin/Button.jsx";
 
 const ResourceTab = ({ id, isResourceModalOpen, closeResourceModal, onLoading, onError, showAlert }) => {
+    const { t } = useTranslation();
 
     const [resources, setResources] = useState([])
 
@@ -19,7 +21,7 @@ const ResourceTab = ({ id, isResourceModalOpen, closeResourceModal, onLoading, o
 
             setResources(response.data)
         } catch (error) {
-            onError("Cannot load resources");
+            onError(t('org_res_load_error'));
             console.error(error)
         } finally {
             onLoading(false);
@@ -140,10 +142,13 @@ const ResourceTab = ({ id, isResourceModalOpen, closeResourceModal, onLoading, o
                                                     {file.resourceName}
                                                 </p>
                                                 <div className="flex items-center gap-3 text-xs text-gray-500">
-                                                    <span className="flex items-center gap-1.5"><Calendar1 className="w-3.5 h-3.5"/> {formatDate(file.createdAt)}</span>
+                                                    <span className="flex items-center gap-1.5"><Calendar1 className="w-3.5 h-3.5" /> {formatDate(file.createdAt)}</span>
                                                     <span>•</span>
                                                     <span>{formatFileSize(file.fileSize)}</span>
                                                 </div>
+                                                <p className="text-xs text-gray-500">
+                                                    {t('org_res_uploaded')} {formatDate(file.createdAt)} • {formatFileSize(file.fileSize)}
+                                                </p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2 ml-6 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -173,12 +178,12 @@ const ResourceTab = ({ id, isResourceModalOpen, closeResourceModal, onLoading, o
                                         <FileText className="w-8 h-8 text-gray-400" />
                                     </div>
 
-                                    <h3 className="text-base font-semibold text-gray-900">
-                                        No resources available
-                                    </h3>
+                                    <p className="text-base font-medium text-gray-700">
+                                        {t('org_res_no_resources')}
+                                    </p>
 
-                                    <p className="text-sm text-gray-500 mt-2 max-w-sm">
-                                        Upload documents and materials for your event staff.
+                                    <p className="text-sm text-gray-500 mt-3">
+                                        {t('org_res_uploaded_files_appear')}
                                     </p>
                                 </div>
                             )}

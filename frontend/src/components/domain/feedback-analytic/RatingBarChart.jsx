@@ -8,8 +8,10 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useTranslation } from 'react-i18next';
 
 export default function RatingBarChart({ ratingDistribution = [], isLoading }) {
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <div className="bg-[#f7f7f7] rounded-2xl p-4 md:p-6 h-64 animate-pulse" />
@@ -18,7 +20,7 @@ export default function RatingBarChart({ ratingDistribution = [], isLoading }) {
 
   return (
     <div className="bg-[#f7f7f7] rounded-2xl p-4 md:p-6 text-sm">
-      <h3 className="font-bold mb-4">Rating Distribution</h3>
+      <h3 className="font-bold mb-4">{t('org_rating_distribution')}</h3>
       <ResponsiveContainer width="100%" height={220}>
         <BarChart data={ratingDistribution}>
           <CartesianGrid strokeDasharray="3 3" />

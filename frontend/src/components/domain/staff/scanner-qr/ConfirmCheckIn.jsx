@@ -1,8 +1,10 @@
 import React from 'react';
 import { Modal } from 'antd';
 import { User, Ticket, QrCode } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const ConfirmCheckIn = ({ isOpen, onClose, onConfirm, ticketInfo, isLoading }) => {
+    const { t } = useTranslation();
     if (!ticketInfo) return null;
 
     return (
@@ -19,7 +21,7 @@ const ConfirmCheckIn = ({ isOpen, onClose, onConfirm, ticketInfo, isLoading }) =
             }}
         >
             <div className="text-center mb-3 mt-0.5">
-                <h3 className="text-[15px] font-bold text-[#2C3E50]">Confirm</h3>
+                <h3 className="text-[15px] font-bold text-[#2C3E50]">{t('staff_confirm')}</h3>
             </div>
             <div className="bg-[#F8FAFC] rounded-lg p-2 mb-4 border border-slate-100 flex flex-col gap-2">
                 <div className="flex items-center gap-2">
@@ -54,7 +56,7 @@ const ConfirmCheckIn = ({ isOpen, onClose, onConfirm, ticketInfo, isLoading }) =
                     disabled={isLoading}
                     className="flex-1 px-2 py-1.5 rounded-md font-semibold text-xs text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors disabled:opacity-50"
                 >
-                    Cancel
+                    {t('staff_cancel')}
                 </button>
                 <button
                     onClick={onConfirm}
@@ -64,7 +66,7 @@ const ConfirmCheckIn = ({ isOpen, onClose, onConfirm, ticketInfo, isLoading }) =
                     {isLoading ? (
                         <div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
                     ) : (
-                        'Check In'
+                        t('staff_check_in')
                     )}
                 </button>
             </div>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Menu, X } from "lucide-react"; // Import icon menu và dấu X
+import { useTranslation } from "react-i18next";
 
 const NAV_ITEMS = [
     { label: "Discover", href: "/" },
@@ -9,6 +10,7 @@ const NAV_ITEMS = [
 ];
 
 const NavMenu = () => {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
 
     const toggleMenu = () => setIsOpen(!isOpen);
@@ -27,7 +29,7 @@ const NavMenu = () => {
                             }`
                         }
                     >
-                        {item.label}
+                        {t(item.label.toLowerCase())}
                     </NavLink>
                 ))}
             </nav>
@@ -54,7 +56,7 @@ const NavMenu = () => {
                                 }`
                             }
                         >
-                            {item.label}
+                            {t(item.label.toLowerCase())}
                         </NavLink>
                     ))}
                 </div>

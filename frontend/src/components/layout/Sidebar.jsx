@@ -63,10 +63,9 @@ const DisabledNavItem = ({ icon: Icon, label }) => (
 
 // ── ActiveNavLink style (same as admin/staff) ──────────────────────────
 const navLinkClass = ({ isActive }) =>
-  `flex items-center gap-3 px-4 py-3 rounded-xl whitespace-nowrap border-2 transition-all duration-300 ease-in-out ${
-    isActive
-      ? "bg-white/20 text-white border-white/20 shadow-lg"
-      : "text-white/70 hover:bg-white/10 hover:text-white border-transparent"
+  `flex items-center gap-3 px-4 py-3 rounded-xl whitespace-nowrap border-2 transition-all duration-300 ease-in-out ${isActive
+    ? "bg-white/20 text-white border-white/20 shadow-lg"
+    : "text-white/70 hover:bg-white/10 hover:text-white border-transparent"
   } font-medium`;
 
 // ── Sidebar ────────────────────────────────────────────────────────────
@@ -163,28 +162,24 @@ const Sidebar = () => {
           <hr className="border-white/10 mb-6" />
 
           {/* Navigation */}
-          <div className="p-5 flex flex-col gap-4 flex-1 overflow-y-auto">
-            {/* Overview */}
-            <nav className="space-y-2">
-              <p className="px-4 text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">
-                Overview
-              </p>
-              {overviewItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <NavLink
-                    key={item.title}
-                    to={item.path}
-                    end={item.end}
-                    onClick={() => setIsOpen(false)}
-                    className={navLinkClass}
-                  >
-                    <Icon size={20} className="shrink-0" />
-                    {item.title}
-                  </NavLink>
-                );
-              })}
-            </nav>
+          <nav className="flex-1 px-4 overflow-y-auto scrollbar-hide space-y-1">
+
+            {/* ── Overview ── */}
+            <p className="px-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 mt-1">
+              Overview
+            </p>
+            <NavItem
+              to="/organizer/dashboard"
+              icon={<LayoutDashboard size={20} />}
+              label="Dashboard"
+              isActive={isDashboardActive}
+            />
+            <NavItem
+              to="/organizer/my-events"
+              icon={<CalendarDays size={20} />}
+              label="My Events"
+              isActive={isMyEventsActive}
+            />
 
             {/* Event Tools */}
             <nav className="space-y-2 mt-2">
@@ -209,11 +204,10 @@ const Sidebar = () => {
                     className={({ isActive: routerActive }) => {
                       // Use our custom isActive logic for event tools
                       const active = item.isActive || routerActive;
-                      return `flex items-center gap-3 px-4 py-3 rounded-xl whitespace-nowrap border-2 transition-all duration-300 ease-in-out ${
-                        active
+                      return `flex items-center gap-3 px-4 py-3 rounded-xl whitespace-nowrap border-2 transition-all duration-300 ease-in-out ${active
                           ? "bg-white/20 text-white border-white/20 shadow-lg"
                           : "text-white/70 hover:bg-white/10 hover:text-white border-transparent"
-                      } font-medium`;
+                        } font-medium`;
                     }}
                   >
                     <Icon size={20} className="shrink-0" />
@@ -222,12 +216,12 @@ const Sidebar = () => {
                 );
               })}
             </nav>
-          </div>
-
-          {/* User dropdown */}
-          <OrganizerDropdown setIsOpen={setIsOpen} />
         </div>
-      </aside>
+
+        {/* User dropdown */}
+        <OrganizerDropdown setIsOpen={setIsOpen} />
+      </div>
+    </aside >
     </>
   );
 };

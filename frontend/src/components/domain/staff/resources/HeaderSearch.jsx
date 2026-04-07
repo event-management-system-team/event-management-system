@@ -1,11 +1,13 @@
 import { Search } from 'lucide-react'
+import { useTranslation } from 'react-i18next';
 
 const HeaderSearch = ({ searchQuery, setSearchQuery, eventName }) => {
+    const { t } = useTranslation();
 
     return (
         <>
             <div className="flex flex-col gap-2 mb-8 pl-2">
-                <h2 className="text-[#2C3E50] text-4xl font-extrabold leading-tight tracking-tight">Resources Event</h2>
+                <h2 className="text-[#2C3E50] text-4xl font-extrabold leading-tight tracking-tight">{t('staff_resources_event')}</h2>
                 <p className="text-[#89A8B2] text-lg font-medium italic">{eventName}</p>
             </div>
 
@@ -18,7 +20,7 @@ const HeaderSearch = ({ searchQuery, setSearchQuery, eventName }) => {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="flex w-full min-w-0 flex-1 border-none bg-transparent focus:outline-none focus:ring-0 px-4 text-base font-medium placeholder:text-slate-400 text-[#2C3E50]"
-                        placeholder="Search document, material,..."
+                        placeholder={t('staff_search_resource')}
                     />
                 </div>
             </div>

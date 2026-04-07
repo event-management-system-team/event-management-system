@@ -1,12 +1,14 @@
 import React from 'react'
 import EmptyState from '../../common/EmptyState'
 import { MapPin } from 'lucide-react'
+import { useTranslation } from "react-i18next";
 
 const AboutTab = ({ eventName, description, imageGallery, locationCoordinates, }) => {
+    const { t } = useTranslation();
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             <div className="bg-cream p-8 rounded-3xl leading-relaxed ">
-                <h3 className="text-2xl font-bold mb-4">Experience the {eventName}</h3>
+                <h3 className="text-2xl font-bold mb-4">{t("experience_the")} {eventName}</h3>
 
                 {description ? (
                     <div className="prose max-w-none text-slate-600">
@@ -19,7 +21,7 @@ const AboutTab = ({ eventName, description, imageGallery, locationCoordinates, }
 
                 {imageGallery && imageGallery.length > 0 && (
                     <div className="mt-8 pt-8 border-t border-slate-200">
-                        <h4 className="text-xl font-bold mb-4">Event Gallery</h4>
+                        <h4 className="text-xl font-bold mb-4">{t("event_gallery")}</h4>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                             {imageGallery.map((imgUrl, index) => (
@@ -45,7 +47,7 @@ const AboutTab = ({ eventName, description, imageGallery, locationCoordinates, }
 
             {locationCoordinates && (
                 <div className="space-y-4">
-                    <h3 className="text-2xl font-bold">Location</h3>
+                    <h3 className="text-2xl font-bold">{t("location")}</h3>
 
                     <div className="w-full h-80 rounded-3xl overflow-hidden relative border border-slate-200 shadow-inner">
                         <iframe

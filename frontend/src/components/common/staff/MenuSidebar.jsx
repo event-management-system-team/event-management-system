@@ -1,23 +1,27 @@
-import { Briefcase, CalendarDays, FolderOpen, Menu, X } from 'lucide-react'
+import { Briefcase, CalendarDays, FolderOpen, Globe, Menu, X } from 'lucide-react'
 import Logo from '../Logo'
 
 import { NavLink, useParams } from 'react-router';
 import { logoutUser } from "../../../store/slices/auth.slice";
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import UserDropdown from './UserDropdown';
 
 const MenuSidebar = () => {
 
     const { eventSlug } = useParams();
+    const { t, i18n } = useTranslation();
 
     const [isOpen, setIsOpen] = useState(false);
 
     const toggleSidebar = () => setIsOpen(!isOpen);
+    const currentLang = i18n.language;
+    const toggleLanguage = () => i18n.changeLanguage(currentLang === 'vi' ? 'en' : 'vi');
 
     const navItems = [
-        { title: 'Workplace', icon: Briefcase, path: `/staff/${eventSlug}`, end: true },
-        { title: 'My Schedule', icon: CalendarDays, path: `/staff/${eventSlug}/my-schedule` },
-        { title: 'Resources', icon: FolderOpen, path: `/staff/${eventSlug}/resource` },
+        { title: t('staff_workplace'), icon: Briefcase, path: `/staff/${eventSlug}`, end: true },
+        { title: t('staff_my_schedule'), icon: CalendarDays, path: `/staff/${eventSlug}/my-schedule` },
+        { title: t('staff_resources'), icon: FolderOpen, path: `/staff/${eventSlug}/resource` },
     ];
 
     return (
@@ -83,6 +87,20 @@ const MenuSidebar = () => {
                                 )
                             })}
                         </nav>
+                    </div>
+
+                    {/* Language Toggle */}
+                    <div className="px-5">
+                        <button
+                            onClick={toggleLanguage}
+                            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                        >
+                            <Globe size={18} />
+                            <span className="flex-1 text-left">{currentLang === 'vi' ? 'Tiếng Việt' : 'English'}</span>
+                            <span className="text-[10px] font-bold bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full uppercase">
+                                {currentLang === 'vi' ? 'VI' : 'EN'}
+                            </span>
+                        </button>
                     </div>
 
                     <UserDropdown

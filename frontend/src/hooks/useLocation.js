@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import eventService from '../services/event.service';
-
+import { useTranslation } from 'react-i18next';
 
 export const useLocation = () => {
+    const { t } = useTranslation();
 
     return useQuery({
         queryKey: ['provinces'],
@@ -10,7 +11,7 @@ export const useLocation = () => {
         select: (rawData) => {
 
             if (!rawData || !Array.isArray(rawData)) {
-                return [{ value: '', label: 'Everywhere' }];
+                return [{ value: '', label: t('everywhere') }];
             }
 
             const formattedData = rawData.map(province => {
@@ -27,7 +28,7 @@ export const useLocation = () => {
             });
 
             return [
-                { value: '', label: 'Everywhere' },
+                { value: '', label: t('everywhere') },
                 ...formattedData
             ]
         }

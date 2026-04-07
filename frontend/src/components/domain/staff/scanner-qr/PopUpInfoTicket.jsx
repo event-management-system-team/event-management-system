@@ -9,6 +9,7 @@ import {
     CalendarOutlined
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
 
@@ -18,6 +19,7 @@ const PopUpInfoTicket = ({
     ticketData,
     onCheckIn
 }) => {
+    const { t } = useTranslation();
     if (!ticketData) return null;
 
     const isCheckedIn = ticketData.status === 'CHECKED_IN';
@@ -25,7 +27,7 @@ const PopUpInfoTicket = ({
 
     return (
         <Modal
-            title={<div className="text-xl font-extrabold text-[#2C3E50] border-b border-slate-100 pb-4 mb-2">Ticket Information</div>}
+            title={<div className="text-xl font-extrabold text-[#2C3E50] border-b border-slate-100 pb-4 mb-2">{t('staff_ticket_info')}</div>}
             open={isVisible}
             onCancel={onClose}
             footer={null}
@@ -39,18 +41,18 @@ const PopUpInfoTicket = ({
             <div className="flex flex-col gap-4 py-2">
 
                 <div className="flex justify-between items-center mb-1">
-                    <span className="text-sm font-semibold text-slate-500">Current Status:</span>
+                    <span className="text-sm font-semibold text-slate-500">{t('staff_current_status')}</span>
                     {isCheckedIn ? (
                         <div className="bg-green-100 text-green-700 text-[11px] font-extrabold px-3 py-1.5 rounded-full flex items-center gap-1.5 m-0 border border-green-200">
-                            <CheckCircleOutlined /> CHECKED IN
+                            <CheckCircleOutlined /> {t('staff_checked_in')}
                         </div>
                     ) : isError ? (
                         <div className="bg-red-100 text-red-700 text-[11px] font-extrabold px-3 py-1.5 rounded-full m-0 uppercase border border-red-200">
-                            {ticketData.message || 'INVALID TICKET'}
+                            {ticketData.message || t('staff_invalid_ticket_badge')}
                         </div>
                     ) : (
                         <div className="bg-[#89A8B2]/10 text-[#89A8B2] text-[11px] font-extrabold px-3 py-1.5 rounded-full m-0 border border-[#89A8B2]/20">
-                            NOT CHECKED IN YET
+                            {t('staff_not_checked_in')}
                         </div>
                     )}
                 </div>
@@ -61,7 +63,7 @@ const PopUpInfoTicket = ({
                             <UserOutlined className="text-xl" />
                         </div>
                         <div className="flex flex-col">
-                            <Text className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Attendee Name</Text>
+                            <Text className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">{t('staff_attendee_name')}</Text>
                             <Text className="text-base font-extrabold text-[#2C3E50] leading-tight">{ticketData.customerName}</Text>
                         </div>
                     </div>
@@ -71,7 +73,7 @@ const PopUpInfoTicket = ({
                             <MailOutlined className="text-xl" />
                         </div>
                         <div className="flex flex-col">
-                            <Text className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Email Address</Text>
+                            <Text className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">{t('staff_email_address')}</Text>
                             <Text className="text-sm font-bold text-[#2C3E50] leading-tight truncate">{ticketData.email}</Text>
                         </div>
                     </div>
@@ -81,7 +83,7 @@ const PopUpInfoTicket = ({
                     <div className="bg-[#89A8B2]/5 p-3.5 rounded-2xl border border-[#89A8B2]/20 flex flex-col gap-1 items-start">
                         <div className="flex items-center gap-1.5 text-slate-500 mb-1">
                             <TagOutlined className="text-[#89A8B2]" />
-                            <Text className="text-[10px] font-bold uppercase tracking-wider">Ticket Type</Text>
+                            <Text className="text-[10px] font-bold uppercase tracking-wider">{t('staff_ticket_type')}</Text>
                         </div>
                         <Text className="font-extrabold text-[#89A8B2] text-sm">{ticketData.ticketType}</Text>
                     </div>
@@ -89,7 +91,7 @@ const PopUpInfoTicket = ({
                     <div className="bg-white p-3.5 rounded-2xl border border-slate-200 flex flex-col gap-1 items-start">
                         <div className="flex items-center gap-1.5 text-slate-500 mb-1">
                             <BarcodeOutlined className="text-slate-400" />
-                            <Text className="text-[10px] font-bold uppercase tracking-wider">Ticket Code</Text>
+                            <Text className="text-[10px] font-bold uppercase tracking-wider">{t('staff_ticket_code')}</Text>
                         </div>
                         <Text className="font-extrabold text-[#2C3E50] tracking-wider text-sm">{ticketData.ticketCode}</Text>
                     </div>
@@ -99,7 +101,7 @@ const PopUpInfoTicket = ({
                     {ticketData.createdAt && (
                         <div className="flex items-center justify-between">
                             <span className="text-slate-500 font-medium flex items-center gap-2">
-                                <CalendarOutlined className="text-slate-400" /> Purchased On
+                                <CalendarOutlined className="text-slate-400" /> {t('staff_purchased_on')}
                             </span>
                             <span className="font-bold text-slate-700 text-xs">
                                 {dayjs(ticketData.createdAt).format('DD MMM YYYY, HH:mm')}
@@ -112,7 +114,7 @@ const PopUpInfoTicket = ({
                             <div className="h-px w-full bg-slate-100 my-0.5"></div>
                             <div className="flex items-center justify-between">
                                 <span className="text-green-600 font-medium flex items-center gap-2">
-                                    <ClockCircleOutlined className="text-green-500" /> Check-in Time
+                                    <ClockCircleOutlined className="text-green-500" /> {t('staff_checkin_time')}
                                 </span>
                                 <span className="font-bold text-green-700 text-xs">
                                     {dayjs(ticketData.checkInTime).format('DD MMM YYYY, HH:mm:ss')}
@@ -132,7 +134,7 @@ const PopUpInfoTicket = ({
                             icon={<CheckCircleOutlined className="text-lg" />}
                             onClick={() => onCheckIn(ticketData)}
                         >
-                            CONFIRM CHECK-IN
+                            {t('staff_confirm_checkin')}
                         </Button>
                     </div>
                 )}
@@ -145,7 +147,7 @@ const PopUpInfoTicket = ({
                             className="w-full h-14 text-base font-extrabold rounded-2xl transition-all hover:scale-[1.02]"
                             onClick={onClose}
                         >
-                            CLOSE
+                            {t('staff_close')}
                         </Button>
                     </div>
                 )}

@@ -18,9 +18,11 @@ import { useAlert } from '../../hooks/useAlert.js';
 import { Popconfirm } from 'antd';
 import LoadingState from '../../components/common/LoadingState.jsx';
 import EmptyState from '../../components/common/EmptyState.jsx';
+import { useTranslation } from 'react-i18next';
 
 export function AccountDetail() {
     const { id } = useParams();
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(true);
     const [account, setAccount] = useState(null);
     const [error, setError] = useState(null);
@@ -141,16 +143,18 @@ export function AccountDetail() {
             {/* Main Content */}
             <main className="flex-1 overflow-auto">
                 {/* Header */}
-                <header className="bg-[#F1F0E8] px-8 py-5 pt-8">
-                    <div className="flex items-start justify-between">
-                        <div>
-                            <div className="flex items-center gap-4 text-gray-400 text-sm font-medium mb-3">
-                                <Link className="text-gray-500 hover:text-gray-700" to="/admin">Dashboard</Link>
-                                <ChevronRight className="h-4 w-4" />
-                                <Link className="text-gray-500 hover:text-gray-700" to="/admin/accounts">Account Management</Link>
-                                <ChevronRight className="h-4 w-4" />
-                                <span className="text-gray-600">Account Detail</span>
-                            </div>
+                <header className="bg-[#f7f7f7] border-b border-gray-200 px-8 py-5">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <Link to="/admin" className="hover:text-gray-900">
+                                {t('admin_dashboard')}
+                            </Link>
+                            <ChevronRight className="h-4 w-4" />
+                            <Link to="/admin/accounts" className="hover:text-gray-900">
+                                {t('ad_account_management')}
+                            </Link>
+                            <ChevronRight className="h-4 w-4" />
+                            <span>{t('ad_account_detail')}</span>
                         </div>
                     </div>
                 </header>
@@ -196,30 +200,30 @@ export function AccountDetail() {
                                 {account?.status === "ACTIVE" ? (
                                     <div className="flex gap-2">
                                         <Popconfirm
-                                            title="Ban account"
-                                            description="Are you sure to ban this account?"
+                                            title={t('ad_ban_account')}
+                                            description={t('ad_ban_confirm')}
                                             onConfirm={handleToggleBan}
-                                            okText="Yes"
-                                            cancelText="No"
+                                            okText={t('ad_yes')}
+                                            cancelText={t('ad_no')}
                                         >
                                             <Button variant="destructive" className="gap-2 hover:cursor-pointer">
                                                 <Ban className="h-4 w-4" />
-                                                Ban Account
+                                                {t('ad_ban_account')}
                                             </Button>
                                         </Popconfirm>
                                     </div>
                                 ) : (
                                     <div className="flex gap-2">
                                         <Popconfirm
-                                            title="Activate account"
-                                            description="Are you sure to activate this account?"
+                                            title={t('ad_activate_account')}
+                                            description={t('ad_activate_confirm')}
                                             onConfirm={handleToggleBan}
-                                            okText="Yes"
-                                            cancelText="No"
+                                            okText={t('ad_yes')}
+                                            cancelText={t('ad_no')}
                                         >
                                             <Button className="gap-2 bg-green-600 hover:bg-green-700 text-white hover:cursor-pointer">
                                                 <CheckCircle className="h-4 w-4" />
-                                                Activate Account
+                                                {t('ad_activate_account')}
                                             </Button>
                                         </Popconfirm>
                                     </div>
@@ -237,7 +241,7 @@ export function AccountDetail() {
                                 value="basic"
                                 className="h-12 bg-transparent border-b-2 border-transparent data-[state=active]:border-[#7FA5A5] data-[state=active]:text-[#7FA5A5] rounded-none px-5 data-[state=active]:shadow-none"
                             >
-                                Basic Info
+                                {t('ad_basic_info')}
                             </TabsTrigger>
                         </TabsList>
 
@@ -248,17 +252,17 @@ export function AccountDetail() {
                                     <Card className="bg-[#ffffff] shadow-sm border border-gray-100 rounded-xl">
                                         <CardHeader className="border-b border-gray-50 pb-5">
                                             <CardTitle className="text-lg">
-                                                Personal Information
+                                                {t('ad_personal_info')}
                                             </CardTitle>
                                             <CardDescription>
-                                                Basic account holder details
+                                                {t('ad_personal_info_desc')}
                                             </CardDescription>
                                         </CardHeader>
                                         <CardContent className="pt-6 space-y-4">
                                             <div>
                                                 <label
                                                     className="text-xs text-gray-500 uppercase tracking-wide mb-1 block">
-                                                    Full Name
+                                                    {t('ad_full_name')}
                                                 </label>
                                                 <div className="text-sm text-gray-900 font-medium">
                                                     {account?.fullName}
@@ -267,7 +271,7 @@ export function AccountDetail() {
                                             <div>
                                                 <label
                                                     className="text-xs text-gray-500 uppercase tracking-wide mb-1 block">
-                                                    Email Address
+                                                    {t('ad_email_address')}
                                                 </label>
                                                 <a
                                                     href={`mailto:${account?.email}`}
@@ -280,7 +284,7 @@ export function AccountDetail() {
                                             <div>
                                                 <label
                                                     className="text-xs text-gray-500 uppercase tracking-wide mb-1 block">
-                                                    Phone Number
+                                                    {t('ad_phone_number')}
                                                 </label>
                                                 <div className="text-sm text-gray-900">
                                                     {account?.phone}
@@ -292,16 +296,16 @@ export function AccountDetail() {
                                     {/* Account Details Card */}
                                     <Card className="bg-[#ffffff] shadow-sm border border-gray-100 rounded-xl">
                                         <CardHeader className="border-b border-gray-50 pb-5">
-                                            <CardTitle className="text-lg">Account Details</CardTitle>
+                                            <CardTitle className="text-lg">{t('ad_account_details')}</CardTitle>
                                             <CardDescription>
-                                                Administrative information and metrics
+                                                {t('ad_account_details_desc')}
                                             </CardDescription>
                                         </CardHeader>
                                         <CardContent className="pt-6 space-y-4">
                                             <div>
                                                 <label
                                                     className="text-xs text-gray-500 uppercase tracking-wide mb-1 block">
-                                                    Registration Date
+                                                    {t('ad_registration_date')}
                                                 </label>
                                                 <div className="text-sm text-gray-900">
                                                     {formatDateTime(account?.createdAt)}
@@ -310,7 +314,7 @@ export function AccountDetail() {
                                             <div>
                                                 <label
                                                     className="text-xs text-gray-500 uppercase tracking-wide mb-1 block">
-                                                    Last Login
+                                                    {t('ad_last_login')}
                                                 </label>
                                                 <div className="text-sm text-gray-900">
                                                     {formatDateTime(account?.lastLoginAt)}
@@ -320,7 +324,7 @@ export function AccountDetail() {
                                                 <div>
                                                     <label
                                                         className="text-xs text-gray-500 uppercase tracking-wide mb-1 block">
-                                                        Events Created
+                                                        {t('ad_events_created')}
                                                     </label>
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-sm text-green-600 font-semibold">

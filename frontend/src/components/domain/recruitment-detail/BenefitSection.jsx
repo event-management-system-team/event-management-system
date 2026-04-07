@@ -1,4 +1,5 @@
 import { ShieldCheck, Award, BookOpen, Coffee, Gift, Star, Briefcase, Heart, CheckCircle } from 'lucide-react';
+import { useTranslation } from "react-i18next";
 
 const iconMap = {
     award: Award,
@@ -31,6 +32,8 @@ const renderBenefitIcon = (iconName) => {
 };
 
 const BenefitSection = ({ benefits }) => {
+    const { t } = useTranslation();
+
     if (!benefits || benefits.length === 0) return null;
 
     // Normalize: handle cả string lẫn object { icon, title }
@@ -48,7 +51,7 @@ const BenefitSection = ({ benefits }) => {
         <section className="bg-[#FBFBFA] border-l-4 border-[#4ECDC4] rounded-xl p-8 shadow-sm">
             <h3 className="text-[15px] font-extrabold text-slate-800 mb-8 flex items-center gap-2 uppercase tracking-wider">
                 <ShieldCheck size={24} className="text-[#4ECDC4]" />
-                Exclusive Benefits
+                {t("exclusive_benefits")}
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

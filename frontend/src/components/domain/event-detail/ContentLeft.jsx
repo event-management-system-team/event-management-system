@@ -3,13 +3,14 @@ import { useState } from 'react'
 import AboutTab from './AboutTab'
 import AgendaTab from './AgendaTab'
 import MoreInfoTab from './MoreInfoTab'
+import { useTranslation } from 'react-i18next'
 
 const ContentLeft = ({ eventName, description, imageGallery, locationCoordinates, metadata, agendas, eventSlug }) => {
-
+    const { t } = useTranslation();
     const navItems = [
-        { id: "about", label: "About" },
-        { id: "agenda", label: "Agenda" },
-        { id: "moreInfo", label: "More Info" },
+        { id: "about", label: t("about") },
+        { id: "agenda", label: t("agenda") },
+        { id: "moreInfo", label: t("moreInfo") },
     ]
 
     const [active, setActive] = useState('about');

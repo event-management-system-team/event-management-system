@@ -14,6 +14,7 @@ import {
     AlertCircle,
 } from 'lucide-react';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
 import organizerService from '../../services/organizer.service';
 
 //số lượng sự kiện trên 1 trang
@@ -27,27 +28,28 @@ const STATUS_STYLES = {
     Pending: { dotColor: 'bg-blue-400', textColor: 'text-blue-600', bgColor: 'bg-blue-50' },
 };
 
-const getEventDisplayStatus = (status, startDate) => {
+const getEventDisplayStatus = (status, startDate, t) => {
     switch (status) {
         case 'APPROVED':
             return { label: 'Active', ...STATUS_STYLES.Active };
         case 'ONGOING':
-            return { label: 'Active', ...STATUS_STYLES.Active };
+            return { key: 'active', label: t('org_status_active'), ...STATUS_STYLES.Active };
         case 'COMPLETED':
-            return { label: 'Completed', ...STATUS_STYLES.Completed };
+            return { key: 'completed', label: t('org_status_completed'), ...STATUS_STYLES.Completed };
         case 'REJECTED':
-            return { label: 'Rejected', ...STATUS_STYLES.Rejected };
+            return { key: 'rejected', label: t('org_status_rejected'), ...STATUS_STYLES.Rejected };
         case 'PENDING':
-            return { label: 'Pending', ...STATUS_STYLES.Pending };
+            return { key: 'pending', label: t('org_status_pending'), ...STATUS_STYLES.Pending };
         case 'DRAFT':
-            return { label: 'Draft', ...STATUS_STYLES.Draft };
+            return { key: 'draft', label: t('org_status_draft'), ...STATUS_STYLES.Draft };
         default:
-            return { label: status, ...STATUS_STYLES.Draft };
+            return { key: status?.toLowerCase(), label: status, ...STATUS_STYLES.Draft };
     }
 };
 
 const MyEventsPage = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const [events, setEvents] = useState([]);
     const [stats, setStats] = useState({ totalEvents: 0, activeCount: 0, completedCount: 0 });
@@ -130,7 +132,7 @@ const MyEventsPage = () => {
         return result;
     }, [events, searchTerm]);
 
-    const getStatusDisplay = (status, startDate) => getEventDisplayStatus(status, startDate);
+    const getStatusDisplay = (status, startDate) => getEventDisplayStatus(status, startDate, t);
 
     const getTicketProgress = (sold, total) => {
         if (!total || total <= 0) return 0;
@@ -173,7 +175,7 @@ const MyEventsPage = () => {
             fetchEvents(currentPage);
             fetchStats();
         } catch (err) {
-            const msg = err.response?.data?.message || 'Failed to delete event.';
+            const msg = err.response?.data?.message || t('org_delete_failed');
             setError(msg);
         } finally {
             setDeleting(false);
@@ -182,21 +184,21 @@ const MyEventsPage = () => {
 
     const statCards = [
         {
-            title: 'TOTAL EVENTS',
+            title: t('org_total_events'),
             value: stats.totalEvents,
             icon: Calendar,
             iconBg: 'bg-blue-50',
             iconColor: 'text-blue-500',
         },
         {
-            title: 'ACTIVE',
+            title: t('org_active'),
             value: stats.activeCount,
             icon: Zap,
             iconBg: 'bg-green-50',
             iconColor: 'text-green-500',
         },
         {
-            title: 'COMPLETED',
+            title: t('org_completed'),
             value: stats.completedCount,
             icon: CheckCircle2,
             iconBg: 'bg-gray-100',
@@ -217,11 +219,11 @@ const MyEventsPage = () => {
             {/* Header */}
             <div className="flex items-start justify-between mb-8">
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
-                        My Events Management
+                    <h1 className="font-sans text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
+                        {t('org_my_events')}
                     </h1>
                     <p className="text-gray-500 text-sm mt-1">
-                        Overview of your current and past event performances.
+                        {t('org_my_events_desc')}
                     </p>
                 </div>
                 <button
@@ -229,7 +231,7 @@ const MyEventsPage = () => {
                     className="flex items-center gap-2 bg-[#8c9db3] hover:bg-[#7a8ca3] text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-colors shadow-sm"
                 >
                     <Plus size={18} />
-                    Create New Event
+                    {t('org_create_new_event')}
                 </button>
             </div>
 
@@ -263,12 +265,12 @@ const MyEventsPage = () => {
                 {/* Listings Header */}
                 <div className="px-6 pt-5 pb-4 border-b border-gray-100">
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-lg font-semibold text-gray-900">Event Listings</h2>
+                        <h2 className="text-lg font-semibold text-gray-900">{t('org_event_listings')}</h2>
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="Search events..."
+                                placeholder={t('org_search_events')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-full bg-white focus:outline-none focus:ring-2 focus:ring-[#7FA5A5]/30 focus:border-[#7FA5A5] w-56"
@@ -293,18 +295,18 @@ const MyEventsPage = () => {
 
                 {/* Table Header */}
                 <div className="grid grid-cols-12 gap-4 px-6 py-3 border-b border-gray-100 text-xs text-gray-400 uppercase tracking-wider font-medium">
-                    <div className="col-span-4 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Event</div>
-                    <div className="col-span-2 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Date</div>
-                    <div className="col-span-2 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Status</div>
-                    <div className="col-span-3 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Ticket Stats</div>
-                    <div className="col-span-1 text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">Actions</div>
+                    <div className="col-span-4 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">{t('org_tbl_event')}</div>
+                    <div className="col-span-2 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">{t('org_tbl_date')}</div>
+                    <div className="col-span-2 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">{t('org_tbl_status')}</div>
+                    <div className="col-span-3 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">{t('org_tbl_ticket_stats')}</div>
+                    <div className="col-span-1 text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider pb-3 pr-6">{t('org_tbl_actions')}</div>
                 </div>
 
                 {/* Loading State */}
                 {loading && (
                     <div className="px-6 py-16 text-center">
                         <div className="inline-block w-8 h-8 border-3 border-gray-200 border-t-[#7FA5A5] rounded-full animate-spin" />
-                        <p className="text-sm text-gray-400 mt-3">Loading events...</p>
+                        <p className="text-sm text-gray-400 mt-3">{t('org_loading_events')}</p>
                     </div>
                 )}
 
@@ -312,8 +314,8 @@ const MyEventsPage = () => {
                 {!loading && filteredEvents.length === 0 && (
                     <div className="px-6 py-16 text-center">
                         <Calendar className="mx-auto h-12 w-12 text-gray-300 mb-3" />
-                        <p className="text-gray-500 font-medium">No events found</p>
-                        <p className="text-sm text-gray-400 mt-1">Create your first event to get started.</p>
+                        <p className="text-gray-500 font-medium">{t('org_no_events_found')}</p>
+                        <p className="text-sm text-gray-400 mt-1">{t('org_create_first_event_start')}</p>
                     </div>
                 )}
 
@@ -351,7 +353,7 @@ const MyEventsPage = () => {
                                         <div className="flex items-center gap-1 mt-0.5">
                                             <MapPin size={12} className="text-gray-400 shrink-0" />
                                             <span className="text-xs text-gray-400 truncate">
-                                                {event.location || 'No location'}
+                                                {event.location || t('org_no_location')}
                                             </span>
                                         </div>
                                     </div>
@@ -412,14 +414,14 @@ const MyEventsPage = () => {
                                             <button
                                                 onClick={() => navigate(`/organizer/edit-event/${event.eventId}`)}
                                                 className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-amber-600 hover:text-amber-700 hover:bg-amber-50 font-medium rounded-lg cursor-pointer transition-colors"
-                                                title="Edit Event"
+                                                title={t('org_edit_event')}
                                             >
                                                 <Pencil size={15} />
                                             </button>
                                             <button
                                                 onClick={() => setDeleteTarget(event)}
                                                 className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-red-400 hover:text-red-600 hover:bg-red-50 font-medium rounded-lg cursor-pointer transition-colors"
-                                                title="Delete Event"
+                                                title={t('org_delete_event_tooltip')}
                                             >
                                                 <Trash2 size={15} />
                                             </button>
@@ -429,7 +431,7 @@ const MyEventsPage = () => {
                                             onClick={() => navigate(`/organizer/events/${event.eventId}`)}
                                             className="flex items-center gap-1.5 px-2.5 py-1.5 text-md text-[#7FA5A5] hover:text-[#5d8585] hover:bg-[#7FA5A5]/10 rounded-lg cursor-pointer transition-colors font-bold"
                                         >
-                                            Manage
+                                            {t('org_manage')}
                                         </button>
                                     )}
                                 </div>
@@ -441,7 +443,7 @@ const MyEventsPage = () => {
                 {!loading && totalElements > 0 && (
                     <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
                         <p className="text-sm text-[#7FA5A5] font-medium">
-                            Showing {currentPage * EVENTS_PER_PAGE + 1}-{Math.min((currentPage + 1) * EVENTS_PER_PAGE, totalElements)} of {totalElements} events
+                            {t('org_showing_of', { count: filteredEvents.length, total: totalElements })}
                         </p>
                         <div className="flex items-center gap-2">
                             <button
@@ -450,14 +452,14 @@ const MyEventsPage = () => {
                                 className="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                             >
                                 <ChevronLeft size={16} />
-                                Previous
+                                {t('org_previous')}
                             </button>
                             <button
                                 onClick={handleNext}
                                 disabled={currentPage >= totalPages - 1}
                                 className="flex items-center gap-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                             >
-                                Next
+                                {t('org_next')}
                                 <ChevronRight size={16} />
                             </button>
                         </div>
@@ -473,10 +475,10 @@ const MyEventsPage = () => {
                             <div className="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center">
                                 <Trash2 size={20} className="text-red-500" />
                             </div>
-                            <h3 className="text-lg font-bold text-gray-900">Delete Event</h3>
+                            <h3 className="text-lg font-bold text-gray-900">{t('org_delete_event')}</h3>
                         </div>
                         <p className="text-sm text-gray-500 mb-1">
-                            Are you sure you want to delete this event?
+                            {t('org_delete_confirm')}
                         </p>
                         <p className="text-sm font-medium text-gray-800 mb-5 truncate">
                             "{deleteTarget.eventName}"
@@ -487,14 +489,14 @@ const MyEventsPage = () => {
                                 disabled={deleting}
                                 className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
                             >
-                                Cancel
+                                {t('org_cancel')}
                             </button>
                             <button
                                 onClick={handleDeleteConfirm}
                                 disabled={deleting}
                                 className="px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg cursor-pointer transition-colors disabled:opacity-60"
                             >
-                                {deleting ? 'Deleting...' : 'Delete'}
+                                {deleting ? t('org_deleting') : t('org_delete')}
                             </button>
                         </div>
                     </div>

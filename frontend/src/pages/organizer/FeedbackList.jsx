@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Eye, Search, Filter, Calendar, Plus, Lock } from "lucide-react";
+import { useTranslation } from 'react-i18next';
+import { Eye, Search, Filter, Calendar, Plus } from "lucide-react";
 import { useFeedbacks } from "../../hooks/useFeedback";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { Pagination } from "antd";
@@ -8,6 +9,7 @@ import axiosInstance from "../../config/axios";
 import { ArrowLeft } from "lucide-react";
 
 const FeedbackList = () => {
+  const { t } = useTranslation();
   const { eventId } = useParams();
   const navigate = useNavigate();
   const { data: feedbacks, isLoading, isError } = useFeedbacks(eventId);
@@ -16,7 +18,7 @@ const FeedbackList = () => {
   // --- STATE MỚI: Quản lý các bộ lọc ---
   const [eventName, setEventName] = useState("Loading...");
   const [isEventEnded, setIsEventEnded] = useState(false);
-  
+
 
   // EFFECT: Gọi API lấy chi tiết Event để check endDate và lấy tên event
   useEffect(() => {
@@ -68,11 +70,28 @@ const FeedbackList = () => {
     setCurrentPage(1);
   };
 
+  const onChangePage = (page) => {
+    setCurrentPage(page);
+
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
+    setTimeout(() => {
+      if (listTopRef.current) {
+        listTopRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    }, 100);
+  };
+
   if (isLoading) {
     return (
       <div className="flex min-h-screen bg-[#F1F0E8] font-sans items-center justify-center">
         <p className="text-gray-500 font-medium animate-pulse">
-          Loading feedbacks...
+          {t('org_loading_feedbacks')}
         </p>
       </div>
     );
@@ -80,8 +99,8 @@ const FeedbackList = () => {
 
   if (isError) {
     return (
-      <div className="flex min-h-screen bg-[#F1F0E8] font-sans items-center justify-center">
-        <p className="text-red-500 font-medium">Error loading feedbacks</p>
+      <div className="flex min-h-screen bg-[#f8f7f2] font-sans items-center justify-center">
+        <p className="text-red-500 font-medium">{t('org_error_loading_feedbacks')}</p>
       </div>
     );
   }
@@ -107,23 +126,6 @@ const FeedbackList = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredFeedbacks.slice(indexOfFirstItem, indexOfLastItem);
 
-  const onChangePage = (page) => {
-    setCurrentPage(page);
-
-    if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
-    }
-
-    setTimeout(() => {
-      if (listTopRef.current) {
-        listTopRef.current.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
-    }, 100);
-  };
-
   return (
     // SỬA Ở ĐÂY: Đổi font-serif thành font-sans
     <div className="p-10 w-full overflow-x-hidden font-sans">
@@ -135,12 +137,12 @@ const FeedbackList = () => {
             className="flex items-center gap-4 text-gray-400 hover:text-gray-700 text-sm font-medium mb-3 transition-colors group"
           >
             <ArrowLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
-          <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
-            Attendee Feedback
-          </h1>
+            <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
+              {t('org_attendee_feedback')}
+            </h1>
           </button>
           <p className="text-gray-500 font-medium italic text-xs sm:text-sm">
-            Showing all responses for{" "}
+            {t('org_showing_responses_for')}{" "}
             <span className="text-gray-800 not-italic font-bold">
               {resolvedEventName}
             </span>
@@ -182,7 +184,7 @@ const FeedbackList = () => {
             type="text"
             value={searchTerm}
             onChange={handleSearchChange}
-            placeholder="Search by name or email..."
+            placeholder={t('org_search_name_email_fb')}
             className="w-full outline-none text-gray-700 placeholder-gray-400 text-xs sm:text-sm font-medium h-full bg-transparent"
           />
         </div>
@@ -222,8 +224,8 @@ const FeedbackList = () => {
             />
             {/* Nút xóa ngày lọc nhanh */}
             {dateFilter && (
-              <button 
-                onClick={() => {setDateFilter(""); setCurrentPage(1);}}
+              <button
+                onClick={() => { setDateFilter(""); setCurrentPage(1); }}
                 className="ml-1 text-gray-400 hover:text-red-500 font-bold"
               >
                 ×
@@ -240,19 +242,19 @@ const FeedbackList = () => {
             <thead className="bg-white">
               <tr className="border-b border-gray-100">
                 <th className="px-6 lg:px-8 py-4 lg:py-6 text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest text-left whitespace-nowrap">
-                  Date & Time
+                  {t('org_table_date_time')}
                 </th>
                 <th className="px-4 lg:px-6 py-4 lg:py-6 text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest text-left">
-                  Attendee
+                  {t('org_table_attendee')}
                 </th>
                 <th className="px-4 lg:px-6 py-4 lg:py-6 text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest text-left">
-                  Score
+                  {t('org_table_rating')}
                 </th>
                 <th className="px-4 lg:px-6 py-4 lg:py-6 text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest text-left">
-                  Ticket
+                  {t('org_table_ticket')}
                 </th>
                 <th className="px-4 lg:px-6 py-4 lg:py-6 text-[10px] lg:text-[11px] font-bold text-gray-400 uppercase tracking-widest text-center">
-                  Action
+                  {t('org_table_action')}
                 </th>
               </tr>
             </thead>
@@ -262,10 +264,10 @@ const FeedbackList = () => {
                   <td colSpan="5" className="text-center py-16 sm:py-20">
                     <div className="flex flex-col items-center justify-center">
                       <p className="text-gray-400 font-medium text-base sm:text-lg">
-                        No feedbacks found.
+                        {t('org_no_feedbacks_found')}
                       </p>
                       <p className="text-gray-300 text-xs sm:text-sm mt-1">
-                        Try adjusting your search or filters.
+                        {t('org_try_adjusting')}
                       </p>
                     </div>
                   </td>
@@ -306,8 +308,8 @@ const FeedbackList = () => {
                       </div>
                     </td>
                     <td className="px-4 lg:px-6 py-4 lg:py-5">
-                      <span className="inline-block text-[9px] sm:text-[10px] lg:text-[11px] font-bold uppercase italic tracking-wider text-[#8c9db3] bg-[#F1F0E8] px-2 sm:px-3 py-1 rounded-full border border-gray-100 whitespace-nowrap">
-                        {item.ticketName || "General"}
+                      <span className="inline-block text-[9px] sm:text-[10px] lg:text-[11px] font-bold uppercase italic tracking-wider text-[#8c9db3] bg-[#f8f7f2] px-2 sm:px-3 py-1 rounded-full border border-gray-100 whitespace-nowrap">
+                        {item.ticketName || t('org_general')}
                       </span>
                     </td>
                     <td className="px-4 lg:px-6 py-4 lg:py-5 text-center">
@@ -328,7 +330,7 @@ const FeedbackList = () => {
         {/* --- CẬP NHẬT: Đổi tổng số response thành số lượng đã lọc --- */}
         <div className="px-8 py-6 border-t border-gray-50 flex flex-col sm:flex-row justify-between items-center gap-4 bg-gray-50/50">
           <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest">
-            Total Responses:{" "}
+            {t('org_total_responses')}{" "}
             <span className="text-gray-700">{filteredFeedbacks.length}</span>
           </p>
           {filteredFeedbacks.length > itemsPerPage && (

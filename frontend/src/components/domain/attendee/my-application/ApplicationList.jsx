@@ -1,14 +1,16 @@
 import ApplicationCard from "./ApplicationCard"
 import LoadingState from '../../../common/LoadingState'
 import EmptyState from '../../../common/EmptyState'
+import { useTranslation } from "react-i18next"
 
 const ApplicationList = ({ isLoading, filteredApps, getStatusStyle, formatDate, isError }) => {
+    const { t } = useTranslation();
     return (
         <div className="flex flex-col gap-6 min-h-50">
             {isLoading ? (
                 <LoadingState />
             ) : (isError || filteredApps.length === 0) ? (
-                <EmptyState message="No applications found" />
+                <EmptyState message={t("no_applications_found")} />
             ) : (
                 filteredApps.map((app) => (
                     <div

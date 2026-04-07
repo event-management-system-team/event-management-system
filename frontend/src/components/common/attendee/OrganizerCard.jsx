@@ -1,9 +1,11 @@
 import { BadgeCheck, Star } from 'lucide-react'
+import { useTranslation } from "react-i18next";
 
 const OrganizerCard = ({ events }) => {
+    const { t } = useTranslation();
     return (
         <div className="bg-white p-6 rounded-3xl border border-[#E5E1DA]">
-            <h5 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Organizer</h5>
+            <h5 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">{t("organizer")}</h5>
             <div className="flex items-center gap-4">
 
                 {events?.organizer?.avatarUrl ? (
@@ -20,7 +22,7 @@ const OrganizerCard = ({ events }) => {
 
                 <div>
                     <div className="flex items-center gap-1.5">
-                        <p className="font-bold">{events?.organizer?.fullName || 'Updating'}</p>
+                        <p className="font-bold">{events?.organizer?.fullName || t("updating")}</p>
                         <BadgeCheck size={18} className="text-blue-500" />
                     </div>
                     <p className="text-xs text-primary ">{events?.organizer?.email}</p>

@@ -1,11 +1,13 @@
 import { Flex, Progress, Tag, Typography } from 'antd';
 import { Ticket, Star } from 'lucide-react';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 
 const { Text } = Typography;
 
 const CheckInStats = ({ ticketStats }) => {
+    const { t } = useTranslation();
 
     const getTicketUI = (ticketName) => {
         const name = (ticketName || '').toLowerCase();
@@ -39,7 +41,7 @@ const CheckInStats = ({ ticketStats }) => {
                             strong
                             style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}
                         >
-                            Total Check-In Progress
+                            {t('staff_total_checkin_progress')}
                         </Text>
 
                         <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: '4px' }}>
@@ -81,7 +83,7 @@ const CheckInStats = ({ ticketStats }) => {
                     strong
                     style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '16px' }}
                 >
-                    Ticket Type Breakdown
+                    {t('staff_ticket_breakdown')}
                 </Text>
 
                 <div className="flex flex-col gap-4">
@@ -101,7 +103,7 @@ const CheckInStats = ({ ticketStats }) => {
                                             {stat.ticketName}
                                         </Text>
                                         <Text type="secondary" style={{ fontSize: '10px', fontWeight: 500 }}>
-                                            Total: {stat.soldCount}
+                                            {t('staff_total')}: {stat.soldCount}
                                         </Text>
                                     </Flex>
                                 </Flex>
@@ -111,7 +113,7 @@ const CheckInStats = ({ ticketStats }) => {
                                         {stat.checkInCount}
                                     </Text>
                                     <Text type="secondary" style={{ fontSize: '12px', fontWeight: 500, marginLeft: '4px' }}>
-                                        in
+                                        {t('staff_in')}
                                     </Text>
                                 </div>
                             </Flex>

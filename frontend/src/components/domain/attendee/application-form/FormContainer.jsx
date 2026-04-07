@@ -3,10 +3,12 @@ import PersonalInformation from './PersonalInformation'
 import DynamicQuestion from './DynamicQuestion'
 import { Loader2, Send } from 'lucide-react'
 import { Checkbox, Form } from 'antd'
+import { useTranslation } from 'react-i18next';
 
 const FormContainer = ({ form, handleSubmit, isFull,
     selectedRole, setSelectedRole, userProfile, isSubmitting,
     renderDynamicField, formSchema, recruitments }) => {
+    const { t } = useTranslation();
 
     return (
         <div className="bg-white rounded-[28px] shadow-sm border border-[#eceeef] overflow-hidden">
@@ -44,13 +46,13 @@ const FormContainer = ({ form, handleSubmit, isFull,
                             {
                                 validator: (_, value) => value
                                     ? Promise.resolve()
-                                    : Promise.reject(new Error('Please agree to the terms.'))
+                                    : Promise.reject(new Error(t('app_agree_terms')))
                             }
                         ]}
                         className="mx-0"
                     >
                         <Checkbox className="text-sm text-slate-600 leading-relaxed font-medium hover:text-slate-900 transition-colors">
-                            I confirm that the information provided is accurate and I agree to the <a className="text-[#89A8B2] underline font-bold" href="#">staff code of conduct</a>.
+                            {t('app_confirm_info')} <a className="text-[#89A8B2] underline font-bold" href="#">{t('app_code_of_conduct')}</a>.
                         </Checkbox>
                     </Form.Item>
 
@@ -62,11 +64,11 @@ const FormContainer = ({ form, handleSubmit, isFull,
                         {isSubmitting ? (
                             <>
                                 <Loader2 size={22} className="animate-spin" />
-                                <span>Loading...</span>
+                                <span>{t('app_loading')}</span>
                             </>
                         ) : (
                             <>
-                                <span>{isFull ? 'Position Full' : 'Submit Application'}</span>
+                                <span>{isFull ? t('app_position_full') : t('app_submit')}</span>
                                 {!isFull && <Send size={18} className="group-hover:translate-x-1 transition-transform" />}
                             </>
                         )}

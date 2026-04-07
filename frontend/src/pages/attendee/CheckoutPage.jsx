@@ -11,6 +11,7 @@ import {
   createPaymentUrl,
   clearBooking,
 } from "../../store/slices/booking.slice";
+import { useTranslation } from "react-i18next";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ const CheckoutPage = () => {
   const reduxTickets = useSelector((state) => state.booking.selectedTickets);
   const reduxEvent = useSelector((state) => state.booking.selectedEvent);
   const { user } = useSelector((state) => state.auth);
+  const { t } = useTranslation();
 
   const selectedTickets =
     reduxTickets?.length > 0
@@ -73,10 +75,10 @@ const CheckoutPage = () => {
 
   const validate = () => {
     const errors = {};
-    if (!form.fullName.trim()) errors.fullName = "Full name is required";
-    if (!form.email.trim()) errors.email = "Email is required";
+    if (!form.fullName.trim()) errors.fullName = t("fullname_required");
+    if (!form.email.trim()) errors.email = t("email_required");
     else if (!/\S+@\S+\.\S+/.test(form.email))
-      errors.email = "Invalid email format";
+      errors.email = t("invalid_email");
     return errors;
   };
 

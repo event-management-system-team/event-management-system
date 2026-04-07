@@ -1,8 +1,10 @@
 import { Wallet } from 'lucide-react'
 import { Slider, Switch } from 'antd';
+import { useTranslation } from "react-i18next";
 
 
 const FilterPrice = ({ price, setPrice, isFree, setIsFree }) => {
+    const { t } = useTranslation();
     const MAX_PRICE = 5000000
 
     const currentPrice = (price !== '' && price !== undefined && price !== null) ? Number(price) : MAX_PRICE;
@@ -29,12 +31,12 @@ const FilterPrice = ({ price, setPrice, isFree, setIsFree }) => {
             <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-2">
                     <Wallet className="text-primary w-5 h-5" strokeWidth={2.5} />
-                    <span className="font-bold text-sm">Price Range</span>
+                    <span className="font-bold text-sm">{t("price_range")}</span>
                 </div>
 
                 <div className="flex items-center gap-2 px-3">
                     <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">
-                        Free
+                        {t("free")}
                     </span>
 
                     <Switch

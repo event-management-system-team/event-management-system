@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from 'react-i18next';
 import organizerService from "../../../services/organizer.service";
 import { TabsContent } from "../admin/Tabs";
 import { CreateScheduleModal } from "./CreateScheduleModal.jsx";
@@ -25,6 +26,7 @@ const WorkScheduleTab = ({
     onError,
     showAlert,
 }) => {
+    const { t } = useTranslation();
     const [assignments, setAssignments] = useState([]);
     const [showHolidays, setShowHolidays] = useState(false);
     const { rawHolidays } = useNationalHolidays();
@@ -46,7 +48,7 @@ const WorkScheduleTab = ({
             setAssignments(response.data);
         } catch (error) {
             console.error(error);
-            onError("Cannot load assignment list");
+            onError(t('org_sch_load_error'));
         } finally {
             onLoading(false);
         }

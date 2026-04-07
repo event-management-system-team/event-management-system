@@ -15,9 +15,11 @@ import { Popconfirm } from 'antd';
 import dayjs from "dayjs";
 import LoadingState from '../../components/common/LoadingState.jsx';
 import EmptyState from '../../components/common/EmptyState.jsx';
+import { useTranslation } from 'react-i18next';
 
 export function EventDetail() {
     const { slug } = useParams();
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(true);
     const [event, setEvent] = useState(null);
     const [ticketTypes, setTicketTypes] = useState([]);
@@ -272,7 +274,7 @@ export function EventDetail() {
                                         <MapPin className="h-5 w-5 mr-2" />
                                         <div>
                                             <div className="text-base font-semibold text-gray-600">
-                                                Location
+                                                {t('ad_location')}
                                             </div>
                                             <div className="text-xs text-gray-500">
                                                 {event?.location}
@@ -300,7 +302,7 @@ export function EventDetail() {
                                     value="general"
                                     className="h-12 bg-transparent border-b-2 border-transparent data-[state=active]:border-[#7FA5A5] data-[state=active]:text-[#7FA5A5] rounded-none px-6 data-[state=active]:shadow-none"
                                 >
-                                    General Information
+                                    {t('ad_general_info')}
                                 </TabsTrigger>
                             </TabsList>
 
@@ -310,7 +312,7 @@ export function EventDetail() {
                                     <CardHeader className="border-b border-gray-50 pb-5">
                                         <CardTitle className="text-lg font-semibold">Event Overview</CardTitle>
                                         <CardDescription className='font-light text-gray-500'>
-                                            Detailed event description and information
+                                            {t('ad_event_overview_desc')}
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="pt-3">
@@ -324,10 +326,10 @@ export function EventDetail() {
                                 <Card className="bg-[#ffffff] shadow-sm border border-gray-100 rounded-xl">
                                     <CardHeader className="border-b border-gray-50 pb-5">
                                         <CardTitle className="text-lg font-semibold">
-                                            Inventory & Pricing
+                                            {t('ad_inventory_pricing')}
                                         </CardTitle>
                                         <CardDescription className='font-light text-gray-500'>
-                                            Ticket tiers and availability
+                                            {t('ad_ticket_tiers')}
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="pt-2">
@@ -336,19 +338,19 @@ export function EventDetail() {
                                                 <thead>
                                                     <tr className="border-b border-gray-200">
                                                         <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                                                            Ticket Tier
+                                                            {t('ad_ticket_tier')}
                                                         </th>
                                                         <th className="text-right py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                                                            Quantity
+                                                            {t('ad_quantity')}
                                                         </th>
                                                         <th className="text-right py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                                                            Price (VND)
+                                                            {t('ad_price_vnd')}
                                                         </th>
                                                         <th className="text-right py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                                                            Available
+                                                            {t('ad_available')}
                                                         </th>
                                                         <th className="text-center py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                                                            Sale Status
+                                                            {t('ad_sale_status')}
                                                         </th>
                                                     </tr>
                                                 </thead>
@@ -406,7 +408,7 @@ export function EventDetail() {
                                     <CardHeader className="border-b border-gray-50 pb-5">
                                         <CardTitle className="text-lg font-semibold">Event Timeline</CardTitle>
                                         <CardDescription className='font-light text-gray-500'>
-                                            Scheduled sessions and activities
+                                            {t('ad_scheduled_sessions')}
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="pt-6">
@@ -459,14 +461,14 @@ export function EventDetail() {
                                 <CardHeader className="border-b border-gray-50 pb-5">
                                     <CardTitle className="text-lg font-semibold">Review & Approve</CardTitle>
                                     <CardDescription>
-                                        Complete checklist before approval
+                                        {t('ad_complete_checklist_before')}
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="pt-6 space-y-6">
                                     {/* Review Checklist */}
                                     <div>
                                         <label className="text-base font-semibold text-gray-900 mb-3 block">
-                                            Review Checklist
+                                            {t('ad_review_checklist')}
                                         </label>
                                         <div className="space-y-3">
                                             <div className="flex items-center">
@@ -481,7 +483,7 @@ export function EventDetail() {
                                                     htmlFor="basicInfo"
                                                     className="ml-3 text-sm text-gray-700 cursor-pointer"
                                                 >
-                                                    Basic Info Verified
+                                                    {t('ad_basic_info_verified')}
                                                 </label>
                                             </div>
                                             <div className="flex items-center">
@@ -496,7 +498,7 @@ export function EventDetail() {
                                                     htmlFor="imagesPolicy"
                                                     className="ml-3 text-sm text-gray-700 cursor-pointer"
                                                 >
-                                                    Images Policy Compliant
+                                                    {t('ad_images_policy')}
                                                 </label>
                                             </div>
                                             <div className="flex items-center">
@@ -511,7 +513,7 @@ export function EventDetail() {
                                                     htmlFor="contentQuality"
                                                     className="ml-3 text-sm text-gray-700 cursor-pointer"
                                                 >
-                                                    Content Quality Audit
+                                                    {t('ad_content_quality')}
                                                 </label>
                                             </div>
                                             <div className="flex items-center">
@@ -526,7 +528,7 @@ export function EventDetail() {
                                                     htmlFor="pricingTransparency"
                                                     className="ml-3 text-sm text-gray-700 cursor-pointer"
                                                 >
-                                                    Pricing Transparency
+                                                    {t('ad_pricing_transparency')}
                                                 </label>
                                             </div>
                                             <div className="flex items-center">
@@ -541,7 +543,7 @@ export function EventDetail() {
                                                     htmlFor="legalPolicy"
                                                     className="ml-3 text-sm text-gray-700 cursor-pointer"
                                                 >
-                                                    Legal / Policy Review
+                                                    {t('ad_legal_policy')}
                                                 </label>
                                             </div>
                                         </div>
@@ -550,16 +552,16 @@ export function EventDetail() {
                                     {/* Internal Admin Notes */}
                                     <div>
                                         <label className="text-base font-semibold text-gray-900 mb-2 block">
-                                            Internal Admin Notes
+                                            {t('ad_admin_notes')}
                                         </label>
                                         <Textarea
-                                            placeholder="Add observations for the organizer..."
+                                            placeholder={t('ad_notes_placeholder')}
                                             value={adminNotes}
                                             onChange={e => setAdminNotes(e.target.value)}
                                             className="min-h-[120px] resize-none border border-gray-200"
                                         />
                                         <p className="text-xs text-gray-500 mt-1">
-                                            For rejection cases only
+                                            {t('ad_rejection_only')}
                                         </p>
                                     </div>
 
@@ -571,12 +573,12 @@ export function EventDetail() {
                                             onClick={handleApproveEvent}
                                         >
                                             <CheckCircle className="mr-2 h-4 w-4" />
-                                            Approve Event
+                                            {t('ad_approve_event')}
                                         </Button>
 
                                         <Popconfirm
-                                            title="Reject event"
-                                            description="Are you sure to reject this event?"
+                                            title={t('ad_reject_event')}
+                                            description={t('ad_reject_confirm')}
                                             onConfirm={handleRejectEvent}
                                             okText="Yes"
                                             cancelText="No"
@@ -588,7 +590,7 @@ export function EventDetail() {
                                                 disabled={allChecklistComplete && !adminNotes.trim()}
                                             >
                                                 <X className="mr-2 h-4 w-4" />
-                                                Reject Submission
+                                                {t('ad_reject_submission')}
                                             </Button>
                                         </Popconfirm>
                                     </div>

@@ -1,6 +1,8 @@
 import {Button} from "./Button.jsx";
+import { useTranslation } from 'react-i18next';
 
 export const AccountsPagination = ({handleNext, handlePrev, handlePageChange, page, totalPages, isSearching}) => {
+    const { t } = useTranslation();
 
     const generatePages = () => {
         const pages = [];
@@ -35,7 +37,7 @@ export const AccountsPagination = ({handleNext, handlePrev, handlePageChange, pa
                 disabled={isSearching || page === 1}
                 onClick={page === 1 ? undefined : handlePrev}
             >
-                Previous
+                {t('adc_previous')}
             </Button>
 
             {/* Page Numbers */}
@@ -68,7 +70,7 @@ export const AccountsPagination = ({handleNext, handlePrev, handlePageChange, pa
                 disabled={isSearching || page === totalPages}
                 onClick={page === totalPages ? undefined : handleNext}
             >
-                Next
+                {t('adc_next')}
             </Button>
         </div>
     )

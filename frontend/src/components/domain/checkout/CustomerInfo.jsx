@@ -1,10 +1,12 @@
 // components/domain/checkout/CustomerInfo.jsx
-// THAY THẾ hoàn toàn file cũ — bỏ defaultValue hardcode, nhận props từ CheckoutPage
 import React from "react";
 import { FaUser } from "react-icons/fa";
 import { InputField } from "../../common/InputField";
+import { useTranslation } from "react-i18next";
 
 const CustomerInfo = ({ form, setForm, formErrors, setFormErrors }) => {
+  const { t } = useTranslation();
+
   const handleChange = (field) => (e) => {
     setForm({ ...form, [field]: e.target.value });
     if (formErrors[field]) {
@@ -15,13 +17,13 @@ const CustomerInfo = ({ form, setForm, formErrors, setFormErrors }) => {
   return (
     <section className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
       <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-        <FaUser className="text-[#89A8B2] size-4" /> Customer Info
+        <FaUser className="text-[#89A8B2] size-4" /> {t("customer_info")}
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <InputField
-            label="Full Name"
+            label={t("full_name")}
             id="full-name"
             value={form.fullName}
             onChange={handleChange("fullName")}
@@ -34,7 +36,7 @@ const CustomerInfo = ({ form, setForm, formErrors, setFormErrors }) => {
 
         <div>
           <InputField
-            label="Email Address"
+            label={t("email_address")}
             id="email"
             type="email"
             value={form.email}

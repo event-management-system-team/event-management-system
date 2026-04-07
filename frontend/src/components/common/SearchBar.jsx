@@ -1,8 +1,9 @@
 import { Search } from "lucide-react";
 import useSearchEvents from '../../hooks/useSearchEvents'
+import { useTranslation } from "react-i18next";
 
 const SearchBar = () => {
-
+    const { t } = useTranslation();
     const { keyword, setKeyword, handleSearch, handleKeyDown } = useSearchEvents()
     return (
         <>
@@ -14,7 +15,7 @@ const SearchBar = () => {
 
 
                 <input className="bg-transparent border-none outline-none focus:ring-0 text-sm ml-2 w-64 placeholder:text-gray-400 "
-                    placeholder="Search..."
+                    placeholder={t("search")}
                     type="text"
                     value={keyword}
                     onChange={(e) => setKeyword(e.target.value)}

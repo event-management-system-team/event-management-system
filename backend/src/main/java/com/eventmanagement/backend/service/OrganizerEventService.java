@@ -90,8 +90,8 @@ public class OrganizerEventService {
         } else {
             totalCapacity = request.getTickets() != null
                     ? request.getTickets().stream()
-                            .mapToInt(t -> t.getQuantity() != null ? t.getQuantity() : 0)
-                            .sum()
+                    .mapToInt(t -> t.getQuantity() != null ? t.getQuantity() : 0)
+                    .sum()
                     : 0;
         }
 
@@ -327,8 +327,8 @@ public class OrganizerEventService {
         } else {
             totalCapacity = request.getTickets() != null
                     ? request.getTickets().stream()
-                            .mapToInt(t -> t.getQuantity() != null ? t.getQuantity() : 0)
-                            .sum()
+                    .mapToInt(t -> t.getQuantity() != null ? t.getQuantity() : 0)
+                    .sum()
                     : 0;
         }
 
@@ -465,10 +465,10 @@ public class OrganizerEventService {
     public OrganizerEventResponse getEventDetail(UUID eventId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found: " + eventId));
-        
+
         Event eventWithTickets = eventRepository.findWithTicketsByEventId(eventId)
                 .orElse(event);
-        
+
         return mapToOrganizerResponse(eventWithTickets);
     }
 
@@ -486,7 +486,7 @@ public class OrganizerEventService {
         long active = approved + ongoing;
         long completed = eventRepository.countByOrganizer_UserIdAndStatus(organizerId, EventStatus.COMPLETED);
         Double avgRating = feedbackRepository.findAverageRatingByOrganizer(organizerId);
-        
+
         return OrganizerEventStatsResponse.builder()
                 .totalEvents(total)
                 .activeCount(active)
@@ -551,7 +551,7 @@ public class OrganizerEventService {
      * Query từ bảng tickets (CONFIRMED, PAID, CHECKED_IN) thay vì event_registrations
      */
     public Page<AttendeeResponse> getEventAttendees(UUID eventId, int page, int size,
-                                                      String ticketType, String status) {
+                                                    String ticketType, String status) {
         eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found: " + eventId));
 

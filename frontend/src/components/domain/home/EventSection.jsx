@@ -5,9 +5,11 @@ import LoadingState from '../../common/LoadingState'
 import EmptyState from "../../common/EmptyState";
 import { Link } from "react-router-dom"
 import { useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 const EventSection = () => {
 
+  const { t } = useTranslation();
   const { data: featuredEvents, isLoading, isError } = useFeaturedEvents();
 
   const isEmpty = isError || !featuredEvents || featuredEvents.length === 0;
@@ -30,8 +32,8 @@ const EventSection = () => {
     <section className="py-16 px-6 bg-[#F1F0E8]/30 overflow-hidden pb-0">
       <div className="max-w-7xl mx-auto">
         <div className="mb-10">
-          <h2 className="text-3xl font-extrabold ">Featured Events</h2>
-          <p className="text-gray-500 mt-2">The most popular experiences picked just for you</p>
+          <h2 className="font-sans text-3xl font-extrabold ">{t("featured_events")}</h2>
+          <p className="text-gray-500 mt-2">{t("featured_events_desc")}</p>
         </div>
 
         {isLoading ? (
@@ -39,7 +41,7 @@ const EventSection = () => {
         )
           :
           isEmpty ? (
-            <EmptyState className="h-[400px]" message="No featured events found" />
+            <EmptyState className="h-[400px]" message={t("no_featured_events_found")} />
           )
             :
             (
@@ -75,7 +77,7 @@ const EventSection = () => {
           <Link to={'/events'}>
             <button className="group flex items-center gap-2 bg-white border-2 border-primary text-primary px-8 py-3 rounded-full font-bold hover:bg-primary hover:text-white transition-all shadow-sm"
             >
-              View More Events
+              {t("view_more_events")}
               <Compass size={18} className="group-hover:rotate-90 transition-transform" />
             </button>
           </Link>

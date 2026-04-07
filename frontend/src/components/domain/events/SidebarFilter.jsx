@@ -1,8 +1,11 @@
 import FilterCategory from "./FilterCategory";
 import FilterPrice from "./FilterPrice";
 import FilterDate from "./FilterDate";
+import { useTranslation } from "react-i18next";
 
 const SidebarFilter = ({ date, setDate, categories, setCategories, price, setPrice, isFree, setIsFree, handleApply, handleReset }) => {
+
+    const { t } = useTranslation();
 
     return (
         <aside className="w-full lg:w-[320px] shrink-0">
@@ -26,13 +29,13 @@ const SidebarFilter = ({ date, setDate, categories, setCategories, price, setPri
                     <button
                         onClick={handleReset}
                         className="flex-1 py-3 bg-red-400 text-white font-bold rounded-lg hover:brightness-90 transition-all cursor-pointer">
-                        Reset
+                        {t("reset")}
                     </button>
 
                     <button
                         onClick={handleApply}
                         className="flex-2 py-3 bg-primary text-white font-bold rounded-lg hover:brightness-90 transition-all cursor-pointer">
-                        Apply Filters
+                        {t("apply_filters")}
                     </button>
                 </div>
 

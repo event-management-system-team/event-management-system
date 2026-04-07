@@ -3,9 +3,11 @@ import { LogOut, User } from 'lucide-react'
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser } from '../../../store/slices/auth.slice';
+import { useTranslation } from 'react-i18next';
 
 const AdminDropdown = ({ setIsOpen }) => {
     const { user } = useSelector((state) => state.auth);
+    const { t } = useTranslation();
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -16,7 +18,7 @@ const AdminDropdown = ({ setIsOpen }) => {
     };
 
     const menuItems = [
-        { key: '2', label: 'Logout', icon: <LogOut size={16} />, danger: true, onClick: handleLogout },
+        { key: '2', label: t('admin_logout'), icon: <LogOut size={16} />, danger: true, onClick: handleLogout },
     ];
 
     return (
@@ -34,7 +36,7 @@ const AdminDropdown = ({ setIsOpen }) => {
                         <p className="text-sm font-bold text-white truncate">{user?.fullName || user?.full_name}</p>
                         <div className="flex items-center gap-1.5">
                             <div className="size-1.5 bg-[#4ECDC4] rounded-full animate-pulse"></div>
-                            <p className="text-[10px] text-white/60 uppercase tracking-wider font-bold">Online</p>
+                            <p className="text-[10px] text-white/60 uppercase tracking-wider font-bold">{t('admin_online')}</p>
                         </div>
                     </div>
                 </div>

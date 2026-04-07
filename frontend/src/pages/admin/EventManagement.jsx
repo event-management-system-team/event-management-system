@@ -9,8 +9,10 @@ import EmptyState from '../../components/common/EmptyState.jsx';
 import EventSummaryCard from '../../components/domain/admin/EventSummaryCard.jsx';
 import EventFilter from '../../components/domain/admin/EventFilter.jsx';
 import EventList from '../../components/domain/admin/EventList.jsx';
+import { useTranslation } from 'react-i18next';
 
 export function EventManagement() {
+    const { t } = useTranslation();
 
     const [searchParams] = useSearchParams()
     const statusParam = searchParams.get("status")

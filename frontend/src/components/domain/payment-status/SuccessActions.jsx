@@ -7,8 +7,8 @@ const SuccessActions = ({ onGoMyTickets, exportToImage, isExporting }) => (
       onClick={exportToImage}
       disabled={isExporting}
       className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 border-2 border-[#8aa9b2] text-[#8aa9b2] font-bold rounded-lg transition-colors ${isExporting
-          ? "opacity-50 cursor-wait bg-[#8aa9b2]/10"
-          : "hover:bg-[#8aa9b2]/5"
+        ? "opacity-50 cursor-wait bg-[#8aa9b2]/10"
+        : "hover:bg-[#8aa9b2]/5"
         }`}
     >
 

@@ -22,6 +22,7 @@ import {
     CartesianGrid,
     Tooltip,
 } from 'recharts';
+import { useTranslation } from 'react-i18next';
 import organizerService from '../../services/organizer.service';
 
 const ACCENT = '#2d3a4f';
@@ -52,6 +53,7 @@ const StatCard = ({ icon: Icon, label, value, loading, color, colorBg }) => (
             className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 bg-${colorBg}`}
         >
             <Icon size={22} className={`text-${color}`} />
+            <Icon size={22} className={`text-${color}`} />
         </div>
         <div>
             <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">
@@ -64,7 +66,7 @@ const StatCard = ({ icon: Icon, label, value, loading, color, colorBg }) => (
     </div>
 );
 
-const DonutCenter = ({ total }) => (
+const DonutCenter = ({ total, label }) => (
     <text
         x="50%"
         y="50%"
@@ -73,7 +75,7 @@ const DonutCenter = ({ total }) => (
         className="select-none"
     >
         <tspan x="50%" dy="-8" fontSize="10" fill="#9CA3AF">
-            Total Ticket
+            {label}
         </tspan>
         <tspan x="50%" dy="24" fontSize="22" fontWeight="700" fill="#111827">
             {total.toLocaleString()}
@@ -101,6 +103,7 @@ const CustomBarTooltip = ({ active, payload, label }) => {
 
 const OrganizerDashboardPage = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const [stats, setStats] = useState({
         totalEvents: 0,
@@ -157,11 +160,11 @@ const OrganizerDashboardPage = () => {
         const partialSold = Math.max(0, sold - soldOutTickets);
 
         return [
-            { name: 'Sold Out', value: soldOutTickets, pct: totalCapacity > 0 ? Math.round((soldOutTickets / totalCapacity) * 100) : 0 },
-            { name: 'Fully Booked', value: partialSold, pct: totalCapacity > 0 ? Math.round((partialSold / totalCapacity) * 100) : 0 },
-            { name: 'Available', value: available, pct: totalCapacity > 0 ? Math.round((available / totalCapacity) * 100) : 0 },
+            { name: t('org_sold_out'), value: soldOutTickets, pct: totalCapacity > 0 ? Math.round((soldOutTickets / totalCapacity) * 100) : 0 },
+            { name: t('org_fully_booked'), value: partialSold, pct: totalCapacity > 0 ? Math.round((partialSold / totalCapacity) * 100) : 0 },
+            { name: t('org_available'), value: available, pct: totalCapacity > 0 ? Math.round((available / totalCapacity) * 100) : 0 },
         ].filter((d) => d.value > 0);
-    }, [events, totalTicketsSold, totalCapacity]);
+    }, [events, totalTicketsSold, totalCapacity, t]);
 
     const monthlyData = useMemo(() => {
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -197,11 +200,11 @@ const OrganizerDashboardPage = () => {
         <div className="p-8 min-h-screen">
             {/* Header */}
             <div className="mb-8">
-                <h1 className="text-2xl md:text-3xl font-black text-[#1e2d3d] tracking-tight">
-                    Dashboard
+                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                    {t('org_dashboard')}
                 </h1>
-                <p className="text-gray-500 text-sm mt-1">
-                    Welcome back! Here's an overview of your events.
+                <p className="text-sm text-gray-500 mt-1">
+                    {t('org_dashboard_welcome')}
                 </p>
             </div>
 
@@ -209,7 +212,7 @@ const OrganizerDashboardPage = () => {
             <div className="grid grid-cols-3 gap-5 mb-8">
                 <StatCard
                     icon={CalendarDays}
-                    label="Total Events"
+                    label={t('org_total_events')}
                     value={stats.totalEvents}
                     loading={loading}
                     color="blue-500"
@@ -217,7 +220,7 @@ const OrganizerDashboardPage = () => {
                 />
                 <StatCard
                     icon={BookOpen}
-                    label="Total Bookings"
+                    label={t('org_total_bookings')}
                     value={totalBookings}
                     loading={loading}
                     color="green-500"
@@ -248,7 +251,7 @@ const OrganizerDashboardPage = () => {
 
                     {totalCapacity === 0 && !loading ? (
                         <div className="flex items-center justify-center flex-1 text-sm text-gray-400">
-                            No ticket data yet
+                            {t('org_no_ticket_data')}
                         </div>
                     ) : (
                         <>
@@ -271,7 +274,7 @@ const OrganizerDashboardPage = () => {
                                                     <Cell key={i} fill={DONUT_COLORS[i % DONUT_COLORS.length]} />
                                                 ))}
                                             </Pie>
-                                            <DonutCenter total={totalCapacity} />
+                                            <DonutCenter total={totalCapacity} label={t('org_total_ticket')} />
                                         </PieChart>
                                     </ResponsiveContainer>
                                 </div>
@@ -314,7 +317,7 @@ const OrganizerDashboardPage = () => {
                             <h2 className="text-lg font-bold text-gray-900">Sales Revenue</h2>
                         </div>
                         <div className="mb-4">
-                            <p className="text-xs text-gray-400">Total Revenue</p>
+                            <p className="text-xs text-gray-400">{t('org_total_revenue')}</p>
                             <p className="text-2xl font-bold text-gray-900">
                                 {formatVND(totalRevenue)}
                             </p>
@@ -349,7 +352,7 @@ const OrganizerDashboardPage = () => {
 
                         {categoryStats.length === 0 && !loading ? (
                             <div className="text-sm text-gray-400 text-center py-6">
-                                No category data yet
+                                {t('org_no_category_data')}
                             </div>
                         ) : (
                             <div className="space-y-4">
@@ -383,7 +386,7 @@ const OrganizerDashboardPage = () => {
                                                     {cat.count.toLocaleString()}
                                                 </span>
                                                 {' '}
-                                                <span className="text-xs text-gray-400">Events</span>
+                                                <span className="text-xs text-gray-400">{t('org_events_label')}</span>
                                             </span>
                                         </div>
                                     );
@@ -397,27 +400,27 @@ const OrganizerDashboardPage = () => {
             {/* All Events */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                 <div className="flex items-center justify-between mb-5">
-                    <h2 className="text-base font-bold text-gray-800">All Events</h2>
+                    <h2 className="text-base font-bold text-gray-800">{t('org_all_events')}</h2>
                     <button
                         onClick={() => navigate('/organizer/my-events')}
                         className="flex items-center gap-1 text-sm font-medium hover:underline transition"
                         style={{ color: ACCENT }}
                     >
-                        View All Event <ArrowRight size={16} />
+                        {t('org_view_all_event')} <ArrowRight size={16} />
                     </button>
                 </div>
 
                 {loading ? (
                     <div className="py-16 text-center">
                         <div className="inline-block w-8 h-8 border-3 border-gray-200 border-t-[#2d3a4f] rounded-full animate-spin" />
-                        <p className="text-sm text-gray-400 mt-3">Loading events...</p>
+                        <p className="text-sm text-gray-400 mt-3">{t('org_loading_events')}</p>
                     </div>
                 ) : events.length === 0 ? (
                     <div className="py-16 text-center">
                         <Calendar className="mx-auto h-12 w-12 text-gray-300 mb-3" />
-                        <p className="text-gray-500 font-medium">No events yet</p>
+                        <p className="text-gray-500 font-medium">{t('org_no_events_yet')}</p>
                         <p className="text-sm text-gray-400 mt-1">
-                            Create your first event to see it here.
+                            {t('org_create_first_event')}
                         </p>
                     </div>
                 ) : (
@@ -458,7 +461,7 @@ const OrganizerDashboardPage = () => {
                                         <div className="flex items-center gap-1 text-xs text-gray-400">
                                             <MapPin size={12} className="shrink-0" />
                                             <span className="truncate">
-                                                {event.location || 'No location'}
+                                                {event.location || t('org_no_location')}
                                             </span>
                                         </div>
                                         <div className="flex items-center gap-1 text-xs text-gray-400 mt-1">

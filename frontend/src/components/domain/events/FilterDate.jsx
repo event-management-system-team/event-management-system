@@ -2,8 +2,11 @@ import { CalendarDays } from 'lucide-react';
 import { DatePicker } from 'antd';
 import dayjs from 'dayjs';
 import useDateFilter from '../../../hooks/useDateFilter';
+import { useTranslation } from "react-i18next";
 
 const FilterDate = ({ date, setDate, className = 'Date' }) => {
+
+    const { t } = useTranslation();
 
     const { DATE_FORMAT, dateValue, handleDateChange, handleQuickSelect } = useDateFilter(date, setDate)
 
@@ -19,7 +22,7 @@ const FilterDate = ({ date, setDate, className = 'Date' }) => {
 
             <div className="flex items-center gap-2 mb-4">
                 <CalendarDays className="text-primary w-5 h-5" strokeWidth={2.5} />
-                <span className="font-bold text-sm">{className}</span>
+                <span className="font-bold text-sm">{t(className.toLowerCase())}</span>
             </div>
 
             <div className="px-1">
@@ -28,7 +31,7 @@ const FilterDate = ({ date, setDate, className = 'Date' }) => {
                     format={DATE_FORMAT}
                     value={dateValue}
                     onChange={handleDateChange}
-                    placeholder="Any date"
+                    placeholder={t("any_date")}
                 />
             </div>
 
@@ -37,19 +40,19 @@ const FilterDate = ({ date, setDate, className = 'Date' }) => {
                     onClick={() => handleQuickSelect('today')}
                     className={getButtonClass(dayjs().format(DATE_FORMAT))}
                 >
-                    Today
+                    {t("today")}
                 </button>
                 <button
                     onClick={() => handleQuickSelect('tomorrow')}
                     className={getButtonClass(dayjs().add(1, 'day').format(DATE_FORMAT))}
                 >
-                    Tomorrow
+                    {t("tomorrow")}
                 </button>
                 <button
                     onClick={() => handleQuickSelect('this_weekend')}
                     className={getButtonClass(dayjs().day(6).format(DATE_FORMAT))}
                 >
-                    This weekend
+                    {t("this_weekend")}
                 </button>
             </div>
         </div>
